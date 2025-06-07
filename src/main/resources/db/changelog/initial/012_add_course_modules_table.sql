@@ -1,4 +1,4 @@
--- changeset Maksat: 008 create course_modules table
+-- changeset Maksat: 012 create course_modules table
 
 CREATE TABLE course_modules
 (

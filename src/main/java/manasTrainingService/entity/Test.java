@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -16,6 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "tests")
 public class Test {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -35,21 +37,23 @@ public class Test {
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
-    @Column(name = "time_limit_minutes")
-    @Builder.Default
-    Integer timeLimitMinutes = 60;
-
-    @Column(name = "max_attempts")
-    @Builder.Default
-    Integer maxAttempts = 3;
-
     @Column(name = "passing_score", precision = 5, scale = 2)
     @Builder.Default
     BigDecimal passingScore = new BigDecimal("70.00");
+
+    @Column(name = "scheduled_start")
+    LocalDateTime scheduledStart;
+
+    @Column(name = "scheduled_end")
+    LocalDateTime scheduledEnd;
+
+    @Column(name = "is_active")
+    @Builder.Default
+    Boolean isActive = true;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<TestQuestion> questions;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<TestAttempt> attempts;
+    List<TestResult> attempts;
 }

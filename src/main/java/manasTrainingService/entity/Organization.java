@@ -11,20 +11,19 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "student_profiles")
-public class StudentProfile {
+@Table(name = "organizations")
+public class Organization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organization_id")
-    Organization organization;
+    @Column(nullable = false, unique = true, length = 20)
+    String code;
 
-    @Column(length = 100)
-    String specialization;
+    @Column(columnDefinition = "TEXT")
+    String description;
 }

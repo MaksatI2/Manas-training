@@ -1,6 +1,5 @@
 package manasTrainingService.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +15,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "test_answers")
 public class TestAnswer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -23,17 +23,15 @@ public class TestAnswer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attempt_id", nullable = false)
-    TestAttempt attempt;
+    TestResult attempt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     TestQuestion question;
 
-    @Column(name = "selected_options", columnDefinition = "JSONB")
-    String selectedOptions;
-
-    @Column(name = "text_answer", columnDefinition = "TEXT")
-    String textAnswer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "selected_option_id")
+    QuestionOption selectedOption;
 
     @Column(name = "is_correct")
     Boolean isCorrect;

@@ -1,10 +1,10 @@
 package manasTrainingService.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,16 +14,17 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "lesson_progress")
-public class LessonProgress {
+@Table(name = "test_results")
+public class TestResult {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id", nullable = false)
-    Lesson lesson;
+    @JoinColumn(name = "test_id", nullable = false)
+    Test test;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
@@ -33,14 +34,19 @@ public class LessonProgress {
     @Builder.Default
     LocalDateTime startedAt = LocalDateTime.now();
 
-    @Column(name = "completed_at")
-    LocalDateTime completedAt;
+    @Column(name = "submitted_at")
+    LocalDateTime submittedAt;
+
+    @Column(name = "score", precision = 5, scale = 2)
+    BigDecimal score;
+
+    @Column(name = "percentage", precision = 5, scale = 2)
+    BigDecimal percentage;
+
+    @Column(name = "is_passed", nullable = false)
+    @Builder.Default
+    Boolean isPassed = false;
 
     @Column(name = "time_spent_minutes")
-    @Builder.Default
-    Integer timeSpentMinutes = 0;
-
-    @Column(name = "is_completed", nullable = false)
-    @Builder.Default
-    Boolean isCompleted = false;
+    Integer timeSpentMinutes;
 }

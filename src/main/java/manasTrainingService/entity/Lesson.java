@@ -27,8 +27,8 @@ public class Lesson {
     @Column(name = "title", length = 200)
     String title;
 
-    @Column(name = "content", columnDefinition = "TEXT")
-    String content;
+    @Column(name = "description", columnDefinition = "TEXT")
+    String description;
 
     @Column(name = "duration_minutes")
     @Builder.Default
@@ -36,9 +36,6 @@ public class Lesson {
 
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<LessonMaterial> materials;
-
-    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<LessonProgress> progressList;
 
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Test> tests;

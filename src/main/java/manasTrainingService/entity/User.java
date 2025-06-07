@@ -46,18 +46,14 @@ public class User {
     @Builder.Default
     Boolean isActive = true;
 
-    @Column(name = "email_verified", nullable = false)
-    @Builder.Default
-    Boolean emailVerified = false;
+    @Column(name = "email_verification_token")
+    String emailVerified;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     StudentProfile studentProfile;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     TeacherProfile teacherProfile;
-
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Course> taughtCourses;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<CourseEnrollment> enrollments;

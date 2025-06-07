@@ -1,4 +1,4 @@
--- changeset Maksat: 013 create test_questions table
+-- changeset Maksat: 017 create test_questions table
 
 CREATE TABLE test_questions
 (
