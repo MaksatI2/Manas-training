@@ -25,6 +25,10 @@ public class Course {
     @JoinColumn(name = "category_id")
     CourseCategory category;
 
+    @Column(name = "is_individual", nullable = false)
+    @Builder.Default
+    Boolean isIndividual = false;
+
     @Column(name = "code", nullable = false, unique = true, length = 20)
     String code;
 
@@ -33,10 +37,6 @@ public class Course {
 
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id", nullable = false)
-    User teacher;
 
     @Column(name = "duration_hours", nullable = false)
     Integer durationHours;

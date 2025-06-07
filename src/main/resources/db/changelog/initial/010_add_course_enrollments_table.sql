@@ -1,4 +1,4 @@
--- changeset Maksat: 007 create course_enrollments table
+-- changeset Maksat: 010 create course_enrollments table
 
 CREATE TYPE enrollment_status AS ENUM ('enrolled', 'in_progress', 'completed', 'dropped');
 

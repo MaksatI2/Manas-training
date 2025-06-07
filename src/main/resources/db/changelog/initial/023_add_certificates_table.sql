@@ -1,4 +1,4 @@
--- changeset Maksat: 019 create certificates table
+-- changeset Maksat: 023 create certificates table
 
 CREATE TABLE certificates
 (

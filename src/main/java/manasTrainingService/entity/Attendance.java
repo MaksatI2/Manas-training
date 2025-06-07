@@ -35,9 +35,6 @@ public class Attendance {
     @Column(name = "check_in_time")
     LocalDateTime checkInTime;
 
-    @Column(name = "notes", columnDefinition = "TEXT")
-    String notes;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marked_by", nullable = false)
     User markedBy;

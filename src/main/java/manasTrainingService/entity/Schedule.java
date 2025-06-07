@@ -16,6 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "schedules")
 public class Schedule {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -31,6 +32,10 @@ public class Schedule {
 
     @Column(name = "title", length = 200)
     String title;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "lesson_type", nullable = false)
+    LessonType lessonType;
 
     @Column(name = "start_datetime", nullable = false)
     LocalDateTime startDatetime;
@@ -54,4 +59,21 @@ public class Schedule {
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Attendance> attendances;
+
+    public enum LessonType {
+        LECTURE("lecture"),
+        PRACTICAL("practical"),
+        EXAM("exam"),
+        CONSULTATION("consultation");
+
+        private final String value;
+
+        LessonType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 }

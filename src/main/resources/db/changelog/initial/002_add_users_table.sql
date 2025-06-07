@@ -11,6 +11,6 @@ CREATE TABLE users
     avatar_url     VARCHAR(500),
     role_id           INT,
     is_active      BOOLEAN   DEFAULT TRUE,
-    email_verified BOOLEAN   DEFAULT FALSE,
+    email_verification_token VARCHAR,
     FOREIGN KEY (role_id) REFERENCES roles (id)
 );

@@ -1,4 +1,4 @@
--- changeset Maksat: 005 create course_categories table
+-- changeset Maksat: 006 create course_categories table
 
 CREATE TABLE course_categories
 (
