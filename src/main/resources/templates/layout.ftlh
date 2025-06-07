@@ -212,8 +212,27 @@
                         <option value="en">English</option>
                     </select>
 
-                    <a href="#" class="btn btn-outline-light me-2">Войти</a>
-                    <a href="#" class="btn btn-light">Регистрация</a>
+                    <#assign known = SPRING_SECURITY_CONTEXT?? >
+                    <#if known>
+                        <#assign
+                        user = SPRING_SECURITY_CONTEXT.authentication.principal
+                        name = user.getUsername()
+                        >
+                        <a href="/profile" class="text-light m-2 m-sm-0">
+                            Здравствуйте, ${name}
+                        </a>
+                        <#if _csrf??>
+                            <form action="/auth/logout" method="post">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                <button type="submit" class="btn btn-outline-light m-2" id="logout">
+                                    Выйти
+                                </button>
+                            </form>
+                        </#if>
+                    <#else>
+                        <a href="/auth/login" class="btn btn-outline-light me-2">Войти</a>
+                        <a href="/auth/register" class="btn btn-light">Регистрация</a>
+                    </#if>
                 </div>
             </div>
         </div>
