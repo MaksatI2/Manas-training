@@ -183,7 +183,7 @@
     <body>
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 <i class="fas fa-graduation-cap me-2"></i>
                 Манас Тренинг Центр
             </a>
@@ -195,7 +195,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-home me-1"></i>Главная</a>
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Главная</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-book me-1"></i>Курсы</a>
@@ -212,8 +212,8 @@
                         <option value="en">English</option>
                     </select>
 
-                    <a href="#" class="btn btn-outline-light me-2">Войти</a>
-                    <a href="#" class="btn btn-light">Регистрация</a>
+                    <a href="auth/login" class="btn btn-outline-light me-2">Войти</a>
+                    <a href="auth/register" class="btn btn-light">Регистрация</a>
                 </div>
             </div>
         </div>
