@@ -10,4 +10,6 @@ import java.util.List;
 public interface AttendanceRepository extends JpaRepository<Attendance, Integer> {
     List<Attendance> findAllByStudentId(Integer studentId);
     List<Attendance> findAllByScheduleId(Integer scheduleId);
+    List<Attendance> findAllByStatus(Attendance.AttendanceStatus status);
+
 }

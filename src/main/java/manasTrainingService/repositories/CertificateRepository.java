@@ -10,4 +10,8 @@ import java.util.List;
 public interface CertificateRepository extends JpaRepository<Certificate, Integer> {
     List<Certificate> findAllByStudentId(Integer studentId);
     List<Certificate> findAllByCourseId(Integer courseId);
+    Certificate findByCertificateNumber(String certificateNumber);
+    boolean existsByCertificateNumber(String certificateNumber);
+    List<Certificate> findAllByStudentIdAndIsActiveTrue(Integer studentId);
+
 }
