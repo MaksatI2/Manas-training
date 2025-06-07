@@ -33,7 +33,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/courses/**", "/", "/auth/**", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/courses/**", "/", "/auth/**", "/auth/**", "/static/**",
+                                "/favicon.ico").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
