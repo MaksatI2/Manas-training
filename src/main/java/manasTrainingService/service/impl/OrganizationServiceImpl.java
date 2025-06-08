@@ -22,6 +22,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         organizationRepository.save(organization);
     }
 
+    @Override
+    public Organization getOrganizationByCode(String code){
+        return organizationRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException());
+    }
+
     private String generateOrganizationCode() {
         int maxAttempts = 10000;
         for (int i = 1; i <= maxAttempts; i++) {
