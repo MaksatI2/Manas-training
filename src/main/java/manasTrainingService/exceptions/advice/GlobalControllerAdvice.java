@@ -197,6 +197,15 @@ public class GlobalControllerAdvice {
         return "errors/error";
     }
 
+    @ExceptionHandler(OrganizationCodeNotFound.class)
+    public String organizationCodeNotFound(
+            HttpServletRequest request,
+            Model model) {
+        log.error("Организация с таким кодом не найдена: {}", request.getRequestURI());
+        prepareErrorModel(model, HttpStatus.NOT_FOUND, request);
+        return "errors/error";
+    }
+
     private void prepareErrorModel(Model model, HttpStatus status, HttpServletRequest request) {
         model.addAttribute("status", status.value());
         model.addAttribute("reason", status.getReasonPhrase());
