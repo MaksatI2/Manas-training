@@ -36,7 +36,6 @@ VALUES
 -- Организации
 INSERT INTO organizations (user_id, code, description)
 VALUES
-<<<<<<< src/main/resources/db/changelog/initial/025_insert_test_data.sql
     ((SELECT id FROM users WHERE email = 'org1@manas.kg'), 'ORG001', 'Организация 1'),
     ((SELECT id FROM users WHERE email = 'org2@manas.kg'), 'ORG002', 'Организация 2'),
     ((SELECT id FROM users WHERE email = 'org3@manas.kg'), 'ORG003', 'Организация 3'),
