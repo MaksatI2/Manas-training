@@ -4,6 +4,7 @@
 INSERT INTO roles (name)
 VALUES ('ADMIN'),
        ('TEACHER'),
+       ('ORGANIZATION'),
        ('STUDENT');
 
 -- Пользователи
@@ -20,21 +21,32 @@ VALUES
     ('student4@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student4', 'Михайлов',      '+996700000007', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
     ('student5@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student5', 'Егоров',      '+996700000008', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
     ('student6@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student6', 'Федоров',      '+996700000009', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
-    ('student7@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student7', 'Григорьев',      '+996700000010', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true);
+    ('student7@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student7', 'Григорьев',      '+996700000010', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
+    ('org1@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization1', 'Manager', '+996700000011', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org2@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization2', 'Manager', '+996700000012', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org3@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization3', 'Manager', '+996700000013', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org4@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization4', 'Manager', '+996700000014', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org5@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization5', 'Manager', '+996700000015', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org6@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization6', 'Manager', '+996700000016', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org7@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization7', 'Manager', '+996700000017', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org8@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization8', 'Manager', '+996700000018', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org9@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization9', 'Manager', '+996700000019', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org10@manas.kg',   '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization10', 'Manager', '+996700000020', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true);
 
 -- Организации
 INSERT INTO organizations (user_id, code, description)
 VALUES
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG001', 'Организация 1'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG002', 'Организация 2'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG003', 'Организация 3'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG004', 'Организация 4'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG005', 'Организация 5'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG006', 'Организация 6'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG007', 'Организация 7'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG008', 'Организация 8'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG009', 'Организация 9'),
-    ((SELECT id FROM users WHERE email = 'admin@manas.kg'), 'ORG010', 'Организация 10');
+<<<<<<< src/main/resources/db/changelog/initial/025_insert_test_data.sql
+    ((SELECT id FROM users WHERE email = 'org1@manas.kg'), 'ORG001', 'Организация 1'),
+    ((SELECT id FROM users WHERE email = 'org2@manas.kg'), 'ORG002', 'Организация 2'),
+    ((SELECT id FROM users WHERE email = 'org3@manas.kg'), 'ORG003', 'Организация 3'),
+    ((SELECT id FROM users WHERE email = 'org4@manas.kg'), 'ORG004', 'Организация 4'),
+    ((SELECT id FROM users WHERE email = 'org5@manas.kg'), 'ORG005', 'Организация 5'),
+    ((SELECT id FROM users WHERE email = 'org6@manas.kg'), 'ORG006', 'Организация 6'),
+    ((SELECT id FROM users WHERE email = 'org7@manas.kg'), 'ORG007', 'Организация 7'),
+    ((SELECT id FROM users WHERE email = 'org8@manas.kg'), 'ORG008', 'Организация 8'),
+    ((SELECT id FROM users WHERE email = 'org9@manas.kg'), 'ORG009', 'Организация 9'),
+    ((SELECT id FROM users WHERE email = 'org10@manas.kg'), 'ORG010', 'Организация 10');
 
 -- Студенты
 INSERT INTO student_profiles (user_id, organization_id, specialization)
