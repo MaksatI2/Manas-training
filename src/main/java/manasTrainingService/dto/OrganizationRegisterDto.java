@@ -25,7 +25,7 @@ public class OrganizationRegisterDto {
     private String companyName;
 
     @NotBlank(message = "Номер телефона не может быть пустым")
-    @Pattern(regexp = "^996\\d{9}$", message = "Номер телефона должен быть в формате 996XXXXXXXXX (12 цифр)")
+    @Pattern(regexp = "^\\+996\\d{9}$", message = "Номер телефона должен быть в формате +996XXXXXXXXX (12 цифр)")
     private String phone;
     private Integer roleId;
 

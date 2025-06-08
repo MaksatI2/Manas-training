@@ -59,11 +59,11 @@
                         <label for="password" class="form-label">
                             <i class="fas fa-lock me-1"></i>Пароль *
                         </label>
-                        <@spring.formInput "studentRegisterDto.password" ' type="password" class="form-control" id="password"'/>
+                        <@spring.formPasswordInput "studentRegisterDto.password" ' type="password" class="form-control" id="password"'/>
                         <div class="error-block">
                             <@spring.showErrors "<br>" "error-message" />
                         </div>
-                        <div class="form-text">Минимум 6 символов</div>
+                        <div class="form-text">Минимум 8 символов, хотя бы одна заглавная буква и цифра</div>
                     </div>
 
                     <div class="mb-3">
