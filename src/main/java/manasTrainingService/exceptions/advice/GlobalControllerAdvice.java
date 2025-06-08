@@ -179,6 +179,24 @@ public class GlobalControllerAdvice {
         return "errors/error";
     }
 
+    @ExceptionHandler(StudentEmailAlreadyExistsException.class)
+    public String studentEmailAlreadyExistsException(UserAlreadyExistsException e,
+                                                         HttpServletRequest request, Model model) {
+        log.error("Студент с такой почтой уже существует: {}", e.getMessage());
+        prepareErrorModel(model, HttpStatus.BAD_REQUEST, request);
+        model.addAttribute("message", e.getMessage());
+        return "errors/error";
+    }
+
+    @ExceptionHandler(StudentPhoneAlreadyExistsException.class)
+    public String studentPhoneAlreadyExistsException(UserAlreadyExistsException e,
+                                                     HttpServletRequest request, Model model) {
+        log.error("Студент с таким номером уже существует: {}", e.getMessage());
+        prepareErrorModel(model, HttpStatus.BAD_REQUEST, request);
+        model.addAttribute("message", e.getMessage());
+        return "errors/error";
+    }
+
     private void prepareErrorModel(Model model, HttpStatus status, HttpServletRequest request) {
         model.addAttribute("status", status.value());
         model.addAttribute("reason", status.getReasonPhrase());
