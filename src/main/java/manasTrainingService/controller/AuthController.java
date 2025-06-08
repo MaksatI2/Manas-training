@@ -3,9 +3,8 @@ package manasTrainingService.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.OrganizationRegisterDto;
-import manasTrainingService.exceptions.OrganizationEmailAlreadyExistsException;
-import manasTrainingService.exceptions.OrganizationNameAlreadyExistsException;
-import manasTrainingService.exceptions.OrganizationPhoneAlreadyExistsException;
+import manasTrainingService.dto.StudentRegisterDto;
+import manasTrainingService.exceptions.*;
 import manasTrainingService.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +27,7 @@ public class AuthController {
     @GetMapping("/register/student")
     public String showStudentRegistration(Model model) {
         model.addAttribute("userType", "student");
+        model.addAttribute("studentRegisterDto", new StudentRegisterDto());
         return "auth/register-student";
     }
 
@@ -54,17 +54,30 @@ public class AuthController {
 
     @PostMapping("/register/student")
     public String registerStudent(
-            RedirectAttributes redirectAttributes) {
+            @Valid @ModelAttribute("studentRegisterDto") StudentRegisterDto studentRegisterDto,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("userType", "student");
+            return "auth/register-student";
+        }
 
         try {
+            userService.registerStudent(studentRegisterDto);
             redirectAttributes.addAttribute("message",
                     "Регистрация прошла успешно! Войдите в свой аккаунт.");
             return "redirect:/auth/login";
-        } catch (Exception e) {
-            redirectAttributes.addAttribute("error",
-                    "Ошибка при регистрации: " + e.getMessage());
-            return "redirect:/auth/register/student";
+        } catch (StudentEmailAlreadyExistsException e) {
+           bindingResult.rejectValue("email","email.exists", e.getMessage());
+        } catch (StudentPhoneAlreadyExistsException e) {
+           bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
+        } catch (OrganizationCodeNotFound e) {
+            bindingResult.rejectValue("organizationCode", "organizationCode.notfound", e.getMessage());
         }
+        model.addAttribute("userType", "student");
+        return "auth/register-student";
     }
 
     @PostMapping("/register/company")
