@@ -1,6 +1,7 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.config.CustomUserDetails;
 import manasTrainingService.entity.User;
 import manasTrainingService.repositories.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,16 +25,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         String role = user.getRole().getName();
 
-        return new org.springframework.security.core.userdetails.User(
+        return new CustomUserDetails(
                 user.getEmail(),
                 user.getPasswordHash(),
                 user.getIsActive(),
                 true,
                 true,
                 true,
-                Collections.singletonList(
-                        new SimpleGrantedAuthority(role)
-                )
+                Collections.singletonList(new SimpleGrantedAuthority(role)),
+                user.getName()
         );
     }
 }

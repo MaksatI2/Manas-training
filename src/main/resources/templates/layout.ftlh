@@ -183,7 +183,7 @@
     <body>
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 <i class="fas fa-graduation-cap me-2"></i>
                 Манас Тренинг Центр
             </a>
@@ -195,7 +195,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-home me-1"></i>Главная</a>
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Главная</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-book me-1"></i>Курсы</a>
@@ -214,21 +214,22 @@
 
                     <#assign known = SPRING_SECURITY_CONTEXT?? >
                     <#if known>
-                        <#assign
-                        user = SPRING_SECURITY_CONTEXT.authentication.principal
-                        name = user.getUsername()
-                        >
-                        <a href="/profile" class="text-light m-2 m-sm-0">
-                            Здравствуйте, ${name}
-                        </a>
-                        <#if _csrf??>
-                            <form action="/auth/logout" method="post">
-                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                <button type="submit" class="btn btn-outline-light m-2" id="logout">
-                                    Выйти
-                                </button>
-                            </form>
-                        </#if>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-light dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" href="/profile">Профиль</a></li>
+                                <li>
+                                    <#if _csrf??>
+                                        <form action="/auth/logout" method="post">
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                            <button type="submit" class="dropdown-item" id="logout">Выйти</button>
+                                        </form>
+                                    </#if>
+                                </li>
+                            </ul>
+                        </div>
                     <#else>
                         <a href="/auth/login" class="btn btn-outline-light me-2">Войти</a>
                         <a href="/auth/register" class="btn btn-light">Регистрация</a>
