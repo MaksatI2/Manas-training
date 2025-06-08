@@ -1,6 +1,18 @@
 <#import "layout.ftlh" as layout>
 
 <@layout.page>
+
+    <#assign known = SPRING_SECURITY_CONTEXT?? >
+    <#if known>
+        <#assign
+        user = SPRING_SECURITY_CONTEXT.authentication.principal
+        name = user.firstName
+        >
+        <div class="alert alert-info mb-4">
+            <h4><i class="me-2"></i> Здравствуйте, ${name}!</h4>
+            <p class="mb-0">Добро пожаловать в Манас Тренинг Центр.</p>
+        </div>
+    </#if>
     <div class="hero-section">
         <h1 class="hero-title">Добро пожаловать в Манас Тренинг Центр</h1>
         <p class="hero-subtitle">

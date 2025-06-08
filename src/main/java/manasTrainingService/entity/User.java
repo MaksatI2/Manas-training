@@ -27,7 +27,7 @@ public class User {
     String passwordHash;
 
     @Column(name = "first_name", nullable = false, length = 100)
-    String firstName;
+    String name;
 
     @Column(name = "last_name", nullable = false, length = 100)
     String lastName;
