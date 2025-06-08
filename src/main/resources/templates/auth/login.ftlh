@@ -32,6 +32,7 @@
                     <#if _csrf??>
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                     </#if>
+
                     <div class="mb-3">
                         <label for="email" class="form-label">
                             <i class="fas fa-envelope me-1"></i>Email
