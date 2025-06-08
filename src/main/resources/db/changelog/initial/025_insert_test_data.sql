@@ -4,7 +4,8 @@
 INSERT INTO roles (name)
 VALUES ('ADMIN'),
        ('TEACHER'),
-       ('STUDENT');
+       ('STUDENT'),
+       ('ORGANIZATION');
 
 -- Пользователи
 -- Пароль для админа: qwerty12345
