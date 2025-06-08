@@ -212,28 +212,8 @@
                         <option value="en">English</option>
                     </select>
 
-                    <#assign known = SPRING_SECURITY_CONTEXT?? >
-                    <#if known>
-                        <div class="dropdown">
-                            <button class="btn btn-link text-light dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                                <li><a class="dropdown-item" href="/profile">Профиль</a></li>
-                                <li>
-                                    <#if _csrf??>
-                                        <form action="/auth/logout" method="post">
-                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                            <button type="submit" class="dropdown-item" id="logout">Выйти</button>
-                                        </form>
-                                    </#if>
-                                </li>
-                            </ul>
-                        </div>
-                    <#else>
-                        <a href="/auth/login" class="btn btn-outline-light me-2">Войти</a>
-                        <a href="/auth/register" class="btn btn-light">Регистрация</a>
-                    </#if>
+                    <a href="auth/login" class="btn btn-outline-light me-2">Войти</a>
+                    <a href="auth/register" class="btn btn-light">Регистрация</a>
                 </div>
             </div>
         </div>
