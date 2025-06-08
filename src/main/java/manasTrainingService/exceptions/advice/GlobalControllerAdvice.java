@@ -170,6 +170,15 @@ public class GlobalControllerAdvice {
         return "errors/error";
     }
 
+    @ExceptionHandler(OrganizationNameAlreadyExistsException.class)
+    public String organizationNameAlreadyExistsException(UserAlreadyExistsException e,
+                                                          HttpServletRequest request, Model model) {
+        log.error("Организация с таким названием уже существует: {}", e.getMessage());
+        prepareErrorModel(model, HttpStatus.BAD_REQUEST, request);
+        model.addAttribute("message", e.getMessage());
+        return "errors/error";
+    }
+
     private void prepareErrorModel(Model model, HttpStatus status, HttpServletRequest request) {
         model.addAttribute("status", status.value());
         model.addAttribute("reason", status.getReasonPhrase());
