@@ -23,7 +23,7 @@
 
             .navbar-custom {
                 background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-                box-shadow: 0 2px 10px rgba(0,102,204,0.3);
+                box-shadow: 0 2px 10px rgba(0, 102, 204, 0.3);
                 padding: 0.8rem 0;
             }
 
@@ -66,7 +66,7 @@
             }
 
             .hero-section {
-                background: linear-gradient(135deg, rgba(0,102,204,0.1), rgba(135,206,235,0.1));
+                background: linear-gradient(135deg, rgba(0, 102, 204, 0.1), rgba(135, 206, 235, 0.1));
                 border-radius: 15px;
                 padding: 3rem;
                 margin-bottom: 2rem;
@@ -91,7 +91,7 @@
                 border-radius: 10px;
                 padding: 2rem;
                 margin-bottom: 2rem;
-                box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+                box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
                 transition: transform 0.3s ease;
                 border-left: 4px solid var(--primary-blue);
             }
@@ -117,7 +117,7 @@
 
             .btn-primary-custom:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+                box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
             }
 
             .footer-custom {
@@ -145,22 +145,22 @@
             }
 
             .footer-bottom {
-                border-top: 1px solid rgba(135,206,235,0.3);
+                border-top: 1px solid rgba(135, 206, 235, 0.3);
                 margin-top: 2rem;
                 padding-top: 1rem;
                 text-align: center;
             }
 
             .language-selector {
-                background: rgba(255,255,255,0.1);
-                border: 1px solid rgba(255,255,255,0.3);
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.3);
                 color: var(--white);
                 border-radius: 20px;
                 padding: 0.3rem 1rem;
             }
 
             .language-selector:focus {
-                background: rgba(255,255,255,0.2);
+                background: rgba(255, 255, 255, 0.2);
                 color: var(--white);
                 border-color: var(--light-blue);
             }
@@ -181,6 +181,16 @@
         </style>
     </head>
     <body>
+    <#assign known = Session.SPRING_SECURITY_CONTEXT??>
+    <#if known>
+        <#assign user = Session.SPRING_SECURITY_CONTEXT.authentication.principal>
+        <#assign name = user.getUsername()>
+        <#assign roles = user.getAuthorities()?join(",")>
+        <#assign isAdmin = roles?contains("ADMIN")>
+        <#assign isTeacher = roles?contains("TEACHER")>
+        <#assign isStudent = roles?contains("STUDENT")>
+        <#assign isOrganization = roles?contains("ORGANIZATION")>
+    </#if>
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="/">
@@ -194,15 +204,53 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Главная</a>
-                    </li>
+                    <#if !isAdmin>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Главная</a>
+                        </li>
+                    </#if>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-book me-1"></i>Курсы</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
                     </li>
+
+                    <#if known>
+                        <#if isAdmin>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i
+                                            class="fas fa-users me-1"></i>Пользователи</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i
+                                            class="fas fa-chart-bar me-1"></i>Отчеты</a>
+                            </li>
+                        </#if>
+
+                        <#if isTeacher>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i class="fas fa-question-circle me-1"></i>Тесты</a>
+                            </li>
+                        </#if>
+
+                        <#if isOrganization>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i class="fas fa-user-tie me-1"></i>Сотрудники</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i
+                                            class="fas fa-graduation-cap me-1"></i>Курсы</a>
+                            </li>
+                        </#if>
+
+                        <#if isStudent>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i class="fas fa-book-open me-1"></i>Мои
+                                    курсы</a>
+                            </li>
+                        </#if>
+                    </#if>
                 </ul>
 
                 <div class="d-flex align-items-center">
@@ -214,7 +262,8 @@
 
                     <#if Session.SPRING_SECURITY_CONTEXT??>
                         <a href="/profile" class="btn btn-outline-light me-2 d-flex align-items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                 class="me-1" viewBox="0 0 16 16">
                                 <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
                             </svg>
                             Профиль
@@ -246,7 +295,8 @@
                         <i class="fas fa-graduation-cap me-2"></i>
                         Манас Тренинг Центр
                     </h5>
-                    <p>Профессиональное учебное заведение для подготовки высококвалифицированных специалистов в сфере гражданской авиации.</p>
+                    <p>Профессиональное учебное заведение для подготовки высококвалифицированных специалистов в сфере
+                        гражданской авиации.</p>
                     <div class="mt-3">
                         <a href="#" class="footer-link me-3"><i class="fab fa-instagram"></i></a>
                         <a href="#" class="footer-link"><i class="fab fa-youtube"></i></a>
