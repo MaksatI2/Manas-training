@@ -3,6 +3,7 @@ package manasTrainingService.service.impl;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CreateOrganizationDto;
 import manasTrainingService.entity.Organization;
+import manasTrainingService.exceptions.OrganizationCodeNotFound;
 import manasTrainingService.repositories.OrganizationRepository;
 import manasTrainingService.service.OrganizationService;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Organization getOrganizationByCode(String code){
         return organizationRepository.findByCode(code)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new OrganizationCodeNotFound("Организация с таким кодом не найдена"));
     }
 
     private String generateOrganizationCode() {
