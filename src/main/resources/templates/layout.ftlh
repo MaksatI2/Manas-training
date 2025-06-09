@@ -204,7 +204,7 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <#if !isAdmin>
+                    <#if !known || !isAdmin>
                         <li class="nav-item">
                             <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Главная</a>
                         </li>
