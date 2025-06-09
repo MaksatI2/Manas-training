@@ -46,9 +46,6 @@ public class User {
     @Builder.Default
     Boolean isActive = true;
 
-    @Column(name = "email_verification_token")
-    String emailVerified;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     StudentProfile studentProfile;
 

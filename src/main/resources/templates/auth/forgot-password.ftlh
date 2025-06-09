@@ -7,22 +7,21 @@
         <p class="hero-subtitle">Введите свой email для получения ссылки на сброс пароля</p>
     </div>
 
-    <#if message??>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </#if>
-    <#if error??>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            ${error}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </#if>
-
     <div class="row justify-content-center">
         <div class="col-lg-5 col-md-7">
+            <#if message??>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </#if>
+            <#if error??>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </#if>
             <div class="feature-card">
                 <form method="post" action="/auth/forgot-password" id="forgotForm">
                     <#if _csrf??>

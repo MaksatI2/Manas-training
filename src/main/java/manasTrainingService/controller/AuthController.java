@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.OrganizationRegisterDto;
+import manasTrainingService.dto.PasswordResetDto;
 import manasTrainingService.dto.StudentRegisterDto;
 import manasTrainingService.exceptions.*;
 import manasTrainingService.service.UserService;
@@ -63,7 +64,6 @@ public class AuthController {
 
         return "auth/login";
     }
-
 
     @PostMapping("/register/student")
     public String registerStudent(
@@ -154,31 +154,39 @@ public class AuthController {
             redirectAttributes.addFlashAttribute("error", "Ссылка для сброса пароля недействительна или устарела.");
             return "redirect:/auth/forgot-password";
         }
-        model.addAttribute("token", token);
+
+        PasswordResetDto passwordResetDto = new PasswordResetDto();
+        passwordResetDto.setToken(token);
+
+        model.addAttribute("passwordResetDto", passwordResetDto);
         return "auth/reset-password";
     }
 
     @PostMapping("/reset-password")
     public String handlePasswordReset(
-            @RequestParam("token") String token,
-            @RequestParam("password") String password,
-            @RequestParam("confirmPassword") String confirmPassword,
+            @Valid @ModelAttribute("passwordResetDto") PasswordResetDto passwordResetDto,
+            BindingResult bindingResult,
+            Model model,
             RedirectAttributes redirectAttributes
     ) {
-        if (!password.equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("error", "Пароли не совпадают.");
-            redirectAttributes.addFlashAttribute("token", token);
-            return "redirect:/auth/reset-password?token=" + token;
+        if (!userService.isValidResetToken(passwordResetDto.getToken())) {
+            redirectAttributes.addFlashAttribute("error", "Ссылка для сброса пароля недействительна или устарела.");
+            return "redirect:/auth/forgot-password";
         }
 
-        boolean success = userService.resetPassword(token, password);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("passwordResetDto", passwordResetDto);
+            return "auth/reset-password";
+        }
+
+        boolean success = userService.resetPassword(passwordResetDto.getToken(), passwordResetDto.getPassword());
         if (success) {
             redirectAttributes.addFlashAttribute("message", "Пароль успешно изменён. Войдите в систему.");
             return "redirect:/auth/login";
         } else {
-            redirectAttributes.addFlashAttribute("error", "Ссылка недействительна или устарела.");
-            return "redirect:/auth/reset-password?token=" + token;
+            redirectAttributes.addFlashAttribute("error", "Произошла ошибка при сбросе пароля. Попробуйте еще раз.");
+            model.addAttribute("passwordResetDto", passwordResetDto);
+            return "auth/reset-password";
         }
     }
-
 }
