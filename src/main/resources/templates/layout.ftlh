@@ -212,8 +212,21 @@
                         <option value="en">English</option>
                     </select>
 
-                    <a href="auth/login" class="btn btn-outline-light me-2">Войти</a>
-                    <a href="auth/register" class="btn btn-light">Регистрация</a>
+                    <#if Session.SPRING_SECURITY_CONTEXT??>
+                        <a href="/profile" class="btn btn-outline-light me-2 d-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            </svg>
+                            Профиль
+                        </a>
+                        <form action="/logout" method="post" class="d-inline">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            <button type="submit" class="btn btn-light">Выйти</button>
+                        </form>
+                    <#else>
+                        <a href="/auth/login" class="btn btn-outline-light me-2">Войти</a>
+                        <a href="/auth/register" class="btn btn-light">Регистрация</a>
+                    </#if>
                 </div>
             </div>
         </div>

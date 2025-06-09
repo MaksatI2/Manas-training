@@ -17,6 +17,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(
+                                "/",
+                                "/auth/**",
+                                "/static/**",
+                                "/favicon.ico",
+                                "/error",
+                                "/courses/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement( session ->
                         session.sessionCreationPolicy( SessionCreationPolicy.ALWAYS ))
                 .httpBasic(Customizer.withDefaults())
@@ -34,11 +45,6 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
                         .permitAll()
-                )
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/courses/**", "/", "/auth/**", "/static/**",
-                                "/favicon.ico").permitAll()
-                        .anyRequest().authenticated()
                 );
         return http.build();
     }
