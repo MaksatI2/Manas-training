@@ -1,11 +1,13 @@
 package manasTrainingService.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.OrganizationRegisterDto;
 import manasTrainingService.dto.StudentRegisterDto;
 import manasTrainingService.exceptions.*;
 import manasTrainingService.service.UserService;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,15 +44,26 @@ public class AuthController {
     public String showLogin(
             @RequestParam(value = "message", required = false) String message,
             @RequestParam(value = "error", required = false) String error,
-            Model model) {
-        if (message != null && !message.isEmpty()) {
-            model.addAttribute("message", message);
-        }
-        if (error != null && !error.isEmpty()) {
-            model.addAttribute("error", error);
-        }
+            Model model
+    ) {
+        if (message != null) model.addAttribute("message", message);
+        if (error != null) model.addAttribute("error", error);
         return "auth/login";
     }
+
+    @PostMapping("/login/error")
+    public String handleLoginError(HttpServletRequest request, Model model) {
+        Exception ex = (Exception) request.getAttribute("SPRING_SECURITY_LAST_EXCEPTION");
+
+        if (ex instanceof DisabledException) {
+            model.addAttribute("error", "Ваш email не подтвержден. Пожалуйста, проверьте почту.");
+        } else {
+            model.addAttribute("error", "Неверный email или пароль");
+        }
+
+        return "auth/login";
+    }
+
 
     @PostMapping("/register/student")
     public String registerStudent(
@@ -70,9 +83,9 @@ public class AuthController {
                     "Регистрация прошла успешно! Войдите в свой аккаунт.");
             return "redirect:/auth/login";
         } catch (StudentEmailAlreadyExistsException e) {
-           bindingResult.rejectValue("email","email.exists", e.getMessage());
+            bindingResult.rejectValue("email", "email.exists", e.getMessage());
         } catch (StudentPhoneAlreadyExistsException e) {
-           bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
+            bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
         } catch (OrganizationCodeNotFound e) {
             bindingResult.rejectValue("organizationCode", "organizationCode.notfound", e.getMessage());
         }
@@ -107,4 +120,65 @@ public class AuthController {
         model.addAttribute("userType", "company");
         return "auth/register-company";
     }
+
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam("token") String token, RedirectAttributes redirectAttributes) {
+        boolean success = userService.verifyEmailToken(token);
+        if (success) {
+            redirectAttributes.addAttribute("message", "Email успешно подтверждён! Теперь вы можете войти.");
+        } else {
+            redirectAttributes.addAttribute("error", "Ссылка недействительна или истекла.");
+        }
+        return "redirect:/auth/login";
+    }
+
+    @GetMapping("/forgot-password")
+    public String forgotPasswordPage() {
+        return "auth/forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String sendResetEmail(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        try {
+            userService.sendResetToken(email);
+            redirectAttributes.addFlashAttribute("message", "Инструкция по сбросу пароля отправлена на указанный email.");
+        } catch (UserNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", "Пользователь с таким email не найден.");
+        }
+        return "redirect:/auth/forgot-password";
+    }
+
+    @GetMapping("/reset-password")
+    public String resetPasswordPage(@RequestParam("token") String token, Model model, RedirectAttributes redirectAttributes) {
+        if (!userService.isValidResetToken(token)) {
+            redirectAttributes.addFlashAttribute("error", "Ссылка для сброса пароля недействительна или устарела.");
+            return "redirect:/auth/forgot-password";
+        }
+        model.addAttribute("token", token);
+        return "auth/reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String handlePasswordReset(
+            @RequestParam("token") String token,
+            @RequestParam("password") String password,
+            @RequestParam("confirmPassword") String confirmPassword,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (!password.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Пароли не совпадают.");
+            redirectAttributes.addFlashAttribute("token", token);
+            return "redirect:/auth/reset-password?token=" + token;
+        }
+
+        boolean success = userService.resetPassword(token, password);
+        if (success) {
+            redirectAttributes.addFlashAttribute("message", "Пароль успешно изменён. Войдите в систему.");
+            return "redirect:/auth/login";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Ссылка недействительна или устарела.");
+            return "redirect:/auth/reset-password?token=" + token;
+        }
+    }
+
 }
