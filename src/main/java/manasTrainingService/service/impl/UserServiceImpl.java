@@ -5,6 +5,7 @@ import manasTrainingService.dto.CreateOrganizationDto;
 import manasTrainingService.dto.OrganizationRegisterDto;
 import manasTrainingService.dto.StudentProfileDto;
 import manasTrainingService.dto.StudentRegisterDto;
+import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.*;
@@ -64,6 +65,12 @@ public class UserServiceImpl implements UserService {
             throw new StudentPhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
         }
 
+        Organization organization = null;
+        String orgCode = studentRegisterDto.getOrganizationCode();
+
+        if (orgCode != null && !orgCode.isBlank()) {
+            organization = organizationService.getOrganizationByCode(orgCode);
+        }
 
         Role studentRole = roleService.getStudentRoleId();
         User user = User.builder()
@@ -75,14 +82,6 @@ public class UserServiceImpl implements UserService {
                 .role(studentRole)
                 .build();
         userRepository.save(user);
-
-        var organization = (studentRegisterDto.getOrganizationCode() != null && !studentRegisterDto.getOrganizationCode().isBlank())
-                ? organizationService.getOrganizationByCode(studentRegisterDto.getOrganizationCode())
-                : null;
-
-        if (organization == null && studentRegisterDto.getOrganizationCode() != null && !studentRegisterDto.getOrganizationCode().isBlank()) {
-            throw new OrganizationCodeNotFound("Организация с таким кодом не найдена");
-        }
 
         studentService.createStudentProfile(
                 StudentProfileDto.builder()
