@@ -1,0 +1,9 @@
+package manasTrainingService.service;
+
+import manasTrainingService.entity.User;
+
+public interface EmailService {
+    void sendVerificationEmail(manasTrainingService.entity.User user, String token);
+
+    void sendPasswordResetEmail(User user, String token);
+}

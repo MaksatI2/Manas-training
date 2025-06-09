@@ -9,13 +9,13 @@ import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.*;
+import manasTrainingService.repositories.PasswordResetTokenRepository;
 import manasTrainingService.repositories.UserRepository;
-import manasTrainingService.service.OrganizationService;
-import manasTrainingService.service.RoleService;
-import manasTrainingService.service.StudentService;
-import manasTrainingService.service.UserService;
+import manasTrainingService.service.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -25,29 +25,34 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final OrganizationService organizationService;
     private final StudentService studentService;
+    private final EmailVerificationService emailVerificationService;
+    private final PasswordResetService passwordResetService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Override
-    public void registerOrganization(OrganizationRegisterDto organizationRegisterDto){
+    public void registerOrganization(OrganizationRegisterDto organizationRegisterDto) {
         if (userRepository.existsByEmail(organizationRegisterDto.getEmail())) {
             throw new OrganizationEmailAlreadyExistsException("Организация с такой почтой уже существует");
         }
         if (userRepository.existsByPhone(organizationRegisterDto.getPhone())) {
             throw new OrganizationPhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
         }
-        if (userRepository.existsByName(organizationRegisterDto.getCompanyName())){
+        if (userRepository.existsByName(organizationRegisterDto.getCompanyName())) {
             throw new OrganizationNameAlreadyExistsException("Организация с таким названием уже существует");
         }
 
         Role companyRole = roleService.getCompanyTypeId();
-        User user  = User.builder()
+        User user = User.builder()
                 .email(organizationRegisterDto.getEmail())
                 .passwordHash(passwordEncoder.encode(organizationRegisterDto.getPassword()))
                 .name(organizationRegisterDto.getCompanyName())
                 .lastName("null")
                 .phone(organizationRegisterDto.getPhone())
                 .role(companyRole)
+                .isActive(false)
                 .build();
         userRepository.save(user);
+        emailVerificationService.generateVerificationToken(user);
 
         organizationService.createOrganization(
                 CreateOrganizationDto.builder()
@@ -71,7 +76,7 @@ public class UserServiceImpl implements UserService {
         if (orgCode != null && !orgCode.isBlank()) {
             organization = organizationService.getOrganizationByCode(orgCode);
         }
-
+        
         Role studentRole = roleService.getStudentRoleId();
         User user = User.builder()
                 .email(studentRegisterDto.getEmail())
@@ -80,8 +85,10 @@ public class UserServiceImpl implements UserService {
                 .lastName(studentRegisterDto.getSurname())
                 .phone(studentRegisterDto.getPhone())
                 .role(studentRole)
+                .isActive(false)
                 .build();
         userRepository.save(user);
+        emailVerificationService.generateVerificationToken(user);
 
         studentService.createStudentProfile(
                 StudentProfileDto.builder()
@@ -91,6 +98,28 @@ public class UserServiceImpl implements UserService {
         );
     }
 
+    @Override
+    public void sendResetToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким email не найден"));
+        passwordResetService.createResetToken(user);
 
+    }
 
+    @Override
+    public boolean resetPassword(String token, String newPassword) {
+        return passwordResetService.resetPassword(token, newPassword);
+    }
+
+    @Override
+    public boolean isValidResetToken(String token) {
+        return passwordResetTokenRepository.findByToken(token)
+                .filter(t -> t.getExpiryDate().isAfter(LocalDateTime.now()))
+                .isPresent();
+    }
+
+    @Override
+    public boolean verifyEmailToken(String token) {
+        return emailVerificationService.verifyEmailToken(token);
+    }
 }
