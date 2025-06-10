@@ -25,4 +25,10 @@ public class RoleServiceImpl implements RoleService {
                 .orElseThrow(()-> new RoleNotFoundException("Тип роли не найдена"));
     }
 
+    @Override
+    public Role getTeacherRoleId(){
+        return roleRepository.findByName("TEACHER")
+                .orElseThrow(()-> new RoleNotFoundException("Тип роли не найдена"));
+    }
+
 }

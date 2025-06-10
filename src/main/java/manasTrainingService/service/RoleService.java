@@ -6,4 +6,6 @@ public interface RoleService {
     Role getCompanyTypeId();
 
     Role getStudentRoleId();
+
+    Role getTeacherRoleId();
 }
