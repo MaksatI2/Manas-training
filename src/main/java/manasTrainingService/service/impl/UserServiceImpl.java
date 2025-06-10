@@ -102,8 +102,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userProfileEditDto.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с таким ID не найден"));
         user.setName(userProfileEditDto.getName());
-        user.setLastName(user.getLastName());
-        user.setPhone(user.getPhone());
+        user.setLastName(userProfileEditDto.getSurname());
+        user.setPhone(userProfileEditDto.getPhone());
         userRepository.saveAndFlush(user);
     }
 

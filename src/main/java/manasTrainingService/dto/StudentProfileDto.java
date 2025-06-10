@@ -1,6 +1,5 @@
 package manasTrainingService.dto;
 
-import jakarta.persistence.Column;
 import lombok.*;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.User;
