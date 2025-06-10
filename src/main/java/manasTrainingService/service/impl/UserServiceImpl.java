@@ -99,11 +99,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void editStudentInformation(UserProfileEditDto userProfileEditDto){
+        if (userRepository.existsByPhone(userProfileEditDto.getPhone())) {
+            throw new StudentPhoneAlreadyExistsException("Пользователь с таким номером уже зарегистрирован");
+        }
         User user = userRepository.findById(userProfileEditDto.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с таким ID не найден"));
         user.setName(userProfileEditDto.getName());
         user.setLastName(userProfileEditDto.getSurname());
         user.setPhone(userProfileEditDto.getPhone());
+        userRepository.saveAndFlush(user);
+    }
+
+    @Override
+    public void editManagerInformation(OrganizationProfileEditDto organizationProfileEditDto){
+        if (userRepository.existsByPhone(organizationProfileEditDto.getPhone())) {
+            throw new StudentPhoneAlreadyExistsException("Пользователь с таким номером уже зарегистрирован");
+        }
+        User user = userRepository.findById(organizationProfileEditDto.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким ID не найден"));
+        user.setName(organizationProfileEditDto.getName());
+        user.setLastName(organizationProfileEditDto.getSurname());
+        user.setPhone(organizationProfileEditDto.getPhone());
         userRepository.saveAndFlush(user);
     }
 
