@@ -1,4 +1,4 @@
-package manasTrainingService.exceptions;
+package manasTrainingService.exceptions.nsee;
 
 public class OrganizationEmailAlreadyExistsException extends RuntimeException {
     public OrganizationEmailAlreadyExistsException(String message) {

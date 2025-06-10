@@ -1,39 +1,35 @@
--- changeset Aislan: 025 add insert_test_data table
+-- changeset Maksat: 025 update insert_test_data table
 
--- Роли пользователей
 INSERT INTO roles (name)
 VALUES ('ADMIN'),
        ('TEACHER'),
        ('STUDENT'),
        ('ORGANIZATION');
 
--- Пользователи
--- Пароль для админа: qwerty12345
--- Пароль для остальных: qwerty1234Q
+-- Пароль для всех: qwe
 INSERT INTO users (email, password_hash, first_name, last_name, phone, avatar_url, role_id, is_active)
 VALUES
-    ('admin@manas.kg',   '$2a$12$TH2gXNw.3eyUuK7uTwqCq.sbAnKDtOnacS6bEB9.v8vjIMQJDIN06', 'Admin',    'System', '+996700000001', NULL, (SELECT id FROM roles WHERE name = 'ADMIN'), true),
-    ('teacher1@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Teacher1', 'One',    '+996700000002', NULL, (SELECT id FROM roles WHERE name = 'TEACHER'), true),
-    ('teacher2@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Teacher2', 'Two',    '+996700000003', NULL, (SELECT id FROM roles WHERE name = 'TEACHER'), true),
-    ('student1@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student1', 'Викторов',      '+996700000004', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
-    ('student2@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student2', 'Менторов',      '+996700000005', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
-    ('student3@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student3', 'Сидоров',      '+996700000006', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
-    ('student4@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student4', 'Михайлов',      '+996700000007', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
-    ('student5@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student5', 'Егоров',      '+996700000008', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
-    ('student6@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student6', 'Федоров',      '+996700000009', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
-    ('student7@manas.kg','$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Student7', 'Григорьев',      '+996700000010', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
-    ('org1@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization1', 'Manager', '+996700000011', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org2@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization2', 'Manager', '+996700000012', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org3@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization3', 'Manager', '+996700000013', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org4@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization4', 'Manager', '+996700000014', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org5@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization5', 'Manager', '+996700000015', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org6@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization6', 'Manager', '+996700000016', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org7@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization7', 'Manager', '+996700000017', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org8@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization8', 'Manager', '+996700000018', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org9@manas.kg',    '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization9', 'Manager', '+996700000019', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
-    ('org10@manas.kg',   '$2a$12$sla1x0XggsF73cl.Fw797uEnr1rbMu3kFxW1fBqo7kC3DDW5xTLzO', 'Organization10', 'Manager', '+996700000020', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true);
+    ('admin@manas.kg',   '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Admin',    'System', '+996700000001', NULL, (SELECT id FROM roles WHERE name = 'ADMIN'), true),
+    ('teacher1@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Teacher1', 'One',    '+996700000002', NULL, (SELECT id FROM roles WHERE name = 'TEACHER'), true),
+    ('teacher2@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Teacher2', 'Two',    '+996700000003', NULL, (SELECT id FROM roles WHERE name = 'TEACHER'), true),
+    ('student1@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Student1', 'Викторов',      '+996700000004', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
+    ('student2@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Student2', 'Менторов',      '+996700000005', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
+    ('student3@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Student3', 'Сидоров',      '+996700000006', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
+    ('student4@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Student4', 'Михайлов',      '+996700000007', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
+    ('student5@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Student5', 'Егоров',      '+996700000008', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
+    ('student6@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Student6', 'Федоров',      '+996700000009', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
+    ('student7@manas.kg','$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Student7', 'Григорьев',      '+996700000010', NULL, (SELECT id FROM roles WHERE name = 'STUDENT'), true),
+    ('org1@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization1', 'Manager', '+996700000011', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org2@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization2', 'Manager', '+996700000012', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org3@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization3', 'Manager', '+996700000013', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org4@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization4', 'Manager', '+996700000014', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org5@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization5', 'Manager', '+996700000015', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org6@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization6', 'Manager', '+996700000016', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org7@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization7', 'Manager', '+996700000017', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org8@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization8', 'Manager', '+996700000018', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org9@manas.kg',    '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization9', 'Manager', '+996700000019', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true),
+    ('org10@manas.kg',   '$2a$12$NCu.brS1wyBZXyZz08m8weRonzZBpeCAPBJAfpdA8/6j4J8DtzrhW', 'Organization10', 'Manager', '+996700000020', NULL, (SELECT id FROM roles WHERE name = 'ORGANIZATION'), true);
 
--- Организации
 INSERT INTO organizations (user_id, code, description)
 VALUES
     ((SELECT id FROM users WHERE email = 'org1@manas.kg'), 'ORG001', 'Организация 1'),
@@ -47,7 +43,6 @@ VALUES
     ((SELECT id FROM users WHERE email = 'org9@manas.kg'), 'ORG009', 'Организация 9'),
     ((SELECT id FROM users WHERE email = 'org10@manas.kg'), 'ORG010', 'Организация 10');
 
--- Студенты
 INSERT INTO student_profiles (user_id, organization_id, specialization)
 VALUES
     ((SELECT id FROM users WHERE email = 'student1@manas.kg'), (SELECT id FROM organizations WHERE code = 'ORG001'), 'Avionics'),
@@ -58,13 +53,11 @@ VALUES
     ((SELECT id FROM users WHERE email = 'student6@manas.kg'), (SELECT id FROM organizations WHERE code = 'ORG006'), 'Cargo'),
     ((SELECT id FROM users WHERE email = 'student7@manas.kg'), (SELECT id FROM organizations WHERE code = 'ORG007'), 'Navigation');
 
--- Преподаватели
 INSERT INTO teacher_profiles (user_id, department, qualifications, bio)
 VALUES
     ((SELECT id FROM users WHERE email = 'teacher1@manas.kg'), 'Aviation', 'Master', 'Senior instructor'),
     ((SELECT id FROM users WHERE email = 'teacher2@manas.kg'), 'Engineering', 'PhD', 'Experienced engineer');
 
--- Категории курсов
 INSERT INTO course_categories (name, description)
 VALUES
     ('ТО ВС', 'Техобслуживание ВС'),
@@ -78,7 +71,6 @@ VALUES
     ('Метеорология', 'Погода и авиация'),
     ('Управление аэропортом', 'Основы управления');
 
--- Курсы
 INSERT INTO courses (category_id, is_individual, code, title, description, duration_hours, is_active)
 VALUES
     ((SELECT id FROM course_categories WHERE name = 'ТО ВС'), false, 'C-001', 'Курс 1', 'Описание курса 1', 40, true),
@@ -92,7 +84,6 @@ VALUES
     ((SELECT id FROM course_categories WHERE name = 'Метеорология'), false, 'C-009', 'Курс 9', 'Описание курса 9', 18, true),
     ((SELECT id FROM course_categories WHERE name = 'Управление аэропортом'), false, 'C-010', 'Курс 10', 'Описание курса 10', 15, true);
 
--- Записи на курсы
 INSERT INTO course_enrollments (course_id, student_id, status, progress_percentage)
 VALUES
     ((SELECT id FROM courses WHERE code = 'C-001'), (SELECT id FROM users WHERE email = 'student1@manas.kg'), 'enrolled', 0),

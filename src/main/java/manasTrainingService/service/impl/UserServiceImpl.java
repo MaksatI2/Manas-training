@@ -1,17 +1,16 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.CreateOrganizationDto;
-import manasTrainingService.dto.OrganizationRegisterDto;
-import manasTrainingService.dto.StudentProfileDto;
-import manasTrainingService.dto.StudentRegisterDto;
+import manasTrainingService.dto.*;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
 import manasTrainingService.entity.User;
-import manasTrainingService.exceptions.*;
+import manasTrainingService.exceptions.nsee.*;
 import manasTrainingService.repositories.PasswordResetTokenRepository;
 import manasTrainingService.repositories.UserRepository;
 import manasTrainingService.service.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -99,6 +98,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void editStudentInformation(UserProfileEditDto userProfileEditDto){
+        User user = userRepository.findById(userProfileEditDto.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким ID не найден"));
+        user.setName(userProfileEditDto.getName());
+        user.setLastName(user.getLastName());
+        user.setPhone(user.getPhone());
+        userRepository.saveAndFlush(user);
+    }
+
+    @Override
     public void sendResetToken(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с таким email не найден"));
@@ -121,5 +130,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean verifyEmailToken(String token) {
         return emailVerificationService.verifyEmailToken(token);
+    }
+
+    @Override
+    public User getUserEntityByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с данным Email не найден"));
+    }
+
+    @Override
+    public User getAuthorizedUser(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        return getUserEntityByEmail(username);
     }
 }

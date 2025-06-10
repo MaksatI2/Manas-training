@@ -1,4 +1,4 @@
-package manasTrainingService.exceptions;
+package manasTrainingService.exceptions.nsee;
 
 public class RoleNotFoundException extends RuntimeException {
     public RoleNotFoundException(String message) {
