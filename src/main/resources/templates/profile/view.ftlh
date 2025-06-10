@@ -16,7 +16,6 @@
         .profile-card {
             background: var(--white);
             border-radius: 15px;
-            border-left: 4px solid var(--primary-blue);
             box-shadow: 0 4px 15px rgba(0,102,204,0.1);
             padding: 2rem;
             transition: all 0.3s ease;
