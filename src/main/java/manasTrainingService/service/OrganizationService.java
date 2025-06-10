@@ -1,6 +1,6 @@
 package manasTrainingService.service;
 
-import manasTrainingService.dto.CreateOrganizationDto;
+import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.entity.Organization;
 
 public interface OrganizationService {
