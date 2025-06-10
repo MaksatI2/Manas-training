@@ -1,4 +1,4 @@
-package manasTrainingService.dto;
+package manasTrainingService.dto.register;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
