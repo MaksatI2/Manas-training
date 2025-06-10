@@ -1,4 +1,4 @@
-package manasTrainingService.exceptions;
+package manasTrainingService.exceptions.nsee;
 
 import java.util.NoSuchElementException;
 

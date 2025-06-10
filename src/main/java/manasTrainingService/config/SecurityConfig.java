@@ -3,7 +3,6 @@ package manasTrainingService.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -28,24 +27,27 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement( session ->
-                        session.sessionCreationPolicy( SessionCreationPolicy.ALWAYS ))
-                .httpBasic(Customizer.withDefaults())
                 .formLogin(form -> form
                         .loginPage("/auth/login")
-                        .loginProcessingUrl("/auth/login")
-                        .usernameParameter("email")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("login")
                         .passwordParameter("password")
                         .defaultSuccessUrl("/", true)
-                        .failureForwardUrl("/auth/login/error")
+                        .failureUrl("/auth/login/error")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/auth/login")
                         .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
-                );
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/errors/400")
+                )
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
         return http.build();
     }
 }

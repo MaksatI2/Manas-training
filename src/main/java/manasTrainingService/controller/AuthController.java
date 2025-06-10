@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.OrganizationRegisterDto;
 import manasTrainingService.dto.PasswordResetDto;
 import manasTrainingService.dto.StudentRegisterDto;
-import manasTrainingService.exceptions.*;
+import manasTrainingService.exceptions.nsee.*;
 import manasTrainingService.service.UserService;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.stereotype.Controller;

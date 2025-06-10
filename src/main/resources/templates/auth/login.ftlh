@@ -28,7 +28,7 @@
                     </div>
                 </#if>
 
-                <form action="/auth/login" method="post" id="loginForm">
+                <form action="/login" method="post">
                     <#if _csrf??>
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                     </#if>
@@ -37,7 +37,7 @@
                         <label for="email" class="form-label">
                             <i class="fas fa-envelope me-1"></i>Email
                         </label>
-                        <input type="email" class="form-control" id="email" name="email"
+                        <input type="email" class="form-control" id="login" name="login"
                                placeholder="Введите ваш email">
                     </div>
 
@@ -106,17 +106,6 @@
                 passwordField.type = 'password';
                 eyeIcon.classList.remove('fa-eye-slash');
                 eyeIcon.classList.add('fa-eye');
-            }
-        });
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) {
-                e.preventDefault();
-                alert('Пожалуйста, заполните все обязательные поля');
-                return;
             }
         });
 

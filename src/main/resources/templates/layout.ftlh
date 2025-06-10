@@ -261,7 +261,18 @@
                     </select>
 
                     <#if Session.SPRING_SECURITY_CONTEXT??>
-                        <a href="/profile" class="btn btn-outline-light me-2 d-flex align-items-center">
+                        <#assign profileUrl = "/profile">
+                        <#if isAdmin>
+                            <#assign profileUrl = "/admin/profile">
+                        <#elseif isTeacher>
+                            <#assign profileUrl = "/teacher/profile">
+                        <#elseif isStudent>
+                            <#assign profileUrl = "/student/profile">
+                        <#elseif isOrganization>
+                            <#assign profileUrl = "/organization/profile">
+                        </#if>
+
+                        <a href="${profileUrl}" class="btn btn-outline-light me-2 d-flex align-items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                                  class="me-1" viewBox="0 0 16 16">
                                 <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
