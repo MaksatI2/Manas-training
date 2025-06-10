@@ -25,6 +25,6 @@ public class UserProfileEditDto {
     @Pattern(regexp = "^\\+996\\d{9}$", message = "Номер телефона должен быть в формате +996XXXXXXXXX (12 цифр)")
     private String phone;
 
-    @NotBlank
+    @NotBlank(message = "Специализация обязательно должна быть указана")
     private String specialization;
 }

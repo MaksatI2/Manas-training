@@ -26,4 +26,6 @@ public interface UserService {
     User getUserEntityByEmail(String email);
 
     User getAuthorizedUser();
+
+    void addAvatarUrl(int userId, String filename);
 }

@@ -165,4 +165,11 @@ public class UserServiceImpl implements UserService {
         }
         return getUserEntityByEmail(username);
     }
+
+    @Override
+    public void addAvatarUrl(int userId, String filename){
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        user.setAvatarUrl(filename);
+        userRepository.saveAndFlush(user);
+    }
 }
