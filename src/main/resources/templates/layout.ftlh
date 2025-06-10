@@ -219,7 +219,7 @@
                     <#if known>
                         <#if isAdmin>
                             <li class="nav-item">
-                                <a class="nav-link" href="/#"><i
+                                <a class="nav-link" href="/admin/users"><i
                                             class="fas fa-users me-1"></i>Пользователи</a>
                             </li>
                             <li class="nav-item">
