@@ -1,5 +1,6 @@
 package manasTrainingService.service;
 
+import manasTrainingService.dto.OrganizationProfileEditDto;
 import manasTrainingService.dto.OrganizationRegisterDto;
 import manasTrainingService.dto.StudentRegisterDto;
 import manasTrainingService.dto.UserProfileEditDto;
@@ -11,6 +12,8 @@ public interface UserService {
     void registerStudent(StudentRegisterDto studentRegisterDto);
 
     void editStudentInformation(UserProfileEditDto userProfileEditDto);
+
+    void editManagerInformation(OrganizationProfileEditDto organizationProfileEditDto);
 
     void sendResetToken(String email);
 
