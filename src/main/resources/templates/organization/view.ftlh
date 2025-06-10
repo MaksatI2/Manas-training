@@ -168,7 +168,7 @@
             <div class="profile-header">
                 <div class="avatar-container">
                     <#if organization.user.avatarUrl?has_content>
-                        <img src="/data/student/images/${organization.user.avatarUrl}"
+                        <img src="/data/images/${organization.user.avatarUrl}"
                              class="avatar-image"
                              alt="Фото профиля">
                     <#else>
@@ -176,6 +176,10 @@
                              class="avatar-image"
                              alt="Фото профиля по умолчанию">
                     </#if>
+                    <a href="/image/upload" class="edit-button">
+                        <i class="fas fa-edit"></i>
+                        Загрузить изображение
+                    </a>
                 </div>
 
                 <div class="user-info">
