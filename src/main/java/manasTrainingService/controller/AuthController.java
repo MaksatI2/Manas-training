@@ -9,6 +9,7 @@ import manasTrainingService.dto.StudentRegisterDto;
 import manasTrainingService.exceptions.nsee.*;
 import manasTrainingService.service.UserService;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,21 +46,22 @@ public class AuthController {
     public String showLogin(
             @RequestParam(value = "message", required = false) String message,
             @RequestParam(value = "error", required = false) String error,
+            HttpServletRequest request,
             Model model
     ) {
-        if (message != null) model.addAttribute("message", message);
-        if (error != null) model.addAttribute("error", error);
-        return "auth/login";
-    }
+        if (message != null) {
+            model.addAttribute("message", message);
+        }
 
-    @PostMapping("/login/error")
-    public String handleLoginError(HttpServletRequest request, Model model) {
-        Exception ex = (Exception) request.getAttribute("SPRING_SECURITY_LAST_EXCEPTION");
+        if (error != null) {
+            Exception ex = (Exception) request.getSession()
+                    .getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
 
-        if (ex instanceof DisabledException) {
-            model.addAttribute("error", "Ваш email не подтвержден. Пожалуйста, проверьте почту.");
-        } else {
-            model.addAttribute("error", "Неверный email или пароль");
+            if (ex instanceof DisabledException) {
+                model.addAttribute("error", "Ваш email не подтвержден. Пожалуйста, проверьте почту.");
+            } else {
+                model.addAttribute("error", "Неверный email или пароль");
+            }
         }
 
         return "auth/login";
