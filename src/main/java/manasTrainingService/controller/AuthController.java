@@ -3,9 +3,9 @@ package manasTrainingService.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.OrganizationRegisterDto;
+import manasTrainingService.dto.register.OrganizationRegisterDto;
 import manasTrainingService.dto.PasswordResetDto;
-import manasTrainingService.dto.StudentRegisterDto;
+import manasTrainingService.dto.register.StudentRegisterDto;
 import manasTrainingService.exceptions.nsee.*;
 import manasTrainingService.service.UserService;
 import org.springframework.security.authentication.DisabledException;
@@ -84,9 +84,9 @@ public class AuthController {
             redirectAttributes.addAttribute("message",
                     "Регистрация прошла успешно! Войдите в свой аккаунт.");
             return "redirect:/auth/login";
-        } catch (StudentEmailAlreadyExistsException e) {
+        } catch (EmailAlreadyExistsException e) {
             bindingResult.rejectValue("email", "email.exists", e.getMessage());
-        } catch (StudentPhoneAlreadyExistsException e) {
+        } catch (PhoneAlreadyExistsException e) {
             bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
         } catch (OrganizationCodeNotFound e) {
             bindingResult.rejectValue("organizationCode", "organizationCode.notfound", e.getMessage());
@@ -112,9 +112,9 @@ public class AuthController {
             redirectAttributes.addAttribute("message",
                     "Регистрация компании прошла успешно! Войдите в свой аккаунт.");
             return "redirect:/auth/login";
-        } catch (OrganizationEmailAlreadyExistsException e) {
+        } catch (EmailAlreadyExistsException e) {
             bindingResult.rejectValue("email", "email.exists", e.getMessage());
-        } catch (OrganizationPhoneAlreadyExistsException e) {
+        } catch (PhoneAlreadyExistsException e) {
             bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
         } catch (OrganizationNameAlreadyExistsException e) {
             bindingResult.rejectValue("companyName", "companyName.exists", e.getMessage());

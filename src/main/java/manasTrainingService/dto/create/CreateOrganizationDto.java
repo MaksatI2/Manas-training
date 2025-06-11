@@ -1,4 +1,4 @@
-package manasTrainingService.dto;
+package manasTrainingService.dto.create;
 
 import lombok.*;
 import manasTrainingService.entity.User;

@@ -1,7 +1,7 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.CreateOrganizationDto;
+import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.OrganizationProfileDto;
 import manasTrainingService.dto.OrganizationProfileEditDto;
 import manasTrainingService.entity.Organization;
