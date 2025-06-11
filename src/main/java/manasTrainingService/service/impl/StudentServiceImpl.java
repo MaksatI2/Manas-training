@@ -1,10 +1,11 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.StudentProfileDto;
-import manasTrainingService.dto.UserProfileEditDto;
+import manasTrainingService.dto.profile.StudentProfileDto;
+import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.entity.StudentProfile;
 import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;
 import manasTrainingService.exceptions.nsee.StudentProfileNotFoundException;
 import manasTrainingService.repositories.StudentProfileRepository;
 import manasTrainingService.service.StudentService;
@@ -38,6 +39,15 @@ public class StudentServiceImpl implements StudentService {
     public void editStudentInformation(UserProfileEditDto userProfileEditDto){
         StudentProfile studentProfile = studentProfileRepository.findByUserId(userProfileEditDto.getUserId())
                 .orElseThrow(() -> new StudentProfileNotFoundException("Профиль студента не найден"));
+
+        User user = studentProfile.getUser();
+
+        if (!user.getPhone().equals(userProfileEditDto.getPhone())) {
+            if (userService.existsByPhone(userProfileEditDto.getPhone())) {
+                throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+            }
+        }
+
         userService.editStudentInformation(userProfileEditDto);
         studentProfile.setSpecialization(userProfileEditDto.getSpecialization());
         studentProfileRepository.saveAndFlush(studentProfile);
