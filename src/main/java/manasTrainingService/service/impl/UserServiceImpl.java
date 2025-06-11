@@ -1,9 +1,11 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.*;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.create.CreateTeacherDto;
+import manasTrainingService.dto.edit.TeacherProfileEditDto;
+import manasTrainingService.dto.edit.UserProfileEditDto;
+import manasTrainingService.dto.profile.StudentProfileDto;
 import manasTrainingService.dto.register.OrganizationRegisterDto;
 import manasTrainingService.dto.register.StudentRegisterDto;
 import manasTrainingService.dto.register.TeacherRegisterDto;
@@ -23,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -175,6 +176,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean existsByPhone(String phone) {
+        return userRepository.existsByPhone(phone);
+    }
+
+    @Override
     public User getUserEntityByEmail(String email){
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с данным Email не найден"));
@@ -193,17 +199,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<User> getUsersWithFilters(String role, String status, String search, Pageable pageable) {
+        return userRepository.findUsersWithFilters(role, status, search, pageable);
     }
 
     @Override
-    public Page<User> getUsersByRole(String role, Pageable pageable) {
-        return userRepository.findByRole_Name(role, pageable);
+    public Page<User> getUsersByStatus(Boolean isActive, Pageable pageable) {
+        return userRepository.findByIsActive(isActive, pageable);
     }
 
     @Override
-    public List<String> getAllRoles() {
-        return userRepository.findAllDistinctRoleNames();
+    public Page<User> searchUsersByEmailOrName(String search, Pageable pageable) {
+        return userRepository.findByEmailOrNameContainingIgnoreCase(search, pageable);
+    }
+
+    @Override
+    public User getUserById(Integer id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + id + " не найден"));
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void editTeacherInformation(TeacherProfileEditDto teacherProfileEditDto) {
+        teacherService.editTeacherProfile(teacherProfileEditDto);
     }
 }
