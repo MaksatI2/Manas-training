@@ -7,6 +7,14 @@ import manasTrainingService.dto.create.CreateTeacherDto;
 import manasTrainingService.dto.register.OrganizationRegisterDto;
 import manasTrainingService.dto.register.StudentRegisterDto;
 import manasTrainingService.dto.register.TeacherRegisterDto;
+import manasTrainingService.dto.create.CreateOrganizationDto;
+import manasTrainingService.dto.create.CreateTeacherDto;
+import manasTrainingService.dto.edit.TeacherProfileEditDto;
+import manasTrainingService.dto.edit.UserProfileEditDto;
+import manasTrainingService.dto.profile.StudentProfileDto;
+import manasTrainingService.dto.register.OrganizationRegisterDto;
+import manasTrainingService.dto.register.StudentRegisterDto;
+import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
 import manasTrainingService.entity.User;
@@ -191,6 +199,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean existsByPhone(String phone) {
+        return userRepository.existsByPhone(phone);
+    }
+
+    @Override
     public User getUserEntityByEmail(String email){
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с данным Email не найден"));
@@ -227,5 +240,36 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         user.setAvatarUrl(filename);
         userRepository.saveAndFlush(user);
+    }
+
+    @Override
+    public Page<User> getUsersWithFilters(String role, String status, String search, Pageable pageable) {
+        return userRepository.findUsersWithFilters(role, status, search, pageable);
+    }
+
+    @Override
+    public Page<User> getUsersByStatus(Boolean isActive, Pageable pageable) {
+        return userRepository.findByIsActive(isActive, pageable);
+    }
+
+    @Override
+    public Page<User> searchUsersByEmailOrName(String search, Pageable pageable) {
+        return userRepository.findByEmailOrNameContainingIgnoreCase(search, pageable);
+    }
+
+    @Override
+    public User getUserById(Integer id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + id + " не найден"));
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void editTeacherInformation(TeacherProfileEditDto teacherProfileEditDto) {
+        teacherService.editTeacherProfile(teacherProfileEditDto);
     }
 }

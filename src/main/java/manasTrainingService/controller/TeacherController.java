@@ -1,0 +1,60 @@
+package manasTrainingService.controller;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.edit.TeacherProfileEditDto;
+import manasTrainingService.dto.profile.TeacherProfileDto;
+import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;
+import manasTrainingService.service.TeacherService;
+import manasTrainingService.service.UserService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/teacher")
+@RequiredArgsConstructor
+public class TeacherController {
+
+    private final UserService userService;
+    private final TeacherService teacherService;
+
+    @GetMapping("/profile")
+    public String viewProfile(Model model) {
+        User currentUser = userService.getAuthorizedUser();
+        TeacherProfileDto teacherProfile = teacherService.getTeacherProfile(currentUser);
+        model.addAttribute("teacher", teacherProfile);
+        return "teacher/profile-view";
+    }
+
+    @GetMapping("/profile/edit")
+    public String editProfileForm(Model model) {
+        model.addAttribute("teacherEditDto", teacherService.getTeacherInformationForEdit(userService.getAuthorizedUser()));
+        return "teacher/profile-edit";
+    }
+
+    @PostMapping("/profile/edit")
+    public String editProfile(@Valid @ModelAttribute("teacherEditDto") TeacherProfileEditDto teacherProfileEditDto,
+                              BindingResult bindingResult,
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("teacherEditDto", teacherProfileEditDto);
+            return "teacher/profile-edit";
+        }
+
+        try {
+            userService.editTeacherInformation(teacherProfileEditDto);
+            redirectAttributes.addFlashAttribute("successMessage", "Профиль успешно обновлен!");
+            return "redirect:/teacher/profile";
+        } catch (PhoneAlreadyExistsException e) {
+            bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
+            model.addAttribute("teacherEditDto", teacherProfileEditDto);
+            return "teacher/profile-edit";
+        }
+    }
+}
