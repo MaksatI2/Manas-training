@@ -206,17 +206,21 @@
 
         <div class="profile-card">
             <div class="profile-header">
-                <div class="avatar-container">
-                    <#if teacher.avatarUrl?has_content>
-                        <img src="/data/teacher/images/${teacher.avatarUrl}"
-                             class="avatar-image"
-                             alt="Фото профиля">
-                    <#else>
-                        <img src="/static/images/default_avatar.jpg"
-                             class="avatar-image"
-                             alt="Фото профиля по умолчанию">
-                    </#if>
-                </div>
+                div class="avatar-container">
+                <#if teacher.teacher.avatarUrl?has_content>
+                    <img src="/data/images/${teacher.teacher.avatarUrl}"
+                         class="avatar-image"
+                         alt="Фото профиля">
+                <#else>
+                    <img src="/static/images/default_avatar.jpg"
+                         class="avatar-image"
+                         alt="Фото профиля по умолчанию">
+                </#if>
+                <a href="/image/upload" class="edit-button">
+                    <i class="fas fa-edit"></i>
+                    Загрузить изображение
+                </a>
+            </div>
 
                 <div class="user-info">
                     <h2 class="user-name">${teacher.teacher.name} ${teacher.teacher.lastName}</h2>
