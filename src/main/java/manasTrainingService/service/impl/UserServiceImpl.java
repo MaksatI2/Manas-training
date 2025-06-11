@@ -2,6 +2,11 @@ package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.*;
+import manasTrainingService.dto.create.CreateOrganizationDto;
+import manasTrainingService.dto.create.CreateTeacherDto;
+import manasTrainingService.dto.register.OrganizationRegisterDto;
+import manasTrainingService.dto.register.StudentRegisterDto;
+import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
 import manasTrainingService.entity.User;
@@ -9,12 +14,16 @@ import manasTrainingService.exceptions.nsee.*;
 import manasTrainingService.repositories.PasswordResetTokenRepository;
 import manasTrainingService.repositories.UserRepository;
 import manasTrainingService.service.*;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final OrganizationService organizationService;
     private final StudentService studentService;
+    private final TeacherService teacherService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetService passwordResetService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -31,10 +41,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerOrganization(OrganizationRegisterDto organizationRegisterDto) {
         if (userRepository.existsByEmail(organizationRegisterDto.getEmail())) {
-            throw new OrganizationEmailAlreadyExistsException("Организация с такой почтой уже существует");
+            throw new EmailAlreadyExistsException("Организация с такой почтой уже существует");
         }
         if (userRepository.existsByPhone(organizationRegisterDto.getPhone())) {
-            throw new OrganizationPhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+            throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
         }
         if (userRepository.existsByName(organizationRegisterDto.getCompanyName())) {
             throw new OrganizationNameAlreadyExistsException("Организация с таким названием уже существует");
@@ -63,10 +73,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerStudent(StudentRegisterDto studentRegisterDto) {
         if (userRepository.existsByEmail(studentRegisterDto.getEmail())) {
-            throw new StudentEmailAlreadyExistsException("Студент с такой почтой уже существует");
+            throw new EmailAlreadyExistsException("Студент с такой почтой уже существует");
         }
         if (userRepository.existsByPhone(studentRegisterDto.getPhone())) {
-            throw new StudentPhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+            throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
         }
 
         Organization organization = null;
@@ -93,6 +103,38 @@ public class UserServiceImpl implements UserService {
                 StudentProfileDto.builder()
                         .student(user)
                         .organization(organization)
+                        .build()
+        );
+    }
+
+    @Override
+    public void registerTeacher(TeacherRegisterDto teacherRegisterDto) {
+        if (userRepository.existsByEmail(teacherRegisterDto.getEmail())) {
+            throw new EmailAlreadyExistsException("Преподаватель с такой почтой уже существует");
+        }
+        if (userRepository.existsByPhone(teacherRegisterDto.getPhone())) {
+            throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+        }
+
+        Role teacherRole = roleService.getTeacherRoleId();
+        User user = User.builder()
+                .email(teacherRegisterDto.getEmail())
+                .passwordHash(passwordEncoder.encode(teacherRegisterDto.getPassword()))
+                .name(teacherRegisterDto.getName())
+                .lastName(teacherRegisterDto.getSurname())
+                .phone(teacherRegisterDto.getPhone())
+                .role(teacherRole)
+                .isActive(false)
+                .build();
+        userRepository.save(user);
+        emailVerificationService.generateVerificationToken(user);
+
+        teacherService.createTeacherProfile(
+                CreateTeacherDto.builder()
+                        .user(user)
+                        .department(teacherRegisterDto.getDepartment())
+                        .qualifications(teacherRegisterDto.getQualifications())
+                        .bio(teacherRegisterDto.getBio())
                         .build()
         );
     }
@@ -167,6 +209,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<User> getUsersByRole(String role, Pageable pageable) {
+        return userRepository.findByRole_Name(role, pageable);
+    }
+
+    @Override
+    public List<String> getAllRoles() {
+        return userRepository.findAllDistinctRoleNames();
+    }
+
     public void addAvatarUrl(int userId, String filename){
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         user.setAvatarUrl(filename);
