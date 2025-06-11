@@ -7,6 +7,9 @@ import manasTrainingService.repositories.RoleRepository;
 import manasTrainingService.service.RoleService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
@@ -29,6 +32,15 @@ public class RoleServiceImpl implements RoleService {
     public Role getTeacherRoleId(){
         return roleRepository.findByName("TEACHER")
                 .orElseThrow(()-> new RoleNotFoundException("Тип роли не найдена"));
+    }
+
+    public List<String> getAllRoles() {
+        return roleRepository.findAll()
+                .stream()
+                .map(Role::getName)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
     }
 
 }
