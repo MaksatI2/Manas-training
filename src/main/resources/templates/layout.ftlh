@@ -210,7 +210,7 @@
                         </li>
                     </#if>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-book me-1"></i>Курсы</a>
+                        <a class="nav-link" href="/courses"><i class="fas fa-book me-1"></i>Курсы</a>
                     </li>
 
                     <#if known>
