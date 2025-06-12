@@ -1,12 +1,7 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.*;
-import manasTrainingService.dto.create.CreateOrganizationDto;
-import manasTrainingService.dto.create.CreateTeacherDto;
-import manasTrainingService.dto.register.OrganizationRegisterDto;
-import manasTrainingService.dto.register.StudentRegisterDto;
-import manasTrainingService.dto.register.TeacherRegisterDto;
+import manasTrainingService.dto.OrganizationProfileEditDto;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.create.CreateTeacherDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
@@ -18,11 +13,13 @@ import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
 import manasTrainingService.entity.User;
-import manasTrainingService.exceptions.nsee.*;
+import manasTrainingService.exceptions.nsee.EmailAlreadyExistsException;
+import manasTrainingService.exceptions.nsee.OrganizationNameAlreadyExistsException;
+import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;
+import manasTrainingService.exceptions.nsee.UserNotFoundException;
 import manasTrainingService.repositories.PasswordResetTokenRepository;
 import manasTrainingService.repositories.UserRepository;
 import manasTrainingService.service.*;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -150,7 +147,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editStudentInformation(UserProfileEditDto userProfileEditDto){
         if (userRepository.existsByPhone(userProfileEditDto.getPhone())) {
-            throw new StudentPhoneAlreadyExistsException("Пользователь с таким номером уже зарегистрирован");
+            throw new PhoneAlreadyExistsException("Пользователь с таким номером уже зарегистрирован");
         }
         User user = userRepository.findById(userProfileEditDto.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с таким ID не найден"));
@@ -163,7 +160,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editManagerInformation(OrganizationProfileEditDto organizationProfileEditDto){
         if (userRepository.existsByPhone(organizationProfileEditDto.getPhone())) {
-            throw new StudentPhoneAlreadyExistsException("Пользователь с таким номером уже зарегистрирован");
+            throw new PhoneAlreadyExistsException("Пользователь с таким номером уже зарегистрирован");
         }
         User user = userRepository.findById(organizationProfileEditDto.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с таким ID не найден"));
@@ -245,16 +242,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> getUsersWithFilters(String role, String status, String search, Pageable pageable) {
         return userRepository.findUsersWithFilters(role, status, search, pageable);
-    }
-
-    @Override
-    public Page<User> getUsersByStatus(Boolean isActive, Pageable pageable) {
-        return userRepository.findByIsActive(isActive, pageable);
-    }
-
-    @Override
-    public Page<User> searchUsersByEmailOrName(String search, Pageable pageable) {
-        return userRepository.findByEmailOrNameContainingIgnoreCase(search, pageable);
     }
 
     @Override

@@ -34,14 +34,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                                     @Param("search") String search,
                                     Pageable pageable);
 
-    Page<User> findByIsActive(Boolean isActive, Pageable pageable);
-
-    @Query("SELECT u FROM User u WHERE " +
-           "LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%'))")
-    Page<User> findByEmailOrNameContainingIgnoreCase(@Param("search") String search, Pageable pageable);
-
     @Query("SELECT DISTINCT r.name FROM Role r")
     List<String> findAllDistinctRoleNames();
 }

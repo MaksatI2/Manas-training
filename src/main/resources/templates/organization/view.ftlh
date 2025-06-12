@@ -16,6 +16,7 @@
         .profile-card {
             background: var(--white);
             border-radius: 15px;
+            border-left: 4px solid var(--primary-blue);
             box-shadow: 0 4px 15px rgba(0,102,204,0.1);
             padding: 2rem;
             transition: all 0.3s ease;
@@ -179,8 +180,8 @@
         <div class="profile-card">
             <div class="profile-header">
                 <div class="avatar-container">
-                    <#if student.student.avatarUrl?has_content>
-                        <img src="/data/images/${student.student.avatarUrl}"
+                    <#if organization.user.avatarUrl?has_content>
+                        <img src="/data/images/${organization.user.avatarUrl}"
                              class="avatar-image"
                              alt="Фото профиля">
                     <#else>
@@ -195,16 +196,16 @@
                 </div>
 
                 <div class="user-info">
-                    <h2 class="user-name">${student.student.name} ${student.student.lastName}</h2>
+                    <h2 class="user-name">${organization.user.name} ${organization.user.lastName}</h2>
                     <p class="user-email">
                         <i class="fas fa-envelope" style="margin-right: 0.5rem;"></i>
-                        ${student.student.email}
+                        ${organization.user.email}
                     </p>
                     <span class="user-role">
-                        <i class="fas fa-graduation-cap" style="margin-right: 0.5rem;"></i>
-                        Студент
+                        <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
+                        Менеджер организации
                     </span>
-                    <a href="/student/profile/edit" class="edit-button">
+                    <a href="/organization/profile/edit" class="edit-button">
                         <i class="fas fa-edit"></i>
                         Редактировать профиль
                     </a>
@@ -212,33 +213,33 @@
             </div>
 
             <div class="profile-details">
-                <#if student.student.phone?has_content>
+                <#if organization.user.phone?has_content>
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-phone" style="margin-right: 0.5rem;"></i>
                             Телефон
                         </div>
-                        <div class="detail-value">${student.student.phone}</div>
+                        <div class="detail-value">${organization.user.phone}</div>
                     </div>
                 </#if>
 
-                <#if student.specialization?has_content>
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-laptop-code" style="margin-right: 0.5rem;"></i>
-                            Специализация
-                        </div>
-                        <div class="detail-value">${student.specialization}</div>
-                    </div>
-                </#if>
-
-                <#if student.organization?has_content>
+                <#if organization.organization?has_content>
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
                             Организация
                         </div>
-                        <div class="detail-value">${student.organizationName}</div>
+                        <div class="detail-value">${organization.organization.description}</div>
+                    </div>
+                </#if>
+
+                <#if organization.organization?has_content>
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
+                            Код организации
+                        </div>
+                        <div class="detail-value">${organization.organization.code}</div>
                     </div>
                 </#if>
 
@@ -248,13 +249,13 @@
                         Статус
                     </div>
                     <div class="detail-value">
-                        <#if student.student.isActive>
+                        <#if organization.user.isActive>
                             <span style="color: #28a745;">
-                                <i class="fas fa-check-circle"></i> Активный
+                                <i class="fas fa-check-circle"></i> Активная
                             </span>
                         <#else>
                             <span style="color: #dc3545;">
-                                <i class="fas fa-times-circle"></i> Неактивный
+                                <i class="fas fa-times-circle"></i> Неактивная
                             </span>
                         </#if>
                     </div>
