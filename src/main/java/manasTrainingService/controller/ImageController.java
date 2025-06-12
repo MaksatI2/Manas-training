@@ -1,5 +1,6 @@
 package manasTrainingService.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import manasTrainingService.dto.ImageDto;
@@ -28,13 +29,18 @@ public class ImageController {
     }
 
     @PostMapping("upload")
-    public String uploadImage(ImageDto avatar, RedirectAttributes redirectAttributes) {
+    public String uploadImage(ImageDto avatar, RedirectAttributes redirectAttributes, HttpServletRequest request) {
         try {
             String filename = imageService.saveImage(avatar);
             redirectAttributes.addFlashAttribute("successMessage",
                     "Изображение успешно загружено!");
             log.info("Изображение успешно загружено: {}", filename);
-            return "redirect:/";
+            if (request.isUserInRole("STUDENT")){
+                return "redirect:/student/profile";
+            }else if(request.isUserInRole("TEACHER")){
+                return "redirect:/teacher/profile";
+            }
+            return "redirect:/organization/profile";
 
         } catch (ImageValidationException e) {
             log.warn("Ошибка валидации изображения: {}", e.getMessage());
