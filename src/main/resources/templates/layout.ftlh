@@ -212,9 +212,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-book me-1"></i>Курсы</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
-                    </li>
 
                     <#if known>
                         <#if isAdmin>
@@ -226,11 +223,17 @@
                                 <a class="nav-link" href="/#"><i
                                             class="fas fa-chart-bar me-1"></i>Отчеты</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
+                            </li>
                         </#if>
 
                         <#if isTeacher>
                             <li class="nav-item">
                                 <a class="nav-link" href="/#"><i class="fas fa-question-circle me-1"></i>Тесты</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
                             </li>
                         </#if>
 
@@ -240,7 +243,10 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/#"><i
-                                            class="fas fa-graduation-cap me-1"></i>Курсы</a>
+                                class="fas fa-graduation-cap me-1"></i>Курсы</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
                             </li>
                         </#if>
 
@@ -248,6 +254,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="/#"><i class="fas fa-book-open me-1"></i>Мои
                                     курсы</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
                             </li>
                         </#if>
                     </#if>

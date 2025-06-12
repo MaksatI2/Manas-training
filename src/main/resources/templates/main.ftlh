@@ -242,7 +242,7 @@
         .fade-in {
             opacity: 0;
             transform: translateY(30px);
-            animation: fadeInUp 0.8s ease forwards;
+            animation: fadeInUp 0.15s ease forwards;
         }
 
         @keyframes fadeInUp {
