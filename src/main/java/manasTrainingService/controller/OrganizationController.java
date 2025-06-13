@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.OrganizationProfileEditDto;
 import manasTrainingService.entity.Organization;
+import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;
 import manasTrainingService.service.OrganizationService;
 import manasTrainingService.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("organization")
@@ -35,12 +37,19 @@ public class OrganizationController {
     }
 
     @PostMapping("profile/edit")
-    public String organizationProfileEdit(@Valid OrganizationProfileEditDto organizationProfileEditDto, BindingResult bindingResult, Model model) {
-        if (!bindingResult.hasErrors()) {
-            organizationService.editOrganizationInformation(organizationProfileEditDto);
-            return "redirect:/organization/profile";
+    public String organizationProfileEdit(@Valid OrganizationProfileEditDto organizationProfileEditDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("organizationProfile", organizationProfileEditDto);
+            return "organization/edit";
         }
-        model.addAttribute("organizationProfile", organizationProfileEditDto);
-        return "organization/edit";
+        try{
+            organizationService.editOrganizationInformation(organizationProfileEditDto);
+            redirectAttributes.addFlashAttribute("successMessage", "Информация профиля успешна изменене!");
+            return "redirect:/organization/profile";
+        } catch (PhoneAlreadyExistsException e){
+            model.addAttribute("errorMessage", "Данный телефонный номер уже зарегистрирован");
+            model.addAttribute("organizationProfile", organizationProfileEditDto);
+            return "organization/edit";
+        }
     }
 }

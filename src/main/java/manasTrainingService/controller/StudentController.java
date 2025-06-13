@@ -48,7 +48,7 @@ public class StudentController {
             redirectAttributes.addFlashAttribute("successMessage", "Профиль успешно обновлен!");
             return "redirect:/student/profile";
         } catch (PhoneAlreadyExistsException e) {
-            bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
+            model.addAttribute("errorMessage", "Данный телефонный номер уже зарегистрирован");
             model.addAttribute("studentProfile", userProfileEditDto);
             return "student/profile-edit";
         }

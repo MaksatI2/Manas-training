@@ -189,7 +189,7 @@
                              alt="Фото профиля по умолчанию">
                     </#if>
                     <a href="/image/upload" class="edit-button">
-                        <i class="fas fa-edit"></i>
+                        <i class="fa-solid fa-pencil"></i>
                         Загрузить изображение
                     </a>
                 </div>
