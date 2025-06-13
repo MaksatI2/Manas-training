@@ -63,6 +63,9 @@
                         <@spring.formInput  "studentProfile.phone"' type="tel" class="form-control" id="phone" placeholder="+996700270984"'/>
                         <div class="form-text">Формат: +996700270984</div>
                         <div class="error-block">
+                            <#if errorMessage??>
+                                <span class="error-message">${errorMessage}</span>
+                            </#if>
                             <@spring.showErrors "<br>" "error-message" />
                         </div>
                     </div>
