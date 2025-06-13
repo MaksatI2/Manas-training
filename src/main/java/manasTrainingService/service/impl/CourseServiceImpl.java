@@ -9,12 +9,9 @@ import manasTrainingService.repositories.CourseCategoryRepository;
 import manasTrainingService.repositories.CourseRepository;
 import manasTrainingService.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -26,32 +23,20 @@ public class CourseServiceImpl implements CourseService {
     private CourseCategoryRepository categoryRepository;
 
     @Override
-    public Page<CourseDto> getCourses(Pageable pageable, Integer categoryId, String search) {
-        if (categoryId != null && !categoryRepository.existsById(categoryId)) {
-            throw new EntityNotFoundException("Category with ID " + categoryId + " not found");
-        }
-        if (search != null && !search.trim().isEmpty()) {
-            return courseRepository.findByTitleContainingIgnoreCaseOrCodeContainingIgnoreCaseAndCategoryId(
-                    search, search, categoryId, pageable).map(this::toDto);
-        }
-        if (categoryId != null) {
-            return courseRepository.findByCategoryId(categoryId, pageable).map(this::toDto);
-        }
-        return courseRepository.findAll(pageable).map(this::toDto);
+    public List<CourseDto> getAllCourses() {
+        return courseRepository.findAll().stream().map(this::toDto).toList();
     }
 
     @Override
     public CourseDto getCourseById(Integer id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Course with ID " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Course not found with id: " + id));
         return toDto(course);
     }
 
     @Override
     public List<CourseCategoryDto> getCategories() {
-        return categoryRepository.findAll().stream()
-                .map(this::toCategoryDto)
-                .collect(Collectors.toList());
+        return categoryRepository.findAll().stream().map(this::toCategoryDto).toList();
     }
 
     private CourseDto toDto(Course course) {

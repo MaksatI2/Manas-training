@@ -1,221 +1,275 @@
 <#import "../layout.ftlh" as layout>
 <@layout.page>
-    <style>
-        .courses-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .filter-card {
-            background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.1);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border-left: 4px solid var(--primary-blue);
-        }
-
-        .course-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .course-card {
-            background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
-            overflow: hidden;
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--light-blue);
-        }
-
-        .course-card:hover {
-            transform: translateY(-7px);
-            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.15);
-        }
-
-        .course-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(0, 102, 204, 0.1);
-        }
-
-        .course-body {
-            padding: 1.5rem;
-        }
-
-        .course-title {
-            color: var(--primary-blue);
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .course-meta {
-            display: flex;
-            gap: 1.5rem;
-            margin: 1rem 0;
-            font-size: 0.9rem;
-        }
-
-        .course-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .empty-courses {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 2rem;
-        }
-    </style>
-
-    <div class="courses-container">
-        <h1 class="page-title">
-            <i class="fas fa-graduation-cap me-2" style="color: var(--primary-blue);"></i>
-            Каталог курсов
-        </h1>
-
-        <div class="filter-card">
-            <form method="GET" action="/courses">
-                <input type="hidden" name="_csrf" value="${_csrf.token}" />
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-4">
-                        <label class="form-label">
-                            <i class="fas fa-filter me-1"></i>Категория
-                        </label>
-                        <select name="categoryId" class="form-select">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
+            <h5 class="m-0 font-weight-bold text-white">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Каталог курсов
+            </h5>
+            <div>
+                <a href="/admin/courses/add" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc;">
+                    <i class="fas fa-plus me-1" style="color: #0066cc;"></i> Добавить курс
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text" style="background: #0066cc; color: white;"><i class="fas fa-filter"></i></span>
+                        <select id="categoryFilter" class="form-select">
                             <option value="">Все категории</option>
                             <#list categories as category>
-                                <option value="${category.id}"
-                                        <#if categoryId?? && categoryId == category.id>selected</#if>>
-                                    ${category.name}
-                                </option>
+                                <option value="${category.name}">${category.name}</option>
                             </#list>
                         </select>
                     </div>
-
-                    <div class="col-md-5">
-                        <label class="form-label">
-                            <i class="fas fa-search me-1"></i>Поиск
-                        </label>
-                        <input type="text" name="search" class="form-control"
-                               placeholder="По названию или коду" value="${search!''}">
-                    </div>
-
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary-custom w-100">
-                            <i class="fas fa-check me-1"></i>Применить
-                        </button>
-                        <a href="/courses/reset" class="btn btn-outline-secondary w-100 mt-2">
-                            <i class="fas fa-redo me-1"></i>Сбросить
-                        </a>
-                    </div>
                 </div>
-            </form>
-        </div>
-
-        <#if courses?size == 0>
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle me-2"></i>
-                Курсы по вашему запросу не найдены
-            </div>
-        <#else>
-            <div class="course-grid">
-                <#list courses as course>
-                    <div class="course-card">
-                        <div class="course-header">
-                            <h5 class="course-title">${course.title}</h5>
-                            <div class="course-meta">
-                                <span class="course-meta-item">
-                                    <i class="fas fa-hashtag"></i>
-                                    ${course.code}
-                                </span>
-                                <span class="course-meta-item">
-                                    <i class="fas fa-clock"></i>
-                                    ${course.duration}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="course-body">
-                            <p class="mb-3">
-                                <i class="fas fa-tag me-2 text-primary"></i>
-                                Категория: ${course.category.name}
-                            </p>
-                            <a href="/courses/${course.id}" class="btn btn-outline-primary w-100">
-                                <i class="fas fa-info-circle me-2"></i>Подробнее
-                            </a>
-                        </div>
-                    </div>
-                </#list>
+                <div class="col-md-9 d-flex justify-content-end align-items-center">
+                    <div id="coursesTable_info" class="text-muted small me-3" style="color: #2c3e50 !important;"></div>
+                </div>
             </div>
 
-            <#if totalPages gt 1>
-                <div class="pagination-container">
-                    <ul class="pagination">
-                        <#if currentPage gt 1>
-                            <li class="page-item">
-                                <a class="page-link" href="/courses?page=${currentPage - 1}&categoryId=${categoryId!''}&search=${search!''}" aria-label="Предыдущая страница">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                        </#if>
-
-                        <#assign startPage = (currentPage - 2)>
-                        <#if startPage lt 1>
-                            <#assign startPage = 1>
-                        </#if>
-                        <#assign endPage = (currentPage + 2)>
-                        <#if endPage gt totalPages>
-                            <#assign endPage = totalPages>
-                        </#if>
-                        <#if startPage gt 1>
-                            <li class="page-item">
-                                <a class="page-link" href="/courses?page=1&categoryId=${categoryId!''}&search=${search!''}" aria-label="Первая страница">1</a>
-                            </li>
-                            <#if startPage gt 2>
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            </#if>
-                        </#if>
-
-                        <#list startPage..endPage as count>
-                            <li class="page-item <#if currentPage == count>active</#if>">
-                                <a class="page-link" href="/courses?page=${count}&categoryId=${categoryId!''}&search=${search!''}" aria-label="Страница ${count}">${count}</a>
-                            </li>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="coursesTable" width="100%" cellspacing="0">
+                    <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Код курса</th>
+                        <th>Категория</th>
+                        <th>Длительность</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <#if courses?has_content>
+                        <#list courses as course>
+                            <tr style="cursor: pointer;" onclick="window.location.href='/courses/${course.id}'">
+                                <td>${course.id}</td>
+                                <td>${course.title}</td>
+                                <td>
+                                    <span class="badge" style="background: #87ceeb; color: #2c3e50;">${course.code}</span>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: #003d7a; color: white;">${course.category.name}</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-clock me-1" style="color: #0066cc;"></i>${course.duration}
+                                </td>
+                            </tr>
                         </#list>
+                    <#else>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                <i class="fas fa-graduation-cap fa-2x mb-2" style="color: #0066cc;"></i>
+                                <p style="color: #2c3e50;">Курсы не найдены</p>
+                            </td>
+                        </tr>
+                    </#if>
+                    </tbody>
+                </table>
+            </div>
 
-                        <#if endPage lt totalPages>
-                            <#if endPage lt (totalPages - 1)>
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            </#if>
-                            <li class="page-item">
-                                <a class="page-link" href="/courses?page=${totalPages}&categoryId=${categoryId!''}&search=${search!''}" aria-label="Последняя страница">${totalPages}</a>
-                            </li>
-                        </#if>
-
-                        <#if currentPage < totalPages>
-                            <li class="page-item">
-                                <a class="page-link" href="/courses?page=${currentPage + 1}&categoryId=${categoryId!''}&search=${search!''}" aria-label="Следующая страница">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        </#if>
-                    </ul>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div id="coursesTable_paginate" class="dataTables_paginate"></div>
                 </div>
-            </#if>
-        </#if>
+            </div>
+        </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#coursesTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ru.json'
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthChange: true,
+                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
+                order: [[0, 'asc']],
+                searching: true,
+                info: true,
+                paging: true,
+                autoWidth: false,
+                stateSave: true,
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                initComplete: function() {
+                    this.api().page.len(10).draw();
+                }
+            });
+
+            $('#categoryFilter').on('change', function() {
+                table.column(3).search(this.value).draw();
+            });
+
+            $('.dataTables_paginate').addClass('pagination');
+            $('.paginate_button').addClass('page-item');
+            $('.paginate_button a').addClass('page-link');
+
+            table.on('draw', function() {
+                $('.paginate_button').removeClass('disabled active');
+                $('.paginate_button.current').addClass('active');
+            });
+        });
+    </script>
+
+    <style>
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+        }
+
+        .card-header {
+            border-bottom: none;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 10px;
+        }
+
+        #coursesTable {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        #coursesTable th {
+            background: linear-gradient(135deg, #0066cc, #003d7a);
+            color: white;
+            padding: 0.75rem;
+            vertical-align: middle;
+            border: none;
+            font-weight: 600;
+        }
+
+        #coursesTable td {
+            padding: 0.75rem;
+            vertical-align: middle;
+            border-top: 1px solid #e3e6f0;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        #coursesTable tr:hover {
+            background-color: rgba(0,102,204,0.05);
+            transform: translateY(-1px);
+            transition: all 0.3s ease;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.375rem;
+        }
+
+        .pagination {
+            display: flex;
+            padding-left: 0;
+            list-style: none;
+            border-radius: 25px;
+        }
+
+        .page-item:first-child .page-link {
+            margin-left: 0;
+            border-top-left-radius: 25px;
+            border-bottom-left-radius: 25px;
+        }
+
+        .page-item:last-child .page-link {
+            border-top-right-radius: 25px;
+            border-bottom-right-radius: 25px;
+        }
+
+        .page-item.active .page-link {
+            z-index: 1;
+            color: #fff;
+            background: linear-gradient(135deg, #0066cc, #003d7a);
+            border-color: #0066cc;
+        }
+
+        .page-link {
+            position: relative;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            margin-left: -1px;
+            line-height: 1.25;
+            color: #0066cc;
+            background-color: #fff;
+            border: 1px solid #dddfeb;
+        }
+
+        .page-link:hover {
+            z-index: 2;
+            color: #003d7a;
+            text-decoration: none;
+            background-color: rgba(0,102,204,0.1);
+            border-color: #dddfeb;
+        }
+
+        .input-group-text {
+            background: #0066cc;
+            border: 1px solid #0066cc;
+            color: white;
+        }
+
+        .form-select {
+            border-left: 0;
+            border-color: #d1d3e2;
+        }
+
+        .form-select:focus {
+            box-shadow: none;
+            border-color: #d1d3e2;
+        }
+
+        .btn-light {
+            transition: all 0.3s ease;
+        }
+
+        .btn-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .card-header h5 {
+                margin-bottom: 1rem;
+                font-size: 2rem;
+            }
+
+            .row.mb-3 {
+                flex-direction: column;
+            }
+
+            .col-md-3, .col-md-9 {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .col-md-9 {
+                margin-top: 1rem;
+                justify-content: flex-start!important;
+            }
+        }
+    </style>
 </@layout.page>

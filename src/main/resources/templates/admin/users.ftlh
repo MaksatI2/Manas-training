@@ -10,71 +10,8 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="mb-4">
-                <form method="get" class="row g-3" id="filterForm">
-                    <div class="col-md-3">
-                        <label for="roleSelect" class="form-label">Роль</label>
-                        <select name="role" id="roleSelect" class="form-control">
-                            <option value="">Все роли</option>
-                            <#list roles as role>
-                                <option value="${role}" <#if selectedRole?? && selectedRole == role>selected</#if>>
-                                    ${role}
-                                </option>
-                            </#list>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="statusSelect" class="form-label">Статус</label>
-                        <select name="status" id="statusSelect" class="form-control">
-                            <option value="">Все статусы</option>
-                            <option value="active" <#if selectedStatus?? && selectedStatus == "active">selected</#if>>
-                                Активные
-                            </option>
-                            <option value="inactive" <#if selectedStatus?? && selectedStatus == "inactive">selected</#if>>
-                                Неактивные
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="searchInput" class="form-label">Поиск</label>
-                        <input type="text"
-                               name="search"
-                               id="searchInput"
-                               class="form-control"
-                               placeholder="Email, имя или фамилия"
-                               value="${searchQuery!''}">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary me-2" style="display: none;">
-                            <i class="fas fa-search"></i> Найти
-                        </button>
-                        <a href="/admin/users" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Сброс
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <div class="mb-3">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p class="text-muted mb-0">
-                            Найдено пользователей: <strong>${userPage.totalElements}</strong>
-                            <#if selectedRole?has_content || selectedStatus?has_content || searchQuery?has_content>
-                                <span class="badge bg-info ms-2">Фильтры применены</span>
-                            </#if>
-                        </p>
-                    </div>
-                    <div class="col-md-6 text-end">
-                        <small class="text-muted">
-                            Страница ${userPage.number + 1} из ${userPage.totalPages}
-                        </small>
-                    </div>
-                </div>
-            </div>
-
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="usersTable" width="100%" cellspacing="0">
                     <thead>
                     <tr>
                         <th>ID</th>
@@ -88,8 +25,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <#if userPage.content?has_content>
-                        <#list userPage.content as user>
+                    <#if users?has_content>
+                        <#list users as user>
                             <tr>
                                 <td>${user.id}</td>
                                 <td>${user.name}</td>
@@ -132,83 +69,106 @@
                             <td colspan="8" class="text-center text-muted py-4">
                                 <i class="fas fa-users fa-2x mb-2"></i>
                                 <p>Пользователи не найдены</p>
-                                <#if selectedRole?has_content || selectedStatus?has_content || searchQuery?has_content>
-                                    <a href="/admin/users" class="btn btn-sm btn-outline-primary">
-                                        Сбросить фильтры
-                                    </a>
-                                </#if>
                             </td>
                         </tr>
                     </#if>
                     </tbody>
                 </table>
             </div>
-
-            <#if userPage.totalPages gt 1>
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        <#assign baseUrl = "?size=${userPage.size}&role=${selectedRole!''}&status=${selectedStatus!''}&search=${searchQuery!''}" />
-
-                        <#if userPage.number gt 0>
-                            <li class="page-item">
-                                <a class="page-link" href="${baseUrl}&page=${userPage.number}">
-                                   &laquo;
-                                </a>
-                            </li>
-                        </#if>
-
-                        <#list 1..userPage.totalPages as p>
-                            <#if (p <= 3) || (p >= userPage.totalPages - 2) || (p >= userPage.number - 1 && p <= userPage.number + 3)>
-                                <li class="page-item <#if p == userPage.number + 1>active</#if>">
-                                    <a class="page-link" href="${baseUrl}&page=${p}">${p}</a>
-                                </li>
-                            <#elseif p == 4 && userPage.number > 5>
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            <#elseif p == userPage.totalPages - 3 && userPage.number < userPage.totalPages - 4>
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            </#if>
-                        </#list>
-
-                        <#if userPage.number < userPage.totalPages - 1>
-                            <li class="page-item">
-                                <a class="page-link" href="${baseUrl}&page=${userPage.number + 2}">
-                                    &raquo;
-                                </a>
-                            </li>
-                        </#if>
-                    </ul>
-                </nav>
-            </#if>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const filterForm = document.getElementById('filterForm');
-            const roleSelect = document.getElementById('roleSelect');
-            const statusSelect = document.getElementById('statusSelect');
-            const searchInput = document.getElementById('searchInput');
+        $(document).ready(function() {
+            $('#usersTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ru.json'
+                },
+                responsive: true,
+                pageLength: 25,
+                lengthChange: true,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Все"]],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'copy',
+                        text: 'Копировать',
+                        className: 'btn btn-secondary btn-sm'
+                    },
+                    {
+                        extend: 'excel',
+                        text: 'Excel',
+                        className: 'btn btn-success btn-sm'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'PDF',
+                        className: 'btn btn-danger btn-sm'
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Печать',
+                        className: 'btn btn-info btn-sm'
+                    }
+                ],
+                columnDefs: [
+                    {
+                        targets: [5, 6],
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        targets: [7],
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                order: [[0, 'asc']],
+                searching: true,
+                info: true,
+                paging: true,
+                autoWidth: false,
+                stateSave: true,
+                initComplete: function() {
+                    this.api().columns([5, 6]).every(function() {
+                        var column = this;
+                        var select = $('<select class="form-select form-select-sm"><option value="">Все</option></select>')
+                            .appendTo($(column.header()))
+                            .on('change', function() {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+                                column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                            });
 
-            let searchTimer;
-
-            roleSelect.addEventListener('change', function() {
-                filterForm.submit();
+                        column.data().unique().sort().each(function(d, j) {
+                            var text = $(d).text() || d;
+                            if (text && text !== '-') {
+                                select.append('<option value="' + text + '">' + text + '</option>');
+                            }
+                        });
+                    });
+                }
             });
 
-            statusSelect.addEventListener('change', function() {
-                filterForm.submit();
-            });
-
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimer);
-                searchTimer = setTimeout(function() {
-                    filterForm.submit();
-                }, 500);
-            });
+            $('.dt-buttons').addClass('mb-3');
+            $('.dt-button').removeClass('dt-button');
         });
     </script>
 
@@ -216,22 +176,24 @@
         .table-responsive {
             overflow-x: auto;
         }
-        #dataTable {
+
+        #usersTable {
             width: 100%;
             margin-bottom: 1rem;
             color: #212529;
         }
 
-        #dataTable th {
+        #usersTable th {
             background-color: var(--primary-blue);
             color: white;
             padding: 0.75rem;
             vertical-align: top;
             border-top: 1px solid #dee2e6;
             font-weight: 600;
+            position: relative;
         }
 
-        #dataTable td {
+        #usersTable td {
             padding: 0.75rem;
             vertical-align: middle;
             border-top: 1px solid #dee2e6;
@@ -269,49 +231,11 @@
             color: white;
         }
 
-        .pagination {
-            display: flex;
-            padding-left: 0;
-            list-style: none;
-            border-radius: 0.375rem;
-        }
-
-        .page-item.active .page-link {
-            background-color: var(--primary-blue);
-            border-color: var(--primary-blue);
-            color: white;
-        }
-
-        .page-link {
-            color: var(--primary-blue);
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            padding: 0.5rem 0.75rem;
-            text-decoration: none;
-        }
-
-        .page-link:hover {
-            color: var(--primary-blue);
-            background-color: #e9ecef;
-            border-color: #dee2e6;
-        }
-
         .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
             line-height: 1.5;
             border-radius: 0.25rem;
-        }
-
-        .form-label {
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .g-3 > * {
-            padding-right: calc(1rem * 0.5);
-            padding-left: calc(1rem * 0.5);
-            margin-top: 1rem;
         }
 
         .text-muted {
@@ -331,12 +255,68 @@
             margin-bottom: 0.5rem!important;
         }
 
-        .justify-content-center {
-            justify-content: center!important;
+        /* DataTables стили */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_processing,
+        .dataTables_wrapper .dataTables_paginate {
+            color: #212529;
         }
 
-        .align-items-end {
-            align-items: flex-end!important;
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.5rem 0.75rem;
+            margin-left: -1px;
+            line-height: 1.25;
+            color: var(--primary-blue);
+            text-decoration: none;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            margin-left: 0.5em;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            margin: 0 0.5em;
+        }
+
+        th select {
+            width: 100%;
+            margin-top: 5px;
+            padding: 2px 5px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: white;
+            color: #333;
+        }
+
+        .dt-buttons {
+            margin-bottom: 1rem;
+        }
+
+        .dt-buttons .btn {
+            margin-right: 0.5rem;
         }
     </style>
 </@layout.page>

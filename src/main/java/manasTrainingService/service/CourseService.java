@@ -8,7 +8,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CourseService {
-    Page<CourseDto> getCourses(Pageable pageable, Integer categoryId, String search);
+
+    List<CourseDto> getAllCourses();
 
     CourseDto getCourseById(Integer id);
 
