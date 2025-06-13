@@ -36,7 +36,8 @@ public interface UserService {
     User getUserById(Integer id);
     User saveUser(User user);
 
-    Page<User> getAllUsers(Pageable pageable);
+    List<User> getAllUsers();
+
     Page<User> getUsersByRole(String role, Pageable pageable);
     List<String> getAllRoles();
     void addAvatarUrl(int userId, String filename);

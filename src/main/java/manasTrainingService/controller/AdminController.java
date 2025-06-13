@@ -61,42 +61,9 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String showUsers(
-            @RequestParam("page") Optional<Integer> page,
-            @RequestParam("size") Optional<Integer> size,
-            @RequestParam("role") Optional<String> role,
-            @RequestParam("status") Optional<String> status,
-            @RequestParam("search") Optional<String> search,
-            Model model) {
-
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(10);
-
-        String roleFilter = role.orElse("");
-        String statusFilter = status.orElse("");
-        String searchFilter = search.orElse("");
-
-        Page<User> userPage = userService.getUsersWithFilters(
-                roleFilter.isEmpty() ? null : roleFilter,
-                statusFilter.isEmpty() ? null : statusFilter,
-                searchFilter.isEmpty() ? null : searchFilter,
-                PageRequest.of(currentPage - 1, pageSize)
-        );
-
-        model.addAttribute("userPage", userPage);
-        model.addAttribute("roles", roleService.getAllRoles());
-        model.addAttribute("selectedRole", roleFilter);
-        model.addAttribute("selectedStatus", statusFilter);
-        model.addAttribute("searchQuery", searchFilter);
-
-        int totalPages = userPage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                    .boxed()
-                    .collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
-        }
-
+    public String showUsers(Model model) {
+        List<User> users = userService.getAllUsers();
+        model.addAttribute("users", users);
         return "admin/users";
     }
 
