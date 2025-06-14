@@ -1,7 +1,7 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.OrganizationProfileEditDto;
+import manasTrainingService.dto.edit.OrganizationProfileEditDto;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.create.CreateTeacherDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
@@ -41,7 +41,6 @@ public class UserServiceImpl implements UserService {
     private final TeacherService teacherService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetService passwordResetService;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Override
     public void registerOrganization(OrganizationRegisterDto organizationRegisterDto) {
@@ -185,9 +184,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean isValidResetToken(String token) {
-        return passwordResetTokenRepository.findByToken(token)
-                .filter(t -> t.getExpiryDate().isAfter(LocalDateTime.now()))
-                .isPresent();
+        return passwordResetService.isValidToken(token);
     }
 
     @Override
@@ -223,15 +220,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-    @Override
-    public Page<User> getUsersByRole(String role, Pageable pageable) {
-        return userRepository.findByRole_Name(role, pageable);
-    }
-
-    @Override
-    public List<String> getAllRoles() {
-        return userRepository.findAllDistinctRoleNames();
-    }
 
     public void addAvatarUrl(int userId, String filename){
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));

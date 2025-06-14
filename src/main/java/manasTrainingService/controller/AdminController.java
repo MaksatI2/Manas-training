@@ -7,10 +7,7 @@ import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.EmailAlreadyExistsException;
 import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;
 import manasTrainingService.service.RoleService;
-import manasTrainingService.service.StudentService;
 import manasTrainingService.service.UserService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,15 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
-    private final StudentService studentService;
     private final UserService userService;
     private final RoleService roleService;
 
@@ -63,6 +56,7 @@ public class AdminController {
     @GetMapping("/users")
     public String showUsers(Model model) {
         List<User> users = userService.getAllUsers();
+        model.addAttribute("roles", roleService.getAllRoles());
         model.addAttribute("users", users);
         return "admin/users";
     }
@@ -95,17 +89,5 @@ public class AdminController {
                     "Ошибка при деактивации пользователя: " + e.getMessage());
         }
         return "redirect:/admin/users";
-    }
-
-    @GetMapping("/users/{userId}")
-    public String viewUser(@PathVariable Integer userId, Model model) {
-        try {
-            User user = userService.getUserById(userId);
-            model.addAttribute("user", user);
-            return "admin/user-details";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", "Пользователь не найден");
-            return "redirect:/admin/users";
-        }
     }
 }

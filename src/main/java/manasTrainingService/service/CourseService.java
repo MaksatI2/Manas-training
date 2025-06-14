@@ -11,7 +11,7 @@ public interface CourseService {
 
     List<CourseDto> getAllCourses();
 
-    CourseDto getCourseById(Integer id);
+    CourseDto getById(Integer id);
 
     List<CourseCategoryDto> getCategories();
 }

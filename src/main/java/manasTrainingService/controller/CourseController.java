@@ -1,6 +1,7 @@
 package manasTrainingService.controller;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.service.CourseService;
@@ -10,38 +11,41 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 @Controller
-public class CourseMvcController {
+@RequestMapping("/courses")
+@RequiredArgsConstructor
+public class CourseController {
 
     @Autowired
     private CourseService courseService;
 
-    @GetMapping("/courses")
+    @GetMapping
     public String getCourseList(Model model) {
         try {
             List<CourseDto> courses = courseService.getAllCourses();
             List<CourseCategoryDto> categories = courseService.getCategories();
             model.addAttribute("courses", courses);
             model.addAttribute("categories", categories);
-            return "course/course_list";
+            return "courses/course_list";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", "Ошибка при загрузке курсов");
             return "error/error";
         }
     }
 
-    @GetMapping("/courses/{id}")
+    @GetMapping("/{id}")
     public String getCourseDetails(@PathVariable Integer id, Model model, Authentication authentication) {
         try {
-            CourseDto course = courseService.getCourseById(id);
+            CourseDto course = courseService.getById(id);
             model.addAttribute("course", course);
             boolean canEnroll = authentication != null && authentication.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_STUDENT") || a.getAuthority().equals("ROLE_ORGANIZATION"));
             model.addAttribute("canEnroll", canEnroll);
-            return "course/course_details";
+            return "courses/course-view";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", "Курс не найден");
             return "error/error";

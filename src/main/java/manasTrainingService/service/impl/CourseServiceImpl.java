@@ -7,6 +7,7 @@ import manasTrainingService.entity.Course;
 import manasTrainingService.entity.CourseCategory;
 import manasTrainingService.repositories.CourseCategoryRepository;
 import manasTrainingService.repositories.CourseRepository;
+import manasTrainingService.service.CourseCategoryService;
 import manasTrainingService.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,10 @@ public class CourseServiceImpl implements CourseService {
     private CourseRepository courseRepository;
 
     @Autowired
-    private CourseCategoryRepository categoryRepository;
+    private CourseCategoryService categoryService;
+
+    @Autowired
+    private CourseCategoryService categoryAdminService;
 
     @Override
     public List<CourseDto> getAllCourses() {
@@ -28,15 +32,15 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseDto getCourseById(Integer id) {
+    public CourseDto getById(Integer id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Course not found with id: " + id));
-        return toDto(course);
+                .orElseThrow(() -> new EntityNotFoundException("Курс с ID " + id + " не найден"));
+        return convertToDto(course);
     }
 
     @Override
     public List<CourseCategoryDto> getCategories() {
-        return categoryRepository.findAll().stream().map(this::toCategoryDto).toList();
+        return categoryService.getAllCategories();
     }
 
     private CourseDto toDto(Course course) {
@@ -55,5 +59,22 @@ public class CourseServiceImpl implements CourseService {
         dto.setId(category.getId());
         dto.setName(category.getName());
         return dto;
+    }
+
+    public CourseDto convertToDto(Course course) {
+        CourseCategoryDto categoryDto = categoryAdminService.convertToDto(course.getCategory());
+        return CourseDto.builder()
+                .id(course.getId())
+                .title(course.getTitle())
+                .code(course.getCode())
+                .description(course.getDescription())
+                .duration(course.getDurationHours())
+                .individual(course.getIsIndividual())
+                .active(course.getIsActive())
+                .createdAt(course.getCreatedAt())
+                .updatedAt(course.getUpdatedAt())
+                .category(categoryDto)
+                .categoryId(course.getCategory().getId())
+                .build();
     }
 }

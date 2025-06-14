@@ -1,4 +1,4 @@
-package manasTrainingService.service.impl;
+package manasTrainingService.config;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.entity.User;
@@ -23,15 +23,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + email));
 
         String role = user.getRole().getName();
+        var authorities = List.of(new SimpleGrantedAuthority(role));
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPasswordHash(),
-                user.getIsActive(),
-                true,
-                true,
-                true,
-                List.of(new SimpleGrantedAuthority(role))
-        );
+        return new CustomUserDetails(user, authorities);
     }
 }

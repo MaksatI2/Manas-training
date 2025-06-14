@@ -1,26 +1,23 @@
 package manasTrainingService.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.dto.create.CreateCourseDto;
+import manasTrainingService.dto.edit.CourseEditDto;
 import manasTrainingService.service.CourseAdminService;
-import manasTrainingService.service.CourseCategoryAdminService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import manasTrainingService.service.CourseCategoryService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/admin/courses")
@@ -28,101 +25,101 @@ import java.util.stream.IntStream;
 public class AdminCourseController {
 
     private final CourseAdminService courseAdminService;
-    private final CourseCategoryAdminService categoryAdminService;
+    private final CourseCategoryService categoryAdminService;
 
     @GetMapping
-    public String listCourses(@RequestParam Optional<Integer> page,
-                              @RequestParam Optional<String> search,
-                              @RequestParam Optional<Integer> categoryId,
-                              @RequestParam Optional<Boolean> isActive,
-                              @RequestParam Optional<Boolean> isIndividual,
-                              Model model,
-                              @RequestHeader(value = "X-Requested-With", required = false) String requestedWith) {
-        int currentPage = page.orElse(1);
-        Page<CourseDto> coursePage = courseAdminService.getCourses(
-                PageRequest.of(currentPage - 1, 10),
-                categoryId.orElse(null),
-                search.orElse(null),
-                isActive.orElse(null),
-                isIndividual.orElse(null));
+    public String listCourses(Model model) {
+        List<CourseDto> courses = courseAdminService.getAllCourses();
         List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
-        model.addAttribute("coursePage", coursePage);
+
+        model.addAttribute("courses", courses);
         model.addAttribute("categories", categories);
-        model.addAttribute("selectedCategoryId", categoryId.orElse(null));
-        model.addAttribute("searchQuery", search.orElse(""));
-        model.addAttribute("selectedIsActive", isActive.orElse(null));
-        model.addAttribute("selectedIsIndividual", isIndividual.orElse(null));
+
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                 .contains(new SimpleGrantedAuthority("ADMIN"));
         model.addAttribute("isAdmin", isAdmin);
-        if (coursePage.getTotalPages() > 1) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, coursePage.getTotalPages())
-                    .boxed()
-                    .collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
-        }
+
         return "admin/courses";
     }
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
-        model.addAttribute("courseDto", CourseDto.builder().active(true).individual(false).build());
-        model.addAttribute("categories", categoryAdminService.getAll(null));
-        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .contains(new SimpleGrantedAuthority("ADMIN"));
-        model.addAttribute("isAdmin", isAdmin);
-        return "admin/course-form";
+        List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
+        model.addAttribute("categories", categories);
+        model.addAttribute("course", new CreateCourseDto());
+        return "admin/course-add";
+    }
+
+    @PostMapping("/add")
+    public String addCourse(@Valid @ModelAttribute("course") CreateCourseDto createCourseDto,
+                            BindingResult bindingResult,
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
+            model.addAttribute("categories", categories);
+            return "admin/course-add";
+        }
+
+        try {
+            CourseDto savedCourse = courseAdminService.create(createCourseDto);
+            redirectAttributes.addFlashAttribute("successMessage", "Курс успешно создан");
+            return "redirect:/courses/" + savedCourse.getId();
+        } catch (Exception e) {
+            List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
+            model.addAttribute("categories", categories);
+            model.addAttribute("errorMessage", e.getMessage());
+            return "admin/course-add";
+        }
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         try {
             CourseDto course = courseAdminService.getById(id);
-            model.addAttribute("courseDto", course);
-            model.addAttribute("categories", categoryAdminService.getAll(null));
-            boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                    .contains(new SimpleGrantedAuthority("ADMIN"));
-            model.addAttribute("isAdmin", isAdmin);
-            return "admin/course-form";
+            List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
+
+            CourseEditDto updateCourseDto = courseAdminService.convertToEditDto(course);
+
+            model.addAttribute("course", updateCourseDto);
+            model.addAttribute("categories", categories);
+            return "admin/course-edit";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/admin/courses";
         }
     }
 
-    @PostMapping("/save")
-    public String saveCourse(@Valid @ModelAttribute("courseDto") CourseDto dto,
+    @PostMapping("/edit/{id}")
+    public String editCourse(@PathVariable Integer id,
+                             @Valid @ModelAttribute("course") CourseEditDto updateCourseDto,
                              BindingResult bindingResult,
+                             HttpServletRequest request,
                              Model model,
                              RedirectAttributes redirectAttributes) {
+
+        updateCourseDto.setId(id);
+
+        String[] activeValues = request.getParameterValues("active");
+        String[] individualValues = request.getParameterValues("individual");
+        updateCourseDto = courseAdminService.prepareEditDtoWithRequestParams(updateCourseDto, activeValues, individualValues);
+
         if (bindingResult.hasErrors()) {
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                dto.addError(error.getField(), error.getDefaultMessage());
-            }
-            model.addAttribute("courseDto", dto);
-            model.addAttribute("categories", categoryAdminService.getAll(null));
-            boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                    .contains(new SimpleGrantedAuthority("ADMIN"));
-            model.addAttribute("isAdmin", isAdmin);
-            return "admin/course-form";
+            List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
+            model.addAttribute("categories", categories);
+            return "admin/course-edit";
         }
+
         try {
-            if (dto.getId() != null) {
-                courseAdminService.update(dto.getId(), dto);
-                redirectAttributes.addFlashAttribute("successMessage", "Курс обновлён");
-            } else {
-                courseAdminService.create(dto);
-                redirectAttributes.addFlashAttribute("successMessage", "Курс создан");
-            }
-            return "redirect:/admin/courses";
+            CourseDto updatedCourse = courseAdminService.update(updateCourseDto);
+            redirectAttributes.addFlashAttribute("successMessage", "Курс успешно обновлен");
+            return "redirect:/courses/" + updatedCourse.getId();
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            model.addAttribute("courseDto", dto);
-            model.addAttribute("categories", categoryAdminService.getAll(null));
-            boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                    .contains(new SimpleGrantedAuthority("ADMIN"));
-            model.addAttribute("isAdmin", isAdmin);
-            return "admin/course-form";
+            List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
+            model.addAttribute("categories", categories);
+            model.addAttribute("errorMessage", e.getMessage());
+            return "admin/course-edit";
         }
     }
 

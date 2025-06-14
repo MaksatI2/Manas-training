@@ -1,16 +1,17 @@
 <#import "../layout.ftlh" as layout>
 <@layout.page>
     <div class="card shadow mb-4">
+        <#if successMessage??>
+            <div id="successMessage" data-message="${successMessage?js_string}"></div>
+        </#if>
+        <#if errorMessage??>
+            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+        </#if>
         <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <h5 class="m-0 font-weight-bold text-white">
                 <i class="fas fa-graduation-cap me-2"></i>
                 Каталог курсов
             </h5>
-            <div>
-                <a href="/admin/courses/add" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc;">
-                    <i class="fas fa-plus me-1" style="color: #0066cc;"></i> Добавить курс
-                </a>
-            </div>
         </div>
         <div class="card-body">
             <div class="row mb-3">

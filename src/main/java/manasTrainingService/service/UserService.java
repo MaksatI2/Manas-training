@@ -1,6 +1,6 @@
 package manasTrainingService.service;
 
-import manasTrainingService.dto.OrganizationProfileEditDto;
+import manasTrainingService.dto.edit.OrganizationProfileEditDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
 import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.register.OrganizationRegisterDto;
@@ -22,6 +22,7 @@ public interface UserService {
     void editManagerInformation(OrganizationProfileEditDto organizationProfileEditDto);
 
     void sendResetToken(String email);
+    void addAvatarUrl(int userId, String filename);
 
     boolean resetPassword(String token, String newPassword);
     boolean existsByPhone(String phone);
@@ -37,8 +38,4 @@ public interface UserService {
     User saveUser(User user);
 
     List<User> getAllUsers();
-
-    Page<User> getUsersByRole(String role, Pageable pageable);
-    List<String> getAllRoles();
-    void addAvatarUrl(int userId, String filename);
 }

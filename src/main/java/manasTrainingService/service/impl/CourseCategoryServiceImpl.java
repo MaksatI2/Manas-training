@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.entity.CourseCategory;
 import manasTrainingService.repositories.CourseCategoryRepository;
-import manasTrainingService.service.CourseCategoryAdminService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import manasTrainingService.service.CourseCategoryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +16,16 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CourseCategoryAdminServiceImpl implements CourseCategoryAdminService {
+public class CourseCategoryServiceImpl implements CourseCategoryService {
 
     private final CourseCategoryRepository categoryRepository;
 
     @Override
-    public Page<CourseCategoryDto> getPage(String search, Pageable pageable) {
-        return categoryRepository.findByNameContainingIgnoreCase(search, pageable)
-                .map(this::convertToDto);
+    public List<CourseCategoryDto> getAllCategories() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .toList();
     }
 
     @Override
@@ -83,8 +83,7 @@ public class CourseCategoryAdminServiceImpl implements CourseCategoryAdminServic
                 .build();
     }
 
-    @Override
-    public CourseCategory convertToEntity(CourseCategoryDto dto) {
+    private CourseCategory convertToEntity(CourseCategoryDto dto) {
         return CourseCategory.builder()
                 .id(dto.getId())
                 .name(dto.getName())
@@ -98,10 +97,6 @@ public class CourseCategoryAdminServiceImpl implements CourseCategoryAdminServic
                 .orElseThrow(() -> new EntityNotFoundException("Категория с ID " + id + " не найдена"));
     }
 
-    @Override
-    public boolean existsById(Integer id) {
-        return categoryRepository.existsById(id);
-    }
 
     private void validateCategory(CourseCategoryDto dto) {
         if (categoryRepository.existsByName(dto.getName())) {

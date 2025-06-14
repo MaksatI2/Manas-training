@@ -1,6 +1,177 @@
 <#import "layout.ftlh" as layout>
 
 <@layout.page>
+    <div class="hero-section-enhanced parallax">
+        <#if successMessage??>
+            <div id="successMessage" data-message="${successMessage?js_string}"></div>
+        </#if>
+        <#if errorMessage??>
+            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+        </#if>
+        <div class="hero-content">
+            <h1 class="hero-title-enhanced fade-in">
+                Добро пожаловать в <br>
+                <span style="color: var(--light-blue);">Манас Тренинг Центр</span>
+            </h1>
+            <p class="hero-subtitle-enhanced fade-in">
+                Профессиональная подготовка специалистов в сфере гражданской авиации
+                и наземного обслуживания воздушных судов с использованием современных технологий
+            </p>
+            <button class="btn btn-hero fade-in">
+                <i class="fas fa-rocket me-2"></i>Начать обучение
+            </button>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Выпускников</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item">
+                    <span class="stat-number">25+</span>
+                    <span class="stat-label">Курсов</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item">
+                    <span class="stat-number">15+</span>
+                    <span class="stat-label">Преподавателей</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item">
+                    <span class="stat-number">98%</span>
+                    <span class="stat-label">Успешность</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <h2 class="section-title">Наши возможности</h2>
+        <p class="section-subtitle">
+            Современная образовательная платформа с широким спектром инструментов для эффективного обучения
+        </p>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card-enhanced text-center fade-in interactive-bg">
+                    <i class="fas fa-laptop-code feature-icon-enhanced"></i>
+                    <h4 class="feature-title">Интерактивное обучение</h4>
+                    <p class="feature-description">
+                        Современные мультимедийные материалы, виртуальные симуляторы
+                        и интерактивные презентации для глубокого понимания материала
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card-enhanced text-center fade-in interactive-bg">
+                    <i class="fas fa-brain feature-icon-enhanced"></i>
+                    <h4 class="feature-title">Адаптивное тестирование</h4>
+                    <p class="feature-description">
+                        Система интеллектуального тестирования с адаптацией под уровень знаний
+                        и мгновенной обратной связью
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card-enhanced text-center fade-in interactive-bg">
+                    <i class="fas fa-award feature-icon-enhanced"></i>
+                    <h4 class="feature-title">Цифровые сертификаты</h4>
+                    <p class="feature-description">
+                        Получение верифицированных цифровых сертификатов с блокчейн-защитой
+                        после успешного завершения курсов
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card-enhanced text-center fade-in interactive-bg">
+                    <i class="fas fa-user-graduate feature-icon-enhanced"></i>
+                    <h4 class="feature-title">Экспертное наставничество</h4>
+                    <p class="feature-description">
+                        Персональное сопровождение от ведущих специалистов авиационной индустрии
+                        с многолетним практическим опытом
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card-enhanced text-center fade-in interactive-bg">
+                    <i class="fas fa-mobile-alt feature-icon-enhanced"></i>
+                    <h4 class="feature-title">Мобильная платформа</h4>
+                    <p class="feature-description">
+                        Полнофункциональное мобильное приложение для обучения в любом месте
+                        и в любое время с синхронизацией прогресса
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card-enhanced text-center fade-in interactive-bg">
+                    <i class="fas fa-analytics feature-icon-enhanced"></i>
+                    <h4 class="feature-title">Аналитика успеваемости</h4>
+                    <p class="feature-description">
+                        Детальная аналитика прогресса обучения с персональными рекомендациями
+                        и планами развития компетенций
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h3 class="cta-title">Готовы начать свой путь в авиации?</h3>
+        <p class="cta-description">
+            Присоединяйтесь к нашему сообществу профессионалов и получите качественное образование
+            в сфере гражданской авиации
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <button class="btn btn-primary-custom btn-lg">
+                <i class="fas fa-play me-2"></i>Просмотреть курсы
+            </button>
+            <button class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-info-circle me-2"></i>Узнать больше
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                el.style.animationPlayState = 'paused';
+                observer.observe(el);
+            });
+
+            if (window.innerWidth <= 768) {
+                const heroSection = document.querySelector('.hero-section-enhanced');
+                if (heroSection) {
+                    heroSection.classList.remove('parallax');
+                    heroSection.classList.add('no-parallax');
+                }
+            }
+        });
+    </script>
     <style>
 
         .hero-section-enhanced {
@@ -322,170 +493,4 @@
             background-attachment: scroll;
         }
     </style>
-
-    <div class="hero-section-enhanced parallax">
-        <div class="hero-content">
-            <h1 class="hero-title-enhanced fade-in">
-                Добро пожаловать в <br>
-                <span style="color: var(--light-blue);">Манас Тренинг Центр</span>
-            </h1>
-            <p class="hero-subtitle-enhanced fade-in">
-                Профессиональная подготовка специалистов в сфере гражданской авиации
-                и наземного обслуживания воздушных судов с использованием современных технологий
-            </p>
-            <button class="btn btn-hero fade-in">
-                <i class="fas fa-rocket me-2"></i>Начать обучение
-            </button>
-        </div>
-    </div>
-
-    <div class="stats-section">
-        <div class="row">
-            <div class="col-lg-3 col-md-6">
-                <div class="stat-item">
-                    <span class="stat-number">500+</span>
-                    <span class="stat-label">Выпускников</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stat-item">
-                    <span class="stat-number">25+</span>
-                    <span class="stat-label">Курсов</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stat-item">
-                    <span class="stat-number">15+</span>
-                    <span class="stat-label">Преподавателей</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stat-item">
-                    <span class="stat-number">98%</span>
-                    <span class="stat-label">Успешность</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="features-section">
-        <h2 class="section-title">Наши возможности</h2>
-        <p class="section-subtitle">
-            Современная образовательная платформа с широким спектром инструментов для эффективного обучения
-        </p>
-
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-laptop-code feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Интерактивное обучение</h4>
-                    <p class="feature-description">
-                        Современные мультимедийные материалы, виртуальные симуляторы
-                        и интерактивные презентации для глубокого понимания материала
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-brain feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Адаптивное тестирование</h4>
-                    <p class="feature-description">
-                        Система интеллектуального тестирования с адаптацией под уровень знаний
-                        и мгновенной обратной связью
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-award feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Цифровые сертификаты</h4>
-                    <p class="feature-description">
-                        Получение верифицированных цифровых сертификатов с блокчейн-защитой
-                        после успешного завершения курсов
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-user-graduate feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Экспертное наставничество</h4>
-                    <p class="feature-description">
-                        Персональное сопровождение от ведущих специалистов авиационной индустрии
-                        с многолетним практическим опытом
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-mobile-alt feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Мобильная платформа</h4>
-                    <p class="feature-description">
-                        Полнофункциональное мобильное приложение для обучения в любом месте
-                        и в любое время с синхронизацией прогресса
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-analytics feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Аналитика успеваемости</h4>
-                    <p class="feature-description">
-                        Детальная аналитика прогресса обучения с персональными рекомендациями
-                        и планами развития компетенций
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="cta-section">
-        <h3 class="cta-title">Готовы начать свой путь в авиации?</h3>
-        <p class="cta-description">
-            Присоединяйтесь к нашему сообществу профессионалов и получите качественное образование
-            в сфере гражданской авиации
-        </p>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <button class="btn btn-primary-custom btn-lg">
-                <i class="fas fa-play me-2"></i>Просмотреть курсы
-            </button>
-            <button class="btn btn-outline-primary btn-lg">
-                <i class="fas fa-info-circle me-2"></i>Узнать больше
-            </button>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.animationPlayState = 'running';
-                    }
-                });
-            }, observerOptions);
-
-            document.querySelectorAll('.fade-in').forEach(el => {
-                el.style.animationPlayState = 'paused';
-                observer.observe(el);
-            });
-
-            if (window.innerWidth <= 768) {
-                const heroSection = document.querySelector('.hero-section-enhanced');
-                if (heroSection) {
-                    heroSection.classList.remove('parallax');
-                    heroSection.classList.add('no-parallax');
-                }
-            }
-        });
-    </script>
 </@layout.page>
