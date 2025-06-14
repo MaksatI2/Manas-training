@@ -1,7 +1,9 @@
 package manasTrainingService.exceptions.handler;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -103,5 +105,23 @@ public class MvcExceptionHandler {
         model.addAttribute("reason", HttpStatus.BAD_REQUEST.getReasonPhrase());
         model.addAttribute("details", request);
         return "error/error";
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public String handleEntityNotFound(EntityNotFoundException e, Model model) {
+        log.error("Entity not found: {}", e.getMessage());
+        model.addAttribute("status", "404");
+        model.addAttribute("reason", "Ресурс не найден");
+        model.addAttribute("errorMessage", e.getMessage());
+        return "error/error";
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public String handleValidation(ValidationException e, Model model) {
+        log.error("Validation error: {}", e.getMessage());
+        model.addAttribute("status", "400");
+        model.addAttribute("reason", "Ошибка валидации");
+        model.addAttribute("errorMessage", e.getMessage());
+        return "error/400";
     }
 }
