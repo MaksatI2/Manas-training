@@ -568,14 +568,105 @@
             </a>
         </div>
 
-        <div class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">Основное</div>
-                <#if !known || !isAdmin>
-                    <div class="nav-item">
-                        <a href="/" class="nav-link" data-tooltip="Главная">
-                            <i class="fas fa-home"></i>
-                            <span>Главная</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <#if !known || !isAdmin>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Главная</a>
+                        </li>
+                    </#if>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/courses"><i class="fas fa-book me-1"></i>Курсы</a>
+                    </li>
+
+                    <#if known>
+                        <#if isAdmin>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin/users"><i
+                                            class="fas fa-users me-1"></i>Пользователи</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i
+                                            class="fas fa-chart-bar me-1"></i>Отчеты</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin/courses">
+                                    <i class="fas fa-book-open me-1"></i>Управление курсами
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin/categories">
+                                    <i class="fas fa-tags me-1"></i>Категории курсов
+                                </a>
+                            </li>
+                        </#if>
+
+                        <#if isTeacher>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i class="fas fa-question-circle me-1"></i>Тесты</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
+                            </li>
+                        </#if>
+
+                        <#if isOrganization>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i class="fas fa-user-tie me-1"></i>Сотрудники</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i
+                                class="fas fa-graduation-cap me-1"></i>Курсы</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
+                            </li>
+                        </#if>
+
+                        <#if isStudent>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/#"><i class="fas fa-book-open me-1"></i>Мои
+                                    курсы</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-calendar me-1"></i>Расписание</a>
+                            </li>
+                        </#if>
+                    </#if>
+                </ul>
+
+                <div class="d-flex align-items-center">
+                    <select class="form-select language-selector me-3" style="width: auto;">
+                        <option value="ru">Русский</option>
+                        <option value="ky">Кыргызча</option>
+                        <option value="en">English</option>
+                    </select>
+
+                    <#if Session.SPRING_SECURITY_CONTEXT??>
+                        <#assign profileUrl = "/profile">
+                        <#if isAdmin>
+                            <#assign profileUrl = "/admin/profile">
+                        <#elseif isTeacher>
+                            <#assign profileUrl = "/teacher/profile">
+                        <#elseif isStudent>
+                            <#assign profileUrl = "/student/profile">
+                        <#elseif isOrganization>
+                            <#assign profileUrl = "/organization/profile">
+                        </#if>
+
+                        <a href="${profileUrl}" class="btn btn-outline-light me-2 d-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                 class="me-1" viewBox="0 0 16 16">
+                                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            </svg>
+                            Профиль
                         </a>
                     </div>
                 </#if>
