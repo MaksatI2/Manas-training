@@ -52,6 +52,8 @@ public class Certificate {
     @JoinColumn(name = "issued_by", nullable = false)
     User issuedBy;
 
+    Integer mark;
+
     @Column(name = "created_at", nullable = false)
     @Builder.Default
     LocalDateTime createdAt = LocalDateTime.now();

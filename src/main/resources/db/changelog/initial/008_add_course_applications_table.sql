@@ -1,5 +1,4 @@
 -- changeset Maksat: 008 create course_applications table
-CREATE TYPE application_status AS ENUM ('pending', 'approved', 'rejected');
 
 CREATE TABLE course_applications
 (
@@ -10,7 +9,7 @@ CREATE TABLE course_applications
     preferred_teacher_id INTEGER,
     preferred_start_date DATE,
     preferred_end_date   DATE,
-    status               application_status DEFAULT 'pending',
+    status VARCHAR(50) DEFAULT 'pending',
     submitted_at         TIMESTAMP          DEFAULT CURRENT_TIMESTAMP,
     processed_by         INTEGER,
     processed_at         TIMESTAMP,

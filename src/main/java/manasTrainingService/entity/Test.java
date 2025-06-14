@@ -24,12 +24,8 @@ public class Test {
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
+    @JoinColumn(name = "course_instance_id")
     Course course;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id")
-    Lesson lesson;
 
     @Column(name = "title", length = 200)
     String title;

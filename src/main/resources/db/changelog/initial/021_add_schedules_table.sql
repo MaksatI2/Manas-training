@@ -1,5 +1,4 @@
 -- changeset Maksat: 021 create schedules table
-CREATE TYPE lesson_type_enum AS ENUM ('lecture', 'practical', 'exam', 'consultation');
 
 CREATE TABLE schedules
 (
@@ -7,7 +6,7 @@ CREATE TABLE schedules
     course_id      INTEGER          NOT NULL REFERENCES courses (id),
     teacher_id     INTEGER          NOT NULL REFERENCES users (id),
     title          VARCHAR(200),
-    lesson_type    lesson_type_enum NOT NULL,
+    lesson_type    VARCHAR(50) NOT NULL,
     start_datetime TIMESTAMP        NOT NULL,
     end_datetime   TIMESTAMP        NOT NULL,
     is_online      BOOLEAN DEFAULT FALSE,

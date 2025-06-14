@@ -18,9 +18,6 @@ import java.util.List;
 @Entity
 @Table(name = "course_applications")
 public class CourseApplication {
-    public enum ApplicationStatus {
-        PENDING, APPROVED, REJECTED
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +30,9 @@ public class CourseApplication {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id")
     Organization organization;
+
+    @JoinColumn(name = "organization_application_number")
+    String organizationApplicationNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "submitted_by", nullable = false)
@@ -51,7 +51,7 @@ public class CourseApplication {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    ApplicationStatus status = ApplicationStatus.PENDING;
+    Status status = Status.PENDING;
 
     @Column(name = "submitted_at", nullable = false)
     @Builder.Default

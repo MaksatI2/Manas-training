@@ -11,20 +11,22 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "lesson_materials")
-public class LessonMaterial {
+@Table(name = "lesson_quiz_options")
+public class LessonQuizOption {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id", nullable = false)
-    Lesson lesson;
+    @JoinColumn(name = "question_id", nullable = false)
+    LessonQuizQuestion question;
 
-    @Column(name = "title", nullable = false, length = 200)
-    String title;
+    @Column(name = "option_text", columnDefinition = "TEXT", nullable = false)
+    String optionText;
 
-    @Column(name = "url", nullable = false, length = 500)
-    String url;
+    @Column(name = "is_correct")
+    @Builder.Default
+    Boolean isCorrect = false;
 }

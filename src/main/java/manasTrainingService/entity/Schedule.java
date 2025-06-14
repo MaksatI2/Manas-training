@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -23,8 +23,19 @@ public class Schedule {
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false)
-    Course course;
+    @JoinColumn(name = "course_instance_id", nullable = false)
+    CourseInstance courseInstance;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lesson_id", nullable = false)
+    Lesson lesson;
+
+    @Column(name = "lesson_date", nullable = false)
+    LocalDate lessonDate;
+
+    @Column(name = "duration_hours", nullable = false)
+    @Builder.Default
+    Integer durationHours = 1;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id", nullable = false)
@@ -36,12 +47,6 @@ public class Schedule {
     @Enumerated(EnumType.STRING)
     @Column(name = "lesson_type", nullable = false)
     LessonType lessonType;
-
-    @Column(name = "start_datetime", nullable = false)
-    LocalDateTime startDatetime;
-
-    @Column(name = "end_datetime", nullable = false)
-    LocalDateTime endDatetime;
 
     @Column(name = "is_online", nullable = false)
     @Builder.Default
@@ -59,21 +64,4 @@ public class Schedule {
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Attendance> attendances;
-
-    public enum LessonType {
-        LECTURE("lecture"),
-        PRACTICAL("practical"),
-        EXAM("exam"),
-        CONSULTATION("consultation");
-
-        private final String value;
-
-        LessonType(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
 }
