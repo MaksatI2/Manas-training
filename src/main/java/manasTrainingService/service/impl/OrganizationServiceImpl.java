@@ -2,8 +2,8 @@ package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.create.CreateOrganizationDto;
-import manasTrainingService.dto.OrganizationProfileDto;
-import manasTrainingService.dto.OrganizationProfileEditDto;
+import manasTrainingService.dto.profile.OrganizationProfileDto;
+import manasTrainingService.dto.edit.OrganizationProfileEditDto;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.OrganizationCodeNotFound;

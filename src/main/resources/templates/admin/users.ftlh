@@ -1,15 +1,53 @@
 <#import "../layout.ftlh" as layout>
 <@layout.page>
     <div class="card shadow mb-4">
+        <#if successMessage??>
+            <div id="successMessage" data-message="${successMessage?js_string}"></div>
+        </#if>
+        <#if errorMessage??>
+            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+        </#if>
         <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
-            <h5 class="m-0 font-weight-bold text-white">Управление пользователями</h5>
+            <h5 class="m-0 font-weight-bold text-white">
+                <i class="fas fa-users me-2"></i>
+                Управление пользователями
+            </h5>
             <div>
-                <a href="/admin/teachers/add" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc;">
+                <a href="/admin/teachers/add" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
                     <i class="fas fa-plus me-1" style="color: #0066cc;"></i> Добавить преподавателя
                 </a>
             </div>
         </div>
         <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text" style="background: #0066cc; color: white;"><i class="fas fa-filter"></i></span>
+                        <select class="form-select form-select-sm" id="roleFilter">
+                            <option value="">Все роли</option>
+                            <#list roles as role>
+                                <option value="${role}" <#if selectedRole?? && selectedRole == role>selected</#if>>
+                                    ${role}
+                                </option>
+                            </#list>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text" style="background: #0066cc; color: white;"><i class="fas fa-filter"></i></span>
+                        <select class="form-select form-select-sm" id="statusFilter">
+                            <option value="">Все статусы</option>
+                            <option value="Активен">Активен</option>
+                            <option value="Неактивен">Неактивен</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end align-items-center">
+                    <div id="usersTable_info" class="text-muted small me-3" style="color: #2c3e50 !important;"></div>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="usersTable" width="100%" cellspacing="0">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
@@ -75,13 +113,18 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div id="usersTable_paginate" class="dataTables_paginate"></div>
+                </div>
+            </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
-
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
@@ -108,27 +151,104 @@
                 paging: true,
                 autoWidth: false,
                 stateSave: true,
-                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                dom: '<"top"Bf>rt<"bottom"lip><"clear">',
                 buttons: [
                     {
-                        extend: 'copy',
-                        text: 'Копировать',
-                        className: 'btn btn-secondary btn-sm'
-                    },
-                    {
-                        extend: 'excel',
-                        text: 'Excel',
-                        className: 'btn btn-success btn-sm'
-                    },
-                    {
-                        extend: 'pdf',
-                        text: 'PDF',
-                        className: 'btn btn-danger btn-sm'
-                    },
-                    {
-                        extend: 'print',
-                        text: 'Печать',
-                        className: 'btn btn-info btn-sm'
+                        extend: 'collection',
+                        text: '<i class="fas fa-download me-1"></i> Экспорт',
+                        className: 'btn btn-primary btn-sm dropdown-toggle',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                text: '<i class="fas fa-copy me-1"></i> Копировать',
+                                className: 'dropdown-item',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                title: 'Список пользователей',
+                                messageTop: 'Список пользователей на ' + new Date().toLocaleDateString()
+                            },
+                            {
+                                extend: 'excel',
+                                text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                                className: 'dropdown-item',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                title: 'Список пользователей',
+                                messageTop: 'Список пользователей на ' + new Date().toLocaleDateString(),
+                                autoFilter: true,
+                                customize: function(xlsx) {
+                                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                    $('row c[r^="A"]', sheet).attr('s', '2');
+                                }
+                            },
+                            {
+                                extend: 'pdf',
+                                text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                                className: 'dropdown-item',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                title: 'Список пользователяй Manas - ' + new Date().toLocaleDateString(),
+                                customize: function (doc) {
+                                    if (!doc.content || doc.content.length < 2 || !doc.content[1].table) {
+                                        console.error('PDF generation error: Invalid document structure', doc);
+                                        return;
+                                    }
+
+                                    doc.defaultStyle = {
+                                        fontSize: 8,
+                                        color: '#2c3e50'
+                                    };
+
+                                    doc.styles.title = {
+                                        color: '#0066cc',
+                                        fontSize: 14,
+                                        alignment: 'center',
+                                        margin: [0, 0, 0, 15]
+                                    };
+
+                                    const table = doc.content[1].table;
+
+                                    table.widths = Array(table.body[0].length).fill('*');
+                                    table.body[0].forEach(function(cell) {
+                                        cell.fillColor = '#003d7a';
+                                        cell.color = '#ffffff';
+                                        cell.alignment = 'center';
+                                        cell.bold = true;
+                                    });
+
+                                    for (let i = 1; i < table.body.length; i++) {
+                                        if (i % 2 === 0) {
+                                            table.body[i].forEach(function(cell) {
+                                                cell.fillColor = '#f8f9fa';
+                                            });
+                                        }
+                                    }
+
+                                    doc.pageMargins = [20, 60, 20, 30];
+                                },
+                                orientation: 'landscape'
+                            },
+                            {
+                                extend: 'print',
+                                text: '<i class="fas fa-print me-1"></i> Печать',
+                                className: 'dropdown-item',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                title: 'Список пользователей',
+                                messageTop: '<h3 class="text-center">Список пользователей</h3><p class="text-center">На ' + new Date().toLocaleDateString() + '</p>',
+                                customize: function(win) {
+                                    $(win.document.body).find('table').addClass('display').css('font-size', '10px');
+                                    $(win.document.body).find('tr:nth-child(odd) td').each(function(index){
+                                        $(this).css('background-color','#f8f9fa');
+                                    });
+                                    $(win.document.body).find('h1').css('text-align','center');
+                                }
+                            }
+                        ]
                     }
                 ],
                 columnDefs: [
@@ -145,23 +265,39 @@
                 ],
                 initComplete: function() {
                     this.api().page.len(10).draw();
+                    $('.dt-buttons').appendTo('.col-md-6.d-flex');
                 }
+            });
+
+            $('#roleFilter').on('change', function() {
+                table.column(5).search(this.value).draw();
+            });
+
+            $('#statusFilter').on('change', function() {
+                table.column(6).search(this.value).draw();
             });
 
             $('.dataTables_paginate').addClass('pagination');
             $('.paginate_button').addClass('page-item');
             $('.paginate_button a').addClass('page-link');
-            $('.dt-buttons').addClass('mb-3');
-            $('.dt-button').removeClass('dt-button');
 
             table.on('draw', function() {
                 $('.paginate_button').removeClass('disabled active');
                 $('.paginate_button.current').addClass('active');
             });
+
+            $('.dt-buttons').addClass('btn-group');
+            $('.dt-button').addClass('btn').removeClass('dt-button');
+            $('.dropdown-toggle').dropdown();
         });
     </script>
 
     <style>
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+        }
+
         .card-header {
             border-bottom: none;
         }
@@ -213,6 +349,19 @@
             border-radius: 0.375rem;
         }
 
+        .bg-primary {
+            background-color: #0066cc !important;
+        }
+
+        .bg-success {
+            background-color: #28a745 !important;
+        }
+
+        .bg-warning {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+        }
+
         .pagination {
             display: flex;
             padding-left: 0;
@@ -257,6 +406,22 @@
             border-color: #dddfeb;
         }
 
+        .input-group-text {
+            background: #0066cc;
+            border: 1px solid #0066cc;
+            color: white;
+        }
+
+        .form-select {
+            border-left: 0;
+            border-color: #d1d3e2;
+        }
+
+        .form-select:focus {
+            box-shadow: none;
+            border-color: #d1d3e2;
+        }
+
         .btn-light {
             transition: all 0.3s ease;
         }
@@ -266,6 +431,92 @@
             box-shadow: 0 4px 15px rgba(0,102,204,0.3);
         }
 
+        .dt-buttons {
+            margin-bottom: 0;
+            margin-left: 15px;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+            margin-right: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+            border-color: #0066cc;
+        }
+
+        .form-select-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+            border: 1px solid #ced4da;
+            background-color: white;
+            color: #495057;
+        }
+
+        .form-select-sm:focus {
+            border-color: #0066cc;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .dropdown-menu {
+            border-radius: 0.375rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-item {
+            padding: 0.25rem 1rem;
+            font-size: 0.875rem;
+            color: #212529;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #0066cc;
+        }
+
+        .dropdown-item i {
+            width: 18px;
+            text-align: center;
+            margin-right: 5px;
+        }
 
         @media (max-width: 768px) {
             .card-header {
@@ -275,7 +526,32 @@
 
             .card-header h5 {
                 margin-bottom: 1rem;
-                font-size: 2rem;
+                font-size: 1.25rem;
+            }
+
+            .dt-buttons {
+                flex-wrap: wrap;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .btn-sm {
+                margin-bottom: 0.5rem;
+            }
+
+            .row.mb-3 {
+                flex-direction: column;
+            }
+
+            .row.mb-3 .col-md-3 {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .col-md-6.d-flex {
+                justify-content: flex-start !important;
+                margin-top: 1rem;
+                flex-direction: column;
             }
         }
     </style>

@@ -5,17 +5,19 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.dto.create.CreateCourseDto;
+import manasTrainingService.dto.edit.CourseEditDto;
 import manasTrainingService.entity.Course;
 import manasTrainingService.entity.CourseCategory;
 import manasTrainingService.repositories.CourseRepository;
 import manasTrainingService.service.CourseAdminService;
-import manasTrainingService.service.CourseCategoryAdminService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import manasTrainingService.service.CourseCategoryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +25,42 @@ import java.time.LocalDateTime;
 public class CourseAdminServiceImpl implements CourseAdminService {
 
     private final CourseRepository courseRepository;
-    private final CourseCategoryAdminService categoryAdminService;
+    private final CourseCategoryService categoryService;
 
     @Override
-    public Page<CourseDto> getCourses(Pageable pageable, Integer categoryId, String search, Boolean isActive, Boolean isIndividual) {
-        return courseRepository.findCourses(categoryId, search, isActive, isIndividual, pageable)
-                .map(this::convertToDto);
+    public CourseEditDto prepareEditDtoWithRequestParams(CourseEditDto updateCourseDto, String[] activeValues, String[] individualValues) {
+        Boolean active = false;
+        Boolean individual = false;
+
+        if (activeValues != null) {
+            for (String value : activeValues) {
+                if ("true".equals(value)) {
+                    active = true;
+                    break;
+                }
+            }
+        }
+
+        if (individualValues != null) {
+            for (String value : individualValues) {
+                if ("true".equals(value)) {
+                    individual = true;
+                    break;
+                }
+            }
+        }
+
+        updateCourseDto.setActive(active);
+        updateCourseDto.setIndividual(individual);
+
+        return updateCourseDto;
+    }
+
+    @Override
+    public List<CourseDto> getAllCourses() {
+        return courseRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -38,26 +70,68 @@ public class CourseAdminServiceImpl implements CourseAdminService {
         return convertToDto(course);
     }
 
-    @Override
     @Transactional
-    public void create(CourseDto dto) {
-        validateCourse(dto);
-        Course course = convertToEntity(dto);
-        courseRepository.save(course);
+    @Override
+    public CourseDto create(CreateCourseDto createCourseDto) {
+        if (existsByCode(createCourseDto.getCode())) {
+            throw new ValidationException("Курс с кодом '" + createCourseDto.getCode() + "' уже существует");
+        }
+
+        CourseCategoryDto categoryDto = categoryService.getById(createCourseDto.getCategoryId());
+        CourseCategory category = CourseCategory.builder()
+                .id(categoryDto.getId())
+                .name(categoryDto.getName())
+                .description(categoryDto.getDescription())
+                .build();
+
+        Course course = Course.builder()
+                .title(createCourseDto.getTitle())
+                .code(createCourseDto.getCode())
+                .description(createCourseDto.getDescription())
+                .durationHours(createCourseDto.getDuration())
+                .isIndividual(Boolean.TRUE.equals(createCourseDto.getIndividual()))
+                .isActive(Boolean.TRUE.equals(createCourseDto.getActive()))
+                .category(category)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        Course savedCourse = courseRepository.save(course);
+        return convertToDto(savedCourse);
     }
 
-    @Override
     @Transactional
-    public void update(Integer id, CourseDto dto) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Курс с ID " + id + " не найден"));
-        validateCourse(dto);
-        updateCourseFromDto(course, dto);
-        courseRepository.save(course);
+    @Override
+    public CourseDto update(CourseEditDto updateCourseDto) {
+        Course existingCourse = courseRepository.findById(updateCourseDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Курс с ID " + updateCourseDto.getId() + " не найден"));
+
+        if (existsByCodeAndIdNot(updateCourseDto.getCode(), updateCourseDto.getId())) {
+            throw new ValidationException("Курс с кодом '" + updateCourseDto.getCode() + "' уже существует");
+        }
+
+        CourseCategoryDto categoryDto = categoryService.getById(updateCourseDto.getCategoryId());
+        CourseCategory category = CourseCategory.builder()
+                .id(categoryDto.getId())
+                .name(categoryDto.getName())
+                .description(categoryDto.getDescription())
+                .build();
+
+        existingCourse.setTitle(updateCourseDto.getTitle());
+        existingCourse.setCode(updateCourseDto.getCode());
+        existingCourse.setDescription(updateCourseDto.getDescription());
+        existingCourse.setDurationHours(updateCourseDto.getDuration());
+        existingCourse.setIsIndividual(Boolean.TRUE.equals(updateCourseDto.getIndividual()));
+        existingCourse.setIsActive(Boolean.TRUE.equals(updateCourseDto.getActive()));
+        existingCourse.setCategory(category);
+        existingCourse.setUpdatedAt(LocalDateTime.now());
+
+        Course updatedCourse = courseRepository.save(existingCourse);
+        return convertToDto(updatedCourse);
     }
 
-    @Override
     @Transactional
+    @Override
     public void delete(Integer id) {
         if (!courseRepository.existsById(id)) {
             throw new EntityNotFoundException("Курс с ID " + id + " не найден");
@@ -66,8 +140,17 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     }
 
     @Override
+    public boolean existsByCode(String code) {
+        return courseRepository.existsByCode(code);
+    }
+
+    @Override
+    public boolean existsByCodeAndIdNot(String code, Integer id) {
+        return courseRepository.existsByCodeAndIdNot(code, id);
+    }
+
     public CourseDto convertToDto(Course course) {
-        CourseCategoryDto categoryDto = categoryAdminService.convertToDto(course.getCategory());
+        CourseCategoryDto categoryDto = categoryService.convertToDto(course.getCategory());
         return CourseDto.builder()
                 .id(course.getId())
                 .title(course.getTitle())
@@ -84,40 +167,17 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     }
 
     @Override
-    public Course convertToEntity(CourseDto dto) {
-        CourseCategory category = categoryAdminService.getCategoryById(dto.getCategoryId());
-        return Course.builder()
+    public CourseEditDto convertToEditDto(CourseDto dto) {
+        return CourseEditDto.builder()
                 .id(dto.getId())
                 .title(dto.getTitle())
                 .code(dto.getCode())
                 .description(dto.getDescription())
-                .durationHours(dto.getDuration())
-                .isIndividual(dto.getIndividual() != null ? dto.getIndividual() : false)
-                .isActive(dto.getActive() != null ? dto.getActive() : true)
-                .category(category)
+                .duration(dto.getDuration())
+                .individual(dto.getIndividual())
+                .active(dto.getActive())
+                .categoryId(dto.getCategoryId())
                 .build();
     }
 
-    private void validateCourse(CourseDto dto) {
-        if (courseRepository.existsByCode(dto.getCode())) {
-            throw new ValidationException("Курс с кодом " + dto.getCode() + " уже существует");
-        }
-        if (dto.getCategoryId() == null) {
-            throw new ValidationException("Категория обязательна для курса");
-        }
-        if (!categoryAdminService.existsById(dto.getCategoryId())) {
-            throw new EntityNotFoundException("Категория с ID " + dto.getCategoryId() + " не найдена");
-        }
-    }
-
-    private void updateCourseFromDto(Course course, CourseDto dto) {
-        course.setTitle(dto.getTitle());
-        course.setCode(dto.getCode());
-        course.setDescription(dto.getDescription());
-        course.setDurationHours(dto.getDuration());
-        course.setIsIndividual(dto.getIndividual() != null ? dto.getIndividual() : false);
-        course.setIsActive(dto.getActive() != null ? dto.getActive() : true);
-        course.setCategory(categoryAdminService.getCategoryById(dto.getCategoryId()));
-        course.setUpdatedAt(LocalDateTime.now());
-    }
 }

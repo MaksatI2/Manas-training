@@ -1,4 +1,4 @@
-package manasTrainingService.dto;
+package manasTrainingService.dto.edit;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

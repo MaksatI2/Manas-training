@@ -1,4 +1,4 @@
-package manasTrainingService.dto;
+package manasTrainingService.dto.edit;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -6,15 +6,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseDto {
+public class CourseEditDto {
 
+    @NotNull(message = "ID курса обязателен")
     private Integer id;
 
     @NotBlank(message = "Название обязательно")
@@ -35,12 +34,6 @@ public class CourseDto {
     private Boolean individual;
 
     private Boolean active;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    private CourseCategoryDto category;
 
     @NotNull(message = "Категория обязательна")
     private Integer categoryId;

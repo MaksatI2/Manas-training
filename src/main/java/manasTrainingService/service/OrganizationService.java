@@ -1,9 +1,8 @@
 package manasTrainingService.service;
 
 import manasTrainingService.dto.create.CreateOrganizationDto;
-import manasTrainingService.dto.OrganizationProfileDto;
-import manasTrainingService.dto.OrganizationProfileEditDto;
-import manasTrainingService.dto.create.CreateOrganizationDto;
+import manasTrainingService.dto.profile.OrganizationProfileDto;
+import manasTrainingService.dto.edit.OrganizationProfileEditDto;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.User;
 
