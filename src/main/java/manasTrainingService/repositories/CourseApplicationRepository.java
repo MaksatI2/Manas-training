@@ -1,6 +1,7 @@
 package manasTrainingService.repositories;
 
 import manasTrainingService.entity.CourseApplication;
+import manasTrainingService.entity.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public interface CourseApplicationRepository extends JpaRepository<CourseApplication, Integer> {
     List<CourseApplication> findBySubmittedById(Integer userId);
     List<CourseApplication> findByOrganizationId(Integer organizationId);
-    List<CourseApplication> findByStatus(CourseApplication.ApplicationStatus status);
+    List<CourseApplication> findByStatus(Status status);
     List<CourseApplication> findByPreferredTeacherId(Integer teacherId);
     List<CourseApplication> findBySubmittedAtBetween(LocalDateTime start, LocalDateTime end);
     List<CourseApplication> findByProcessedById(Integer adminId);

@@ -1,3 +1,16 @@
 databaseChangeLog:
   - includeAll:
-      path: db/changelog/initial
+      path: db/changelog/initial/
+      relativeToChangelogFile: false
+
+  - includeAll:
+      path: db/changelog/features/
+      relativeToChangelogFile: false
+
+  - includeAll:
+      path: db/changelog/data/
+      relativeToChangelogFile: false
+
+  - includeAll:
+      path: db/changelog/fixes/
+      relativeToChangelogFile: false

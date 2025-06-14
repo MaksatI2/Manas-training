@@ -30,7 +30,7 @@ public class Attendance {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    AttendanceStatus status;
+    Status status;
 
     @Column(name = "check_in_time")
     LocalDateTime checkInTime;
@@ -42,21 +42,4 @@ public class Attendance {
     @Column(name = "marked_at", nullable = false)
     @Builder.Default
     LocalDateTime markedAt = LocalDateTime.now();
-
-    public enum AttendanceStatus {
-        PRESENT("present"),
-        ABSENT("absent"),
-        LATE("late"),
-        EXCUSED("excused");
-
-        private final String value;
-
-        AttendanceStatus(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
 }

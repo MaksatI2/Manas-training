@@ -3,6 +3,7 @@ package manasTrainingService.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import java.util.List;
 
 @Getter
 @Setter
@@ -11,30 +12,31 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "course_modules")
-public class CourseModule {
+@Table(name = "lesson_quizzes")
+public class LessonQuiz {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_instance_id", nullable = false)
-    Course course;
+    @JoinColumn(name = "lesson_id", nullable = false)
+    Lesson lesson;
 
-    @Column(name = "title", length = 200)
+    @Column(name = "question_time_limit")
+    Integer questionTimeLimit;
+
+    @Column(name = "title", length = 200, nullable = false)
     String title;
-
-    @Column(name = "duration_hours", nullable = false)
-    Integer durationHours;
 
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
-    @Column(name = "order_index", nullable = false)
-    Integer orderIndex;
-
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active")
     @Builder.Default
     Boolean isActive = true;
+
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<LessonQuizQuestion> questions;
 }

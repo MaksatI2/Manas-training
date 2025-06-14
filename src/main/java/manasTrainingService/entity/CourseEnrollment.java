@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "course_enrollments",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"course_id", "student_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"course_instance_id", "student_id"}))
 public class CourseEnrollment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,7 @@ public class CourseEnrollment {
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false)
+    @JoinColumn(name = "course_instance_id", nullable = false)
     Course course;
 
     @ManyToOne
@@ -40,7 +40,7 @@ public class CourseEnrollment {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     @Builder.Default
-    EnrollmentStatus status = EnrollmentStatus.ENROLLED;
+    Status status = Status.ENROLLED;
 
     @Column(name = "progress_percentage", precision = 5, scale = 2)
     @Builder.Default
@@ -48,21 +48,4 @@ public class CourseEnrollment {
 
     @Column(name = "final_grade", precision = 5, scale = 2)
     BigDecimal finalGrade;
-
-    public enum EnrollmentStatus {
-        ENROLLED("enrolled"),
-        IN_PROGRESS("in_progress"),
-        COMPLETED("completed"),
-        DROPPED("dropped");
-
-        private final String value;
-
-        EnrollmentStatus(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
 }
