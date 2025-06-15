@@ -28,7 +28,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendVerificationEmail(User user, String token) {
         String subject = "Подтверждение регистрации";
         String link = baseUrl + "/auth/verify-email?token=" + token;
-        String message = "<p>Здравствуйте, " + user.getName() + "!</p>" + "<p>Пожалуйста, подтвердите свою регистрацию по ссылке ниже:</p>" + "<p><a href=\"" + link + "\">Подтвердить Email</a></p>" + "<p>Если вы не регистрировались, просто проигнорируйте это письмо.</p>";
+        String message = "<p>Здравствуйте, " + user.getName() + "!</p>" + "<p>Пожалуйста, подтвердите регистрацию:</p>" + "<p><a href=\"" + link + "\">Подтвердить Email</a></p>";
 
         sendEmail(user.getEmail(), subject, message);
     }
@@ -56,6 +56,7 @@ public class EmailServiceImpl implements EmailService {
             log.info("Письмо отправлено на: {}", to);
         } catch (MessagingException e) {
             log.error("Ошибка при отправке письма на: " + to, e);
+            throw new RuntimeException("Ошибка при отправке письма на " + to, e);
         }
     }
 }
