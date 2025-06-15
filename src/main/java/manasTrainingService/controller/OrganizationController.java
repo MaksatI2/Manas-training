@@ -25,20 +25,20 @@ public class OrganizationController {
     @GetMapping("profile")
     public String organizationProfilePage(Model model) {
         model.addAttribute("organization", organizationService.getAuthorizedUserOrganization(userService.getAuthorizedUser()));
-        return "organization/view";
+        return "organization/profile-view";
     }
 
     @GetMapping("profile/edit")
     public String organizationProfileEditPage(Model model) {
         model.addAttribute("organizationProfile", organizationService.getOrganizationUserInformationForEdit(userService.getAuthorizedUser()));
-        return "organization/edit";
+        return "organization/profile-edit";
     }
 
     @PostMapping("profile/edit")
     public String organizationProfileEdit(@Valid OrganizationProfileEditDto organizationProfileEditDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("organizationProfile", organizationProfileEditDto);
-            return "organization/edit";
+            return "organization/profile-edit";
         }
         try{
             organizationService.editOrganizationInformation(organizationProfileEditDto);
@@ -47,7 +47,7 @@ public class OrganizationController {
         } catch (PhoneAlreadyExistsException e){
             model.addAttribute("errorMessage", "Данный телефонный номер уже зарегистрирован");
             model.addAttribute("organizationProfile", organizationProfileEditDto);
-            return "organization/edit";
+            return "organization/profile-edit";
         }
     }
 }

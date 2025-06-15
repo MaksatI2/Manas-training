@@ -35,9 +35,41 @@
             flex-wrap: wrap;
         }
 
+        .avatar-image:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0,102,204,0.3);
+        }
+
+        .avatar-edit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .avatar-container:hover .avatar-edit-overlay {
+            opacity: 1;
+        }
+
+        .avatar-edit-text {
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            padding: 0.5rem;
+        }
+
         .avatar-container {
             position: relative;
             flex-shrink: 0;
+            cursor: pointer;
         }
 
         .avatar-image {
@@ -47,6 +79,7 @@
             object-fit: cover;
             border: 4px solid var(--light-blue);
             box-shadow: 0 4px 15px rgba(0,102,204,0.2);
+            transition: all 0.3s ease;
         }
 
         .user-info {
@@ -179,7 +212,7 @@
 
         <div class="profile-card">
             <div class="profile-header">
-                <div class="avatar-container">
+                <div class="avatar-container" onclick="window.location.href='/image/upload'">
                     <#if organization.user.avatarUrl?has_content>
                         <img src="/data/images/${organization.user.avatarUrl}"
                              class="avatar-image"
@@ -189,10 +222,12 @@
                              class="avatar-image"
                              alt="Фото профиля по умолчанию">
                     </#if>
-                    <a href="/image/upload" class="edit-button">
-                        <i class="fa-solid fa-pencil"></i>
-                        Загрузить изображение
-                    </a>
+                    <div class="avatar-edit-overlay">
+                        <div class="avatar-edit-text">
+                            <i class="fa-solid fa-pencil"></i><br>
+                            Изменить фото
+                        </div>
+                    </div>
                 </div>
 
                 <div class="user-info">
