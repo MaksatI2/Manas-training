@@ -13,11 +13,7 @@ import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
 import manasTrainingService.entity.User;
-import manasTrainingService.exceptions.nsee.EmailAlreadyExistsException;
-import manasTrainingService.exceptions.nsee.OrganizationNameAlreadyExistsException;
-import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;
-import manasTrainingService.exceptions.nsee.UserNotFoundException;
-import manasTrainingService.repositories.PasswordResetTokenRepository;
+import manasTrainingService.exceptions.nsee.*;
 import manasTrainingService.repositories.UserRepository;
 import manasTrainingService.service.*;
 import org.springframework.data.domain.Page;
@@ -27,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -246,5 +241,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editTeacherInformation(TeacherProfileEditDto teacherProfileEditDto) {
         teacherService.editTeacherProfile(teacherProfileEditDto);
+    }
+
+    @Override
+    public void resendVerificationEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с email " + email + " не найден"));
+
+        if (user.getIsActive()) {
+            throw new EmailAlreadyVerifiedException("Email уже подтвержден");
+        }
+        emailVerificationService.generateVerificationToken(user);
     }
 }

@@ -83,7 +83,7 @@ public class AuthController {
             userService.registerStudent(studentRegisterDto);
             redirectAttributes.addAttribute("message",
                     "Регистрация прошла успешно! Войдите в свой аккаунт.");
-            return "redirect:/auth/login";
+            return "redirect:/auth/verify-pending?email=" + studentRegisterDto.getEmail();
         } catch (EmailAlreadyExistsException e) {
             bindingResult.rejectValue("email", "email.exists", e.getMessage());
         } catch (PhoneAlreadyExistsException e) {
@@ -111,7 +111,7 @@ public class AuthController {
             userService.registerOrganization(organizationRegisterDto);
             redirectAttributes.addAttribute("message",
                     "Регистрация компании прошла успешно! Войдите в свой аккаунт.");
-            return "redirect:/auth/login";
+            return "redirect:/auth/verify-pending?email=" + organizationRegisterDto.getEmail();
         } catch (EmailAlreadyExistsException e) {
             bindingResult.rejectValue("email", "email.exists", e.getMessage());
         } catch (PhoneAlreadyExistsException e) {
@@ -191,4 +191,27 @@ public class AuthController {
             return "auth/reset-password";
         }
     }
+
+    @GetMapping("/verify-pending")
+    public String showVerificationPendingPage(@RequestParam("email") String email, Model model) {
+        model.addAttribute("email", email);
+        return "auth/verify-pending";
+    }
+
+    @PostMapping("/resend-verification")
+    public String resendVerificationEmail(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        try {
+            userService.resendVerificationEmail(email);
+            redirectAttributes.addFlashAttribute("message", "Письмо с подтверждением повторно отправлено на " + email);
+        } catch (UserNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", "Пользователь с таким email не найден.");
+        } catch (EmailAlreadyVerifiedException e) {
+            redirectAttributes.addFlashAttribute("error", "Email уже подтвержден. Вы можете войти в систему.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Произошла ошибка при отправке письма. Попробуйте позже.");
+        }
+        return "redirect:/auth/verify-pending?email=" + email;
+    }
+
+
 }
