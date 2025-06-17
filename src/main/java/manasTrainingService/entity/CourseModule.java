@@ -20,7 +20,7 @@ public class CourseModule {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_instance_id", nullable = false)
-    Course course;
+    CourseInstance courseInstance;
 
     @Column(name = "title", length = 200)
     String title;
