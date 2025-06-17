@@ -11,7 +11,6 @@ import lombok.Setter;
 import manasTrainingService.validation.EndDateAfterStartDate;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 
 @Getter
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EndDateAfterStartDate
-public class CourseInstanceDTO {
+public class CourseInstanceCreationDTO {
     private Integer id;
 
     @NotNull(message = "Курс должен быть выбран")

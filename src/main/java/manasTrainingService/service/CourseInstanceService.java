@@ -1,12 +1,14 @@
 package manasTrainingService.service;
 
-import manasTrainingService.dto.CourseInstanceDTO;
-import manasTrainingService.entity.CourseInstance;
+import manasTrainingService.dto.CourseInstanceCreationDTO;
+import manasTrainingService.dto.instance.CourseInstanceDTO;
 
 import java.util.List;
 
 public interface CourseInstanceService {
-    Integer createCourseInstance(CourseInstanceDTO dto);
+    Integer createCourseInstance(CourseInstanceCreationDTO dto);
 
     List<CourseInstanceDTO> findAll();
+
+    CourseInstanceDTO getCourseInstanceById(Integer id);
 }

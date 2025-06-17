@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,6 +35,9 @@ public class CourseModule {
 
     @Column(name = "order_index", nullable = false)
     Integer orderIndex;
+
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Lesson> lessons;
 
     @Column(name = "is_active", nullable = false)
     @Builder.Default

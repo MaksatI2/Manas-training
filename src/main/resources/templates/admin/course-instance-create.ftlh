@@ -10,6 +10,8 @@
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
                     <div class="mb-3">
+                        <#assign errors = Request["org.springframework.validation.BindingResult.courseInstanceDto"] />
+
                         <label for="courseId" class="form-label">
                             <i class="fas fa-book me-1"></i>Курс *
                         </label>
@@ -19,6 +21,16 @@
                                     <option value="${course.id}" <#if (courseInstanceDto.courseId)?? && courseInstanceDto.courseId = course.id> selected </#if>>${course.title}</option>
                                 </#list>
                         </select>
+                        <div class="error-block text-danger">
+                            <#if errors??>
+                                <#list errors.fieldErrors as error>
+                                    <#if error.field == "courseId">
+                                        <div class="error-message">${error.defaultMessage}</div>
+                                    </#if>
+                                </#list>
+                            </#if>
+
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -27,7 +39,7 @@
                         </label>
                         <@spring.formInput "courseInstanceDto.title", "class='form-control' id='title'" />
                         <div class="error-block text-danger">
-                            <@spring.showErrors "<br>", "error-message" />
+                            <@spring.showErrors "title", "error-message" />
                         </div>
                     </div>
 
@@ -37,7 +49,7 @@
                         </label>
                         <@spring.formInput "courseInstanceDto.startDate", "class='form-control' id='startDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
-                            <@spring.showErrors "<br>", "error-message" />
+                            <@spring.showErrors "startDate", "error-message" />
                         </div>
                     </div>
 
@@ -47,7 +59,7 @@
                         </label>
                         <@spring.formInput "courseInstanceDto.endDate", "class='form-control' id='endDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
-                            <@spring.showErrors "<br>", "error-message" />
+                            <@spring.showErrors "endDate", "error-message" />
                         </div>
                     </div>
 
@@ -58,7 +70,7 @@
                         </label>
                         <@spring.formCheckbox "courseInstanceDto.isActive", "class='form-check-input' id='isActive'" />
                         <div class="error-block text-danger">
-                            <@spring.showErrors "<br>", "error-message" />
+                            <@spring.showErrors "isActive", "error-message" />
                         </div>
                     </div>
 

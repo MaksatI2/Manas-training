@@ -2,12 +2,12 @@ package manasTrainingService.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import manasTrainingService.dto.CourseInstanceDTO;
+import manasTrainingService.dto.CourseInstanceCreationDTO;
 
-public class EndDateAfterStartDateValidator implements ConstraintValidator<EndDateAfterStartDate, CourseInstanceDTO> {
+public class EndDateAfterStartDateValidator implements ConstraintValidator<EndDateAfterStartDate, CourseInstanceCreationDTO> {
 
     @Override
-    public boolean isValid(CourseInstanceDTO dto, ConstraintValidatorContext context) {
+    public boolean isValid(CourseInstanceCreationDTO dto, ConstraintValidatorContext context) {
         if (dto.getStartDate() == null || dto.getEndDate() == null) {
             return true;
         }
