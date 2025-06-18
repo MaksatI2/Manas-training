@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
     Optional<Schedule> findByTeacherId(Integer teacherId);
     List<Schedule> findAllByLessonType(LessonType lessonType);
+    Optional<Schedule> findByLessonId(Integer lessonId);
 }

@@ -2,6 +2,7 @@ package manasTrainingService.service;
 
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.entity.Course;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,4 +15,6 @@ public interface CourseService {
     CourseDto getById(Integer id);
 
     List<CourseCategoryDto> getCategories();
+
+    Course getCourseById(Integer id);
 }

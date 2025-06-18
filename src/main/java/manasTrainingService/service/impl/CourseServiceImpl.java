@@ -5,12 +5,12 @@ import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.entity.Course;
 import manasTrainingService.entity.CourseCategory;
-import manasTrainingService.repositories.CourseCategoryRepository;
 import manasTrainingService.repositories.CourseRepository;
 import manasTrainingService.service.CourseCategoryService;
 import manasTrainingService.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import manasTrainingService.exceptions.nsee.CourseNotFoundException;
 
 import java.util.List;
 
@@ -76,5 +76,10 @@ public class CourseServiceImpl implements CourseService {
                 .category(categoryDto)
                 .categoryId(course.getCategory().getId())
                 .build();
+    }
+
+    @Override
+    public Course getCourseById(Integer id) {
+        return courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException("Курс не был найден"));
     }
 }

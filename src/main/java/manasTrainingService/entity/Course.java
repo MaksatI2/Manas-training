@@ -53,11 +53,6 @@ public class Course {
     @Builder.Default
     LocalDateTime updatedAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<CourseEnrollment> enrollments;
-
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<CourseModule> modules;
 
     @PreUpdate
     void preUpdate() {

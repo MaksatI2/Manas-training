@@ -24,7 +24,7 @@ public class CourseEnrollment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_instance_id", nullable = false)
-    Course course;
+    CourseInstance courseInstance;
 
     @ManyToOne
     @JoinColumn(name = "student_id")

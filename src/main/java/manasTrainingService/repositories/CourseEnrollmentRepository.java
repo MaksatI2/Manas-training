@@ -10,10 +10,13 @@ import java.util.Optional;
 
 @Repository
 public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollment, Integer> {
-    List<CourseEnrollment> findAllByCourseId(Integer courseId);
+    List<CourseEnrollment> findAllByCourseInstanceId(Integer courseId);
     List<CourseEnrollment> findAllByStudentId(Integer studentId);
-    Optional<CourseEnrollment> findByCourseIdAndStudentId(Integer courseId, Integer studentId);
-    List<CourseEnrollment> findAllByCourseIdAndStatus(Integer courseId, Status status);
+    Optional<CourseEnrollment> findByCourseInstanceIdAndStudentId(Integer courseId, Integer studentId);
+    List<CourseEnrollment> findAllByCourseInstanceIdAndStatus(Integer courseId, Status status);
     List<CourseEnrollment> findAllByStudentIdAndStatus(Integer studentId, Status status);
-
+    List<CourseEnrollment> findByCourseInstanceId(Integer courseInstanceId);
+    boolean existsByCourseInstanceIdAndStudentId(Integer courseInstanceId, Integer studentId);
+    List<CourseEnrollment> findByStudentIdAndStatus(Integer studentId, Status status);
+    boolean existsByStudentIdAndCourseInstanceId(Integer studentId, Integer courseInstanceId);
 }
