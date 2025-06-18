@@ -19,9 +19,9 @@
     </#if>
 
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-        <a href="<@spring.url '/admin/instances/${courseInstance.id}/modules'/>" class="btn btn-primary">Модули</a>
-        <a href="<@spring.url '/admin/instances/${courseInstance.id}/participants'/>" class="btn btn-primary">Участники</a>
-        <a href="<@spring.url '/admin/instances'/>" class="btn btn-secondary">Назад</a>
+        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary">Модули</a>
+        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary">Участники</a>
+        <a href="<@spring.url '/admin/course-instances'/>" class="btn btn-secondary">Назад</a>
     </div>
     <div class="container">
         <h2>Модули курса</h2>
