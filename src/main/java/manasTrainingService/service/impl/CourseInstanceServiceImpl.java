@@ -98,6 +98,7 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .isActive(courseInstance.getIsActive())
                 .modules(moduleDtos)
                 .durationHours(courseInstance.getCourse().getDurationHours())
+                .courseId(courseInstance.getCourse().getId())
                 .build();
     }
 }

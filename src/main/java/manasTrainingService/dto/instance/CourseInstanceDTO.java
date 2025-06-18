@@ -18,6 +18,7 @@ public class CourseInstanceDTO {
     private Integer id;
     private String title;
     private LocalDate startDate;
+    private Integer courseId;
     private LocalDate endDate;
     private Integer durationHours;
     private List<CourseModuleDTO> modules;

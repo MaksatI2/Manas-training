@@ -1,8 +1,11 @@
 package manasTrainingService.repositories;
 
 import manasTrainingService.entity.CourseApplicationEmployee;
+import manasTrainingService.entity.CourseEnrollment;
 import manasTrainingService.entity.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,4 +18,8 @@ public interface CourseApplicationEmployeeRepository extends JpaRepository<Cours
 
     Optional<CourseApplicationEmployee> findByApplicationIdAndEmployeeId(Integer applicationId, Integer employeeId);
     List<CourseApplicationEmployee> findByApplicationCourseIdAndApplicationStatus(Integer courseId, Status status);
+    List<CourseApplicationEmployee> findByApplication_Course_IdAndApplicationStatus(Integer courseId, Status status);
+
+
+
 }
