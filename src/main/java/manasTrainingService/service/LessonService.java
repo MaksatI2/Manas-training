@@ -13,4 +13,6 @@ public interface LessonService {
     Integer createLesson(LessonCreateRequest request, CourseModule module);
 
     List<Lesson> getLessonsByModuleId(Integer moduleId);
+
+    int getMinutesLeft(CourseModule module);
 }

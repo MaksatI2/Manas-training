@@ -28,6 +28,9 @@
             <div class="error-block text-danger">
                 <@spring.showErrors  "<br>" "error-message" />
             </div>
+            <#if minutesLeft??>
+                <small class="text-muted">Доступно минут: ${minutesLeft?string}</small>
+            </#if>
         </div>
 
         <button type="submit" class="btn btn-primary">Создать урок</button>

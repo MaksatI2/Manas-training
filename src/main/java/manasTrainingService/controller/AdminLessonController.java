@@ -2,13 +2,10 @@ package manasTrainingService.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.instance.CourseInstanceDTO;
-import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.CourseModuleService;
 import manasTrainingService.service.LessonService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,7 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin/course-instances")
-public class LessonController {
+public class AdminLessonController {
 
     private final LessonService lessonService;
     private final CourseModuleService courseModuleService;
@@ -29,6 +26,7 @@ public class LessonController {
     public String showCreateLessonForm(@PathVariable Integer instanceId,
                                        @PathVariable Integer moduleId,
                                        Model model) {
+
         if (!model.containsAttribute("lessonCreateRequest")) {
 
             model.addAttribute("lessonCreateRequest", new LessonCreateRequest());
@@ -36,6 +34,7 @@ public class LessonController {
         if (!courseModuleService.getCourseModuleById(moduleId).getCourseInstance().getId().equals(instanceId)) {
             throw new IllegalStateException("Данный модуль не относится к этому курсу");
         }
+        model.addAttribute("minutesLeft", lessonService.getMinutesLeft(courseModuleService.getCourseModuleById(moduleId)));
         model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
         model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
         return "admin/lesson-create";
@@ -49,6 +48,7 @@ public class LessonController {
                                Model model,
                                RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("minutesLeft", lessonService.getMinutesLeft(courseModuleService.getCourseModuleById(moduleId)));
             model.addAttribute("lessonCreateRequest", request);
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
             model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));

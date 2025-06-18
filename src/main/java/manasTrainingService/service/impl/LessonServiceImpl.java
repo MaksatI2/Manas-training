@@ -20,7 +20,7 @@ public class LessonServiceImpl implements LessonService {
     public Integer createLesson(LessonCreateRequest request, CourseModule module) {
         int usedMinutes = lessonRepository.getTotalUsedMinutes(module.getId());
         if (usedMinutes + request.getDurationMinutes() > module.getDurationHours() * 60) {
-            throw new IllegalArgumentException("Превышено допустимое время модуля. " + (usedMinutes + request.getDurationMinutes() - module.getDurationHours() * 60));
+            throw new IllegalArgumentException("Превышено допустимое время модуля. " + (module.getDurationHours() * 60 - usedMinutes ));
         }
         Lesson lesson = Lesson.builder()
                 .title(request.getTitle())
@@ -37,5 +37,10 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public List<Lesson> getLessonsByModuleId(Integer moduleId) {
         return lessonRepository.findByModuleId(moduleId);
+    }
+
+    @Override
+    public int getMinutesLeft(CourseModule module) {
+        return module.getDurationHours() * 60 - lessonRepository.getTotalUsedMinutes(module.getId()) ;
     }
 }
