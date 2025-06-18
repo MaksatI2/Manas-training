@@ -86,10 +86,10 @@ VALUES
 
 INSERT INTO course_enrollments (course_id, student_id, status, progress_percentage)
 VALUES
-    ((SELECT id FROM courses WHERE code = 'C-001'), (SELECT id FROM users WHERE email = 'student1@manas.kg'), 'enrolled', 0),
-    ((SELECT id FROM courses WHERE code = 'C-002'), (SELECT id FROM users WHERE email = 'student2@manas.kg'), 'enrolled', 0),
-    ((SELECT id FROM courses WHERE code = 'C-003'), (SELECT id FROM users WHERE email = 'student3@manas.kg'), 'enrolled', 0),
-    ((SELECT id FROM courses WHERE code = 'C-004'), (SELECT id FROM users WHERE email = 'student4@manas.kg'), 'enrolled', 0),
-    ((SELECT id FROM courses WHERE code = 'C-005'), (SELECT id FROM users WHERE email = 'student5@manas.kg'), 'enrolled', 0),
-    ((SELECT id FROM courses WHERE code = 'C-006'), (SELECT id FROM users WHERE email = 'student6@manas.kg'), 'enrolled', 0),
-    ((SELECT id FROM courses WHERE code = 'C-007'), (SELECT id FROM users WHERE email = 'student7@manas.kg'), 'enrolled', 0);
+    ((SELECT id FROM courses WHERE code = 'C-001'), (SELECT id FROM users WHERE email = 'student1@manas.kg'), 'ENROLLED', 0),
+    ((SELECT id FROM courses WHERE code = 'C-002'), (SELECT id FROM users WHERE email = 'student2@manas.kg'), 'ENROLLED', 0),
+    ((SELECT id FROM courses WHERE code = 'C-003'), (SELECT id FROM users WHERE email = 'student3@manas.kg'), 'ENROLLED', 0),
+    ((SELECT id FROM courses WHERE code = 'C-004'), (SELECT id FROM users WHERE email = 'student4@manas.kg'), 'ENROLLED', 0),
+    ((SELECT id FROM courses WHERE code = 'C-005'), (SELECT id FROM users WHERE email = 'student5@manas.kg'), 'ENROLLED', 0),
+    ((SELECT id FROM courses WHERE code = 'C-006'), (SELECT id FROM users WHERE email = 'student6@manas.kg'), 'ENROLLED', 0),
+    ((SELECT id FROM courses WHERE code = 'C-007'), (SELECT id FROM users WHERE email = 'student7@manas.kg'), 'ENROLLED', 0);
