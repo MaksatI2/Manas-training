@@ -2,6 +2,11 @@
 <#import "/spring.ftl" as spring>
 
 <@layout.page>
+    <div class="container mb-4">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="/admin/course-instances/${courseInstance.id}" class="btn btn-secondary">Назад</a>
+        </div>
+    </div>
     <div class="container py-4">
         <div class="hero-section mb-4 text-center">
             <h2 class="hero-title mb-2">Управление участниками курса: <strong>${courseInstance.title}</strong></h2>
@@ -144,6 +149,17 @@
 
         .form-check-input {
             margin-top: 0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066cc, #003d7a);
+            border-color: #0066cc;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #003d7a, #002a5a);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
         }
     </style>
 </@layout.page>

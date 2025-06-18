@@ -60,6 +60,11 @@ public class CourseModuleServiceImpl implements CourseModuleService {
         return courseModuleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException("Модуль не был найден"));
     }
 
+    @Override
+    public CourseModuleDTO getCourseModuleDTOById(Integer moduleId) {
+        return convertToDto(courseModuleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException("Модуль не был найден")));
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<CourseModuleDTO> findByCourseInstanceId(Integer courseInstanceId) {

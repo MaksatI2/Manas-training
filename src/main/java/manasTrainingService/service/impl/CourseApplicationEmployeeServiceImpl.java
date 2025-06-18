@@ -44,12 +44,11 @@ public class CourseApplicationEmployeeServiceImpl implements CourseApplicationEm
 
     @Override
     public List<CourseApplicationEmployeeDTO> getPendingEmployeesForCourseInstance(Integer courseInstanceId) {
-        var e =  employeeRepository
+        return employeeRepository
                 .findByApplication_Course_IdAndApplicationStatus(courseInstanceId, Status.PENDING)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
-        return e;
     }
 
     private CourseApplicationEmployeeDTO toDto(CourseApplicationEmployee employee) {

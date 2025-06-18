@@ -20,6 +20,8 @@ public interface CourseModuleService {
 
     CourseModule getCourseModuleById(Integer moduleId);
 
+    CourseModuleDTO getCourseModuleDTOById(Integer moduleId);
+
     @Transactional(readOnly = true)
     List<CourseModuleDTO> findByCourseInstanceId(Integer courseInstanceId);
 }

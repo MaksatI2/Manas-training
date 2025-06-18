@@ -6,6 +6,7 @@ import manasTrainingService.dto.CourseInstanceCreationDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.CourseModuleListDTO;
+import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.CourseModuleService;
 import manasTrainingService.service.CourseService;
@@ -60,6 +61,7 @@ public class CourseInstanceController {
     public String viewCourseInstance(@PathVariable Integer id, Model model) {
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
         model.addAttribute("courseInstance", courseInstanceDto);
+        model.addAttribute("lessonCreateRequest", new LessonCreateRequest());
         return "admin/course-instance-detail";
     }
 
