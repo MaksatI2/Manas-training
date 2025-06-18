@@ -3,9 +3,14 @@ package manasTrainingService.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
+import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.profile.TeacherProfileDto;
+import manasTrainingService.entity.CourseInstanceTeacher;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;
+import manasTrainingService.service.CourseInstanceService;
+import manasTrainingService.service.CourseService;
+import manasTrainingService.service.CourseTeacherInstanceService;
 import manasTrainingService.service.TeacherService;
 import manasTrainingService.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -21,6 +26,8 @@ public class TeacherController {
 
     private final UserService userService;
     private final TeacherService teacherService;
+    private final CourseTeacherInstanceService courseTeacherInstanceService;
+    private final CourseInstanceService courseInstanceService;
 
     @GetMapping("/profile")
     public String viewProfile(Model model) {
@@ -56,5 +63,21 @@ public class TeacherController {
             model.addAttribute("teacherEditDto", teacherProfileEditDto);
             return "teacher/profile-edit";
         }
+    }
+
+    @GetMapping("/my-courses")
+    public String viewTeacherCourses(Model model) {
+        Integer userId = userService.getAuthorizedUser().getId();
+        model.addAttribute("courses", courseTeacherInstanceService.getTeacherCourses(userId));
+        return "teacher/my-courses";
+    }
+
+    @GetMapping("/course/{id}")
+    public String viewTeacherCourse(@PathVariable Integer id,
+                                    Model model) {
+        courseTeacherInstanceService.hasAccess(id);
+        CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
+        model.addAttribute("courseInstance", courseInstanceDto);
+        return "student/course-detail";
     }
 }

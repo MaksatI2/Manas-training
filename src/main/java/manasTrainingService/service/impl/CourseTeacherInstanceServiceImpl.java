@@ -2,8 +2,10 @@ package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
+import manasTrainingService.dto.teacher.TeacherCourseCardDTO;
 import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.CourseInstanceTeacher;
+import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.UserNotFoundException;
 import manasTrainingService.repositories.CourseInstanceTeacherRepository;
 import manasTrainingService.service.CourseInstanceService;
@@ -66,4 +68,30 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
                 .orElseThrow(() -> new UserNotFoundException("Teacher assignment not found"));
         repository.delete(teacher);
     }
+
+    @Override
+    public List<TeacherCourseCardDTO> getTeacherCourses(Integer teacherId) {
+        return repository.findByTeacherId(teacherId).stream()
+                .map(relation -> {
+                    CourseInstance ci = relation.getCourseInstance();
+                    return TeacherCourseCardDTO.builder()
+                            .courseInstanceId(ci.getId())
+                            .courseTitle(ci.getCourse().getTitle())
+                            .instanceTitle(ci.getTitle())
+                            .startDate(ci.getStartDate())
+                            .endDate(ci.getEndDate())
+                            .isPrimary(relation.getIsPrimary())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void hasAccess(Integer courseId) {
+        User user = userService.getAuthorizedUser();
+        if (!repository.existsByCourseInstanceIdAndTeacherId(courseId, user.getId())) {
+            throw new NoAccessException("У вас нет доступа к курсу");
+        };
+    }
+
 }

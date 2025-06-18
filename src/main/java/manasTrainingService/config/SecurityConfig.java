@@ -26,6 +26,7 @@ public class SecurityConfig {
                                 "/courses/**"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/student/**").hasAuthority("STUDENT")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

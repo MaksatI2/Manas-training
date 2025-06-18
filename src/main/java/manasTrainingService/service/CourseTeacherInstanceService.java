@@ -1,6 +1,7 @@
 package manasTrainingService.service;
 
 import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
+import manasTrainingService.dto.teacher.TeacherCourseCardDTO;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -13,4 +14,8 @@ public interface CourseTeacherInstanceService {
 
     @Transactional
     void deleteTeacher(Integer courseInstanceId, Integer teacherId);
+
+    List<TeacherCourseCardDTO> getTeacherCourses(Integer teacherId);
+
+    void hasAccess(Integer courseId);
 }
