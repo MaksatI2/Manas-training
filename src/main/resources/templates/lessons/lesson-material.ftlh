@@ -11,7 +11,7 @@
     </#if>
 
     <div class="container">
-        <form action="<@spring.url '/admin/lessons/${lesson.id}/materials'/>" method="post">
+        <form action="/admin/lessons/${lesson.id}/materials" method="post">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <@spring.formHiddenInput "material.lessonId" 'value="${lesson.id}"'/>
             <div class="mb-3">

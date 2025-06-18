@@ -37,7 +37,7 @@
                                         aria-controls="collapse${module.id}">
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
-                                <a href="<@spring.url '/admin/instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-success btn-sm ms-3">
+                                <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-success btn-sm ms-3">
                                     + Урок
                                 </a>
                             </div>

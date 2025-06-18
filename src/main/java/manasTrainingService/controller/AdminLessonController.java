@@ -94,7 +94,7 @@ public class AdminLessonController {
     public String showMaterialForm(@PathVariable Integer lessonId, Model model) {
         LessonDTO lesson = lessonService.getLessonById(lessonId);
         model.addAttribute("lesson", lesson);
-        model.addAttribute("material", new LessonMaterialDTO());
+        model.addAttribute("material", LessonMaterialDTO.builder().lessonId(lessonId).build());
         return "lessons/lesson-material";
     }
 
