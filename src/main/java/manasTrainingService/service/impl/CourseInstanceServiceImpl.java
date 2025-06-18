@@ -63,6 +63,12 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
         return convertToDto(course);
     }
 
+    @Override
+    public CourseInstance getCourseInstanceModelById(Integer id) {
+        return courseInstanceRepository.findById(id)
+                .orElseThrow(() -> new CourseNotFoundException("Course instance not found"));
+    }
+
     private CourseInstanceDTO convertToDto(CourseInstance courseInstance) {
         var moduleDtos = courseInstance.getModules().stream()
                 .filter(CourseModule::getIsActive)
@@ -91,6 +97,7 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .endDate(courseInstance.getEndDate().toLocalDate())
                 .isActive(courseInstance.getIsActive())
                 .modules(moduleDtos)
+                .durationHours(courseInstance.getCourse().getDurationHours())
                 .build();
     }
 }

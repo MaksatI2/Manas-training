@@ -13,4 +13,6 @@ public interface CourseModuleRepository extends JpaRepository<CourseModule, Inte
     List<CourseModule> findByCourseInstanceId(Integer courseInstanceId);
     @Query("SELECT SUM(cm.durationHours) FROM CourseModule cm WHERE cm.courseInstance.id = :courseInstanceId")
     Integer sumDurationHoursByCourseInstanceId(Integer courseInstanceId);
+
+    List<CourseModule> findByCourseInstanceIdOrderByOrderIndexAsc(Integer courseInstanceId);
 }

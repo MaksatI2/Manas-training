@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseInstanceCreationDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
-import manasTrainingService.dto.instance.CoursePlanDTO;
-import manasTrainingService.dto.instance.LessonDTO;
-import manasTrainingService.entity.CourseInstance;
-import manasTrainingService.entity.CourseModule;
+import manasTrainingService.dto.instance.CourseModuleListDTO;
 import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.CourseModuleService;
 import manasTrainingService.service.CourseService;
@@ -22,9 +19,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
+
 
 @Controller
 @RequestMapping("/admin/course-instances")
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 public class CourseInstanceController {
     private final CourseInstanceService courseInstanceService;
     private final CourseService courseService;
-    private final LessonService lessonService;
     private final CourseModuleService courseModuleService;
 
     @GetMapping
@@ -63,6 +61,66 @@ public class CourseInstanceController {
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
         model.addAttribute("courseInstance", courseInstanceDto);
         return "admin/course-instance-detail";
+    }
+
+    @GetMapping("/{id}/modules")
+    public String manageModules(@PathVariable Integer id, Model model) {
+        CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
+        List<CourseModuleDTO> modules = courseInstanceDto.getModules();
+
+        int totalModuleHours = modules.stream().mapToInt(CourseModuleDTO::getDurationHours).sum();
+        int remainingHours = courseInstanceDto.getDurationHours() - totalModuleHours;
+
+        model.addAttribute("courseInstance", courseInstanceDto);
+        model.addAttribute("modules", modules);
+        model.addAttribute("moduleListDto", new CourseModuleListDTO());
+        model.addAttribute("remainingHours", remainingHours);
+        return "admin/course-instance-modules";
+    }
+
+    @PostMapping("/{id}/modules")
+    public String createModules(@PathVariable Integer id, @Valid @ModelAttribute("moduleListDto") CourseModuleListDTO moduleListDto, BindingResult result, Model model) {
+
+        CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
+        List<CourseModuleDTO> modules = courseInstanceDto.getModules();
+        int totalExistingHours = modules.stream()
+                .mapToInt(CourseModuleDTO::getDurationHours)
+                .sum();
+
+        int newModulesHours = Optional.ofNullable(moduleListDto.getModules())
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(Objects::nonNull)
+                .mapToInt(m -> m.getDurationHours() != null ? m.getDurationHours() : 0)
+                .sum();
+
+        int totalHoursAfterAdd = totalExistingHours + newModulesHours;
+        int maxAllowedHours = courseInstanceDto.getDurationHours();
+
+        if (totalHoursAfterAdd > maxAllowedHours) {
+            result.reject("duration.exceeded", "Общее количество часов превышает лимит курса");
+
+            int remainingHours = maxAllowedHours - totalExistingHours;
+
+            model.addAttribute("courseInstance", courseInstanceDto);
+            model.addAttribute("modules", modules);
+            model.addAttribute("remainingHours", remainingHours);
+            model.addAttribute("errorMessage", "Общее количество часов превышает допустимое значение (" + maxAllowedHours + ")");
+            return "admin/course-instance-modules";
+        }
+
+        if (result.hasErrors()) {
+
+            int totalModuleHours = modules.stream().mapToInt(CourseModuleDTO::getDurationHours).sum();
+            int remainingHours = courseInstanceDto.getDurationHours() - totalModuleHours;
+
+            model.addAttribute("courseInstance", courseInstanceDto);
+            model.addAttribute("modules", modules);
+            model.addAttribute("remainingHours", remainingHours);
+            return "admin/course-instance-modules";
+        }
+        courseModuleService.createCourseModules(id, moduleListDto.getModules());
+        return "redirect:/admin/course-instances/" + id;
     }
 
 }
