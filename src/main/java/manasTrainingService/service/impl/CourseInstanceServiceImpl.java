@@ -8,10 +8,12 @@ import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.entity.Course;
 import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.CourseModule;
+import manasTrainingService.entity.Lesson;
 import manasTrainingService.exceptions.nsee.CourseNotFoundException;
 import manasTrainingService.repositories.CourseInstanceRepository;
 import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.CourseService;
+import manasTrainingService.service.LessonService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class CourseInstanceServiceImpl implements CourseInstanceService {
     private final CourseInstanceRepository courseInstanceRepository;
     private final CourseService courseService;
+    private final LessonService lessonService;
 
     @Override
     public Integer createCourseInstance(CourseInstanceCreationDTO dto) {
@@ -100,5 +103,12 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .durationHours(courseInstance.getCourse().getDurationHours())
                 .courseId(courseInstance.getCourse().getId())
                 .build();
+    }
+
+    @Override
+    public CourseInstanceDTO getCourseInstanceByLessonId(Integer lessonId) {
+        Lesson lesson = lessonService.getLessonModelById(lessonId);
+        CourseInstance instance = lesson.getModule().getCourseInstance();
+        return convertToDto(instance);
     }
 }

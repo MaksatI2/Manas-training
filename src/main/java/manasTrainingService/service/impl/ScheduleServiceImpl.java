@@ -1,0 +1,76 @@
+package manasTrainingService.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.lesson.ScheduleDTO;
+import manasTrainingService.entity.CourseInstance;
+import manasTrainingService.entity.Lesson;
+import manasTrainingService.entity.Schedule;
+import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.ScheduleNotFouneException;
+import manasTrainingService.repositories.ScheduleRepository;
+import manasTrainingService.service.CourseInstanceService;
+import manasTrainingService.service.LessonService;
+import manasTrainingService.service.ScheduleService;
+import manasTrainingService.service.UserService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class ScheduleServiceImpl implements ScheduleService {
+    private final ScheduleRepository scheduleRepository;
+
+    private final LessonService lessonService;
+    private final CourseInstanceService courseInstanceService;
+    private final UserService userService;
+
+    @Override
+    public ScheduleDTO getScheduleByLessonId(Integer lessonId) {
+        Schedule schedule = scheduleRepository.findByLessonId(lessonId).orElse(null);
+        if (schedule == null) {
+            return null;
+        }
+        return ScheduleDTO.builder()
+                .id(schedule.getId())
+                .courseInstanceId(schedule.getCourseInstance().getId())
+                .lessonId(lessonId)
+                .lessonDate(schedule.getLessonDate())
+                .durationHours(schedule.getDurationHours())
+                .teacherId(schedule.getTeacher().getId())
+                .title(schedule.getTitle())
+                .lessonType(schedule.getLessonType())
+                .isOnline(schedule.getIsOnline())
+                .meetingUrl(schedule.getMeetingUrl())
+                .notes(schedule.getNotes())
+                .isActive(schedule.getIsActive())
+                .teacherName(schedule.getTeacher().getName())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public void saveSchedule(ScheduleDTO schedule) {
+        Lesson lesson = lessonService.getLessonModelById(schedule.getLessonId());
+        CourseInstance courseInstance = courseInstanceService.getCourseInstanceModelById(schedule.getCourseInstanceId());
+        User teacher = userService.getUserById(schedule.getTeacherId());
+
+        Schedule entity = schedule.getId() != null
+                ? scheduleRepository.findById(schedule.getId())
+                .orElseThrow(() -> new ScheduleNotFouneException("Schedule not found"))
+                : new Schedule();
+
+        entity.setLesson(lesson);
+        entity.setCourseInstance(courseInstance);
+        entity.setLessonDate(schedule.getLessonDate());
+        entity.setDurationHours(schedule.getDurationHours());
+        entity.setTeacher(teacher);
+        entity.setTitle(schedule.getTitle());
+        entity.setLessonType(schedule.getLessonType());
+        entity.setIsOnline(schedule.getIsOnline());
+        entity.setMeetingUrl(schedule.getMeetingUrl());
+        entity.setNotes(schedule.getNotes());
+        entity.setIsActive(schedule.getIsActive());
+
+        scheduleRepository.save(entity);
+    }
+}

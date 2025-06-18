@@ -1,5 +1,6 @@
 <#import "../layout.ftlh" as layout>
-<#import "/spring.ftl" as spring />
+<#import "/spring.ftl" as spring>
+
 <@layout.page>
     <div class="hero-section">
         <h1 class="hero-title">${courseInstance.title}</h1>
@@ -17,11 +18,10 @@
         <div class="alert alert-danger">${error}</div>
     </#if>
 
-
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-        <a href="/admin/course-instances/${courseInstance.id}/modules" class="btn btn-primary">Модули</a>
-        <a href="/admin/course-instances/${courseInstance.id}/participants" class="btn btn-primary">Участники</a>
-        <a href="/admin/course-instances" class="btn btn-secondary">Назад</a>
+        <a href="<@spring.url '/admin/instances/${courseInstance.id}/modules'/>" class="btn btn-primary">Модули</a>
+        <a href="<@spring.url '/admin/instances/${courseInstance.id}/participants'/>" class="btn btn-primary">Участники</a>
+        <a href="<@spring.url '/admin/instances'/>" class="btn btn-secondary">Назад</a>
     </div>
     <div class="container">
         <h2>Модули курса</h2>
@@ -37,26 +37,35 @@
                                         aria-controls="collapse${module.id}">
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
-                                <a href="/admin/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new" class="btn btn-success btn-sm ms-3">
+                                <a href="<@spring.url '/admin/instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-success btn-sm ms-3">
                                     + Урок
                                 </a>
                             </div>
-
-
                             <div id="collapse${module.id}" class="accordion-collapse collapse"
                                  aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
                                 <div class="accordion-body">
                                     <p>${module.description!''}</p>
                                     <h5>Уроки</h5>
                                     <#if module.lessons?has_content>
-                                        <ul>
+                                        <div class="row row-cols-1 row-cols-md-2 g-3">
                                             <#list module.lessons as lesson>
-                                                <li>
-                                                    ${lesson.title} (${lesson.durationMinutes} мин.)
-                                                    <p>${lesson.description!''}</p>
-                                                </li>
+                                                <div class="col">
+                                                    <a href="<@spring.url '/lessons/${lesson.id}'/>" class="text-decoration-none">
+                                                        <div class="card h-100 shadow-sm">
+                                                            <div class="card-body">
+                                                                <h6 class="card-title">${lesson.title}</h6>
+                                                                <p class="card-text text-muted small">
+                                                                    ${lesson.description!''}
+                                                                </p>
+                                                                <p class="card-text text-muted small">
+                                                                    Длительность: ${lesson.durationMinutes} мин.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
                                             </#list>
-                                        </ul>
+                                        </div>
                                     <#else>
                                         <p>Уроки отсутствуют</p>
                                     </#if>
@@ -70,26 +79,39 @@
             <p>Модули отсутствуют</p>
         </#if>
     </div>
-    <#if moduleIdWithErrors??>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                var moduleId = "${moduleIdWithErrors}";
-                var modalId = "#createLessonModal" + moduleId;
-                var myModal = new bootstrap.Modal(document.querySelector(modalId));
-                myModal.show();
-            });
-        </script>
-    </#if>
     <style>
         .btn-primary {
             background: linear-gradient(135deg, #0066cc, #003d7a);
             border-color: #0066cc;
         }
-
         .btn-primary:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
             box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .feature-card {
+            background-color: #fff;
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .accordion-button {
+            font-weight: 500;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .card-text {
+            font-size: 0.875rem;
         }
     </style>
 </@layout.page>

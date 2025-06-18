@@ -14,5 +14,9 @@ public interface LessonService {
 
     List<Lesson> getLessonsByModuleId(Integer moduleId);
 
+    LessonDTO getLessonById(Integer lessonId);
+
+    Lesson getLessonModelById(Integer lessonId);
+
     int getMinutesLeft(CourseModule module);
 }

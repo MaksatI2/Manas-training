@@ -7,9 +7,12 @@ import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.CourseModuleListDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
+import manasTrainingService.dto.teacher.TeacherFormDTO;
 import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.CourseModuleService;
 import manasTrainingService.service.CourseService;
+import manasTrainingService.service.CourseTeacherInstanceService;
+import manasTrainingService.service.CourseTeacherService;
 import manasTrainingService.service.LessonService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +37,8 @@ public class CourseInstanceController {
     private final CourseInstanceService courseInstanceService;
     private final CourseService courseService;
     private final CourseModuleService courseModuleService;
+    private final CourseTeacherService courseTeacherService;
+    private final CourseTeacherInstanceService courseInstanceTeacherService;
 
     @GetMapping
     public String listCourseInstances(Model model) {
@@ -123,6 +129,41 @@ public class CourseInstanceController {
         }
         courseModuleService.createCourseModules(id, moduleListDto.getModules());
         return "redirect:/admin/course-instances/" + id;
+    }
+
+    @GetMapping("/{id}/teachers")
+    public String showTeacherManagementPage(@PathVariable Integer id, Model model) {
+        CourseInstanceDTO courseInstance = courseInstanceService.getCourseInstanceById(id);
+        model.addAttribute("courseInstance", courseInstance);
+        model.addAttribute("instanceTeachers", courseInstanceTeacherService.getTeachersByCourseInstanceId(id));
+        model.addAttribute("eligibleTeachers", courseTeacherService.getEligibleTeachersForCourseInstance(id));
+        model.addAttribute("teacherForm", new TeacherFormDTO());
+        return "admin/manage-teachers";
+    }
+
+    @PostMapping("/{id}/teachers/add")
+    public String addTeachers(
+            @PathVariable Integer id,
+            @Valid @ModelAttribute("teacherForm") TeacherFormDTO teacherForm,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(id));
+            model.addAttribute("instanceTeachers", courseInstanceTeacherService.getTeachersByCourseInstanceId(id));
+            model.addAttribute("eligibleTeachers", courseTeacherService.getEligibleTeachersForCourseInstance(id));
+            model.addAttribute("errorMessage", "Пожалуйста, выберите хотя бы одного преподавателя");
+            return "admin/manage-teachers";
+        }
+
+        try {
+            courseInstanceTeacherService.addTeachers(id, teacherForm.getTeacherIds());
+            redirectAttributes.addFlashAttribute("success", "Преподаватели добавлены");
+            return "redirect:/admin/course-instances/" + id + "/teachers";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/course-instances/" + id + "/teachers";
+        }
     }
 
 }

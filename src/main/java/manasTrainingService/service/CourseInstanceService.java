@@ -14,4 +14,6 @@ public interface CourseInstanceService {
     CourseInstanceDTO getCourseInstanceById(Integer id);
 
     CourseInstance getCourseInstanceModelById(Integer id);
+
+    CourseInstanceDTO getCourseInstanceByLessonId(Integer lessonId);
 }
