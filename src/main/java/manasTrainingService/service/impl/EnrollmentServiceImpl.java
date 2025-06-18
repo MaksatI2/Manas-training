@@ -1,12 +1,14 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseEnrollmentDTO;
 import manasTrainingService.entity.CourseApplicationEmployee;
 import manasTrainingService.entity.CourseEnrollment;
 import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.Status;
 import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.repositories.CourseEnrollmentRepository;
 import manasTrainingService.service.CourseApplicationEmployeeService;
 import manasTrainingService.service.CourseInstanceService;
@@ -14,6 +16,7 @@ import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,5 +72,35 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         dto.setProgressPercentage(enrollment.getProgressPercentage());
         dto.setFinalGrade(enrollment.getFinalGrade());
         return dto;
+    }
+
+    @Override
+    public List<CourseEnrollment> getStudentEnrollments(Integer studentId) {
+        return enrollmentRepository.findAllByStudentIdAndStatus(studentId, Status.ENROLLED);
+    }
+
+    @Override
+    public List<CourseEnrollmentCardDTO> getStudentCourses() {
+        User user = userService.getAuthorizedUser();
+        List<CourseEnrollment> enrollments = getStudentEnrollments(user.getId());
+
+        return enrollments.stream()
+                .map(enrollment -> CourseEnrollmentCardDTO.builder()
+                        .courseInstanceId(enrollment.getCourseInstance().getId())
+                        .courseTitle(enrollment.getCourseInstance().getCourse().getTitle())
+                        .instanceTitle(enrollment.getCourseInstance().getTitle())
+                        .startDate(enrollment.getCourseInstance().getStartDate())
+                        .endDate(enrollment.getCourseInstance().getEndDate())
+                        .status(enrollment.getStatus())
+                        .build())
+                .toList();
+    }
+
+    @Override
+    public void hasAccess(Integer courseInstanceId) {
+        User user = userService.getAuthorizedUser();
+        if (!enrollmentRepository.existsByCourseInstanceIdAndStudentId(courseInstanceId, user.getId())) {
+            throw new NoAccessException("У вас нет доступа к курсу");
+        };
     }
 }

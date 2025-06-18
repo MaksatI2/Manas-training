@@ -1,5 +1,5 @@
 <#import "../layout.ftlh" as layout>
-<#import "/spring.ftl" as spring>
+<#import "/spring.ftl" as spring/>
 
 <@layout.page>
     <div class="hero-section">
@@ -11,21 +11,9 @@
         </p>
     </div>
 
-    <#if success??>
-        <div class="alert alert-success">${success}</div>
-    </#if>
-    <#if error??>
-        <div class="alert alert-danger">${error}</div>
-    </#if>
-
-    <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary">Модули</a>
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary">Участники</a>
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary">Учителя</a>
-        <a href="<@spring.url '/admin/course-instances'/>" class="btn btn-secondary">Назад</a>
-    </div>
-    <div class="container">
+    <div class="container mt-4">
         <h2>Модули курса</h2>
+
         <#if courseInstance.modules?has_content>
             <div class="accordion" id="modulesAccordion">
                 <#list courseInstance.modules as module>
@@ -38,9 +26,6 @@
                                         aria-controls="collapse${module.id}">
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
-                                <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-success btn-sm ms-3">
-                                    + Урок
-                                </a>
                             </div>
                             <div id="collapse${module.id}" class="accordion-collapse collapse"
                                  aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
@@ -80,37 +65,34 @@
             <p>Модули отсутствуют</p>
         </#if>
     </div>
+
     <style>
         .btn-primary {
             background: linear-gradient(135deg, #0066cc, #003d7a);
             border-color: #0066cc;
         }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #003d7a, #002a5a);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-        }
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-        }
+
         .feature-card {
             background-color: #fff;
             border-radius: 0.375rem;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
+
         .accordion-button {
             font-weight: 500;
         }
+
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: all 0.2s ease-in-out;
         }
+
         .card-title {
             font-size: 1.1rem;
             font-weight: 500;
         }
+
         .card-text {
             font-size: 0.875rem;
         }

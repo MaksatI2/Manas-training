@@ -91,6 +91,12 @@
                                 <span>Категории курсов</span>
                             </a>
                         </div>
+                        <div class="nav-item">
+                            <a href="/admin/course-instances" class="nav-link" data-tooltip="Потоки курсов">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Потоки курсов</span>
+                            </a>
+                        </div>
                     </div>
                 </#if>
 
@@ -140,7 +146,7 @@
                     <div class="nav-section">
                         <div class="nav-section-title">Обучение</div>
                         <div class="nav-item">
-                            <a href="/#" class="nav-link" data-tooltip="Мои курсы">
+                            <a href="/student/my-courses" class="nav-link" data-tooltip="Мои курсы">
                                 <i class="fas fa-book-open"></i>
                                 <span>Мои курсы</span>
                             </a>
