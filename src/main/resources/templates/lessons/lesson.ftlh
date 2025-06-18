@@ -81,7 +81,7 @@
                         <p class="card-text">
                             <strong>Дата:</strong> ${schedule.lessonDate}<br>
                             <strong>Длительность:</strong> ${schedule.durationHours} ч.<br>
-                            <strong>Преподаватель:</strong> ${schedule.teacher.fullName!'Не указан'}<br>
+                            <strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}<br>
                             <strong>Тип урока:</strong> ${schedule.lessonType}<br>
                             <strong>Формат:</strong> ${schedule.isOnline?string('Онлайн', 'Офлайн')}<br>
                             <#if schedule.isOnline && schedule.meetingUrl?has_content>

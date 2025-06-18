@@ -3,7 +3,9 @@
 
 <@layout.page>
     <div class="hero-section">
-        <h1 class="hero-title">${schedule.id?? 'Создать' 'Редактировать'} расписание для урока: ${lesson.title}</h1>
+        <h1 class="hero-title">
+            ${schedule.id???string("Редактировать", "Создать")} расписание для урока: ${lesson.title}
+        </h1>
     </div>
 
     <#if errorMessage??>
@@ -33,6 +35,7 @@
                 <@spring.formSingleSelect "schedule.teacherId" teachers 'class="form-control" id="teacherId" required' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
+
             <div class="mb-3">
                 <label for="title" class="form-label">Название</label>
                 <@spring.formInput "schedule.title" 'class="form-control" id="title" maxlength="200"' />
@@ -90,6 +93,39 @@
 
             updateSubmitButton();
         });
+            document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            const dateInput = document.querySelector('#lessonDate');
+            const durationInput = document.querySelector('#durationHours');
+            const teacherInput = document.querySelector('#teacherId');
+            const typeInput = document.querySelector('#lessonType');
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            flatpickr("#lessonDate", {
+            dateFormat: "Y-m-d",
+            locale: "ru",
+            altInput: true,
+            altFormat: "d.m.Y",
+        });
+
+            durationInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value < 1) this.value = '';
+        });
+
+            function updateSubmitButton() {
+            const isValid = dateInput.value && durationInput.value >= 1 && teacherInput.value && typeInput.value;
+            submitButton.disabled = !isValid;
+            submitButton.classList.toggle('btn-primary', isValid);
+            submitButton.classList.toggle('btn-secondary', !isValid);
+        }
+
+            [dateInput, durationInput, teacherInput, typeInput].forEach(input => {
+            input.addEventListener('input', updateSubmitButton);
+        });
+
+            updateSubmitButton();
+        });
     </script>
 
     <style>
@@ -107,6 +143,14 @@
         }
         .error-block {
             font-size: 0.875rem;
+        }
+        .flatpickr-input {
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            border: 1px solid #ced4da;
         }
     </style>
 </@layout.page>
