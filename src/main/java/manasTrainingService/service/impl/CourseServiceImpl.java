@@ -5,12 +5,14 @@ import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.entity.Course;
 import manasTrainingService.entity.CourseCategory;
+import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.CourseNotFoundException;
+import manasTrainingService.repositories.CourseInstanceRepository;
 import manasTrainingService.repositories.CourseRepository;
 import manasTrainingService.service.CourseCategoryService;
 import manasTrainingService.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import manasTrainingService.exceptions.nsee.CourseNotFoundException;
 
 import java.util.List;
 
@@ -25,6 +27,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     private CourseCategoryService categoryAdminService;
+
+    @Autowired
+    private CourseInstanceRepository courseInstanceRepository;
 
     @Override
     public List<CourseDto> getAllCourses() {
@@ -82,4 +87,16 @@ public class CourseServiceImpl implements CourseService {
     public Course getCourseById(Integer id) {
         return courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException("Курс не был найден"));
     }
+
+    @Override
+    public List<CourseDto> getAvailableCoursesForOrganization(User organizationUser) {
+        return courseInstanceRepository.findAllByIsActiveTrue().stream()
+                .map(instance -> CourseDto.builder()
+                        .id(instance.getId())
+                        .title(instance.getCourse().getTitle())
+                        .build())
+                .toList();
+    }
+
+
 }

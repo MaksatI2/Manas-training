@@ -12,8 +12,10 @@ import manasTrainingService.dto.register.StudentRegisterDto;
 import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
+import manasTrainingService.entity.StudentProfile;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.*;
+import manasTrainingService.repositories.StudentProfileRepository;
 import manasTrainingService.repositories.UserRepository;
 import manasTrainingService.service.*;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,7 @@ public class UserServiceImpl implements UserService {
     private final TeacherService teacherService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetService passwordResetService;
+    private final StudentProfileRepository studentProfileRepository;
 
     @Override
     public void registerOrganization(OrganizationRegisterDto organizationRegisterDto) {
@@ -84,7 +88,7 @@ public class UserServiceImpl implements UserService {
         if (orgCode != null && !orgCode.isBlank()) {
             organization = organizationService.getOrganizationByCode(orgCode);
         }
-        
+
         Role studentRole = roleService.getStudentRoleId();
         User user = User.builder()
                 .email(studentRegisterDto.getEmail())
@@ -139,7 +143,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editStudentInformation(UserProfileEditDto userProfileEditDto){
+    public void editStudentInformation(UserProfileEditDto userProfileEditDto) {
         if (userRepository.existsByPhone(userProfileEditDto.getPhone())) {
             throw new PhoneAlreadyExistsException("Пользователь с таким номером уже зарегистрирован");
         }
@@ -152,7 +156,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editManagerInformation(OrganizationProfileEditDto organizationProfileEditDto){
+    public void editManagerInformation(OrganizationProfileEditDto organizationProfileEditDto) {
         if (userRepository.existsByPhone(organizationProfileEditDto.getPhone())) {
             throw new PhoneAlreadyExistsException("Пользователь с таким номером уже зарегистрирован");
         }
@@ -193,13 +197,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserEntityByEmail(String email){
+    public User getUserEntityByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с данным Email не найден"));
     }
 
     @Override
-    public User getAuthorizedUser(){
+    public User getAuthorizedUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username;
         if (principal instanceof UserDetails) {
@@ -216,7 +220,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public void addAvatarUrl(int userId, String filename){
+    public void addAvatarUrl(int userId, String filename) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         user.setAvatarUrl(filename);
         userRepository.saveAndFlush(user);
@@ -253,4 +257,15 @@ public class UserServiceImpl implements UserService {
         }
         emailVerificationService.generateVerificationToken(user);
     }
+
+    @Override
+    public List<User> getStudentsWithoutOrganization() {
+        List<StudentProfile> profiles = studentProfileRepository.findAllByOrganizationIsNull();
+
+        return profiles.stream()
+                .map(StudentProfile::getUser)
+                .filter(user -> user.getRole() != null && "STUDENT".equals(user.getRole().getName()))
+                .collect(Collectors.toList());
+    }
+
 }

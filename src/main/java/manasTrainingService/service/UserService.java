@@ -14,30 +14,43 @@ import java.util.List;
 
 public interface UserService {
     void registerOrganization(OrganizationRegisterDto organizationRegisterDto);
+
     void registerStudent(StudentRegisterDto studentRegisterDto);
+
     void registerTeacher(TeacherRegisterDto teacherRegisterDto);
 
     void editStudentInformation(UserProfileEditDto userProfileEditDto);
+
     void editTeacherInformation(TeacherProfileEditDto teacherProfileEditDto);
+
     void editManagerInformation(OrganizationProfileEditDto organizationProfileEditDto);
 
     void sendResetToken(String email);
+
     void addAvatarUrl(int userId, String filename);
 
     boolean resetPassword(String token, String newPassword);
+
     boolean existsByPhone(String phone);
+
     boolean isValidResetToken(String token);
+
     boolean verifyEmailToken(String token);
 
     User getUserEntityByEmail(String email);
+
     User getAuthorizedUser();
 
     Page<User> getUsersWithFilters(String role, String status, String search, Pageable pageable);
 
     User getUserById(Integer id);
+
     User saveUser(User user);
 
     List<User> getAllUsers();
 
     void resendVerificationEmail(String email);
+
+    List<User> getStudentsWithoutOrganization();
+
 }

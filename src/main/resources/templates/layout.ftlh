@@ -55,6 +55,12 @@
                         <span>Курсы</span>
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a href="/teachers" class="nav-link" data-tooltip="Преподаватели">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>Преподаватели</span>
+                    </a>
+                </div>
             </div>
 
             <#if known>
@@ -122,7 +128,7 @@
                     <div class="nav-section">
                         <div class="nav-section-title">Организация</div>
                         <div class="nav-item">
-                            <a href="/#" class="nav-link" data-tooltip="Сотрудники">
+                            <a href="/organization/students" class="nav-link" data-tooltip="Сотрудники">
                                 <i class="fas fa-user-tie"></i>
                                 <span>Сотрудники</span>
                             </a>
