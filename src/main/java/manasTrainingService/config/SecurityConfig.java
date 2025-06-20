@@ -23,7 +23,9 @@ public class SecurityConfig {
                                 "/static/**",
                                 "/favicon.ico",
                                 "/error",
-                                "/courses/**"
+                                "/courses/**",
+                                "/teachers/**",
+                                "/data/images/**"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/student/**").hasAuthority("STUDENT")
