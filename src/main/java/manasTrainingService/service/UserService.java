@@ -53,4 +53,7 @@ public interface UserService {
 
     List<User> getStudentsWithoutOrganization();
 
+    long countActiveAdmins();
+
+
 }

@@ -1,9 +1,9 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.edit.OrganizationProfileEditDto;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.create.CreateTeacherDto;
+import manasTrainingService.dto.edit.OrganizationProfileEditDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
 import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.profile.StudentProfileDto;
@@ -267,5 +267,11 @@ public class UserServiceImpl implements UserService {
                 .filter(user -> user.getRole() != null && "STUDENT".equals(user.getRole().getName()))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public long countActiveAdmins() {
+        return userRepository.countByRole_NameAndIsActiveTrue("ADMIN");
+    }
+
 
 }
