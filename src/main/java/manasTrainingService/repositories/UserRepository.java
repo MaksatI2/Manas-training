@@ -36,4 +36,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT DISTINCT r.name FROM Role r")
     List<String> findAllDistinctRoleNames();
+
+    long countByRole_NameAndIsActiveTrue(String roleName);
+
 }

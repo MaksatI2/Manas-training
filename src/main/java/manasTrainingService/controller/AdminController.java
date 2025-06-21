@@ -2,12 +2,14 @@ package manasTrainingService.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.config.CustomUserDetails;
 import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.EmailAlreadyExistsException;
 import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;
 import manasTrainingService.service.RoleService;
 import manasTrainingService.service.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -79,6 +81,20 @@ public class AdminController {
     @GetMapping("/users/{userId}/deactivate")
     public String deactivateUser(@PathVariable Integer userId, RedirectAttributes redirectAttributes) {
         try {
+            CustomUserDetails currentUser = (CustomUserDetails)
+                    SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            Integer currentUserId = currentUser.getUser().getId();
+
+            if (currentUserId.equals(userId)) {
+                long activeAdmins = userService.countActiveAdmins();
+                if (activeAdmins <= 1) {
+                    redirectAttributes.addFlashAttribute("errorMessage",
+                            "Невозможно деактивировать себя, так как вы — последний активный администратор.");
+                    return "redirect:/admin/users";
+                }
+            }
+
             User user = userService.getUserById(userId);
             user.setIsActive(false);
             userService.saveUser(user);

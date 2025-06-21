@@ -59,4 +59,20 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Ошибка при отправке письма на " + to, e);
         }
     }
+
+    @Override
+    public void sendStudentWelcomeEmail(String email, String name, String rawPassword) {
+        String subject = "Добро пожаловать в Manas Training Center!";
+        String message = """
+            <p>Здравствуйте, <strong>%s</strong>!</p>
+            <p>Вы были зарегистрированы как студент в системе <strong>Manas Training Center</strong>.</p>
+            <p><strong>Ваш временный пароль:</strong> <code>%s</code></p>
+            <p>Пожалуйста, войдите в систему и <strong>смените пароль</strong> после первого входа.</p>
+            <p>Ссылка на вход: <a href="%s/auth/login">%s/auth/login</a></p>
+            """.formatted(name, rawPassword, baseUrl, baseUrl);
+
+        sendEmail(email, subject, message);
+    }
+
+
 }
