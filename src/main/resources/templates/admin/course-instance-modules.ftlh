@@ -29,9 +29,9 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                     <tr>
-                        <th scope="col" style="width: 8%;">Порядок</th>
-                        <th scope="col" style="width: 30%;">Название</th>
-                        <th scope="col" style="width: 15%;">Продолжительность (часы)</th>
+                        <th scope="col" >Порядок</th>
+                        <th scope="col" >Название</th>
+                        <th scope="col" >Продолжительность (часы)</th>
                         <th scope="col">Описание</th>
                     </tr>
                     </thead>
@@ -41,7 +41,13 @@
                             <td>${module.orderIndex}</td>
                             <td>${module.title}</td>
                             <td>${module.durationHours}</td>
-                            <td>${module.description!''}</td>
+                            <td>
+                                <div class="description-cell" id="desc-${module.id}">
+                                    ${module.description!''}
+                                </div>
+
+                            </td>
+
                         </tr>
                     </#list>
                     </tbody>
@@ -171,5 +177,6 @@
             background: linear-gradient(135deg, #c82333, #921823);
             transform: translateY(-2px);
         }
+
     </style>
 </@layout.page>

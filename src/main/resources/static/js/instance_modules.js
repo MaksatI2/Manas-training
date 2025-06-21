@@ -196,4 +196,5 @@ document.addEventListener('DOMContentLoaded', () => {
     handleSaveModuleChanges();
     handleFormSubmit();
     updateHoursStatus();
+
 });
