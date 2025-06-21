@@ -39,11 +39,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .teacherId(schedule.getTeacher().getId())
                 .title(schedule.getTitle())
                 .lessonType(schedule.getLessonType())
-                .isOnline(schedule.getIsOnline())
                 .meetingUrl(schedule.getMeetingUrl())
                 .notes(schedule.getNotes())
-                .isActive(schedule.getIsActive())
-                .teacherName(schedule.getTeacher().getName())
+                .teacherName(schedule.getTeacher().getName() + " " + schedule.getTeacher().getLastName())
                 .build();
     }
 
@@ -66,10 +64,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         entity.setTeacher(teacher);
         entity.setTitle(schedule.getTitle());
         entity.setLessonType(schedule.getLessonType());
-        entity.setIsOnline(schedule.getIsOnline());
+        entity.setIsOnline(true);
         entity.setMeetingUrl(schedule.getMeetingUrl());
         entity.setNotes(schedule.getNotes());
-        entity.setIsActive(schedule.getIsActive());
+        entity.setIsActive(true);
 
         scheduleRepository.save(entity);
     }

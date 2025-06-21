@@ -141,8 +141,6 @@ public class AdminLessonController {
             schedule = ScheduleDTO.builder()
                     .lessonId(lessonId)
                     .courseInstanceId(courseInstance.getId())
-                    .isOnline(false)
-                    .isActive(true)
                     .build();
         }
         Map<String, String> teachers = courseTeacherInstanceService.getTeachersByCourseInstanceId(courseInstance.getId()).stream()

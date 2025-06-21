@@ -31,8 +31,6 @@ public class ScheduleDTO {
     private String title;
     @NotNull(message = "Тип урока необходим")
     private LessonType lessonType;
-    private Boolean isOnline;
     private String meetingUrl;
     private String notes;
-    private Boolean isActive;
 }

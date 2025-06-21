@@ -24,7 +24,10 @@
 
         <div class="mb-3">
             <label for="lessonDuration" class="form-label">Длительность (мин.) *</label>
-            <@spring.formInput "lessonCreateRequest.durationMinutes", "type='number' min='1' class='form-control' id='lessonDuration'" />
+            <@spring.formInput
+            "lessonCreateRequest.durationMinutes",
+            "type='number' min='1' step='1' class='form-control' id='lessonDuration' inputmode='numeric' pattern='[0-9]*'"
+            />
             <div class="error-block text-danger">
                 <@spring.showErrors  "<br>" "error-message" />
             </div>
@@ -36,4 +39,27 @@
         <button type="submit" class="btn btn-primary">Создать урок</button>
         <a href="/admin/course-instances/${courseInstance.id}" class="btn btn-secondary ms-2">Отмена</a>
     </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('durationMinutes');
+
+            input.addEventListener('input', function () {
+                this.value = this.value.replace(/\D/g, '');
+            });
+
+            input.addEventListener('keypress', function (e) {
+                if (!/\d/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+
+            input.addEventListener('paste', function (e) {
+                const pasted = (e.clipboardData || window.clipboardData).getData('text');
+                if (/\D/.test(pasted)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+
 </@layout.page>

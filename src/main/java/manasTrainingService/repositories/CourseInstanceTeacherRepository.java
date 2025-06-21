@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface CourseInstanceTeacherRepository extends JpaRepository<CourseInstanceTeacher, Integer> {
     List<CourseInstanceTeacher> findByCourseInstanceId(Integer courseInstance);
+    List<CourseInstanceTeacher> findByCourseInstanceIdAndIsPrimaryTrue(Integer courseInstance);
+
     boolean existsByCourseInstanceIdAndTeacherIdAndIsPrimaryTrue(Integer courseInstance, Integer teacherId);
     boolean existsByCourseInstanceIdAndTeacherId(Integer courseInstance, Integer teacherId);
     Optional<CourseInstanceTeacher> findByCourseInstanceIdAndTeacherId(Integer courseId, Integer teacherId);

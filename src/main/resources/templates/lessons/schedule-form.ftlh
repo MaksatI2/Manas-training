@@ -50,10 +50,6 @@
                 <@spring.formSingleSelect "schedule.lessonType" lessonTypes 'class="form-control" id="lessonType"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
-            <div class="mb-3 form-check">
-                <@spring.formCheckbox "schedule.isOnline" 'class="form-check-input" id="isOnline"' />
-                <label for="isOnline" class="form-check-label">Онлайн</label>
-            </div>
             <div class="mb-3">
                 <label for="meetingUrl" class="form-label">Ссылка на встречу</label>
                 <@spring.formInput "schedule.meetingUrl" 'class="form-control" id="meetingUrl" maxlength="500"' />
@@ -63,10 +59,6 @@
                 <label for="notes" class="form-label">Примечания</label>
                 <@spring.formTextarea "schedule.notes" 'rows="4" class="form-control" id="notes"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
-            </div>
-            <div class="mb-3 form-check">
-                <@spring.formCheckbox "schedule.isActive" 'class="form-check-input" id="isActive"' />
-                <label for="isActive" class="form-check-label">Активно</label>
             </div>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Сохранить</button>

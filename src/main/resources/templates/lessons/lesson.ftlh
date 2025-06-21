@@ -90,14 +90,12 @@
                             <strong>Длительность:</strong> ${schedule.durationHours} ч.<br>
                             <strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}<br>
                             <strong>Тип урока:</strong> ${schedule.lessonType}<br>
-                            <strong>Формат:</strong> ${schedule.isOnline?string('Онлайн', 'Офлайн')}<br>
-                            <#if schedule.isOnline && schedule.meetingUrl?has_content>
+                            <#if schedule.meetingUrl?has_content>
                                 <strong>Ссылка на встречу:</strong> <a href="${schedule.meetingUrl}" target="_blank">Присоединиться</a><br>
                             </#if>
                             <#if schedule.notes?has_content>
                                 <strong>Примечания:</strong> ${schedule.notes}<br>
                             </#if>
-                            <strong>Статус:</strong> ${schedule.isActive?string('Активен', 'Неактивен')}
                         </p>
                     </div>
                 </div>
