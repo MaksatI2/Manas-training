@@ -14,18 +14,16 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 <#list courses as course>
                     <div class="col">
-                        <div class="card course-card h-100 shadow-sm border-0">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title mb-2">
-                                    <a href="/student/course/${course.courseInstanceId}" class="text-decoration-none text-primary">
-                                        ${course.courseTitle}
-                                    </a>
-                                </h5>
+                        <div class="card course-card h-100 shadow-sm border-0 d-flex flex-column">
+                            <a href="/teacher/course/${course.courseInstanceId}" class="text-decoration-none text-body flex-grow-1 d-flex flex-column p-3">
+                                <h5 class="card-title mb-2">${course.courseTitle}</h5>
                                 <h6 class="card-subtitle mb-3 text-muted">${course.instanceTitle}</h6>
-                                <p class="card-text flex-grow-1">
+                                <p class="card-text mt-auto">
                                     <span class="d-block text-muted small">Срок: ${course.startDate.toLocalDate()} – ${course.endDate.toLocalDate()}</span>
                                 </p>
-                                <a href="/teacher/course/${course.courseInstanceId}" class="btn btn-outline-primary mt-auto">
+                            </a>
+                            <div class="card-body pt-0 px-3 pb-3">
+                                <a href="/teacher/course/${course.courseInstanceId}" class="btn btn-outline-primary w-100">
                                     Перейти к курсу
                                 </a>
                             </div>
