@@ -64,4 +64,10 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return user.getIsActive();
     }
+
+    public boolean hasRole(String role) {
+        return authorities.stream()
+                .anyMatch(auth -> auth.getAuthority().equals(role));
+    }
+
 }
