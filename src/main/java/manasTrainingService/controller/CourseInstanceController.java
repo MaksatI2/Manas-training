@@ -69,7 +69,6 @@ public class CourseInstanceController {
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Integer id, Model model) {
         model.addAttribute("courseInstanceDto", courseInstanceService.getUpdateDtoById(id));
-        model.addAttribute("courses", courseService.getAllCourses());
         return "admin/course-instance-edit";
     }
 
