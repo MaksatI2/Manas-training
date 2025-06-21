@@ -34,6 +34,10 @@ public class Lesson {
     @Builder.Default
     Integer durationMinutes = 0;
 
-    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "lesson", orphanRemoval = true, cascade = CascadeType.REMOVE,  fetch = FetchType.LAZY)
+    List<Schedule> schedules;
+
+    @OneToMany(mappedBy = "lesson", orphanRemoval = true, cascade = CascadeType.REMOVE,  fetch = FetchType.LAZY)
     List<LessonMaterial> materials;
+
 }

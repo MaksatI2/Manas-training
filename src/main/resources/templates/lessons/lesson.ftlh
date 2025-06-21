@@ -20,44 +20,63 @@
         <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
 
-    <div class="hero-section">
-        <h1 class="hero-title">${lesson.title}</h1>
-        <p class="hero-subtitle">
-            Длительность: ${lesson.durationMinutes} минут
-        </p>
-    </div>
+    <div class="container my-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="display-5">${lesson.title}</h1>
+                <p class="text-muted">Длительность: <strong>${lesson.durationMinutes} минут</strong></p>
+            </div>
+            <#if isAdmin || isTeacher>
+                <div class="d-flex gap-2">
+                    <a href="<@spring.url '/admin/lessons/${lesson.id}/edit'/>" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit me-1"></i>Редактировать
+                    </a>
 
-    <div class="container">
+                </div>
+            </#if>
+        </div>
+
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <h5 class="card-title">Описание</h5>
-                <#if lesson.description?has_content>
-                    <p class="card-text">${lesson.description}</p>
-                <#else>
-                    <p class="card-text text-muted">Описание отсутствует</p>
-                </#if>
+                <p class="card-text">
+                    <#if lesson.description?has_content>
+                        ${lesson.description}
+                    <#else>
+                        <span class="text-muted">Описание отсутствует</span>
+                    </#if>
+                </p>
             </div>
         </div>
 
         <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5>Материалы урока</h5>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4>Материалы</h4>
                 <#if isAdmin || isTeacher>
-                    <a href="<@spring.url '/admin/lessons/${lesson.id}/materials/new'/>" class="btn btn-primary btn-sm">+ Добавить материал</a>
+                    <a href="<@spring.url '/admin/lessons/${lesson.id}/materials/new'/>" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i>Добавить
+                    </a>
                 </#if>
             </div>
+
             <#if materials?has_content>
                 <div class="row row-cols-1 row-cols-md-2 g-3">
                     <#list materials as material>
                         <div class="col">
-                            <div class="card h-100 shadow-sm">
+                            <div class="card h-100 border-0 shadow-sm">
                                 <div class="card-body">
-                                    <h6 class="card-title">${material.title}</h6>
-                                    <a href="${material.url}" target="_blank" class="card-link small">Открыть материал</a>
-                                    <#if isAdmin || isTeacher>
-                                        <form action="<@spring.url '/admin/lessons/${lesson.id}/materials/${material.id}/delete'/>" method="post" class="d-inline">
+                                    <h6 class="card-title mb-2">${material.title}</h6>
+                                    <a href="${material.url}" target="_blank" class="card-link small">
+                                        <i class="fas fa-external-link-alt me-1"></i>Открыть
+                                    </a>
+                                    <#if isAdmin>
+                                        <form action="<@spring.url '/admin/lessons/${lesson.id}/materials/${material.id}/delete'/>"
+                                              method="post" class="d-inline float-end"
+                                              onsubmit="return confirm('Удалить материал?')">
                                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                            <button type="submit" class="btn btn-danger btn-sm float-end" onclick="return confirm('Удалить материал?')">Удалить</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </form>
                                     </#if>
                                 </div>
@@ -66,75 +85,70 @@
                     </#list>
                 </div>
             <#else>
-                <p class="text-muted">Материалы отсутствуют</p>
+                <p class="text-muted">Материалы не добавлены.</p>
             </#if>
         </div>
 
         <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5>Расписание</h5>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4>Расписание</h4>
                 <#if isAdmin>
-                    <#if schedule??>
-                        <a href="<@spring.url '/admin/lessons/${lesson.id}/schedule'/>" class="btn btn-primary btn-sm">Редактировать расписание</a>
-                    <#else>
-                        <a href="<@spring.url '/admin/lessons/${lesson.id}/schedule'/>" class="btn btn-primary btn-sm">Создать расписание</a>
-                    </#if>
+                    <a href="<@spring.url '/admin/lessons/${lesson.id}/schedule'/>" class="btn btn-primary btn-sm">
+                        <i class="fas fa-calendar-alt me-1"></i><#if schedule??>Редактировать<#else>Создать</#if>
+                    </a>
                 </#if>
             </div>
+
             <#if schedule??>
-                <div class="card shadow-sm">
+                <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h6 class="card-title">${schedule.title!lesson.title}</h6>
-                        <p class="card-text">
-                            <strong>Дата:</strong> ${schedule.lessonDate}<br>
-                            <strong>Длительность:</strong> ${schedule.durationHours} ч.<br>
-                            <strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}<br>
-                            <strong>Тип урока:</strong> ${schedule.lessonType}<br>
+                        <ul class="list-unstyled small mb-0">
+                            <li><strong>Дата:</strong> ${schedule.lessonDate}</li>
+                            <li><strong>Длительность:</strong> ${schedule.durationHours} ч.</li>
+                            <li><strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}</li>
+                            <li><strong>Тип урока:</strong> ${schedule.lessonType}</li>
                             <#if schedule.meetingUrl?has_content>
-                                <strong>Ссылка на встречу:</strong> <a href="${schedule.meetingUrl}" target="_blank">Присоединиться</a><br>
+                                <li><strong>Ссылка:</strong> <a href="${schedule.meetingUrl}" target="_blank">Присоединиться</a></li>
                             </#if>
                             <#if schedule.notes?has_content>
-                                <strong>Примечания:</strong> ${schedule.notes}<br>
+                                <li><strong>Примечания:</strong> ${schedule.notes}</li>
                             </#if>
-                        </p>
+                        </ul>
                     </div>
                 </div>
             <#else>
-                <p class="text-muted">Расписание не задано</p>
+                <p class="text-muted">Расписание пока не задано.</p>
             </#if>
         </div>
-
-        <a href="<@spring.url '/courses'/>" class="btn btn-secondary">К списку курсов</a>
     </div>
 
     <style>
-        .btn-primary {
-            background: linear-gradient(135deg, #0066cc, #003d7a);
-            border-color: #0066cc;
-        }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #003d7a, #002a5a);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-        }
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-        }
-        .card {
-            border-radius: 0.375rem;
-        }
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             transition: all 0.2s ease-in-out;
         }
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 500;
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066cc, #003d7a);
+            border: none;
         }
-        .card-text, .card-link {
-            font-size: 0.875rem;
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #004a99, #002f66);
+        }
+
+        .card-title {
+            font-weight: 600;
+        }
+
+        .list-unstyled li {
+            margin-bottom: 0.25rem;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            font-weight: bold;
         }
     </style>
 </@layout.page>

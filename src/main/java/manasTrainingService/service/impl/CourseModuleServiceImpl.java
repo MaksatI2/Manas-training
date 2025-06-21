@@ -92,6 +92,7 @@ public class CourseModuleServiceImpl implements CourseModuleService {
                 .durationHours(module.getDurationHours())
                 .description(module.getDescription())
                 .orderIndex(module.getOrderIndex())
+                .courseInstanceId(module.getCourseInstance().getId())
                 .lessons(module.getLessons().stream()
                         .map(lesson -> LessonDTO.builder()
                                 .id(lesson.getId())

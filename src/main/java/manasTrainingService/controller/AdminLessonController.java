@@ -3,11 +3,14 @@ package manasTrainingService.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.dto.instance.LessonDTO;
+import manasTrainingService.dto.lesson.LessonEditDto;
 import manasTrainingService.dto.lesson.LessonMaterialDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
+import manasTrainingService.entity.Lesson;
 import manasTrainingService.entity.LessonType;
 import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.CourseModuleService;
@@ -195,4 +198,48 @@ public class AdminLessonController {
             return "redirect:/lessons/" + lessonId;
         }
     }
+
+    @PostMapping("/lessons/{id}/delete")
+    public String deleteLesson(@PathVariable Integer id,
+                               RedirectAttributes redirectAttributes) {
+        LessonDTO lesson = lessonService.getLessonById(id);
+        CourseModuleDTO module = courseModuleService.getCourseModuleDTOById(lesson.getModuleId());
+        lessonService.deleteById(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Урок удалён");
+        return "redirect:/admin/course-instances/" + module.getCourseInstanceId();
+    }
+
+    @GetMapping("/lessons/{id}/edit")
+    public String editLessonForm(@PathVariable Integer id, Model model) {
+        LessonEditDto lesson = lessonService.getLessonEditDto(id);
+        model.addAttribute("lessonId", id);
+
+        model.addAttribute("lessonEditDto", lesson);
+        return "admin/lesson-edit";
+    }
+
+    @PostMapping("/lessons/{id}/edit")
+    public String updateLesson(@PathVariable Integer id,
+                               @Valid @ModelAttribute("lessonEditDto") LessonEditDto dto,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes,
+                               Model model) {
+        model.addAttribute("lessonId", id);
+
+        if (bindingResult.hasErrors()) {
+            return "admin/lesson-edit";
+        }
+
+        try {
+            lessonService.updateLesson(id, dto);
+        } catch (IllegalArgumentException ex) {
+            bindingResult.rejectValue("durationMinutes", "lesson.duration.exceeded", ex.getMessage());
+            return "admin/lesson-edit";
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", "Урок обновлён");
+        return "redirect:/lessons/" + id;
+    }
+
+
 }

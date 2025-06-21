@@ -27,6 +27,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
 
   output:
     ansi:
@@ -59,6 +61,12 @@ logging:
   level:
     root: info
     org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
       springframework:
         security: debug
 
