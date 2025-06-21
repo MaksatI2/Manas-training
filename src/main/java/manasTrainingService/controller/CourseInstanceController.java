@@ -13,7 +13,6 @@ import manasTrainingService.service.CourseModuleService;
 import manasTrainingService.service.CourseService;
 import manasTrainingService.service.CourseTeacherInstanceService;
 import manasTrainingService.service.CourseTeacherService;
-import manasTrainingService.service.LessonService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -127,6 +126,8 @@ public class CourseInstanceController {
             model.addAttribute("remainingHours", remainingHours);
             return "admin/course-instance-modules";
         }
+
+        model.addAttribute("successMessage", "Модули были добавлены");
         courseModuleService.createCourseModules(id, moduleListDto.getModules());
         return "redirect:/admin/course-instances/" + id;
     }
@@ -158,12 +159,26 @@ public class CourseInstanceController {
 
         try {
             courseInstanceTeacherService.addTeachers(id, teacherForm.getTeacherIds());
-            redirectAttributes.addFlashAttribute("success", "Преподаватели добавлены");
+            redirectAttributes.addFlashAttribute("successMessage", "Преподаватели добавлены");
             return "redirect:/admin/course-instances/" + id + "/teachers";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/admin/course-instances/" + id + "/teachers";
         }
     }
+
+    @PostMapping("/{courseInstanceId}/teachers/{teacherId}/toggle-primary")
+    public String togglePrimaryTeacher(@PathVariable Integer courseInstanceId,
+                                       @PathVariable Integer teacherId,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            courseInstanceTeacherService.togglePrimary(courseInstanceId, teacherId);
+            redirectAttributes.addFlashAttribute("successMessage", "Статус преподавателя обновлён");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/course-instances/" + courseInstanceId + "/teachers";
+    }
+
 
 }

@@ -62,14 +62,14 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     @Override
     public CourseInstanceDTO getCourseInstanceById(Integer id) {
         CourseInstance course =  courseInstanceRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException("Course instance not found"));
+                .orElseThrow(() -> new CourseNotFoundException("Поток курса не был найден"));
         return convertToDto(course);
     }
 
     @Override
     public CourseInstance getCourseInstanceModelById(Integer id) {
         return courseInstanceRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException("Course instance not found"));
+                .orElseThrow(() -> new CourseNotFoundException("Поток курса не был найден"));
     }
 
     private CourseInstanceDTO convertToDto(CourseInstance courseInstance) {

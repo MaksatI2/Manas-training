@@ -2,7 +2,6 @@ package manasTrainingService.controller;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.instance.LessonDTO;
-import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.LessonMaterialService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.ScheduleService;

@@ -8,12 +8,10 @@ import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.dto.lesson.LessonMaterialDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
-import manasTrainingService.entity.CourseInstanceTeacher;
 import manasTrainingService.entity.LessonType;
 import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.CourseModuleService;
 import manasTrainingService.service.CourseTeacherInstanceService;
-import manasTrainingService.service.CourseTeacherService;
 import manasTrainingService.service.LessonMaterialService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.ScheduleService;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.LinkedHashMap;
@@ -113,10 +110,10 @@ public class AdminLessonController {
 
         try {
             lessonMaterialService.addMaterial(material);
-            redirectAttributes.addFlashAttribute("success", "Материал добавлен");
+            redirectAttributes.addFlashAttribute("successMessage", "Материал добавлен");
             return "redirect:/lessons/" + lessonId;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/lessons/" + lessonId;
         }
     }
@@ -128,9 +125,9 @@ public class AdminLessonController {
             RedirectAttributes redirectAttributes) {
         try {
             lessonMaterialService.deleteMaterial(materialId);
-            redirectAttributes.addFlashAttribute("success", "Материал удален");
+            redirectAttributes.addFlashAttribute("successMessage", "Материал удален");
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/lessons/" + lessonId;
     }
@@ -193,10 +190,10 @@ public class AdminLessonController {
 
         try {
             scheduleService.saveSchedule(schedule);
-            redirectAttributes.addFlashAttribute("success", "Расписание сохранено");
+            redirectAttributes.addFlashAttribute("successMessage", "Расписание сохранено");
             return "redirect:/lessons/" + lessonId;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/lessons/" + lessonId;
         }
     }

@@ -48,13 +48,13 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
             User teacher = userService.getUserById(teacherId);
 
             if (repository.existsByCourseInstanceIdAndTeacherId(courseInstanceId, teacherId)) {
-                throw new IllegalArgumentException("Teacher already assigned to this course instance");
+                throw new IllegalArgumentException("Учитель уже был назначен на этот курс");
             }
 
             CourseInstanceTeacher entity = CourseInstanceTeacher.builder()
                     .courseInstance(courseInstance)
                     .teacher(teacher)
-                    .isPrimary(false)
+                    .isPrimary(true)
                     .build();
 
             repository.save(entity);
@@ -65,13 +65,13 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     @Override
     public void deleteTeacher(Integer courseInstanceId, Integer teacherId) {
         CourseInstanceTeacher teacher = repository.findByCourseInstanceIdAndTeacherId(courseInstanceId, teacherId)
-                .orElseThrow(() -> new UserNotFoundException("Teacher assignment not found"));
+                .orElseThrow(() -> new UserNotFoundException("Назначение учителя не было найдено"));
         repository.delete(teacher);
     }
 
     @Override
     public List<TeacherCourseCardDTO> getTeacherCourses(Integer teacherId) {
-        return repository.findByTeacherId(teacherId).stream()
+        return repository.findByTeacherIdAndIsPrimaryTrue(teacherId).stream()
                 .map(relation -> {
                     CourseInstance ci = relation.getCourseInstance();
                     return TeacherCourseCardDTO.builder()
@@ -89,9 +89,22 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     @Override
     public void hasAccess(Integer courseId) {
         User user = userService.getAuthorizedUser();
-        if (!repository.existsByCourseInstanceIdAndTeacherId(courseId, user.getId())) {
+        if (!repository.existsByCourseInstanceIdAndTeacherIdAndIsPrimaryTrue(courseId, user.getId())) {
             throw new NoAccessException("У вас нет доступа к курсу");
         };
     }
+
+    @Transactional
+    @Override
+    public void togglePrimary(Integer courseInstanceId, Integer teacherId) {
+        CourseInstanceTeacher instance = repository
+                .findByCourseInstanceIdAndTeacherId(courseInstanceId, teacherId)
+                .orElseThrow(() -> new UserNotFoundException("Преподаватель не найден"));
+
+        boolean currentPrimary = Boolean.TRUE.equals(instance.getIsPrimary());
+        instance.setIsPrimary(!currentPrimary);
+        repository.save(instance);
+    }
+
 
 }

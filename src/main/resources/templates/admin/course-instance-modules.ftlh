@@ -2,6 +2,13 @@
 <#import "/spring.ftl" as spring>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <div class="container mb-4">
         <div class="d-flex flex-wrap gap-2">
             <a href="/admin/course-instances/${courseInstance.id}" class="btn btn-secondary">Назад</a>
@@ -15,11 +22,6 @@
             </p>
         </div>
 
-        <#if errorMessage??>
-            <div class="alert alert-danger mt-3 mx-auto" style="max-width: 600px;">
-                ${errorMessage}
-            </div>
-        </#if>
 
         <div class="feature-card mb-5 p-4 bg-white shadow-sm rounded">
             <h3 class="mb-3">Существующие модули</h3>
@@ -73,16 +75,6 @@
                                     <div class="col-md-3">
                                         <label class="form-label">Описание</label>
                                         <@spring.formTextarea "moduleListDto.modules[${module?index}].description" 'class="form-control" rows="3"' />
-                                        <@spring.showErrors "<br>" "error text-danger small" />
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Порядок</label>
-                                        <@spring.formInput "moduleListDto.modules[${module?index}].orderIndex" 'class="form-control" type="number"  min="0" readonly' />
-                                        <@spring.showErrors "<br>" "error text-danger small" />
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Активен</label>
-                                        <@spring.formSingleSelect "moduleListDto.modules[${module?index}].isActive" {"true": "Да", "false": "Нет"} 'class="form-select"' />
                                         <@spring.showErrors "<br>" "error text-danger small" />
                                     </div>
                                 </div>

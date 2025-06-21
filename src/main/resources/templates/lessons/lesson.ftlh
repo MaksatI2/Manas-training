@@ -13,6 +13,13 @@
 </#if>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <div class="hero-section">
         <h1 class="hero-title">${lesson.title}</h1>
         <p class="hero-subtitle">

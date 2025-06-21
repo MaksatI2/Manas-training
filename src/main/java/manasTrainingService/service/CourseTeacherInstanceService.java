@@ -18,4 +18,7 @@ public interface CourseTeacherInstanceService {
     List<TeacherCourseCardDTO> getTeacherCourses(Integer teacherId);
 
     void hasAccess(Integer courseId);
+
+    @Transactional
+    void togglePrimary(Integer courseInstanceId, Integer teacherId);
 }

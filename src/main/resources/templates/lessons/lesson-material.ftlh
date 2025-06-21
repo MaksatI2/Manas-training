@@ -6,8 +6,11 @@
         <h1 class="hero-title">Добавить материал к уроку: ${lesson.title}</h1>
     </div>
 
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
     <#if errorMessage??>
-        <div class="alert alert-danger">${errorMessage}</div>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
 
     <div class="container">

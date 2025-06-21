@@ -3,6 +3,12 @@
 
 <@layout.page>
         <div class="container mb-4">
+            <#if successMessage??>
+                <div id="successMessage" data-message="${successMessage?js_string}"></div>
+            </#if>
+            <#if errorMessage??>
+                <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+            </#if>
             <div class="d-flex flex-wrap gap-2">
                 <a href="/admin/course-instances/${courseInstance.id}" class="btn btn-secondary">Назад</a>
             </div>
@@ -15,11 +21,7 @@
                 </p>
             </div>
 
-            <#if errorMessage??>
-                <div class="alert alert-danger mt-3 mx-auto" style="max-width: 600px;">
-                    ${errorMessage}
-                </div>
-            </#if>
+
 
             <div class="feature-card mb-5 p-4 bg-white shadow-sm rounded">
                 <h3 class="mb-3">Текущие преподаватели</h3>
@@ -40,11 +42,14 @@
                                 <td>${teacher.isPrimary?string('Да', 'Нет')}</td>
                                 <td>${teacher.createdAt.toLocalDate()}</td>
                                 <td>
-                                    <form action="/admin/course-instances/${courseInstance.id}/teachers/${teacher.id}/delete" method="post" class="d-inline">
+                                    <form action="/admin/course-instances/${courseInstance.id}/teachers/${teacher.teacherId}/toggle-primary" method="post" class="d-inline">
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить преподавателя?')">Удалить</button>
+                                        <button type="submit" class="btn btn-${teacher.isPrimary?string('warning', 'outline-secondary')} btn-sm">
+                                            ${teacher.isPrimary?string('Снять как основного', 'Сделать основным')}
+                                        </button>
                                     </form>
                                 </td>
+
                             </tr>
                         </#list>
                         </tbody>

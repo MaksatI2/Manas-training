@@ -13,6 +13,7 @@ import manasTrainingService.service.CourseModuleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,17 +28,24 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     @Override
     public void createCourseModules(Integer courseInstanceId, List<CourseModuleCreationDTO> dtos) {
         CourseInstance courseInstance = courseInstanceService.getCourseInstanceModelById(courseInstanceId);
+        int currentMaxOrder = courseInstance.getModules().stream()
+                .mapToInt(CourseModule::getOrderIndex)
+                .max()
+                .orElse(-1);
 
-        List<CourseModule> modules = dtos.stream()
-                .map(dto -> CourseModule.builder()
-                        .courseInstance(courseInstance)
-                        .title(dto.getTitle())
-                        .durationHours(dto.getDurationHours())
-                        .description(dto.getDescription())
-                        .orderIndex(dto.getOrderIndex())
-                        .isActive(dto.getIsActive())
-                        .build())
-                .collect(Collectors.toList());
+        List<CourseModule> modules = new ArrayList<>();
+        for (int i = 0; i < dtos.size(); i++) {
+            CourseModuleCreationDTO dto = dtos.get(i);
+            CourseModule module = CourseModule.builder()
+                    .courseInstance(courseInstance)
+                    .title(dto.getTitle())
+                    .durationHours(dto.getDurationHours())
+                    .description(dto.getDescription())
+                    .orderIndex(currentMaxOrder + i + 1)
+                    .isActive(true)
+                    .build();
+            modules.add(module);
+        }
 
         courseModuleRepository.saveAll(modules);
     }

@@ -2,6 +2,13 @@
 <#import "/spring.ftl" as spring>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <div class="hero-section">
         <h1 class="hero-title">${courseInstance.title}</h1>
         <p class="hero-subtitle">
@@ -11,12 +18,7 @@
         </p>
     </div>
 
-    <#if success??>
-        <div class="alert alert-success">${success}</div>
-    </#if>
-    <#if error??>
-        <div class="alert alert-danger">${error}</div>
-    </#if>
+
 
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary">Модули</a>

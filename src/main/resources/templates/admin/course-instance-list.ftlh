@@ -108,7 +108,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 
     <script>
@@ -266,18 +266,23 @@
         .card-header {
             border-bottom: none;
         }
+
         .table-responsive {
             overflow-x: auto;
             border-radius: 10px;
         }
-        #courseInstancesTable {
+
+        #courseInstancesTable,
+        #usersTable {
             width: 100%;
             margin-bottom: 1rem;
             color: #2c3e50;
             border-collapse: separate;
             border-spacing: 0;
         }
-        #courseInstancesTable th {
+
+        #courseInstancesTable th,
+        #usersTable th {
             background: linear-gradient(135deg, #0066cc, #003d7a);
             color: white;
             padding: 0.75rem;
@@ -285,17 +290,22 @@
             border: none;
             font-weight: 600;
         }
-        #courseInstancesTable td {
+
+        #courseInstancesTable td,
+        #usersTable td {
             padding: 0.75rem;
             vertical-align: middle;
             border-top: 1px solid #e3e6f0;
             border-bottom: 1px solid #e3e6f0;
         }
-        #courseInstancesTable tr:hover {
+
+        #courseInstancesTable tr:hover,
+        #usersTable tr:hover {
             background-color: rgba(0,102,204,0.05);
             transform: translateY(-1px);
             transition: all 0.3s ease;
         }
+
         .badge {
             display: inline-block;
             padding: 0.35em 0.65em;
@@ -307,37 +317,45 @@
             vertical-align: baseline;
             border-radius: 0.375rem;
         }
+
         .bg-primary {
             background-color: #0066cc !important;
         }
+
         .bg-success {
             background-color: #28a745 !important;
         }
+
         .bg-warning {
             background-color: #ffc107 !important;
             color: #212529 !important;
         }
+
         .pagination {
             display: flex;
             padding-left: 0;
             list-style: none;
             border-radius: 25px;
         }
+
         .page-item:first-child .page-link {
             margin-left: 0;
             border-top-left-radius: 25px;
             border-bottom-left-radius: 25px;
         }
+
         .page-item:last-child .page-link {
             border-top-right-radius: 25px;
             border-bottom-right-radius: 25px;
         }
+
         .page-item.active .page-link {
             z-index: 1;
             color: #fff;
             background: linear-gradient(135deg, #0066cc, #003d7a);
             border-color: #0066cc;
         }
+
         .page-link {
             position: relative;
             display: block;
@@ -348,6 +366,7 @@
             background-color: #fff;
             border: 1px solid #dddfeb;
         }
+
         .page-link:hover {
             z-index: 2;
             color: #003d7a;
@@ -355,30 +374,37 @@
             background-color: rgba(0,102,204,0.1);
             border-color: #dddfeb;
         }
+
         .input-group-text {
             background: #0066cc;
             border: 1px solid #0066cc;
             color: white;
         }
+
         .form-select {
             border-left: 0;
             border-color: #d1d3e2;
         }
+
         .form-select:focus {
             box-shadow: none;
             border-color: #d1d3e2;
         }
+
         .btn-light {
             transition: all 0.3s ease;
         }
+
         .btn-light:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,102,204,0.3);
         }
+
         .dt-buttons {
             margin-bottom: 0;
             margin-left: 15px;
         }
+
         .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
@@ -386,26 +412,37 @@
             margin-right: 0.25rem;
             transition: all 0.3s ease;
         }
+
         .btn-sm:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
         .btn-success {
             background-color: #28a745;
             border-color: #28a745;
         }
+
         .btn-danger {
             background-color: #dc3545;
             border-color: #dc3545;
         }
+
         .btn-info {
             background-color: #17a2b8;
             border-color: #17a2b8;
         }
+
         .btn-primary {
             background-color: #0066cc;
             border-color: #0066cc;
         }
+
         .form-select-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
@@ -414,35 +451,42 @@
             background-color: white;
             color: #495057;
         }
+
         .form-select-sm:focus {
             border-color: #0066cc;
             outline: 0;
             box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
         }
+
         .form-label {
             font-weight: 600;
             color: #2c3e50;
             margin-bottom: 0.5rem;
         }
+
         .dropdown-menu {
             border-radius: 0.375rem;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
+
         .dropdown-item {
             padding: 0.25rem 1rem;
             font-size: 0.875rem;
             color: #212529;
         }
+
         .dropdown-item:hover {
             background-color: #f8f9fa;
             color: #0066cc;
         }
+
         .dropdown-item i {
             width: 18px;
             text-align: center;
             margin-right: 5px;
         }
+
         @media (max-width: 768px) {
             .card-header {
                 flex-direction: column;
@@ -463,15 +507,17 @@
             .row.mb-3 {
                 flex-direction: column;
             }
-            .row.mb-3 .col-md-3 {
+            .row.mb-3 .col-md-3,
+            .row.mb-3 .col-md-6 {
                 width: 100%;
                 margin-bottom: 1rem;
             }
-            .col-md-9.d-flex {
+            .col-md-6.d-flex {
                 justify-content: flex-start !important;
                 margin-top: 1rem;
                 flex-direction: column;
             }
         }
+
     </style>
 </@layout.page>

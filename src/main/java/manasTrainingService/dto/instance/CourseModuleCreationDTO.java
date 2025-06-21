@@ -19,10 +19,4 @@ public class CourseModuleCreationDTO {
 
     private String description;
 
-    @NotNull(message = "Порядок обязателен")
-    @Min(value = 0, message = "Порядок не может быть отрицательным")
-    private Integer orderIndex;
-
-    @NotNull(message = "Статус активности обязателен")
-    private Boolean isActive = true;
 }
