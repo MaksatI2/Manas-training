@@ -1,6 +1,5 @@
 package manasTrainingService.repositories;
 
-import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.CourseInstanceTeacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 

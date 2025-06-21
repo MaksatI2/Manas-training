@@ -9,38 +9,6 @@
             --text-dark: #2c3e50;
         }
 
-        .breadcrumb-wrapper {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            color: white;
-            padding: 0.75rem 0;
-        }
-
-        .breadcrumb-wrapper .container {
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-        }
-
-        .breadcrumb-wrapper a {
-            color: white;
-            text-decoration: none;
-            margin-right: 0.5rem;
-        }
-
-        .breadcrumb-wrapper a:hover {
-            text-decoration: underline;
-        }
-
-        .breadcrumb-separator {
-            margin: 0 0.4rem;
-            color: #ccc;
-        }
-
-        .breadcrumb-current {
-            font-weight: 600;
-            color: #fff;
-        }
-
         .page-title {
             text-align: center;
             font-size: 2rem;
@@ -68,12 +36,20 @@
         }
 
         .teacher-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 1.5rem;
             padding: 0 1rem 3rem;
             max-width: 1280px;
             margin: 0 auto;
+        }
+
+        .teacher-card-item {
+            flex: 1 1 calc(33.333% - 1rem);
+            max-width: 340px;
+            min-width: 260px;
+            display: flex;
         }
 
         .teacher-card {
@@ -85,6 +61,8 @@
             display: flex;
             flex-direction: column;
             transition: all 0.3s ease;
+            height: 100%;
+            width: 100%;
         }
 
         .teacher-card:hover {
@@ -106,6 +84,7 @@
             padding: 1rem;
             font-size: 0.9rem;
             color: var(--text-dark);
+            flex-grow: 1;
         }
 
         .teacher-name {
@@ -144,14 +123,6 @@
         }
     </style>
 
-    <div class="breadcrumb-wrapper text-center">
-        <nav class="breadcrumb-nav d-inline-block">
-            <a href="/">Главная</a>
-            <span class="breadcrumb-separator">›</span>
-            <a href="/teachers">Наши преподаватели</a>
-        </nav>
-    </div>
-
     <div class="container">
         <h1 class="page-title">
             <i class="fas fa-users"></i> Наши преподаватели
@@ -169,26 +140,28 @@
 
         <div class="teacher-grid" id="teacherCardsContainer">
             <#list teachers as teacher>
-                <div class="teacher-card teacher-card-item"
+                <div class="teacher-card-item"
                      data-name="${teacher.fullName?lower_case}" data-department="${teacher.department?lower_case}">
-                    <#if teacher.avatarUrl?? && teacher.avatarUrl?length gt 0>
-                        <img src="/data/images/${teacher.avatarUrl}" class="teacher-img" alt="${teacher.fullName}">
-                    <#else>
-                        <img src="/static/images/default_avatar.jpg" class="teacher-img" alt="${teacher.fullName}">
-                    </#if>
+                    <div class="teacher-card">
+                        <#if teacher.avatarUrl?? && teacher.avatarUrl?length gt 0>
+                            <img src="/data/images/${teacher.avatarUrl}" class="teacher-img" alt="${teacher.fullName}">
+                        <#else>
+                            <img src="/static/images/default_avatar.jpg" class="teacher-img" alt="${teacher.fullName}">
+                        </#if>
 
-                    <div class="teacher-info">
-                        <div class="teacher-name">
-                            <a href="/teachers/${teacher.id}">${teacher.fullName}</a>
-                        </div>
-                        <div class="teacher-department">
-                            Перечень преподаваемых дисциплин: ${teacher.department}
-                        </div>
-                        <div class="teacher-contact">
-                            <div><i class="fas fa-envelope"></i>${teacher.email}</div>
-                            <#if teacher.phone??>
-                                <div><i class="fas fa-phone"></i>${teacher.phone}</div>
-                            </#if>
+                        <div class="teacher-info">
+                            <div class="teacher-name">
+                                <a href="/teachers/${teacher.id}">${teacher.fullName}</a>
+                            </div>
+                            <div class="teacher-department">
+                                Перечень преподаваемых дисциплин: ${teacher.department}
+                            </div>
+                            <div class="teacher-contact">
+                                <div><i class="fas fa-envelope"></i>${teacher.email}</div>
+                                <#if teacher.phone??>
+                                    <div><i class="fas fa-phone"></i>${teacher.phone}</div>
+                                </#if>
+                            </div>
                         </div>
                     </div>
                 </div>

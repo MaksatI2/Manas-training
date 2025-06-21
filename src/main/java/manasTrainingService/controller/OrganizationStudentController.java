@@ -14,10 +14,13 @@ import manasTrainingService.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/organization/students")
@@ -39,12 +42,20 @@ public class OrganizationStudentController {
     @GetMapping("/add")
     public String showAddStudentForm(Model model) {
         model.addAttribute("studentDto", new CreateStudentByOrganizationDto());
+        model.addAttribute("validationErrors", Map.of());
         return "organization/students/add";
     }
 
     @PostMapping("/add")
-    public String addStudent(@Valid @ModelAttribute("studentDto") CreateStudentByOrganizationDto dto, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String addStudent(
+            @Valid @ModelAttribute("studentDto") CreateStudentByOrganizationDto dto,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("studentDto", dto);
+            model.addAttribute("validationErrors", getFieldErrors(bindingResult));
             return "organization/students/add";
         }
 
@@ -53,9 +64,19 @@ public class OrganizationStudentController {
             redirectAttributes.addFlashAttribute("successMessage", "Студент успешно добавлен");
             return "redirect:/organization/students";
         } catch (Exception e) {
+            model.addAttribute("studentDto", dto);
             model.addAttribute("errorMessage", e.getMessage());
             return "organization/students/add";
         }
+    }
+
+    private Map<String, String> getFieldErrors(BindingResult result) {
+        return result.getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (existing, replacement) -> existing
+                ));
     }
 
     @GetMapping("/{studentId}/edit")

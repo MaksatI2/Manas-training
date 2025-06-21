@@ -1,8 +1,8 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.profile.StudentProfileDto;
 import manasTrainingService.dto.edit.UserProfileEditDto;
+import manasTrainingService.dto.profile.StudentProfileDto;
 import manasTrainingService.entity.StudentProfile;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.PhoneAlreadyExistsException;

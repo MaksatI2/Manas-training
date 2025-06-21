@@ -7,34 +7,6 @@
             --text-dark: #2c3e50;
         }
 
-        .breadcrumb-wrapper {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            color: white;
-            padding: 0.75rem 0;
-        }
-
-        .breadcrumb-wrapper .container {
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-        }
-
-        .breadcrumb-wrapper a {
-            color: white;
-            text-decoration: none;
-            margin-right: 0.5rem;
-        }
-
-        .breadcrumb-separator {
-            margin: 0 0.4rem;
-            color: #ccc;
-        }
-
-        .breadcrumb-current {
-            font-weight: 600;
-            color: #fff;
-        }
-
         .page-title {
             text-align: center;
             font-size: 2rem;
@@ -69,16 +41,6 @@
             font-weight: 500;
         }
     </style>
-
-    <div class="breadcrumb-wrapper text-center">
-        <nav class="breadcrumb-nav d-inline-block">
-            <a href="/">Главная</a>
-            <span class="breadcrumb-separator">›</span>
-            <a href="/organization/students">Сотрудники</a>
-            <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-current">Редактирование</span>
-        </nav>
-    </div>
 
     <h1 class="page-title">Редактирование студента</h1>
 

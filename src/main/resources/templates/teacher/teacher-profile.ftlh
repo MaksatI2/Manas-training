@@ -9,38 +9,6 @@
             --text-dark: #2c3e50;
         }
 
-        .breadcrumb-wrapper {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            color: white;
-            padding: 0.75rem 0;
-        }
-
-        .breadcrumb-wrapper .container {
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-        }
-
-        .breadcrumb-wrapper a {
-            color: white;
-            text-decoration: none;
-            margin-right: 0.5rem;
-        }
-
-        .breadcrumb-wrapper a:hover {
-            text-decoration: underline;
-        }
-
-        .breadcrumb-separator {
-            margin: 0 0.4rem;
-            color: #ccc;
-        }
-
-        .breadcrumb-current {
-            font-weight: 600;
-            color: #fff;
-        }
-
         .page-title-block {
             margin: 2rem auto 1.5rem;
             text-align: center;
@@ -144,16 +112,6 @@
             }
         }
     </style>
-
-    <div class="breadcrumb-wrapper text-center">
-        <nav class="breadcrumb-nav d-inline-block">
-            <a href="/">Главная</a>
-            <span class="breadcrumb-separator">›</span>
-            <a href="/teachers">Наши преподаватели</a>
-            <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-current">${teacher.teacher.name} ${teacher.teacher.lastName}</span>
-        </nav>
-    </div>
 
     <div class="page-title-block">
         <h1 class="page-title">
