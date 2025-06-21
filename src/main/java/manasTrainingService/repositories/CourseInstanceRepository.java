@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface CourseInstanceRepository extends JpaRepository<CourseInstance, Integer> {
     List<CourseInstance> findByCourseId(Integer courseId);
+
+    List<CourseInstance> findAllByIsActiveTrue();
+
 }

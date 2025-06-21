@@ -1,6 +1,7 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.dto.create.CreateTeacherDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
 import manasTrainingService.dto.profile.TeacherProfileDto;
@@ -13,7 +14,12 @@ import manasTrainingService.service.TeacherService;
 import manasTrainingService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -87,4 +93,59 @@ public class TeacherServiceImpl implements TeacherService {
                 .bio(getTeacherProfile(user).getBio())
                 .build();
     }
+
+    @Override
+    public Page<TeacherCardDto> getTeachers(Pageable pageable, String search, String department) {
+        List<TeacherCardDto> filtered = teacherProfileRepository.findAll()
+                .stream()
+                .filter(tp -> {
+                    User user = tp.getUser();
+                    return user != null &&
+                            Boolean.TRUE.equals(user.getIsActive()) &&
+                            user.getRole() != null &&
+                            "TEACHER".equalsIgnoreCase(user.getRole().getName()) &&
+                            (search == null || (user.getName() + " " + user.getLastName())
+                                    .toLowerCase().contains(search.toLowerCase())) &&
+                            (department == null || department.isBlank() || tp.getDepartment().equalsIgnoreCase(department));
+                })
+                .map(tp -> {
+                    User user = tp.getUser();
+                    return TeacherCardDto.builder()
+                            .id(user.getId().longValue())
+                            .fullName(user.getName() + " " + user.getLastName())
+                            .avatarUrl(user.getAvatarUrl())
+                            .department(tp.getDepartment())
+                            .email(user.getEmail())
+                            .phone(user.getPhone())
+                            .build();
+                })
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filtered.size());
+        List<TeacherCardDto> pageContent = filtered.subList(start, end);
+
+        return new PageImpl<>(pageContent, pageable, filtered.size());
+    }
+
+    @Override
+    public TeacherProfileDto getTeacherProfileById(Long id) {
+        User user = userService.getUserById(id.intValue());
+
+        if (!"TEACHER".equalsIgnoreCase(user.getRole().getName())) {
+            throw new UserNotFoundException("Пользователь не является преподавателем");
+        }
+
+        TeacherProfile teacherProfile = teacherProfileRepository.findByUser(user)
+                .orElseThrow(() -> new UserNotFoundException("Профиль преподавателя не найден"));
+
+        return TeacherProfileDto.builder()
+                .teacher(user)
+                .department(teacherProfile.getDepartment())
+                .qualifications(teacherProfile.getQualifications())
+                .bio(teacherProfile.getBio())
+                .avatarUrl(user.getAvatarUrl())
+                .build();
+    }
+
 }

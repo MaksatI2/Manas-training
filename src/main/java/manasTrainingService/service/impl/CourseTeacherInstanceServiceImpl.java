@@ -5,6 +5,7 @@ import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
 import manasTrainingService.dto.teacher.TeacherCourseCardDTO;
 import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.CourseInstanceTeacher;
+import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.UserNotFoundException;
 import manasTrainingService.repositories.CourseInstanceTeacherRepository;
@@ -13,7 +14,6 @@ import manasTrainingService.service.CourseTeacherInstanceService;
 import manasTrainingService.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import manasTrainingService.entity.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
