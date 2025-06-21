@@ -3,6 +3,7 @@ package manasTrainingService.service.impl;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseInstanceCreationDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.entity.Course;
@@ -16,6 +17,8 @@ import manasTrainingService.service.CourseService;
 import manasTrainingService.service.LessonService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -111,4 +114,33 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
         CourseInstance instance = lesson.getModule().getCourseInstance();
         return convertToDto(instance);
     }
+
+    @Override
+    public CourseInstanceUpdateDTO getUpdateDtoById(Integer id) {
+        CourseInstance instance = courseInstanceRepository.findById(id)
+                .orElseThrow(() -> new CourseNotFoundException("Поток курса не найден"));
+
+        return CourseInstanceUpdateDTO.builder()
+                .id(instance.getId())
+                .title(instance.getTitle())
+                .startDate(instance.getStartDate().toLocalDate())
+                .endDate(instance.getEndDate().toLocalDate())
+                .isActive(instance.getIsActive())
+                .build();
+    }
+
+    @Override
+    public void updateCourseInstance(Integer id, CourseInstanceUpdateDTO dto) {
+        CourseInstance instance = courseInstanceRepository.findById(id)
+                .orElseThrow(() -> new CourseNotFoundException("Поток курса не найден"));
+
+        instance.setTitle(dto.getTitle());
+        instance.setStartDate(dto.getStartDate().atStartOfDay());
+        instance.setEndDate(dto.getEndDate().atTime(23, 59));
+        instance.setIsActive(Boolean.TRUE.equals(dto.getIsActive()));
+        instance.setUpdatedAt(LocalDateTime.now());
+
+        courseInstanceRepository.save(instance);
+    }
+
 }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseInstanceCreationDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.CourseModuleListDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
@@ -13,6 +14,7 @@ import manasTrainingService.service.CourseModuleService;
 import manasTrainingService.service.CourseService;
 import manasTrainingService.service.CourseTeacherInstanceService;
 import manasTrainingService.service.CourseTeacherService;
+import manasTrainingService.service.ScheduleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,6 +40,7 @@ public class CourseInstanceController {
     private final CourseModuleService courseModuleService;
     private final CourseTeacherService courseTeacherService;
     private final CourseTeacherInstanceService courseInstanceTeacherService;
+    private final ScheduleService scheduleService;
 
     @GetMapping
     public String listCourseInstances(Model model) {
@@ -61,6 +64,38 @@ public class CourseInstanceController {
         courseInstanceService.createCourseInstance(courseInstanceCreationDTO);
         return "redirect:/admin/course-instances";
     }
+
+
+    @GetMapping("/{id}/edit")
+    public String showEditForm(@PathVariable Integer id, Model model) {
+        model.addAttribute("courseInstanceDto", courseInstanceService.getUpdateDtoById(id));
+        model.addAttribute("courses", courseService.getAllCourses());
+        return "admin/course-instance-edit";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String updateCourseInstance(@PathVariable Integer id,
+                                       @Valid @ModelAttribute("courseInstanceDto") CourseInstanceUpdateDTO courseInstanceDto,
+                                       BindingResult result,
+                                       Model model,
+                                       RedirectAttributes redirectAttributes) {
+        if (scheduleService.hasSchedulesBeforeDateRange(id, courseInstanceDto.getStartDate())) {
+            result.rejectValue("startDate", "lesson.date.conflict.start", "Существуют уроки до новой даты начала");
+        }
+        if (scheduleService.hasSchedulesAfterDateRange(id, courseInstanceDto.getEndDate())) {
+            result.rejectValue("endDate", "lesson.date.conflict.end", "Существуют уроки после новой даты окончания");
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("courses", courseService.getAllCourses());
+            return "admin/course-instance-edit";
+        }
+
+        courseInstanceService.updateCourseInstance(id, courseInstanceDto);
+        redirectAttributes.addFlashAttribute("successMessage", "Поток курса успешно обновлён");
+        return "redirect:/admin/course-instances";
+    }
+
 
     @GetMapping("/{id}")
     public String viewCourseInstance(@PathVariable Integer id, Model model) {

@@ -15,6 +15,8 @@ import manasTrainingService.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
@@ -71,4 +73,20 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         scheduleRepository.save(entity);
     }
+
+    @Override
+    public boolean hasSchedulesOutsideDateRange(Integer courseInstanceId, LocalDate newStart, LocalDate newEnd) {
+        return scheduleRepository.existsByCourseInstanceIdAndLessonDateOutsideRange(courseInstanceId, newStart, newEnd);
+    }
+
+    @Override
+    public boolean hasSchedulesBeforeDateRange(Integer courseInstanceId, LocalDate newStart) {
+        return scheduleRepository.existsByCourseInstanceIdAndLessonDateBeforeStart(courseInstanceId, newStart);
+    }
+
+    @Override
+    public boolean hasSchedulesAfterDateRange(Integer courseInstanceId, LocalDate newEnd) {
+        return scheduleRepository.existsByCourseInstanceIdAndLessonDateAfterEnd(courseInstanceId, newEnd);
+    }
+
 }
