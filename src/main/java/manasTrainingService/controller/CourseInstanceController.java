@@ -7,6 +7,7 @@ import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.CourseModuleListDTO;
+import manasTrainingService.dto.instance.CourseModuleUpdateDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.dto.teacher.TeacherFormDTO;
 import manasTrainingService.service.CourseInstanceService;
@@ -223,6 +224,67 @@ public class CourseInstanceController {
             redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении потока курса: " + e.getMessage());
         }
         return "redirect:/admin/course-instances";
+    }
+
+
+    @PostMapping("/{id}/modules/{moduleId}/delete")
+    public String deleteModule(
+            @PathVariable Integer id,
+            @PathVariable Integer moduleId,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            courseModuleService.deleteByIdIfNoLessons(moduleId);
+            redirectAttributes.addFlashAttribute("successMessage", "Модуль успешно удалён");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Модуль содержит уроки и не может быть удалён");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении модуля");
+        }
+
+        return "redirect:/admin/course-instances/" + id + "/modules";
+    }
+
+    @GetMapping("/{id}/modules/{moduleId}/edit")
+    public String editModuleForm(
+            @PathVariable Integer id,
+            @PathVariable Integer moduleId,
+            Model model
+    ) {
+        CourseModuleUpdateDTO dto = courseModuleService.getModuleForUpdate(moduleId);
+        model.addAttribute("module", dto);
+        model.addAttribute("courseInstanceId", id);
+        model.addAttribute("moduleId", moduleId);
+        return "admin/course-module-edit";
+    }
+
+    @PostMapping("/{id}/modules/{moduleId}/edit")
+    public String updateModule(
+            @PathVariable Integer id,
+            @PathVariable Integer moduleId,
+            @Valid @ModelAttribute("module") CourseModuleUpdateDTO dto,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            Model model
+    ) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courseInstanceId", id);
+            model.addAttribute("moduleId", moduleId);
+            return "admin/course-module-edit";
+        }
+
+        try {
+            courseModuleService.updateModule(moduleId, dto);
+            redirectAttributes.addFlashAttribute("successMessage", "Модуль успешно обновлён");
+
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при обновлении модуля");
+        }
+
+        return "redirect:/admin/course-instances/" + id + "/modules";
     }
 
 

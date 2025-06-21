@@ -34,13 +34,11 @@ $(document).ready(function() {
                             `<li class="list-group-item"><strong>${m.title}</strong> — ${duration} ч., порядок: ${order}</li>`
                         );
                     });
-                    // Отключаем кнопку удаления, т.к. есть модули
                     $('#confirmDeleteBtn').prop('disabled', true).text('Удаление невозможно — есть модули');
                 }
             },
             error: function() {
                 modulesList.html('<li class="list-group-item text-danger text-center">Ошибка при загрузке модулей.</li>');
-                // Лучше отключить кнопку удаления на случай ошибки
                 $('#confirmDeleteBtn').prop('disabled', true).text('Невозможно проверить модули');
             }
         });

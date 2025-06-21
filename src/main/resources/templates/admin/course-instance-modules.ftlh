@@ -29,6 +29,7 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                     <tr>
+                        <th scope="col">Действия</th>
                         <th scope="col" >Порядок</th>
                         <th scope="col" >Название</th>
                         <th scope="col" >Продолжительность (часы)</th>
@@ -37,7 +38,21 @@
                     </thead>
                     <tbody id="existing-modules">
                     <#list modules as module>
+
                         <tr data-module-id="${module.id}" data-order-index="${module.orderIndex}">
+                            <td>
+                                <a href="/admin/course-instances/${courseInstance.id}/modules/${module.id}/edit" class="btn btn-sm btn-primary" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-danger delete-module-btn"
+                                        data-module-id="${module.id}"
+                                        data-lessons-count="${module.lessons?size!0}"
+                                        title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+
+                            </td>
                             <td>${module.orderIndex}</td>
                             <td>${module.title}</td>
                             <td>${module.durationHours}</td>
@@ -102,6 +117,31 @@
         </div>
     </div>
 
+    <div class="modal fade" id="deleteModuleModal" tabindex="-1" aria-labelledby="deleteModuleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteModuleForm" method="POST">
+                    <input type="hidden" name="_csrf" value="${_csrf.token}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModuleModalLabel">Удаление модуля</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body" id="deleteModuleModalBody">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-danger" id="confirmDeleteModuleBtn">Удалить модуль</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const courseInstanceId = ${courseInstance.id?json_string};
+    </script>
     <script src="/static/js/instance_modules.js" defer></script>
 
     <style>

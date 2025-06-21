@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.instance.CourseModuleApiDto;
 import manasTrainingService.dto.instance.CourseModuleCreationDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
+import manasTrainingService.dto.instance.CourseModuleUpdateDTO;
 import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.CourseModule;
+import manasTrainingService.entity.Lesson;
 import manasTrainingService.exceptions.nsee.ModuleNotFoundException;
 import manasTrainingService.repositories.CourseModuleRepository;
 import manasTrainingService.service.CourseInstanceService;
@@ -112,5 +114,46 @@ public class CourseModuleServiceImpl implements CourseModuleService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteByIdIfNoLessons(Integer moduleId) {
+        CourseModule module = getCourseModuleById(moduleId);
+        if (!module.getLessons().isEmpty()) {
+            throw new IllegalStateException("У модуля есть уроки");
+        }
+        courseModuleRepository.deleteById(moduleId);
+    }
+
+    @Override
+    public CourseModuleUpdateDTO getModuleForUpdate(Integer moduleId) {
+        CourseModule module = getCourseModuleById(moduleId);
+        CourseModuleUpdateDTO updateDTO = new CourseModuleUpdateDTO();
+        updateDTO.setTitle(module.getTitle());
+        updateDTO.setDurationHours(module.getDurationHours());
+        updateDTO.setDescription(module.getDescription());
+        return updateDTO;
+    }
+
+    @Override
+    public void updateModule(Integer moduleId, CourseModuleUpdateDTO dto) {
+        CourseModule module = getCourseModuleById(moduleId);
+        List<Lesson> lessons = module.getLessons();
+        int totalLessonMinutes = lessons.stream()
+                .mapToInt(Lesson::getDurationMinutes)
+                .sum();
+
+        int newModuleMinutes = dto.getDurationHours() * 60;
+
+        if (totalLessonMinutes > newModuleMinutes) {
+            throw new IllegalStateException(
+                    "Изменение невозможно " +
+                            "новая продолжительность модуля (" + newModuleMinutes + " мин) меньше общего времени уроков " + totalLessonMinutes + "."
+            );
+        }
+        module.setTitle(dto.getTitle());
+        module.setDurationHours(dto.getDurationHours());
+        module.setDescription(dto.getDescription());
+        courseModuleRepository.save(module);
     }
 }

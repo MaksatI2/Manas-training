@@ -101,76 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         moduleCount = modules.length;
     };
 
-    const handleEditModule = () => {
-        document.querySelectorAll('.edit-module-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const moduleId = btn.dataset.moduleId;
-                const row = document.querySelector(`tr[data-module-id="${moduleId}"]`);
-                if (!row) return;
-
-                const cells = row.querySelectorAll('td');
-
-                document.getElementById('edit-module-id').value = moduleId;
-                document.getElementById('edit-module-title').value = cells[1].textContent.trim();
-                document.getElementById('edit-module-duration').value = cells[2].textContent.trim();
-                document.getElementById('edit-module-description').value = cells[3].textContent.trim();
-            });
-        });
-    };
-
-    const handleDeleteModule = () => {
-        document.querySelectorAll('.delete-module-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (!confirm('Вы уверены, что хотите удалить этот модуль?')) return;
-
-                const moduleId = btn.dataset.moduleId;
-
-                fetch(`/admin/course-instances/${courseInstance.id}/modules/${moduleId}`, {
-                    method: 'DELETE'
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            alert('Ошибка при удалении модуля');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Ошибка:', error);
-                        alert('Произошла ошибка при удалении модуля');
-                    });
-            });
-        });
-    };
-
-    const handleSaveModuleChanges = () => {
-        document.getElementById('save-module-changes').addEventListener('click', () => {
-            const moduleId = document.getElementById('edit-module-id').value;
-            const updatedModule = {
-                id: moduleId,
-                title: document.getElementById('edit-module-title').value,
-                durationHours: parseInt(document.getElementById('edit-module-duration').value, 10),
-                description: document.getElementById('edit-module-description').value
-            };
-
-            fetch(`/admin/course-instances/${courseInstance.id}/modules/${moduleId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedModule)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        alert('Ошибка при обновлении модуля');
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                    alert('Произошла ошибка при обновлении модуля');
-                });
-        });
-    };
 
     const handleFormSubmit = () => {
         moduleForm.addEventListener('submit', e => {
@@ -191,10 +121,52 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     addModuleBtn?.addEventListener('click', addNewModuleForm);
-    handleEditModule();
-    handleDeleteModule();
-    handleSaveModuleChanges();
     handleFormSubmit();
     updateHoursStatus();
+
+
+    const moduleTable = document.getElementById('existing-modules');
+
+    moduleTable?.addEventListener('click', (event) => {
+
+        const deleteBtn = event.target.closest('.delete-module-btn');
+        if (!deleteBtn) return;
+
+        const moduleId = deleteBtn.dataset.moduleId;
+        const lessonsCount = parseInt(deleteBtn.dataset.lessonsCount || '0', 10);
+
+        const confirmBtn = document.getElementById('confirmDeleteModuleBtn');
+        const modalBody = document.getElementById('deleteModuleModalBody');
+
+        if (lessonsCount > 0) {
+            modalBody.innerHTML = `
+            <p>Этот модуль содержит <strong>${lessonsCount}</strong> уроков и не может быть удалён.</p>
+        `;
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Удаление невозможно';
+        } else {
+            modalBody.innerHTML = `<p>Вы уверены, что хотите удалить модуль?</p>`;
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Удалить модуль';
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const form = document.getElementById('deleteModuleForm');
+            form.action = `/admin/course-instances/${courseInstanceId}/modules/${moduleId}/delete`;
+            form.querySelector('input[name="_csrf"]').value = csrfToken;
+
+            $('#deleteFormContainer').html(form);
+            confirmBtn.onclick = () => {
+                const form = document.getElementById('deleteCourseInstanceForm');
+                if (form) {
+                    form.submit();
+                }
+            };
+
+
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('deleteModuleModal'));
+        modal.show();
+    });
 
 });
