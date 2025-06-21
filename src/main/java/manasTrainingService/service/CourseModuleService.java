@@ -1,5 +1,6 @@
 package manasTrainingService.service;
 
+import manasTrainingService.dto.instance.CourseModuleApiDto;
 import manasTrainingService.dto.instance.CourseModuleCreationDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.CoursePlanDTO;
@@ -24,4 +25,6 @@ public interface CourseModuleService {
 
     @Transactional(readOnly = true)
     List<CourseModuleDTO> findByCourseInstanceId(Integer courseInstanceId);
+
+    List<CourseModuleApiDto> getModuleApiDtosByCourseInstanceId(Integer courseInstanceId);
 }

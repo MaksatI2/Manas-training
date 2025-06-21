@@ -215,5 +215,17 @@ public class CourseInstanceController {
         return "redirect:/admin/course-instances/" + courseInstanceId + "/teachers";
     }
 
+    @PostMapping("/{id}/delete")
+    public String deleteCourseInstance(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            courseInstanceService.deleteCourseInstance(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Поток курса успешно удалён");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении потока курса: " + e.getMessage());
+        }
+        return "redirect:/admin/course-instances";
+    }
+
+
 
 }

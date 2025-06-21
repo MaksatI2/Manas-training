@@ -71,10 +71,10 @@
                                     <a href="/admin/course-instances/${instance.id}/edit" class="btn btn-sm btn-primary" title="Редактировать">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="/admin/course-instances/${instance.id}/delete" class="btn btn-sm btn-danger" title="Удалить"
-                                       onclick="return confirm('Вы уверены, что хотите удалить этот поток курса?')">
+                                    <button type="button" class="btn btn-sm btn-danger" title="Удалить" data-id="${instance.id}">
                                         <i class="fas fa-trash"></i>
-                                    </a>
+                                    </button>
+
                                 </td>
                             </tr>
                         </#list>
@@ -97,6 +97,28 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="deleteCourseInstanceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Удаление потока курса</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="courseModulesList" class="list-group mb-3">
+                    </ul>
+                    <div id="deleteFormContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
@@ -256,7 +278,10 @@
             $('.dt-button').addClass('btn').removeClass('dt-button');
             $('.dropdown-toggle').dropdown();
         });
+
+
     </script>
+    <script src="/static/js/instances-list.js"></script>
 
     <style>
         .card {

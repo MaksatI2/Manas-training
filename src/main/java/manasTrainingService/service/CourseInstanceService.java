@@ -21,4 +21,6 @@ public interface CourseInstanceService {
     CourseInstanceUpdateDTO getUpdateDtoById(Integer id);
 
     void updateCourseInstance(Integer id, CourseInstanceUpdateDTO dto);
+
+    void deleteCourseInstance(Integer id);
 }

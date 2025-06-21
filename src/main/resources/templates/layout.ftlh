@@ -8,6 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="${_csrf.token}" />
+    <meta name="csrf-header" content="${_csrf.headerName}" />
 </head>
 <div id="flash-message-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 <script src="/static/js/notifications.js"></script>

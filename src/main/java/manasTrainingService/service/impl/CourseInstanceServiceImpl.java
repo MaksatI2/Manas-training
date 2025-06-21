@@ -17,7 +17,6 @@ import manasTrainingService.service.CourseService;
 import manasTrainingService.service.LessonService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -141,6 +140,17 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
         instance.setUpdatedAt(LocalDateTime.now());
 
         courseInstanceRepository.save(instance);
+    }
+
+    @Override
+    public void deleteCourseInstance(Integer id) {
+        CourseInstance instance = courseInstanceRepository.findById(id)
+                .orElseThrow(() -> new CourseNotFoundException("Поток курса не найден"));
+        if (!instance.getModules().isEmpty()) {
+            throw new IllegalArgumentException("Невозможно удаление курса, у него есть модули");
+        }
+
+        courseInstanceRepository.deleteById(id);
     }
 
 }

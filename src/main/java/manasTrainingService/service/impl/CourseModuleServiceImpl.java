@@ -1,6 +1,7 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.instance.CourseModuleApiDto;
 import manasTrainingService.dto.instance.CourseModuleCreationDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.LessonDTO;
@@ -98,5 +99,18 @@ public class CourseModuleServiceImpl implements CourseModuleService {
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
+    }
+
+    @Override
+    public List<CourseModuleApiDto> getModuleApiDtosByCourseInstanceId(Integer courseInstanceId) {
+        return courseModuleRepository.findByCourseInstanceIdOrderByOrderIndexAsc(courseInstanceId).stream()
+                .map(module -> {
+                    CourseModuleApiDto dto = new CourseModuleApiDto();
+                    dto.setTitle(module.getTitle());
+                    dto.setDurationHours(module.getDurationHours());
+                    dto.setOrderIndex(module.getOrderIndex());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
