@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import manasTrainingService.entity.LessonType;
+import manasTrainingService.validation.LessonDateInCourseRange;
 
 import java.time.LocalDate;
 
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@LessonDateInCourseRange
 public class ScheduleDTO {
     private Integer id;
     private Integer courseInstanceId;
