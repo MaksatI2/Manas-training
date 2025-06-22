@@ -29,6 +29,9 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/student/**").hasAuthority("STUDENT")
+                        .requestMatchers("/test/create/*").hasAuthority("TEACHER")
+                        .requestMatchers("/test/{id}/edit").hasAuthority("TEACHER")
+                        .requestMatchers("/test/{id}/passing").hasAuthority("STUDENT")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
