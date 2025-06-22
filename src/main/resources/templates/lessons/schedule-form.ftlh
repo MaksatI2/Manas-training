@@ -17,7 +17,7 @@
 
 
     <div class="container">
-        <form action="<@spring.url '/admin/lessons/${lesson.id}/schedule'/>" method="post">
+        <form action="<@spring.url '/schedules/lessons/${lesson.id}'/>" method="post">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <@spring.formHiddenInput "schedule.lessonId" 'value="${lesson.id}"'/>
             <@spring.formHiddenInput "schedule.courseInstanceId" 'value="${courseInstance.id}"'/>

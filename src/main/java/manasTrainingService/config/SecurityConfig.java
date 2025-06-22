@@ -27,6 +27,7 @@ public class SecurityConfig {
                                 "/teachers/**",
                                 "/data/images/**"
                         ).permitAll()
+                        .requestMatchers("/schedules/**").hasAnyAuthority("ADMIN", "STUDENT", "TEACHER")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/student/**").hasAuthority("STUDENT")
                         .requestMatchers("/test/create/*").hasAuthority("TEACHER")

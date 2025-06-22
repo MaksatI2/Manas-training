@@ -2,32 +2,16 @@ package manasTrainingService.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.instance.CourseInstanceDTO;
-import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.dto.lesson.LessonEditDto;
 import manasTrainingService.dto.lesson.LessonMaterialDTO;
-import manasTrainingService.dto.lesson.ScheduleDTO;
-import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
-import manasTrainingService.entity.Lesson;
-import manasTrainingService.entity.LessonType;
-import manasTrainingService.service.CourseInstanceService;
-import manasTrainingService.service.CourseModuleService;
-import manasTrainingService.service.CourseTeacherInstanceService;
-import manasTrainingService.service.LessonMaterialService;
-import manasTrainingService.service.LessonService;
-import manasTrainingService.service.ScheduleService;
+import manasTrainingService.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Comparator;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.LinkedHashMap;
 
 @Controller
 @RequiredArgsConstructor
@@ -134,112 +118,5 @@ public class AdminLessonController {
         }
         return "redirect:/lessons/" + lessonId;
     }
-
-    @GetMapping("/lessons/{lessonId}/schedule")
-    public String showScheduleForm(@PathVariable Integer lessonId, Model model) {
-        LessonDTO lesson = lessonService.getLessonById(lessonId);
-        CourseInstanceDTO courseInstance = courseInstanceService.getCourseInstanceByLessonId(lessonId);
-        ScheduleDTO schedule = scheduleService.getScheduleByLessonId(lessonId);
-        if (schedule == null) {
-            schedule = ScheduleDTO.builder()
-                    .lessonId(lessonId)
-                    .courseInstanceId(courseInstance.getId())
-                    .build();
-        }
-        Map<String, String> teachers = courseTeacherInstanceService.getTeachersByCourseInstanceId(courseInstance.getId()).stream()
-                .sorted(Comparator.comparing(CourseInstanceTeacherDTO::getIsPrimary, Comparator.reverseOrder()))
-                .collect(Collectors.toMap(
-                        dto -> String.valueOf(dto.getTeacherId()),
-                        CourseInstanceTeacherDTO::getTeacherName,
-                        (existing, replacement) -> existing,
-                        LinkedHashMap::new
-                ));
-
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("courseInstance", courseInstance);
-        model.addAttribute("schedule", schedule);
-        model.addAttribute("teachers", teachers);
-        model.addAttribute("lessonTypes", LessonType.values());
-        return "lessons/schedule-form";
-    }
-
-    @PostMapping("/lessons/{lessonId}/schedule")
-    public String saveSchedule(
-            @PathVariable Integer lessonId,
-            @Valid @ModelAttribute("schedule") ScheduleDTO schedule,
-            BindingResult bindingResult,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            CourseInstanceDTO courseInstance = courseInstanceService.getCourseInstanceByLessonId(lessonId);
-            Map<String, String> teachers = courseTeacherInstanceService.getTeachersByCourseInstanceId(courseInstance.getId()).stream()
-                    .sorted(Comparator.comparing(CourseInstanceTeacherDTO::getIsPrimary, Comparator.reverseOrder()))
-                    .collect(Collectors.toMap(
-                            dto -> String.valueOf(dto.getTeacherId()),
-                            CourseInstanceTeacherDTO::getTeacherName,
-                            (existing, replacement) -> existing,
-                            LinkedHashMap::new
-                    ));
-
-            model.addAttribute("lesson", lessonService.getLessonById(lessonId));
-            model.addAttribute("courseInstance", courseInstance);
-            model.addAttribute("teachers", teachers);
-            model.addAttribute("lessonTypes", LessonType.values());
-            model.addAttribute("errorMessage", "Пожалуйста, исправьте ошибки в форме");
-            return "lessons/schedule-form";
-        }
-
-        try {
-            scheduleService.saveSchedule(schedule);
-            redirectAttributes.addFlashAttribute("successMessage", "Расписание сохранено");
-            return "redirect:/lessons/" + lessonId;
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/lessons/" + lessonId;
-        }
-    }
-
-    @PostMapping("/lessons/{id}/delete")
-    public String deleteLesson(@PathVariable Integer id,
-                               RedirectAttributes redirectAttributes) {
-        LessonDTO lesson = lessonService.getLessonById(id);
-        CourseModuleDTO module = courseModuleService.getCourseModuleDTOById(lesson.getModuleId());
-        lessonService.deleteById(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Урок удалён");
-        return "redirect:/admin/course-instances/" + module.getCourseInstanceId();
-    }
-
-    @GetMapping("/lessons/{id}/edit")
-    public String editLessonForm(@PathVariable Integer id, Model model) {
-        LessonEditDto lesson = lessonService.getLessonEditDto(id);
-        model.addAttribute("lessonId", id);
-
-        model.addAttribute("lessonEditDto", lesson);
-        return "admin/lesson-edit";
-    }
-
-    @PostMapping("/lessons/{id}/edit")
-    public String updateLesson(@PathVariable Integer id,
-                               @Valid @ModelAttribute("lessonEditDto") LessonEditDto dto,
-                               BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes,
-                               Model model) {
-        model.addAttribute("lessonId", id);
-
-        if (bindingResult.hasErrors()) {
-            return "admin/lesson-edit";
-        }
-
-        try {
-            lessonService.updateLesson(id, dto);
-        } catch (IllegalArgumentException ex) {
-            bindingResult.rejectValue("durationMinutes", "lesson.duration.exceeded", ex.getMessage());
-            return "admin/lesson-edit";
-        }
-
-        redirectAttributes.addFlashAttribute("successMessage", "Урок обновлён");
-        return "redirect:/lessons/" + id;
-    }
-
 
 }

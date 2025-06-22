@@ -48,10 +48,6 @@ public class Schedule {
     @Column(name = "lesson_type", nullable = false)
     LessonType lessonType;
 
-    @Column(name = "is_online", nullable = false)
-    @Builder.Default
-    Boolean isOnline = false;
-
     @Column(name = "meeting_url", length = 500)
     String meetingUrl;
 

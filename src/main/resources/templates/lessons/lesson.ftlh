@@ -93,9 +93,11 @@
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>Расписание</h4>
                 <#if isAdmin>
-                    <a href="<@spring.url '/admin/lessons/${lesson.id}/schedule'/>" class="btn btn-primary btn-sm">
-                        <i class="fas fa-calendar-alt me-1"></i><#if schedule??>Редактировать<#else>Создать</#if>
-                    </a>
+                    <#if schedule??>
+                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm">Редактировать расписание</a>
+                    <#else>
+                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm">Создать расписание</a>
+                    </#if>
                 </#if>
             </div>
 
@@ -103,13 +105,13 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h6 class="card-title">${schedule.title!lesson.title}</h6>
-                        <ul class="list-unstyled small mb-0">
-                            <li><strong>Дата:</strong> ${schedule.lessonDate}</li>
-                            <li><strong>Длительность:</strong> ${schedule.durationHours} ч.</li>
-                            <li><strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}</li>
-                            <li><strong>Тип урока:</strong> ${schedule.lessonType}</li>
+                        <p class="card-text">
+                            <strong>Дата:</strong> ${schedule.lessonDate}<br>
+                            <strong>Длительность:</strong> ${schedule.durationHours} ч.<br>
+                            <strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}<br>
+                            <strong>Тип урока:</strong> ${schedule.lessonType}<br>
                             <#if schedule.meetingUrl?has_content>
-                                <li><strong>Ссылка:</strong> <a href="${schedule.meetingUrl}" target="_blank">Присоединиться</a></li>
+                                <strong>Ссылка на встречу:</strong> <a href="${schedule.meetingUrl}" target="_blank">Присоединиться</a><br>
                             </#if>
                             <#if schedule.notes?has_content>
                                 <li><strong>Примечания:</strong> ${schedule.notes}</li>
