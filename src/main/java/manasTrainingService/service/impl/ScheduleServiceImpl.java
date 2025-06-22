@@ -1,12 +1,11 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.ScheduleViewDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
-import manasTrainingService.entity.CourseInstance;
-import manasTrainingService.entity.Lesson;
-import manasTrainingService.entity.Schedule;
-import manasTrainingService.entity.User;
+import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.ScheduleNotFouneException;
+import manasTrainingService.repositories.CourseEnrollmentRepository;
 import manasTrainingService.repositories.ScheduleRepository;
 import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.LessonService;
@@ -15,13 +14,14 @@ import manasTrainingService.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
-
     private final LessonService lessonService;
     private final CourseInstanceService courseInstanceService;
     private final UserService userService;
@@ -66,7 +66,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         entity.setTeacher(teacher);
         entity.setTitle(schedule.getTitle());
         entity.setLessonType(schedule.getLessonType());
-        entity.setIsOnline(true);
         entity.setMeetingUrl(schedule.getMeetingUrl());
         entity.setNotes(schedule.getNotes());
         entity.setIsActive(true);
@@ -74,19 +73,102 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRepository.save(entity);
     }
 
+    @Transactional
     @Override
-    public boolean hasSchedulesOutsideDateRange(Integer courseInstanceId, LocalDate newStart, LocalDate newEnd) {
-        return scheduleRepository.existsByCourseInstanceIdAndLessonDateOutsideRange(courseInstanceId, newStart, newEnd);
+    public void deleteSchedule(Integer scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleNotFouneException("Schedule not found"));
+        schedule.setIsActive(false);
+        scheduleRepository.save(schedule);
     }
 
     @Override
-    public boolean hasSchedulesBeforeDateRange(Integer courseInstanceId, LocalDate newStart) {
-        return scheduleRepository.existsByCourseInstanceIdAndLessonDateBeforeStart(courseInstanceId, newStart);
+    public boolean canUserEditSchedule(Integer userId, String userRole, Integer scheduleId) {
+        if ("ADMIN".equals(userRole)) {
+            return true;
+        }
+        if ("TEACHER".equals(userRole)) {
+            Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
+            return schedule != null && schedule.getTeacher().getId().equals(userId);
+        }
+        return false;
     }
 
     @Override
-    public boolean hasSchedulesAfterDateRange(Integer courseInstanceId, LocalDate newEnd) {
-        return scheduleRepository.existsByCourseInstanceIdAndLessonDateAfterEnd(courseInstanceId, newEnd);
+    public List<ScheduleViewDTO> getFilteredSchedules(String courseTitle, String courseInstanceTitle,
+                                                      String teacherName, String lessonType) {
+        LessonType typeEnum = null;
+        if (lessonType != null && !lessonType.isEmpty()) {
+            try {
+                typeEnum = LessonType.valueOf(lessonType);
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        List<Schedule> schedules = scheduleRepository.findWithFilters(
+                courseTitle, courseInstanceTitle, teacherName, typeEnum);
+
+        return schedules.stream()
+                .map(this::mapToScheduleViewDTO)
+                .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ScheduleViewDTO> getFilteredAndSortedSchedules(String courseTitle, String courseInstanceTitle,
+                                                               String teacherName, String lessonType,
+                                                               String sortBy, String sortDir) {
+        List<ScheduleViewDTO> schedules = getFilteredSchedules(
+                courseTitle, courseInstanceTitle, teacherName, lessonType);
+        return sortSchedules(schedules, sortBy, sortDir);
+    }
+
+    private List<ScheduleViewDTO> sortSchedules(List<ScheduleViewDTO> schedules, String sortBy, String sortDir) {
+        Comparator<ScheduleViewDTO> comparator = getComparator(sortBy);
+        if ("desc".equalsIgnoreCase(sortDir)) {
+            comparator = comparator.reversed();
+        }
+        return schedules.stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+    }
+
+    private Comparator<ScheduleViewDTO> getComparator(String sortBy) {
+        switch (sortBy != null ? sortBy.toLowerCase() : "date") {
+            case "course":
+                return Comparator.comparing(s -> s.getCourseTitle() != null ? s.getCourseTitle() : "");
+            case "teacher":
+                return Comparator.comparing(s -> s.getTeacherName() != null ? s.getTeacherName() : "");
+            case "type":
+                return Comparator.comparing(s -> s.getLessonType() != null ? s.getLessonType().name() : "");
+            case "lesson":
+                return Comparator.comparing(s -> s.getLessonTitle() != null ? s.getLessonTitle() : "");
+            case "date":
+            default:
+                return Comparator.comparing(ScheduleViewDTO::getLessonDate);
+        }
+    }
+
+    private ScheduleViewDTO mapToScheduleViewDTO(Schedule schedule) {
+        CourseInstance courseInstance = schedule.getCourseInstance();
+        Course course = courseInstance.getCourse();
+        Lesson lesson = schedule.getLesson();
+        User teacher = schedule.getTeacher();
+
+        return ScheduleViewDTO.builder()
+                .id(schedule.getId())
+                .lessonId(schedule.getLesson().getId())
+                .courseInstanceId(courseInstance.getId())
+                .courseTitle(course.getTitle())
+                .courseInstanceTitle(courseInstance.getTitle())
+                .lessonTitle(lesson.getTitle())
+                .lessonDescription(lesson.getDescription())
+                .lessonDate(schedule.getLessonDate())
+                .durationHours(schedule.getDurationHours())
+                .teacherName(teacher.getName() + " " + teacher.getLastName())
+                .teacherId(teacher.getId())
+                .lessonType(schedule.getLessonType())
+                .meetingUrl(schedule.getMeetingUrl())
+                .notes(schedule.getNotes())
+                .isActive(schedule.getIsActive())
+                .build();
+    }
 }

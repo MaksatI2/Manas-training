@@ -12,26 +12,9 @@ import java.util.List;
 
 public interface CourseModuleService {
 
-//    void createCourseModules(CoursePlanDTO planDTO);
-
     @Transactional
     void createCourseModules(Integer courseInstanceId, List<CourseModuleCreationDTO> dtos);
 
-    List<CourseModule> getModulesByCourseInstanceId(Integer courseInstanceId);
-
-
     CourseModule getCourseModuleById(Integer moduleId);
 
-    CourseModuleDTO getCourseModuleDTOById(Integer moduleId);
-
-    @Transactional(readOnly = true)
-    List<CourseModuleDTO> findByCourseInstanceId(Integer courseInstanceId);
-
-    List<CourseModuleApiDto> getModuleApiDtosByCourseInstanceId(Integer courseInstanceId);
-
-    void deleteByIdIfNoLessons(Integer moduleId);
-
-    CourseModuleUpdateDTO getModuleForUpdate(Integer moduleId);
-
-    void updateModule(Integer moduleId, CourseModuleUpdateDTO dto);
 }

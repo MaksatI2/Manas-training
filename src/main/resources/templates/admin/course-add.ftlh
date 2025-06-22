@@ -153,7 +153,6 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <div class="form-check form-switch">
-                                <!-- Скрытое поле для обеспечения отправки false при снятом чекбоксе -->
                                 <input type="hidden" name="active" value="false">
                                 <input class="form-check-input"
                                        type="checkbox"

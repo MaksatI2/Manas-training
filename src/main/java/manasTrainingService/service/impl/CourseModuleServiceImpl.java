@@ -53,11 +53,6 @@ public class CourseModuleServiceImpl implements CourseModuleService {
         courseModuleRepository.saveAll(modules);
     }
 
-    @Override
-    public List<CourseModule> getModulesByCourseInstanceId(Integer courseInstanceId) {
-        return courseModuleRepository.findByCourseInstanceId(courseInstanceId);
-    }
-
     @Transactional
     public void deleteCourseModule(Integer moduleId) {
         if (!courseModuleRepository.existsById(moduleId)) {
@@ -69,20 +64,6 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     @Override
     public CourseModule getCourseModuleById(Integer moduleId) {
         return courseModuleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException("Модуль не был найден"));
-    }
-
-    @Override
-    public CourseModuleDTO getCourseModuleDTOById(Integer moduleId) {
-        return convertToDto(courseModuleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException("Модуль не был найден")));
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<CourseModuleDTO> findByCourseInstanceId(Integer courseInstanceId) {
-        return courseModuleRepository.findByCourseInstanceIdOrderByOrderIndexAsc(courseInstanceId)
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
     }
 
     private CourseModuleDTO convertToDto(CourseModule module) {

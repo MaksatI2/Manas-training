@@ -280,7 +280,7 @@
             }
 
             function validateFile(file) {
-                const maxSize = 5 * 1024 * 1024; // 5MB
+                const maxSize = 5 * 1024 * 1024;
                 const allowedTypes = ['image/jpeg', 'image/jpg'];
 
                 if (!allowedTypes.includes(file.type)) {
