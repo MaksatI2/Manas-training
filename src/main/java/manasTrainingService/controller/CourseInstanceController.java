@@ -4,8 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseInstanceCreationDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.CourseModuleListDTO;
+import manasTrainingService.dto.instance.CourseModuleUpdateDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.dto.teacher.TeacherFormDTO;
 import manasTrainingService.service.CourseInstanceService;
@@ -13,7 +15,7 @@ import manasTrainingService.service.CourseModuleService;
 import manasTrainingService.service.CourseService;
 import manasTrainingService.service.CourseTeacherInstanceService;
 import manasTrainingService.service.CourseTeacherService;
-import manasTrainingService.service.LessonService;
+import manasTrainingService.service.ScheduleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,6 +41,7 @@ public class CourseInstanceController {
     private final CourseModuleService courseModuleService;
     private final CourseTeacherService courseTeacherService;
     private final CourseTeacherInstanceService courseInstanceTeacherService;
+    private final ScheduleService scheduleService;
 
     @GetMapping
     public String listCourseInstances(Model model) {
@@ -62,6 +65,37 @@ public class CourseInstanceController {
         courseInstanceService.createCourseInstance(courseInstanceCreationDTO);
         return "redirect:/admin/course-instances";
     }
+
+
+    @GetMapping("/{id}/edit")
+    public String showEditForm(@PathVariable Integer id, Model model) {
+        model.addAttribute("courseInstanceDto", courseInstanceService.getUpdateDtoById(id));
+        return "admin/course-instance-edit";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String updateCourseInstance(@PathVariable Integer id,
+                                       @Valid @ModelAttribute("courseInstanceDto") CourseInstanceUpdateDTO courseInstanceDto,
+                                       BindingResult result,
+                                       Model model,
+                                       RedirectAttributes redirectAttributes) {
+        if (scheduleService.hasSchedulesBeforeDateRange(id, courseInstanceDto.getStartDate())) {
+            result.rejectValue("startDate", "lesson.date.conflict.start", "Существуют уроки до новой даты начала");
+        }
+        if (scheduleService.hasSchedulesAfterDateRange(id, courseInstanceDto.getEndDate())) {
+            result.rejectValue("endDate", "lesson.date.conflict.end", "Существуют уроки после новой даты окончания");
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("courses", courseService.getAllCourses());
+            return "admin/course-instance-edit";
+        }
+
+        courseInstanceService.updateCourseInstance(id, courseInstanceDto);
+        redirectAttributes.addFlashAttribute("successMessage", "Поток курса успешно обновлён");
+        return "redirect:/admin/course-instances";
+    }
+
 
     @GetMapping("/{id}")
     public String viewCourseInstance(@PathVariable Integer id, Model model) {
@@ -127,6 +161,8 @@ public class CourseInstanceController {
             model.addAttribute("remainingHours", remainingHours);
             return "admin/course-instance-modules";
         }
+
+        model.addAttribute("successMessage", "Модули были добавлены");
         courseModuleService.createCourseModules(id, moduleListDto.getModules());
         return "redirect:/admin/course-instances/" + id;
     }
@@ -158,12 +194,99 @@ public class CourseInstanceController {
 
         try {
             courseInstanceTeacherService.addTeachers(id, teacherForm.getTeacherIds());
-            redirectAttributes.addFlashAttribute("success", "Преподаватели добавлены");
+            redirectAttributes.addFlashAttribute("successMessage", "Преподаватели добавлены");
             return "redirect:/admin/course-instances/" + id + "/teachers";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/admin/course-instances/" + id + "/teachers";
         }
     }
+
+    @PostMapping("/{courseInstanceId}/teachers/{teacherId}/toggle-primary")
+    public String togglePrimaryTeacher(@PathVariable Integer courseInstanceId,
+                                       @PathVariable Integer teacherId,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            courseInstanceTeacherService.togglePrimary(courseInstanceId, teacherId);
+            redirectAttributes.addFlashAttribute("successMessage", "Статус преподавателя обновлён");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/course-instances/" + courseInstanceId + "/teachers";
+    }
+
+    @PostMapping("/{id}/delete")
+    public String deleteCourseInstance(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            courseInstanceService.deleteCourseInstance(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Поток курса успешно удалён");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении потока курса: " + e.getMessage());
+        }
+        return "redirect:/admin/course-instances";
+    }
+
+
+    @PostMapping("/{id}/modules/{moduleId}/delete")
+    public String deleteModule(
+            @PathVariable Integer id,
+            @PathVariable Integer moduleId,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            courseModuleService.deleteByIdIfNoLessons(moduleId);
+            redirectAttributes.addFlashAttribute("successMessage", "Модуль успешно удалён");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Модуль содержит уроки и не может быть удалён");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении модуля");
+        }
+
+        return "redirect:/admin/course-instances/" + id + "/modules";
+    }
+
+    @GetMapping("/{id}/modules/{moduleId}/edit")
+    public String editModuleForm(
+            @PathVariable Integer id,
+            @PathVariable Integer moduleId,
+            Model model
+    ) {
+        CourseModuleUpdateDTO dto = courseModuleService.getModuleForUpdate(moduleId);
+        model.addAttribute("module", dto);
+        model.addAttribute("courseInstanceId", id);
+        model.addAttribute("moduleId", moduleId);
+        return "admin/course-module-edit";
+    }
+
+    @PostMapping("/{id}/modules/{moduleId}/edit")
+    public String updateModule(
+            @PathVariable Integer id,
+            @PathVariable Integer moduleId,
+            @Valid @ModelAttribute("module") CourseModuleUpdateDTO dto,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            Model model
+    ) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courseInstanceId", id);
+            model.addAttribute("moduleId", moduleId);
+            return "admin/course-module-edit";
+        }
+
+        try {
+            courseModuleService.updateModule(moduleId, dto);
+            redirectAttributes.addFlashAttribute("successMessage", "Модуль успешно обновлён");
+
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при обновлении модуля");
+        }
+
+        return "redirect:/admin/course-instances/" + id + "/modules";
+    }
+
+
 
 }

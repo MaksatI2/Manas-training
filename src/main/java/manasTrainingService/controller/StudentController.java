@@ -10,8 +10,6 @@ import manasTrainingService.service.CourseInstanceService;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.StudentService;
 import manasTrainingService.service.UserService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Controller

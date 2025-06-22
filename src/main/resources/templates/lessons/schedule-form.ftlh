@@ -2,15 +2,19 @@
 <#import "/spring.ftl" as spring>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <div class="hero-section">
         <h1 class="hero-title">
             ${schedule.id???string("Редактировать", "Создать")} расписание для урока: ${lesson.title}
         </h1>
     </div>
 
-    <#if errorMessage??>
-        <div class="alert alert-danger">${errorMessage}</div>
-    </#if>
+
 
     <div class="container">
         <form action="<@spring.url '/admin/lessons/${lesson.id}/schedule'/>" method="post">
@@ -22,17 +26,17 @@
             </#if>
             <div class="mb-3">
                 <label for="lessonDate" class="form-label">Дата урока *</label>
-                <@spring.formInput "schedule.lessonDate" 'class="form-control" id="lessonDate" type="date" required' />
+                <@spring.formInput "schedule.lessonDate" 'class="form-control" id="lessonDate" type="date"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="mb-3">
                 <label for="durationHours" class="form-label">Длительность (ч.) *</label>
-                <@spring.formInput "schedule.durationHours" 'class="form-control" id="durationHours" type="number" min="1" required' />
+                <@spring.formInput "schedule.durationHours" 'class="form-control" id="durationHours" type="number" min="1"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="mb-3">
                 <label for="teacherId" class="form-label">Преподаватель *</label>
-                <@spring.formSingleSelect "schedule.teacherId" teachers 'class="form-control" id="teacherId" required' />
+                <@spring.formSingleSelect "schedule.teacherId" teachers 'class="form-control" id="teacherId"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
 
@@ -43,12 +47,8 @@
             </div>
             <div class="mb-3">
                 <label for="lessonType" class="form-label">Тип урока *</label>
-                <@spring.formSingleSelect "schedule.lessonType" lessonTypes 'class="form-control" id="lessonType" required' />
+                <@spring.formSingleSelect "schedule.lessonType" lessonTypes 'class="form-control" id="lessonType"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
-            </div>
-            <div class="mb-3 form-check">
-                <@spring.formCheckbox "schedule.isOnline" 'class="form-check-input" id="isOnline"' />
-                <label for="isOnline" class="form-check-label">Онлайн</label>
             </div>
             <div class="mb-3">
                 <label for="meetingUrl" class="form-label">Ссылка на встречу</label>
@@ -59,10 +59,6 @@
                 <label for="notes" class="form-label">Примечания</label>
                 <@spring.formTextarea "schedule.notes" 'rows="4" class="form-control" id="notes"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
-            </div>
-            <div class="mb-3 form-check">
-                <@spring.formCheckbox "schedule.isActive" 'class="form-check-input" id="isActive"' />
-                <label for="isActive" class="form-check-label">Активно</label>
             </div>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Сохранить</button>

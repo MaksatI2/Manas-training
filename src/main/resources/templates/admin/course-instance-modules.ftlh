@@ -2,6 +2,13 @@
 <#import "/spring.ftl" as spring>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <div class="container mb-4">
         <div class="d-flex flex-wrap gap-2">
             <a href="/admin/course-instances/${courseInstance.id}" class="btn btn-secondary">Назад</a>
@@ -15,11 +22,6 @@
             </p>
         </div>
 
-        <#if errorMessage??>
-            <div class="alert alert-danger mt-3 mx-auto" style="max-width: 600px;">
-                ${errorMessage}
-            </div>
-        </#if>
 
         <div class="feature-card mb-5 p-4 bg-white shadow-sm rounded">
             <h3 class="mb-3">Существующие модули</h3>
@@ -27,19 +29,40 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                     <tr>
-                        <th scope="col" style="width: 8%;">Порядок</th>
-                        <th scope="col" style="width: 30%;">Название</th>
-                        <th scope="col" style="width: 15%;">Продолжительность (часы)</th>
+                        <th scope="col">Действия</th>
+                        <th scope="col" >Порядок</th>
+                        <th scope="col" >Название</th>
+                        <th scope="col" >Продолжительность (часы)</th>
                         <th scope="col">Описание</th>
                     </tr>
                     </thead>
                     <tbody id="existing-modules">
                     <#list modules as module>
+
                         <tr data-module-id="${module.id}" data-order-index="${module.orderIndex}">
+                            <td>
+                                <a href="/admin/course-instances/${courseInstance.id}/modules/${module.id}/edit" class="btn btn-sm btn-primary" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-danger delete-module-btn"
+                                        data-module-id="${module.id}"
+                                        data-lessons-count="${module.lessons?size!0}"
+                                        title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+
+                            </td>
                             <td>${module.orderIndex}</td>
                             <td>${module.title}</td>
                             <td>${module.durationHours}</td>
-                            <td>${module.description!''}</td>
+                            <td>
+                                <div class="description-cell" id="desc-${module.id}">
+                                    ${module.description!''}
+                                </div>
+
+                            </td>
+
                         </tr>
                     </#list>
                     </tbody>
@@ -75,16 +98,6 @@
                                         <@spring.formTextarea "moduleListDto.modules[${module?index}].description" 'class="form-control" rows="3"' />
                                         <@spring.showErrors "<br>" "error text-danger small" />
                                     </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Порядок</label>
-                                        <@spring.formInput "moduleListDto.modules[${module?index}].orderIndex" 'class="form-control" type="number"  min="0" readonly' />
-                                        <@spring.showErrors "<br>" "error text-danger small" />
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Активен</label>
-                                        <@spring.formSingleSelect "moduleListDto.modules[${module?index}].isActive" {"true": "Да", "false": "Нет"} 'class="form-select"' />
-                                        <@spring.showErrors "<br>" "error text-danger small" />
-                                    </div>
                                 </div>
                                 <button type="button" class="btn btn-danger btn-sm mt-2 remove-module-btn">Удалить</button>
                             </div>
@@ -104,6 +117,31 @@
         </div>
     </div>
 
+    <div class="modal fade" id="deleteModuleModal" tabindex="-1" aria-labelledby="deleteModuleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteModuleForm" method="POST">
+                    <input type="hidden" name="_csrf" value="${_csrf.token}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModuleModalLabel">Удаление модуля</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body" id="deleteModuleModalBody">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-danger" id="confirmDeleteModuleBtn">Удалить модуль</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const courseInstanceId = ${courseInstance.id?json_string};
+    </script>
     <script src="/static/js/instance_modules.js" defer></script>
 
     <style>
@@ -179,5 +217,6 @@
             background: linear-gradient(135deg, #c82333, #921823);
             transform: translateY(-2px);
         }
+
     </style>
 </@layout.page>

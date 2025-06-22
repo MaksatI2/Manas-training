@@ -1,7 +1,9 @@
 package manasTrainingService.service;
 
+import manasTrainingService.dto.instance.CourseModuleApiDto;
 import manasTrainingService.dto.instance.CourseModuleCreationDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
+import manasTrainingService.dto.instance.CourseModuleUpdateDTO;
 import manasTrainingService.dto.instance.CoursePlanDTO;
 import manasTrainingService.entity.CourseModule;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,4 +26,12 @@ public interface CourseModuleService {
 
     @Transactional(readOnly = true)
     List<CourseModuleDTO> findByCourseInstanceId(Integer courseInstanceId);
+
+    List<CourseModuleApiDto> getModuleApiDtosByCourseInstanceId(Integer courseInstanceId);
+
+    void deleteByIdIfNoLessons(Integer moduleId);
+
+    CourseModuleUpdateDTO getModuleForUpdate(Integer moduleId);
+
+    void updateModule(Integer moduleId, CourseModuleUpdateDTO dto);
 }
