@@ -29,7 +29,7 @@
                 Информация о курсе
             </h5>
             <div>
-                <a href="/admin/courses" class="btn btn-light btn-sm me-2" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                <a href="/courses" class="btn btn-light btn-sm me-2" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
                     <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
                 </a>
                 <#if isAdmin>
