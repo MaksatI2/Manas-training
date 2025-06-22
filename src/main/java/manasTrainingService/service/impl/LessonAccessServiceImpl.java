@@ -3,7 +3,7 @@ package manasTrainingService.service.impl;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.config.CustomUserDetails;
 import manasTrainingService.entity.Lesson;
-import manasTrainingService.service.CourseTeacherInstanceService;
+import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.LessonAccessService;
 import org.springframework.security.core.context.SecurityContextHolder;

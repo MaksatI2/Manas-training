@@ -2,7 +2,7 @@ package manasTrainingService.config;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.entity.User;
-import manasTrainingService.repositories.UserRepository;
+import manasTrainingService.repositories.user.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

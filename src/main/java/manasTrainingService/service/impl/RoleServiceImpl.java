@@ -2,9 +2,9 @@ package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.entity.Role;
-import manasTrainingService.exceptions.nsee.RoleNotFoundException;
-import manasTrainingService.repositories.RoleRepository;
-import manasTrainingService.service.RoleService;
+import manasTrainingService.exceptions.nsee.user.RoleNotFoundException;
+import manasTrainingService.repositories.user.RoleRepository;
+import manasTrainingService.service.user.RoleService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

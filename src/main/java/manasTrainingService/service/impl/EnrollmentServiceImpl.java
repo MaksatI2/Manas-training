@@ -9,14 +9,13 @@ import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.Status;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.NoAccessException;
-import manasTrainingService.repositories.CourseEnrollmentRepository;
-import manasTrainingService.service.CourseApplicationEmployeeService;
-import manasTrainingService.service.CourseInstanceService;
+import manasTrainingService.repositories.course.CourseEnrollmentRepository;
+import manasTrainingService.service.course.CourseApplicationEmployeeService;
+import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.EnrollmentService;
-import manasTrainingService.service.UserService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
 

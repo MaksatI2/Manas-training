@@ -4,7 +4,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
-import manasTrainingService.service.CourseInstanceService;
+import manasTrainingService.service.course.CourseInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;

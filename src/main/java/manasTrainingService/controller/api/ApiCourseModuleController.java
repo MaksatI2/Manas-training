@@ -2,7 +2,7 @@ package manasTrainingService.controller.api;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.instance.CourseModuleApiDto;
-import manasTrainingService.service.CourseModuleService;
+import manasTrainingService.service.course.CourseModuleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

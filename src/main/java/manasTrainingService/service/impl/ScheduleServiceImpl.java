@@ -5,15 +5,15 @@ import manasTrainingService.dto.ScheduleViewDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.ScheduleNotFouneException;
-import manasTrainingService.repositories.CourseEnrollmentRepository;
 import manasTrainingService.repositories.ScheduleRepository;
-import manasTrainingService.service.CourseInstanceService;
+import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.ScheduleService;
-import manasTrainingService.service.UserService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -145,6 +145,21 @@ public class ScheduleServiceImpl implements ScheduleService {
             default:
                 return Comparator.comparing(ScheduleViewDTO::getLessonDate);
         }
+    }
+
+    @Override
+    public boolean hasSchedulesOutsideDateRange(Integer courseInstanceId, LocalDate newStart, LocalDate newEnd) {
+        return scheduleRepository.existsByCourseInstanceIdAndLessonDateOutsideRange(courseInstanceId, newStart, newEnd);
+    }
+
+    @Override
+    public boolean hasSchedulesBeforeDateRange(Integer courseInstanceId, LocalDate newStart) {
+        return scheduleRepository.existsByCourseInstanceIdAndLessonDateBeforeStart(courseInstanceId, newStart);
+    }
+
+    @Override
+    public boolean hasSchedulesAfterDateRange(Integer courseInstanceId, LocalDate newEnd) {
+        return scheduleRepository.existsByCourseInstanceIdAndLessonDateAfterEnd(courseInstanceId, newEnd);
     }
 
     private ScheduleViewDTO mapToScheduleViewDTO(Schedule schedule) {
