@@ -12,6 +12,9 @@ import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
 import manasTrainingService.entity.LessonType;
 import manasTrainingService.entity.User;
 import manasTrainingService.service.*;
+import manasTrainingService.service.course.CourseInstanceService;
+import manasTrainingService.service.course.CourseTeacherInstanceService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,8 +48,6 @@ public class ScheduleController {
             schedule = ScheduleDTO.builder()
                     .lessonId(lessonId)
                     .courseInstanceId(courseInstance.getId())
-                    .isOnline(false)
-                    .isActive(true)
                     .build();
         }
 

@@ -14,4 +14,10 @@ public interface ScheduleService {
     boolean canUserEditSchedule(Integer userId, String userRole, Integer scheduleId);
     List<ScheduleViewDTO> getFilteredSchedules(String courseTitle, String courseInstanceTitle, String teacherName, String lessonType);
     List<ScheduleViewDTO> getFilteredAndSortedSchedules(String courseTitle, String courseInstanceTitle, String teacherName, String lessonType, String sortBy, String sortDir);
+
+    boolean hasSchedulesOutsideDateRange(Integer courseInstanceId, LocalDate newStart, LocalDate newEnd);
+
+    boolean hasSchedulesBeforeDateRange(Integer courseInstanceId, LocalDate newStart);
+
+    boolean hasSchedulesAfterDateRange(Integer courseInstanceId, LocalDate newEnd);
 }

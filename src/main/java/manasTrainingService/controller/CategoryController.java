@@ -3,7 +3,7 @@ package manasTrainingService.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
-import manasTrainingService.service.CourseCategoryService;
+import manasTrainingService.service.course.CourseCategoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

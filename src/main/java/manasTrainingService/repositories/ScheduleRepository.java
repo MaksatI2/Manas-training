@@ -27,4 +27,35 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer>, Jp
             @Param("courseInstanceTitle") String courseInstanceTitle,
             @Param("teacherName") String teacherName,
             @Param("lessonType") LessonType lessonType);
+
+    @Query("""
+                SELECT COUNT(s) > 0 FROM Schedule s
+                WHERE s.courseInstance.id = :courseInstanceId
+                  AND (s.lessonDate < :newStart OR s.lessonDate > :newEnd)
+            """)
+    boolean existsByCourseInstanceIdAndLessonDateOutsideRange(
+            @Param("courseInstanceId") Integer courseInstanceId,
+            @Param("newStart") LocalDate newStart,
+            @Param("newEnd") LocalDate newEnd
+    );
+
+    @Query("""
+            SELECT COUNT(s) > 0 FROM Schedule s
+            WHERE s.courseInstance.id = :courseInstanceId
+              AND s.lessonDate < :newStart
+            """)
+    boolean existsByCourseInstanceIdAndLessonDateBeforeStart(
+            @Param("courseInstanceId") Integer courseInstanceId,
+            @Param("newStart") LocalDate newStart
+    );
+
+    @Query("""
+            SELECT COUNT(s) > 0 FROM Schedule s
+            WHERE s.courseInstance.id = :courseInstanceId
+              AND s.lessonDate > :newEnd
+            """)
+    boolean existsByCourseInstanceIdAndLessonDateAfterEnd(
+            @Param("courseInstanceId") Integer courseInstanceId,
+            @Param("newEnd") LocalDate newEnd
+    );
 }

@@ -6,7 +6,7 @@ import manasTrainingService.dto.tests.QuestionDto;
 import manasTrainingService.entity.Test;
 import manasTrainingService.entity.TestQuestion;
 import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
-import manasTrainingService.repositories.TestQuestionRepository;
+import manasTrainingService.repositories.test.TestQuestionRepository;
 import manasTrainingService.service.OptionService;
 import manasTrainingService.service.QuestionService;
 import org.springframework.stereotype.Service;

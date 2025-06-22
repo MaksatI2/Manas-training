@@ -3,7 +3,7 @@ package manasTrainingService.controller.publicview;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.dto.profile.TeacherProfileDto;
-import manasTrainingService.service.TeacherService;
+import manasTrainingService.service.user.TeacherService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

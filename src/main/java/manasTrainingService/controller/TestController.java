@@ -5,16 +5,13 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
-import manasTrainingService.service.TestService;
+import manasTrainingService.service.test.TestService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 @Controller
 @RequestMapping("test")

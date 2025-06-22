@@ -3,7 +3,6 @@ package manasTrainingService.controller;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.exceptions.nsee.NoAccessException;
-import manasTrainingService.service.CourseService;
 import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.LessonMaterialService;
 import manasTrainingService.service.LessonService;
