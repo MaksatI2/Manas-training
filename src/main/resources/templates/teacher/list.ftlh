@@ -151,7 +151,7 @@
 
                         <div class="teacher-info">
                             <div class="teacher-name">
-                                <a href="/teachers/${teacher.id}">${teacher.fullName}</a>
+                                <a href="/teacher/${teacher.id}">${teacher.fullName}</a>
                             </div>
                             <div class="teacher-department">
                                 Перечень преподаваемых дисциплин: ${teacher.department}

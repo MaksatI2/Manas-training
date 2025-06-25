@@ -148,11 +148,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public boolean hasSchedulesOutsideDateRange(Integer courseInstanceId, LocalDate newStart, LocalDate newEnd) {
-        return scheduleRepository.existsByCourseInstanceIdAndLessonDateOutsideRange(courseInstanceId, newStart, newEnd);
-    }
-
-    @Override
     public boolean hasSchedulesBeforeDateRange(Integer courseInstanceId, LocalDate newStart) {
         return scheduleRepository.existsByCourseInstanceIdAndLessonDateBeforeStart(courseInstanceId, newStart);
     }

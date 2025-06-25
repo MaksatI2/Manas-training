@@ -6,7 +6,6 @@ import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.dto.lesson.LessonEditDto;
 import manasTrainingService.entity.CourseModule;
 import manasTrainingService.entity.Lesson;
-import manasTrainingService.entity.LessonMaterial;
 import manasTrainingService.exceptions.nsee.LessonNotFoundException;
 import manasTrainingService.repositories.LessonRepository;
 import manasTrainingService.service.LessonService;
@@ -37,11 +36,6 @@ public class LessonServiceImpl implements LessonService {
         lessonRepository.save(lesson);
 
         return module.getCourseInstance().getId();
-    }
-
-    @Override
-    public List<Lesson> getLessonsByModuleId(Integer moduleId) {
-        return lessonRepository.findByModuleId(moduleId);
     }
 
     @Override

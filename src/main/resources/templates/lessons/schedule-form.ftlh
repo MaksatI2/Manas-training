@@ -14,8 +14,6 @@
         </h1>
     </div>
 
-
-
     <div class="container">
         <form action="<@spring.url '/schedules/lessons/${lesson.id}'/>" method="post">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

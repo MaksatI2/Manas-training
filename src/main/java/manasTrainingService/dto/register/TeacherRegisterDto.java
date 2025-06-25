@@ -18,6 +18,8 @@ import lombok.Setter;
 public class TeacherRegisterDto {
     @NotBlank(message = "Email обязателен")
     @Email(message = "Некорректный формат email")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            message = "Email должен содержать только английские символы")
     private String email;
 
     @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).+$",
@@ -26,9 +28,11 @@ public class TeacherRegisterDto {
     private String password;
 
     @NotBlank(message = "Имя обязательно для заполнения")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Имя должно содержать только буквы")
     private String name;
 
     @NotBlank(message = "Фамилия обязательна для заполнения")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Фамилия должна содержать только буквы")
     private String surname;
 
     @NotBlank(message = "Номер телефона не может быть пустым")

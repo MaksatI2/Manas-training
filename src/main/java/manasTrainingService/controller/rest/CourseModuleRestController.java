@@ -1,4 +1,4 @@
-package manasTrainingService.controller.api;
+package manasTrainingService.controller.rest;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.instance.CourseModuleApiDto;
@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/courses")
 @RequiredArgsConstructor
-public class ApiCourseModuleController {
+public class CourseModuleRestController {
 
     private final CourseModuleService courseModuleService;
 
