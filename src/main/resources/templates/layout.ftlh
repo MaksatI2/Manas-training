@@ -35,7 +35,7 @@
     <div class="sidebar-header">
         <a href="/" class="sidebar-brand">
             <i class="fas fa-graduation-cap"></i>
-            <span>Манас Центр</span>
+            <span>Манас Тренинг Центр</span>
         </a>
     </div>
 
@@ -58,7 +58,7 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="/teachers" class="nav-link" data-tooltip="Преподаватели">
+                    <a href="/teacher" class="nav-link" data-tooltip="Преподаватели">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <span>Преподаватели</span>
                     </a>
@@ -414,7 +414,7 @@
 
     .sidebar-brand {
         color: var(--white);
-        font-size: 1.4rem;
+        font-size: 1.0rem;
         font-weight: bold;
         text-decoration: none;
         display: flex;

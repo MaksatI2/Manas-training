@@ -10,10 +10,7 @@ import java.util.List;
 
 public interface LessonService {
 
-
     Integer createLesson(LessonCreateRequest request, CourseModule module);
-
-    List<Lesson> getLessonsByModuleId(Integer moduleId);
 
     LessonDTO getLessonById(Integer lessonId);
 

@@ -19,29 +19,6 @@ public class CourseApplicationEmployeeServiceImpl implements CourseApplicationEm
     private final CourseApplicationEmployeeRepository employeeRepository;
 
     @Override
-    public List<CourseApplicationEmployee> getPendingEmployeesForCourse(Integer courseId) {
-        return employeeRepository.findByApplicationCourseIdAndApplicationStatus(courseId, Status.PENDING);
-    }
-
-    @Override
-    public void approveEmployee(Integer applicationId, Integer employeeId) {
-        CourseApplicationEmployee employee = employeeRepository
-                .findByApplicationIdAndEmployeeId(applicationId, employeeId)
-                .orElseThrow(() -> new IllegalArgumentException("Сотрудник не найден"));
-        employee.setApplicationStatus(Status.APPROVED);
-        employeeRepository.save(employee);
-    }
-
-    @Override
-    public void rejectEmployee(Integer applicationId, Integer employeeId) {
-        CourseApplicationEmployee employee = employeeRepository
-                .findByApplicationIdAndEmployeeId(applicationId, employeeId)
-                .orElseThrow(() -> new IllegalArgumentException("Сотрудник не найден"));
-        employee.setApplicationStatus(Status.REJECTED);
-        employeeRepository.save(employee);
-    }
-
-    @Override
     public List<CourseApplicationEmployeeDTO> getPendingEmployeesForCourseInstance(Integer courseInstanceId) {
         return employeeRepository
                 .findByApplication_Course_IdAndApplicationStatus(courseInstanceId, Status.PENDING)
