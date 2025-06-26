@@ -47,7 +47,9 @@
                             <div id="collapse${module.id}" class="accordion-collapse collapse"
                                  aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
                                 <div class="accordion-body">
-                                    <p>${module.description!''}</p>
+                                    <p class="card-text text-muted small text-break">
+                                        ${module.description!''}
+                                    </p>
                                     <h5>Уроки</h5>
                                     <#if module.lessons?has_content>
                                         <div class="row row-cols-1 row-cols-md-2 g-3">
@@ -57,8 +59,8 @@
                                                         <div class="card h-100 shadow-sm">
                                                             <div class="card-body">
                                                                 <h6 class="card-title">${lesson.title}</h6>
-                                                                <p class="card-text text-muted small">
-                                                                    ${lesson.description!''}
+                                                                <p class="card-text text-muted small text-break">
+                                                                    ${module.description!''}
                                                                 </p>
                                                                 <p class="card-text text-muted small">
                                                                     Длительность: ${lesson.durationMinutes} мин.
@@ -116,5 +118,13 @@
         .card-text {
             font-size: 0.875rem;
         }
+
+        .accordion-body,
+        .card-text {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
     </style>
 </@layout.page>

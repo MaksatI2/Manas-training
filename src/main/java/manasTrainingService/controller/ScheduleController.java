@@ -97,10 +97,10 @@ public class ScheduleController {
 
         try {
             scheduleService.saveSchedule(schedule);
-            redirectAttributes.addFlashAttribute("success", "Расписание сохранено");
+            redirectAttributes.addFlashAttribute("successMessage", "Расписание сохранено");
             return "redirect:/lessons/" + lessonId;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/lessons/" + lessonId;
         }
     }

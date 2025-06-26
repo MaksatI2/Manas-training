@@ -43,7 +43,7 @@ $(document).ready(function() {
             }
         });
 
-        const csrfToken = $('meta[name="csrf-token"]').attr('content');
+        const csrfToken = $('meta[name="_csrf"]').attr('content');
         const formHtml = `
             <form id="deleteCourseInstanceForm" method="POST" action="/admin/course-instances/${courseInstanceId}/delete">
                 <input type="hidden" name="_csrf" value="${csrfToken}">

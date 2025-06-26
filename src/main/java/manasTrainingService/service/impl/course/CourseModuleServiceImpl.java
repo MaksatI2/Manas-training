@@ -31,6 +31,19 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     @Override
     public void createCourseModules(Integer courseInstanceId, List<CourseModuleCreationDTO> dtos) {
         CourseInstance courseInstance = courseInstanceService.getCourseInstanceModelById(courseInstanceId);
+
+        int existingModulesHours = courseInstance.getModules().stream()
+                .mapToInt(m -> m.getDurationHours() != null ? m.getDurationHours() : 0)
+                .sum();
+
+        int newModulesHours = dtos.stream()
+                .mapToInt(dto -> dto.getDurationHours() != null ? dto.getDurationHours() : 0)
+                .sum();
+
+        int totalHoursAfterAdd = existingModulesHours + newModulesHours;
+
+        validateTotalDuration(courseInstance, null, totalHoursAfterAdd);
+
         int currentMaxOrder = courseInstance.getModules().stream()
                 .mapToInt(CourseModule::getOrderIndex)
                 .max()
@@ -56,7 +69,7 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     @Transactional
     public void deleteCourseModule(Integer moduleId) {
         if (!courseModuleRepository.existsById(moduleId)) {
-            throw new IllegalArgumentException("CourseModule not found with id: " + moduleId);
+            throw new IllegalArgumentException("Модуль не был найден: " + moduleId);
         }
         courseModuleRepository.deleteById(moduleId);
     }
@@ -120,6 +133,7 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     @Override
     public void updateModule(Integer moduleId, CourseModuleUpdateDTO dto) {
         CourseModule module = getCourseModuleById(moduleId);
+        CourseInstance courseInstance = module.getCourseInstance();
         List<Lesson> lessons = module.getLessons();
         int totalLessonMinutes = lessons.stream()
                 .mapToInt(Lesson::getDurationMinutes)
@@ -133,9 +147,33 @@ public class CourseModuleServiceImpl implements CourseModuleService {
                             "новая продолжительность модуля (" + newModuleMinutes + " мин) меньше общего времени уроков " + totalLessonMinutes + "."
             );
         }
+
+        int totalOtherModulesHours = courseInstance.getModules().stream()
+                .filter(m -> !m.getId().equals(moduleId))
+                .mapToInt(m -> m.getDurationHours() != null ? m.getDurationHours() : 0)
+                .sum();
+        int totalAfterUpdate = totalOtherModulesHours + (dto.getDurationHours() != null ? dto.getDurationHours() : 0);
+
+        validateTotalDuration(courseInstance, moduleId, totalAfterUpdate);
+
         module.setTitle(dto.getTitle());
         module.setDurationHours(dto.getDurationHours());
         module.setDescription(dto.getDescription());
         courseModuleRepository.save(module);
+    }
+
+    private void validateTotalDuration(CourseInstance courseInstance, Integer updatingModuleId, int totalNewDuration) {
+        int maxAllowedHours = courseInstance.getCourse().getDurationHours();
+        if (totalNewDuration > maxAllowedHours) {
+            throw new IllegalStateException(
+                    "Общее количество часов модулей (" + totalNewDuration + ") " +
+                            "превышает лимит курса (" + maxAllowedHours + ")."
+            );
+        }
+    }
+
+    @Override
+    public CourseModuleDTO getCourseModuleDTOById(Integer moduleId) {
+        return convertToDto(courseModuleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException("Модуль не был найден")));
     }
 }

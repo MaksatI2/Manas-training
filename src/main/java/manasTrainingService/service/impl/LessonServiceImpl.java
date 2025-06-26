@@ -9,6 +9,7 @@ import manasTrainingService.entity.Lesson;
 import manasTrainingService.exceptions.nsee.LessonNotFoundException;
 import manasTrainingService.repositories.LessonRepository;
 import manasTrainingService.service.LessonService;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,11 +67,14 @@ public class LessonServiceImpl implements LessonService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new LessonNotFoundException("Урок не найден"));
 
-        lesson.getSchedules().size();
-        lesson.getMaterials().size();
+        Hibernate.initialize(lesson.getSchedules());
+        Hibernate.initialize(lesson.getMaterials());
+        Hibernate.initialize(lesson.getQuizzes());
+
+        CourseModule module = lesson.getModule();
+        module.getLessons().remove(lesson);
 
         lessonRepository.delete(lesson);
-
     }
 
 

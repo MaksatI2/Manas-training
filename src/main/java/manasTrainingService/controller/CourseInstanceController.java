@@ -26,10 +26,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+
 
 
 @Controller
@@ -121,50 +119,34 @@ public class CourseInstanceController {
     }
 
     @PostMapping("/{id}/modules")
-    public String createModules(@PathVariable Integer id, @Valid @ModelAttribute("moduleListDto") CourseModuleListDTO moduleListDto, BindingResult result, Model model) {
+    public String createModules(@PathVariable Integer id,
+                                @Valid @ModelAttribute("moduleListDto") CourseModuleListDTO moduleListDto,
+                                BindingResult result,
+                                Model model) {
 
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
         List<CourseModuleDTO> modules = courseInstanceDto.getModules();
-        int totalExistingHours = modules.stream()
-                .mapToInt(CourseModuleDTO::getDurationHours)
-                .sum();
-
-        int newModulesHours = Optional.ofNullable(moduleListDto.getModules())
-                .orElse(Collections.emptyList())
-                .stream()
-                .filter(Objects::nonNull)
-                .mapToInt(m -> m.getDurationHours() != null ? m.getDurationHours() : 0)
-                .sum();
-
-        int totalHoursAfterAdd = totalExistingHours + newModulesHours;
-        int maxAllowedHours = courseInstanceDto.getDurationHours();
-
-        if (totalHoursAfterAdd > maxAllowedHours) {
-            result.reject("duration.exceeded", "Общее количество часов превышает лимит курса");
-
-            int remainingHours = maxAllowedHours - totalExistingHours;
-
-            model.addAttribute("courseInstance", courseInstanceDto);
-            model.addAttribute("modules", modules);
-            model.addAttribute("remainingHours", remainingHours);
-            model.addAttribute("errorMessage", "Общее количество часов превышает допустимое значение (" + maxAllowedHours + ")");
-            return "admin/course-instance-modules";
-        }
+        int totalModuleHours = modules.stream().mapToInt(CourseModuleDTO::getDurationHours).sum();
+        int remainingHours = courseInstanceDto.getDurationHours() - totalModuleHours;
 
         if (result.hasErrors()) {
-
-            int totalModuleHours = modules.stream().mapToInt(CourseModuleDTO::getDurationHours).sum();
-            int remainingHours = courseInstanceDto.getDurationHours() - totalModuleHours;
-
             model.addAttribute("courseInstance", courseInstanceDto);
             model.addAttribute("modules", modules);
             model.addAttribute("remainingHours", remainingHours);
             return "admin/course-instance-modules";
         }
 
-        model.addAttribute("successMessage", "Модули были добавлены");
-        courseModuleService.createCourseModules(id, moduleListDto.getModules());
-        return "redirect:/admin/course-instances/" + id;
+        try {
+            courseModuleService.createCourseModules(id, moduleListDto.getModules());
+            model.addAttribute("successMessage", "Модули были добавлены");
+            return "redirect:/admin/course-instances/" + id;
+        } catch (IllegalStateException e) {
+            model.addAttribute("courseInstance", courseInstanceDto);
+            model.addAttribute("modules", modules);
+            model.addAttribute("remainingHours", remainingHours);
+            model.addAttribute("errorMessage", e.getMessage());
+            return "admin/course-instance-modules";
+        }
     }
 
     @GetMapping("/{id}/teachers")
@@ -278,7 +260,10 @@ public class CourseInstanceController {
             redirectAttributes.addFlashAttribute("successMessage", "Модуль успешно обновлён");
 
         } catch (IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("courseInstanceId", id);
+            model.addAttribute("moduleId", moduleId);
+            return "admin/course-module-edit";
         }
         catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при обновлении модуля");
