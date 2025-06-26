@@ -1,5 +1,10 @@
 <#import "/spring.ftl" as spring />
 <#include "../layout.ftlh">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/css/intlTelInput.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/intlTelInput.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/utils.js"></script>
+
 <style>
 
     .error-block {
@@ -81,8 +86,7 @@
                         <label for="phone" class="form-label">
                             <i class="fas fa-phone me-1"></i>Номер телефона *
                         </label>
-                        <@spring.formInput  "studentRegisterDto.phone"' type="tel" class="form-control" id="phone" placeholder="+996700270984"'/>
-                        <div class="form-text">Формат: +996700270984</div>
+                        <@spring.formInput "studentRegisterDto.phone" ' type="tel" class="form-control" id="phone" autocomplete="off"'/>
                         <div class="error-block">
                             <@spring.showErrors "<br>" "error-message" />
                         </div>
@@ -111,23 +115,42 @@
     </div>
 
     <script>
-        document.getElementById('phone').addEventListener('input', function(e) {
-            let value = e.target.value;
-            if (!value.startsWith('+996')) {
-                if (value.startsWith('+')) {
-                    e.target.value = '+996' + value.substring(1);
-                } else if (value.startsWith('996')) {
-                    e.target.value = '+' + value;
-                } else if (value.length > 0 && !value.startsWith('+996')) {
-                    e.target.value = '+996' + value;
-                }
+        const input = document.querySelector("#phone");
+        const errorBlock = document.querySelector("#phone").nextElementSibling.nextElementSibling;
+
+        input.addEventListener("input", () => {
+            if (iti.isValidNumber()) {
+                input.style.borderColor = "green";
+                errorBlock.textContent = "";
+            } else {
+                input.style.borderColor = "red";
+                errorBlock.textContent = "Некорректный номер";
             }
         });
 
-        document.getElementById('phone').addEventListener('focus', function(e) {
-            if (e.target.value === '') {
-                e.target.value = '+996';
-            }
+        document.addEventListener("DOMContentLoaded", function() {
+            const input = document.querySelector("#phone");
+            const iti = window.intlTelInput(input, {
+                preferredCountries: ["kg", "ru", "kz", "uz"],
+                initialCountry: "kg",
+                geoIpLookup: function(callback) {
+                    fetch('https://ipinfo.io/json?token=ваш_токен')
+                        .then(resp => resp.json())
+                        .then(resp => callback(resp.country || "kg"))
+                        .catch(() => callback("kg"));
+                },
+                formatOnDisplay: true,
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/utils.js"
+            });
+
+            document.getElementById("studentForm").addEventListener("submit", function(e) {
+                const number = iti.getNumber();
+                input.value = number;
+            });
         });
+
+
     </script>
+
+
 </@page>

@@ -2,6 +2,7 @@ package manasTrainingService.dto.register;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import manasTrainingService.validation.ValidPhoneNumber;
 
 @Getter
 @Setter
@@ -32,6 +33,6 @@ public class StudentRegisterDto {
     private String organizationCode;
 
     @NotBlank(message = "Номер телефона не может быть пустым")
-    @Pattern(regexp = "^\\+996\\d{9}$", message = "Номер телефона должен быть в формате +996XXXXXXXXX (12 цифр)")
+    @ValidPhoneNumber
     private String phone;
 }
