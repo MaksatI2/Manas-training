@@ -1,5 +1,6 @@
 package manasTrainingService.service.impl.user;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.edit.OrganizationProfileEditDto;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,17 +35,18 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationRepository organizationRepository;
+    private final UserRepository userRepository;
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+    private final StudentProfileRepository studentProfileRepository;
+    private final CourseInstanceRepository courseInstanceRepository;
+    private final EmailService emailService;
     private UserService userService;
-    private UserRepository userRepository;
-    private CourseEnrollmentRepository courseEnrollmentRepository;
-    private PasswordEncoder passwordEncoder;
-    private RoleService roleService;
-    private StudentProfileRepository studentProfileRepository;
-    private CourseInstanceRepository courseInstanceRepository;
-    private EmailService emailService;
 
     @Autowired
     public void setUserService(@Lazy UserService userService) {
@@ -219,7 +222,6 @@ public class OrganizationServiceImpl implements OrganizationService {
         courseEnrollmentRepository.save(enrollment);
     }
 
-
     @Override
     public void removeStudentFromCourse(Integer enrollmentId, User organizationUser) {
         CourseEnrollment enrollment = courseEnrollmentRepository.findById(enrollmentId)
@@ -237,7 +239,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         courseEnrollmentRepository.delete(enrollment);
     }
-
 
     @Override
     public void deleteStudentFromOrganization(Integer studentId, User organizationUser) {
@@ -263,14 +264,18 @@ public class OrganizationServiceImpl implements OrganizationService {
         userRepository.save(student);
     }
 
-
     @Override
+    @Transactional
     public void createStudentByOrganization(CreateStudentByOrganizationDto dto, User organizationUser) {
+        Organization organization = organizationRepository.findByUserId(organizationUser.getId())
+                .orElseThrow(() -> new OrganizationNotFoundException("Организация не найдена"));
+
+        String normalizedPhone = normalizePhoneNumber(dto.getPhone());
+
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistsException("Email уже используется");
         }
-
-        if (userRepository.existsByPhone(dto.getPhone())) {
+        if (userRepository.existsByPhone(normalizedPhone)) {
             throw new PhoneAlreadyExistsException("Телефон уже используется");
         }
 
@@ -281,7 +286,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .passwordHash(passwordEncoder.encode(rawPassword))
                 .name(dto.getName())
                 .lastName(dto.getLastName())
-                .phone(dto.getPhone())
+                .phone(normalizedPhone)
                 .isActive(true)
                 .role(studentRole)
                 .build();
@@ -290,13 +295,28 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         StudentProfile studentProfile = StudentProfile.builder()
                 .user(student)
-                .organization(organizationRepository.findByUserId(organizationUser.getId())
-                        .orElseThrow(() -> new OrganizationNotFoundException("Организация не найдена")))
+                .organization(organization)
                 .build();
         studentProfileRepository.save(studentProfile);
         emailService.sendStudentWelcomeEmail(student.getEmail(), student.getName(), rawPassword);
     }
 
+    private String normalizePhoneNumber(String phone) {
+        if (phone == null || phone.isBlank()) {
+            throw new ValidationException("Номер телефона не может быть пустым");
+        }
+        String cleanedPhone = phone.replaceAll("[^0-9+]", "");
+        if (cleanedPhone.startsWith("+996") && cleanedPhone.length() == 13) {
+            return cleanedPhone;
+        }
+        if (cleanedPhone.startsWith("0")) {
+            cleanedPhone = cleanedPhone.substring(1);
+        }
+        if (cleanedPhone.length() == 9) {
+            return "+996" + cleanedPhone;
+        }
+        throw new ValidationException("Некорректный формат номера телефона. Ожидается 9 цифр или формат +996XXXXXXXXX");
+    }
 
     @Override
     public void attachStudentToOrganization(Integer studentId, User organizationUser) {
@@ -315,41 +335,5 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         profile.setOrganization(organization);
         studentProfileRepository.save(profile);
-    }
-
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setCourseEnrollmentRepository(CourseEnrollmentRepository courseEnrollmentRepository) {
-        this.courseEnrollmentRepository = courseEnrollmentRepository;
-    }
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    @Autowired
-    public void setRoleService(RoleService roleService) {
-        this.roleService = roleService;
-    }
-
-    @Autowired
-    public void setStudentProfileRepository(StudentProfileRepository studentProfileRepository) {
-        this.studentProfileRepository = studentProfileRepository;
-    }
-
-    @Autowired
-    public void setCourseInstanceRepository(CourseInstanceRepository courseInstanceRepository) {
-        this.courseInstanceRepository = courseInstanceRepository;
-    }
-
-    @Autowired
-    public void setEmailService(EmailService emailService) {
-        this.emailService = emailService;
     }
 }
