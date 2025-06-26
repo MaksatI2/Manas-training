@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Манас Тренинг Центр</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet">
     <meta name="_csrf" content="${_csrf.token}">
@@ -246,7 +246,7 @@
 </div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="../static/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -370,10 +370,12 @@
         box-shadow: var(--shadow);
         display: flex;
         flex-direction: column;
+        overflow-x: hidden;
     }
 
     .sidebar.collapsed {
         width: var(--sidebar-collapsed-width);
+        overflow-x: hidden;
     }
 
     .sidebar-toggle {
@@ -402,7 +404,7 @@
     }
 
     .sidebar-toggle.collapsed {
-        left: 85px;
+        left: var(--sidebar-collapsed-width);
     }
 
     .sidebar-header {
@@ -450,12 +452,14 @@
         display: flex;
         flex-direction: column;
         min-height: 0;
+        overflow-x: hidden;
     }
 
     .sidebar-nav {
         flex: 1;
         padding: 1rem 0;
         overflow-y: auto;
+        overflow-x: hidden;
         min-height: 0;
     }
 
@@ -498,6 +502,8 @@
         transition: all 0.3s ease;
         border-radius: 0;
         position: relative;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .sidebar.collapsed .nav-link {
@@ -586,6 +592,7 @@
         background: rgba(0, 0, 0, 0.1);
         max-height: 250px;
         overflow-y: auto;
+        overflow-x: hidden;
         transition: all 0.3s ease;
     }
 
@@ -593,6 +600,7 @@
         padding: 1rem 0.5rem;
         text-align: center;
         max-height: 200px;
+        width: var(--sidebar-collapsed-width);
     }
 
     .profile-info {
@@ -663,6 +671,7 @@
         justify-content: center;
         gap: 8px;
         width: 100%;
+        box-sizing: border-box;
     }
 
     .sidebar.collapsed .profile-btn {
@@ -814,6 +823,7 @@
             transform: translateX(-100%);
             width: 100%;
             max-width: var(--sidebar-width);
+            overflow-x: hidden;
         }
 
         .sidebar.open {
@@ -867,6 +877,7 @@
 
         .sidebar-profile {
             max-height: none;
+            overflow-x: hidden;
         }
     }
 
