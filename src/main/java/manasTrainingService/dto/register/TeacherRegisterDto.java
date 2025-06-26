@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import manasTrainingService.validation.ValidPhoneNumber;
 
 @Getter
 @Setter
@@ -36,7 +37,7 @@ public class TeacherRegisterDto {
     private String surname;
 
     @NotBlank(message = "Номер телефона не может быть пустым")
-    @Pattern(regexp = "^\\+996\\d{9}$", message = "Номер телефона должен быть в формате +996XXXXXXXXX (12 цифр)")
+    @ValidPhoneNumber
     private String phone;
 
     @NotBlank(message = "Отделение обязательна для заполнения")

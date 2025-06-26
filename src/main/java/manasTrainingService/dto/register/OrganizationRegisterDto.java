@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import manasTrainingService.validation.ValidPhoneNumber;
 
 @Getter
 @Setter
@@ -28,7 +29,7 @@ public class OrganizationRegisterDto {
     private String companyName;
 
     @NotBlank(message = "Номер телефона не может быть пустым")
-    @Pattern(regexp = "^\\+996\\d{9}$", message = "Номер телефона должен быть в формате +996XXXXXXXXX (12 цифр)")
+    @ValidPhoneNumber
     private String phone;
     private Integer roleId;
 
