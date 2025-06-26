@@ -2,6 +2,7 @@ package manasTrainingService.service.course;
 
 import manasTrainingService.dto.instance.CourseModuleApiDto;
 import manasTrainingService.dto.instance.CourseModuleCreationDTO;
+import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.CourseModuleUpdateDTO;
 import manasTrainingService.entity.CourseModule;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,4 +23,6 @@ public interface CourseModuleService {
     CourseModuleUpdateDTO getModuleForUpdate(Integer moduleId);
 
     void updateModule(Integer moduleId, CourseModuleUpdateDTO dto);
+
+    CourseModuleDTO getCourseModuleDTOById(Integer moduleId);
 }

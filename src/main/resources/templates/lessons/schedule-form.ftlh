@@ -87,7 +87,7 @@
 
             updateSubmitButton();
         });
-            document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.querySelector('form');
             const dateInput = document.querySelector('#lessonDate');
             const durationInput = document.querySelector('#durationHours');
@@ -96,27 +96,27 @@
             const submitButton = form.querySelector('button[type="submit"]');
 
             flatpickr("#lessonDate", {
-            dateFormat: "Y-m-d",
-            locale: "ru",
-            altInput: true,
-            altFormat: "d.m.Y",
-        });
+                dateFormat: "Y-m-d",
+                locale: "ru",
+                altInput: true,
+                altFormat: "d.m.Y",
+            });
 
             durationInput.addEventListener('input', function () {
-            this.value = this.value.replace(/[^0-9]/g, '');
-            if (this.value < 1) this.value = '';
-        });
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value < 1) this.value = '';
+            });
 
             function updateSubmitButton() {
-            const isValid = dateInput.value && durationInput.value >= 1 && teacherInput.value && typeInput.value;
-            submitButton.disabled = !isValid;
-            submitButton.classList.toggle('btn-primary', isValid);
-            submitButton.classList.toggle('btn-secondary', !isValid);
-        }
+                const isValid = dateInput.value && durationInput.value >= 1 && teacherInput.value && typeInput.value;
+                submitButton.disabled = !isValid;
+                submitButton.classList.toggle('btn-primary', isValid);
+                submitButton.classList.toggle('btn-secondary', !isValid);
+            }
 
             [dateInput, durationInput, teacherInput, typeInput].forEach(input => {
-            input.addEventListener('input', updateSubmitButton);
-        });
+                input.addEventListener('input', updateSubmitButton);
+            });
 
             updateSubmitButton();
         });

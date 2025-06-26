@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmBtn.disabled = false;
             confirmBtn.textContent = 'Удалить модуль';
 
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfToken = $('meta[name="_csrf"]').attr('content');
             const form = document.getElementById('deleteModuleForm');
             form.action = `/admin/course-instances/${courseInstanceId}/modules/${moduleId}/delete`;
             form.querySelector('input[name="_csrf"]').value = csrfToken;

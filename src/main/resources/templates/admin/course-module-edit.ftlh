@@ -3,6 +3,13 @@
 
 <@layout.page>
     <div class="container">
+        <#if successMessage??>
+            <div id="successMessage" data-message="${successMessage?js_string}"></div>
+        </#if>
+        <#if errorMessage??>
+            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+        </#if>
+
         <h2 class="section-title">Редактировать модуль курса</h2>
 
         <div class="card feature-card-enhanced">
