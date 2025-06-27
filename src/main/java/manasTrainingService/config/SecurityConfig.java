@@ -21,6 +21,7 @@ public class SecurityConfig {
                                 "/",
                                 "/auth/**",
                                 "/static/**",
+                                "/js/**",
                                 "/favicon.ico",
                                 "/error",
                                 "/courses/**",

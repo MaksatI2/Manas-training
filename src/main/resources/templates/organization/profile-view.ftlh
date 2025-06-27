@@ -99,18 +99,7 @@
             margin-bottom: 1rem;
         }
 
-        .user-role {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            color: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-        }
-
-        .profile-details {
+          .profile-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
@@ -138,27 +127,36 @@
             font-weight: 500;
         }
 
+        .user-role,
         .edit-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
             color: var(--white);
             border: none;
-            padding: 0.8rem 2rem;
+            padding: 0.75rem 1.5rem;
             border-radius: 25px;
             font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
             gap: 0.5rem;
             text-decoration: none;
-            margin-top: 1rem;
+            min-width: 220px;
+            text-align: center;
+            box-sizing: border-box;
         }
 
         .edit-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,102,204,0.3);
             color: var(--white);
+        }
+
+        .user-role-and-edit {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
         }
 
         @media (max-width: 768px) {
@@ -236,14 +234,16 @@
                         <i class="fas fa-envelope" style="margin-right: 0.5rem;"></i>
                         ${organization.user.email}
                     </p>
+                    <div class="user-role-and-edit">
                     <span class="user-role">
                         <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                        Менеджер организации
+                    Тип аккаунта: Менеджер организации
                     </span>
                     <a href="/organization/profile/edit" class="edit-button">
                         <i class="fas fa-edit"></i>
                         Редактировать профиль
                     </a>
+                    </div>
                 </div>
             </div>
 

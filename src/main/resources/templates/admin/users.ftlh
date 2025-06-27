@@ -7,47 +7,61 @@
         <#if errorMessage??>
             <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
-        <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
-            <h5 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-users me-2"></i>
-                Управление пользователями
-            </h5>
-            <div>
-                <a href="/admin/teachers/add" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-plus me-1" style="color: #0066cc;"></i> Добавить преподавателя
-                </a>
+        <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="m-0 font-weight-bold text-white">
+                    <i class="fas fa-users me-2"></i> Управление пользователями
+                </h5>
+
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <div id="usersTable_buttons"></div>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+
+                        <div class="input-group input-group-sm" style="width: 180px;">
+                             <span class="input-group-text" style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
+                               <i class="fas fa-filter"></i>
+                             </span>
+                            <select class="form-select form-select-sm" id="roleFilter"
+                                    style="border: 1px solid #0066cc; border-left: 0; color: #0066cc;">
+                                <option hidden disabled selected value="">Все пользователи</option>
+                                <#list roles as role>
+                                    <option value="${role}" <#if selectedRole?? && selectedRole == role>selected</#if>>
+                                        ${roleDisplayNames[role]!role}
+                                    </option>
+                                </#list>
+                            </select>
+                        </div>
+
+
+                        <div class="input-group input-group-sm" style="width: 180px;">
+                          <span class="input-group-text" style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
+                           <i class="fas fa-filter"></i>
+                          </span>
+                            <select class="form-select form-select-sm" id="statusFilter"
+                                    style="border: 1px solid #0066cc; border-left: 0; color: #0066cc;">
+                                <option hidden disabled selected value="">Все статусы</option>
+                                <option value="Активен">Активен</option>
+                                <option value="Неактивен">Неактивен</option>
+                            </select>
+                        </div>
+
+                        <button id="resetFilters"
+                                class="btn btn-link text-white btn-sm px-2"
+                                title="Сбросить фильтры"
+                                style="font-size: 1rem;">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+
+                    <a href="/admin/teachers/add" class="btn btn-light btn-sm"
+                       style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                        <i class="fas fa-plus me-1"></i> Добавить преподавателя
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text" style="background: #0066cc; color: white;"><i class="fas fa-filter"></i></span>
-                        <select class="form-select form-select-sm" id="roleFilter">
-                            <option value="">Все роли</option>
-                            <#list roles as role>
-                                <option value="${role}" <#if selectedRole?? && selectedRole == role>selected</#if>>
-                                    ${role}
-                                </option>
-                            </#list>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text" style="background: #0066cc; color: white;"><i class="fas fa-filter"></i></span>
-                        <select class="form-select form-select-sm" id="statusFilter">
-                            <option value="">Все статусы</option>
-                            <option value="Активен">Активен</option>
-                            <option value="Неактивен">Неактивен</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6 d-flex justify-content-end align-items-center">
-                    <div id="usersTable_info" class="text-muted small me-3" style="color: #2c3e50 !important;"></div>
-                </div>
-            </div>
 
+        <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="usersTable" width="100%" cellspacing="0">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
@@ -134,12 +148,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
 
     <script>
         $(document).ready(function() {
             var table = $('#usersTable').DataTable({
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ru.json'
+                    url: '/js/datatables/ru.json',
+                    paginate: {previous: '‹', next: '›'}
                 },
                 responsive: true,
                 pageLength: 10,
@@ -147,11 +165,13 @@
                 lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
                 order: [[0, 'asc']],
                 searching: true,
-                info: true,
+                info: false,
                 paging: true,
                 autoWidth: false,
                 stateSave: true,
-                dom: '<"top"Bf>rt<"bottom"lip><"clear">',
+                dom: '<"row mb-3 pt-2"<"col-md-6"l><"col-md-6 text-end"f>>' +
+                    'rt' +
+                    '<"row mt-3 align-items-center pb-2"<"col-md-6"i><"col-md-6"p>>',
                 buttons: [
                     {
                         extend: 'collection',
@@ -265,7 +285,7 @@
                 ],
                 initComplete: function() {
                     this.api().page.len(10).draw();
-                    $('.dt-buttons').appendTo('.col-md-6.d-flex');
+                    table.buttons().container().appendTo('#usersTable_buttons');
                 }
             });
 
@@ -277,18 +297,16 @@
                 table.column(6).search(this.value).draw();
             });
 
-            $('.dataTables_paginate').addClass('pagination');
-            $('.paginate_button').addClass('page-item');
-            $('.paginate_button a').addClass('page-link');
-
-            table.on('draw', function() {
-                $('.paginate_button').removeClass('disabled active');
-                $('.paginate_button.current').addClass('active');
-            });
-
             $('.dt-buttons').addClass('btn-group');
             $('.dt-button').addClass('btn').removeClass('dt-button');
             $('.dropdown-toggle').dropdown();
+
+            $('#resetFilters').on('click', function () {
+                $('#categoryFilter').prop('selectedIndex', 0).trigger('change');
+                $('#typeFilter').prop('selectedIndex', 0).trigger('change');
+                $('#statusFilter').prop('selectedIndex', 0).trigger('change');
+                table.search('').columns().search('').draw();
+            });
         });
     </script>
 
@@ -362,48 +380,39 @@
             color: #212529 !important;
         }
 
-        .pagination {
+        .custom-pagination .pagination {
             display: flex;
+            gap: 5px;
             padding-left: 0;
             list-style: none;
-            border-radius: 25px;
+            margin: 0;
         }
 
-        .page-item:first-child .page-link {
-            margin-left: 0;
-            border-top-left-radius: 25px;
-            border-bottom-left-radius: 25px;
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item .page-link {
+            border-radius: 0 !important;
         }
 
-        .page-item:last-child .page-link {
-            border-top-right-radius: 25px;
-            border-bottom-right-radius: 25px;
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item:first-child .page-link {
+            border-top-left-radius: 12px !important;
+            border-bottom-left-radius: 12px !important;
         }
 
-        .page-item.active .page-link {
-            z-index: 1;
-            color: #fff;
-            background: linear-gradient(135deg, #0066cc, #003d7a);
-            border-color: #0066cc;
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item:last-child .page-link {
+            border-top-right-radius: 12px !important;
+            border-bottom-right-radius: 12px !important;
         }
 
-        .page-link {
-            position: relative;
-            display: block;
-            padding: 0.5rem 0.75rem;
-            margin-left: -1px;
-            line-height: 1.25;
-            color: #0066cc;
-            background-color: #fff;
-            border: 1px solid #dddfeb;
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item.active .page-link {
+            background-color: var(--primary-blue) !important;
+            color: white !important;
+            font-weight: bold;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue) !important;
         }
 
-        .page-link:hover {
-            z-index: 2;
-            color: #003d7a;
-            text-decoration: none;
-            background-color: rgba(0,102,204,0.1);
-            border-color: #dddfeb;
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item .page-link:hover {
+            background-color: #005bb5 !important;
+            color: white !important;
         }
 
         .input-group-text {
@@ -416,6 +425,10 @@
             border-left: 0;
             border-color: #d1d3e2;
         }
+        .form-select-sm {
+            padding-right: 2rem !important;
+        }
+
 
         .form-select:focus {
             box-shadow: none;
@@ -516,6 +529,15 @@
             width: 18px;
             text-align: center;
             margin-right: 5px;
+        }
+
+        .dataTables_length select.form-select {
+            padding-right: 2rem;
+            background-position: right 0.5rem center;
+            background-size: 12px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
 
         @media (max-width: 768px) {
