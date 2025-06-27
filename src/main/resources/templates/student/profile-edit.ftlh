@@ -71,8 +71,8 @@
                     </div>
                     <input type="hidden" name="userId" value="${studentProfile.userId}">
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary-custom">
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary-custom" style="padding: 0.3rem 0.9rem !important;">
                             <i class="fas fa-user-plus me-2"></i>Сохранить
                         </button>
                     </div>

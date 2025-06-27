@@ -88,9 +88,9 @@
 
                     <input type="hidden" name="userId" value="${teacherEditDto.userId}">
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary-custom">
-                            <i class="fas fa-save me-2"></i>Сохранить изменения
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary-custom" style="padding: 0.3rem 0.9rem !important;">
+                            <i class="fas fa-save me-2"></i>Сохранить
                         </button>
                     </div>
                 </form>

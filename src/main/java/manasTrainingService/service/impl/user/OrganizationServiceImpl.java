@@ -22,6 +22,7 @@ import manasTrainingService.service.user.OrganizationService;
 import manasTrainingService.service.user.RoleService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.PasswordGenerator;
+import manasTrainingService.util.StatusUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
@@ -157,6 +158,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                                         .phone(student.getPhone())
                                         .courseTitle("-")
                                         .status("-")
+                                        .localizedStatus("-")
                                         .progress(BigDecimal.ZERO)
                                         .finalGrade(null)
                                         .build()
@@ -170,7 +172,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                                         .email(student.getEmail())
                                         .phone(student.getPhone())
                                         .courseTitle(enrollment.getCourseInstance().getCourse().getTitle())
-                                        .status(enrollment.getStatus().name())
+                                        .localizedStatus(StatusUtil.localize(enrollment.getStatus()))
                                         .progress(enrollment.getProgressPercentage())
                                         .finalGrade(enrollment.getFinalGrade())
                                         .build()

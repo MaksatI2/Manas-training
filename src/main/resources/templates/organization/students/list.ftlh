@@ -15,11 +15,13 @@
                 Студенты организации
             </h5>
             <div class="d-flex gap-2">
-                <a href="/organization/students/unassigned" class="btn btn-outline-light rounded-pill shadow-sm">
-                    <i class="fas fa-user-check me-1"></i> Присоединить студента
+                <a href="/organization/students/unassigned" class="btn btn-light btn-sm"
+                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                    <i class="fas fa-user-check me-1" style="color: #0066cc;"></i> Присоединить студента
                 </a>
-                <a href="/organization/students/add" class="btn btn-light rounded-pill shadow-sm">
-                    <i class="fa fa-user-plus me-1"></i> Добавить студента
+                <a href="/organization/students/add" class="btn btn-light btn-sm"
+                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                    <i class="fa fa-user-plus me-1" style="color: #0066cc;"></i> Добавить студента
                 </a>
             </div>
         </div>
@@ -54,7 +56,7 @@
                                 <ul class="mb-0 ps-3 small">
                                     <#list courseList as c>
                                         <li>
-                                            <strong>${c.courseTitle}</strong> — ${c.status}, ${c.progress}%
+                                            <strong>${c.courseTitle}</strong> — ${c.localizedStatus}, ${c.progress}%
                                             <#if c.finalGrade??>, оценка: ${c.finalGrade}</#if>
                                             <#if c.enrollmentId??>
                                                 <form action="/organization/students/enrollment/${c.enrollmentId}/remove"
@@ -101,15 +103,21 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
         $(document).ready(function () {
             $('#studentsTable').DataTable({
-                language: {url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ru.json'},
+                language: {
+                    url: '/js/datatables/ru.json',
+                    paginate: {previous: '‹', next: '›'}
+                },
                 responsive: true,
                 pageLength: 10,
                 order: [[0, 'asc']],
-                autoWidth: false
+                autoWidth: false,
+                info:false
             });
         });
     </script>

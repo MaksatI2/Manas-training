@@ -9,6 +9,7 @@ import manasTrainingService.exceptions.nsee.user.EmailAlreadyExistsException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.service.user.RoleService;
 import manasTrainingService.service.user.UserService;
+import manasTrainingService.util.RoleUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,7 +59,8 @@ public class AdminController {
     @GetMapping("/users")
     public String showUsers(Model model) {
         List<User> users = userService.getAllUsers();
-        model.addAttribute("roles", roleService.getAllRoles());
+        model.addAttribute("roles", RoleUtil.getAll().keySet());
+        model.addAttribute("roleDisplayNames", RoleUtil.getAll());
         model.addAttribute("users", users);
         return "admin/users";
     }

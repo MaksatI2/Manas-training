@@ -19,4 +19,6 @@ public class StudentCourseInfoDto {
     private String status;
     private BigDecimal progress;
     private BigDecimal finalGrade;
+    private String localizedStatus;
+
 }
