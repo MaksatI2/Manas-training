@@ -24,12 +24,12 @@
 
         <div class="filters-panel">
             <div class="filters-header" onclick="toggleFilters()">
-                <h3><i class="fas fa-filter"></i> Фильтры и сортировка</h3>
+                <h3><i class="fas fa-filter"></i> Фильтры</h3>
                 <button class="toggle-filters-btn" id="toggleFiltersBtn">
                     <i class="fas fa-chevron-down"></i>
                 </button>
             </div>
-            <div class="filters-content expanded" id="filtersContent">
+            <div class="filters-content" id="filtersContent">
                 <form class="filters-form" id="filtersForm">
                     <div class="filter-row">
                         <div class="filter-group">
@@ -84,23 +84,6 @@
                         </div>
                     </div>
                     <div class="filter-row">
-                        <div class="filter-group">
-                            <label for="sortBy">Сортировать по:</label>
-                            <select name="sortBy" id="sortBy" onchange="applyFilters()">
-                                <option value="date" <#if selectedSortBy == "date">selected</#if>>Дате</option>
-                                <option value="course" <#if selectedSortBy == "course">selected</#if>>Курсу</option>
-                                <option value="teacher" <#if selectedSortBy == "teacher">selected</#if>>Преподавателю</option>
-                                <option value="type" <#if selectedSortBy == "type">selected</#if>>Типу занятия</option>
-                                <option value="lesson" <#if selectedSortBy == "lesson">selected</#if>>Названию урока</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="sortDir">Направление:</label>
-                            <select name="sortDir" id="sortDir" onchange="applyFilters()">
-                                <option value="asc" <#if selectedSortDir == "asc">selected</#if>>По возрастанию</option>
-                                <option value="desc" <#if selectedSortDir == "desc">selected</#if>>По убыванию</option>
-                            </select>
-                        </div>
                         <div class="filter-actions">
                             <button type="button" class="reset-filters-btn" onclick="resetFilters()">
                                 <i class="fas fa-undo"></i> Сбросить
@@ -186,8 +169,6 @@
                 const courseInstanceTitle = document.getElementById('courseInstanceTitle').value;
                 const teacherName = document.getElementById('teacherName').value;
                 const lessonType = document.getElementById('lessonType').value;
-                const sortBy = document.getElementById('sortBy').value;
-                const sortDir = document.getElementById('sortDir').value;
 
                 filteredSchedulesData = {};
 
@@ -201,37 +182,6 @@
                         if (teacherName && lesson.teacherName !== teacherName) return false;
                         if (lessonType && lesson.lessonType !== lessonType) return false;
                         return true;
-                    });
-
-                    filteredLessons.sort((a, b) => {
-                        let aValue, bValue;
-
-                        switch (sortBy) {
-                            case 'course':
-                                aValue = a.courseTitle || '';
-                                bValue = b.courseTitle || '';
-                                break;
-                            case 'teacher':
-                                aValue = a.teacherName || '';
-                                bValue = b.teacherName || '';
-                                break;
-                            case 'type':
-                                aValue = a.lessonType || '';
-                                bValue = b.lessonType || '';
-                                break;
-                            case 'lesson':
-                                aValue = a.lessonTitle || '';
-                                bValue = b.lessonTitle || '';
-                                break;
-                            case 'date':
-                            default:
-                                aValue = a.startTime || '00:00';
-                                bValue = b.startTime || '00:00';
-                                break;
-                        }
-
-                        const comparison = aValue.localeCompare(bValue);
-                        return sortDir === 'desc' ? -comparison : comparison;
                     });
 
                     if (filteredLessons.length > 0) {
@@ -255,8 +205,6 @@
                 document.getElementById('courseInstanceTitle').value = '';
                 document.getElementById('teacherName').value = '';
                 document.getElementById('lessonType').value = '';
-                document.getElementById('sortBy').value = 'date';
-                document.getElementById('sortDir').value = 'asc';
 
                 schedulesData = JSON.parse(JSON.stringify(originalSchedulesData));
                 generateCalendar();
@@ -787,11 +735,12 @@
             padding: 0 2rem 2rem;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transition: max-height 0.3s ease, padding 0.3s ease;
         }
 
         .filters-content.expanded {
             max-height: 500px;
+            padding: 0 2rem 2rem;
         }
 
         .filters-form {

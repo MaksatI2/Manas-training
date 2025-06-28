@@ -170,41 +170,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleViewDTO> getFilteredAndSortedSchedules(String courseTitle, String courseInstanceTitle,
-                                                               String teacherName, String lessonType,
-                                                               String sortBy, String sortDir) {
-        List<ScheduleViewDTO> schedules = getFilteredSchedules(
-                courseTitle, courseInstanceTitle, teacherName, lessonType);
-        return sortSchedules(schedules, sortBy, sortDir);
-    }
-
-    private List<ScheduleViewDTO> sortSchedules(List<ScheduleViewDTO> schedules, String sortBy, String sortDir) {
-        Comparator<ScheduleViewDTO> comparator = getComparator(sortBy);
-        if ("desc".equalsIgnoreCase(sortDir)) {
-            comparator = comparator.reversed();
-        }
-        return schedules.stream()
-                .sorted(comparator)
-                .collect(Collectors.toList());
-    }
-
-    private Comparator<ScheduleViewDTO> getComparator(String sortBy) {
-        switch (sortBy != null ? sortBy.toLowerCase() : "date") {
-            case "course":
-                return Comparator.comparing(s -> s.getCourseTitle() != null ? s.getCourseTitle() : "");
-            case "teacher":
-                return Comparator.comparing(s -> s.getTeacherName() != null ? s.getTeacherName() : "");
-            case "type":
-                return Comparator.comparing(s -> s.getLessonType() != null ? s.getLessonType().name() : "");
-            case "lesson":
-                return Comparator.comparing(s -> s.getLessonTitle() != null ? s.getLessonTitle() : "");
-            case "date":
-            default:
-                return Comparator.comparing(ScheduleViewDTO::getLessonDate);
-        }
-    }
-
-    @Override
     public boolean hasSchedulesBeforeDateRange(Integer courseInstanceId, LocalDate newStart) {
         return scheduleRepository.existsByCourseInstanceIdAndLessonDateBeforeStart(courseInstanceId, newStart);
     }
