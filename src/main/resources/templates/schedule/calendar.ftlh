@@ -109,7 +109,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title" id="modalTitle"></h2>
-                <button class="close" onclick="closeModal()">&times;</button>
+                <button class="close" onclick="closeModal()">×</button>
             </div>
             <div class="modal-body" id="modalBody"></div>
             <div class="modal-actions" id="modalActions" style="display: none;">
@@ -330,7 +330,6 @@
 
         let currentLesson;
 
-
         function openSingleLessonModal(lesson) {
             try {
                 currentLesson = lesson;
@@ -458,7 +457,6 @@
             }
         }
 
-
         function editLesson() {
             if (!currentLesson) {
                 alert('Не удалось определить урок для редактирования');
@@ -547,7 +545,6 @@
             return false;
         };
     </script>
-
 
     <style>
         :root {
@@ -732,7 +729,7 @@
         }
 
         .filters-content {
-            padding: 0 2rem 2rem;
+            padding: 0;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease, padding 0.3s ease;
@@ -1207,6 +1204,10 @@
             }
 
             .filters-content {
+                padding: 0;
+            }
+
+            .filters-content.expanded {
                 padding: 0 1rem 1rem;
             }
 
