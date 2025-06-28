@@ -34,4 +34,21 @@ public class LessonAccessServiceImpl implements LessonAccessService {
         }
         return false;
     }
+
+    @Override
+    public boolean canAccessLessonStaff(Lesson lesson) {
+        CustomUserDetails user = (CustomUserDetails)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (user.hasRole("ADMIN")) {
+            return true;
+        }
+        if (user.hasRole("TEACHER")) {
+            courseInstanceTeacherService.hasAccess(lesson.getModule().getCourseInstance().getId());
+            return true;
+        }
+        return false;
+    }
+
+
 }

@@ -43,9 +43,7 @@
                                                                 <p class="card-text text-muted small">
                                                                     ${lesson.description!''}
                                                                 </p>
-                                                                <p class="card-text text-muted small">
-                                                                    Длительность: ${lesson.durationMinutes} мин.
-                                                                </p>
+
                                                             </div>
                                                         </div>
                                                     </a>

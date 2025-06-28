@@ -14,7 +14,4 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
     List<Lesson> findAllByModuleId(Integer moduleId);
     List<Lesson> findByModuleId(Integer moduleId);
 
-    @Query("SELECT COALESCE(SUM(l.durationMinutes), 0) FROM Lesson l WHERE l.module.id = :moduleId")
-    int getTotalUsedMinutes(@Param("moduleId") Integer moduleId);
-
 }

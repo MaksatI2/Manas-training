@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.config.CustomUserDetails;
 import manasTrainingService.dto.ScheduleViewDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.LessonDTO;
@@ -11,11 +12,13 @@ import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
 import manasTrainingService.entity.LessonType;
 import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.service.*;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,6 +43,12 @@ public class ScheduleController {
 
     @GetMapping("/lessons/{lessonId}")
     public String showScheduleForm(@PathVariable Integer lessonId, Model model) {
+        CustomUserDetails user = (CustomUserDetails)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.hasRole("ADMIN")) {
+            throw new NoAccessException("У вас нет доступа к редактированию");
+        }
         LessonDTO lesson = lessonService.getLessonById(lessonId);
         CourseInstanceDTO courseInstance = courseInstanceService.getCourseInstanceByLessonId(lessonId);
         ScheduleDTO schedule = scheduleService.getScheduleByLessonId(lessonId);
@@ -76,6 +85,13 @@ public class ScheduleController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
+        CustomUserDetails user = (CustomUserDetails)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.hasRole("ADMIN")) {
+            throw new NoAccessException("У вас нет доступа к редактированию");
+        }
+
         if (bindingResult.hasErrors()) {
             CourseInstanceDTO courseInstance = courseInstanceService.getCourseInstanceByLessonId(lessonId);
             Map<String, String> teachers = courseTeacherInstanceService.getTeachersByCourseInstanceId(courseInstance.getId()).stream()
@@ -100,8 +116,21 @@ public class ScheduleController {
             redirectAttributes.addFlashAttribute("successMessage", "Расписание сохранено");
             return "redirect:/lessons/" + lessonId;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/lessons/" + lessonId;
+            model.addAttribute("errorMessage", e.getMessage());
+            CourseInstanceDTO courseInstance = courseInstanceService.getCourseInstanceByLessonId(lessonId);
+            Map<String, String> teachers = courseTeacherInstanceService.getTeachersByCourseInstanceId(courseInstance.getId()).stream()
+                    .sorted(Comparator.comparing(CourseInstanceTeacherDTO::getIsPrimary, Comparator.reverseOrder()))
+                    .collect(Collectors.toMap(
+                            dto -> String.valueOf(dto.getTeacherId()),
+                            CourseInstanceTeacherDTO::getTeacherName,
+                            (existing, replacement) -> existing,
+                            LinkedHashMap::new
+                    ));
+            model.addAttribute("lesson", lessonService.getLessonById(lessonId));
+            model.addAttribute("courseInstance", courseInstance);
+            model.addAttribute("teachers", teachers);
+            model.addAttribute("lessonTypes", LessonType.values());
+            return "lessons/schedule-form";
         }
     }
 

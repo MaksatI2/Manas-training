@@ -16,7 +16,4 @@ public class LessonCreateRequest {
 
     private String description;
 
-    @NotNull(message = "Длительность обязательна")
-    @Min(value = 0, message = "Длительность не может быть отрицательной")
-    private Integer durationMinutes;
 }

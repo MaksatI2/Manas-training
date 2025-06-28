@@ -24,7 +24,6 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="display-4 fw-bold">${lesson.title}</h1>
-                <p class="text-muted mb-0"><i class="fas fa-clock me-1"></i>Длительность: <strong>${lesson.durationMinutes} минут</strong></p>
             </div>
             <#if isAdmin || isTeacher>
                 <div class="d-flex gap-2">
@@ -59,7 +58,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold">Материалы</h4>
                 <#if isAdmin || isTeacher>
-                    <a href="<@spring.url '/admin/lessons/${lesson.id}/materials/new'/>" class="btn btn-primary btn-sm rounded-pill">
+                    <a href="<@spring.url '/lessons/${lesson.id}/materials/new'/>" class="btn btn-primary btn-sm rounded-pill">
                         <i class="fas fa-plus me-1"></i>Добавить
                     </a>
                 </#if>
@@ -73,7 +72,7 @@
                                 <div class="card-body d-flex flex-column">
                                     <h6 class="card-title mb-3 fw-semibold">${material.title}</h6>
                                     <div class="mt-auto d-flex justify-content-between align-items-center">
-                                        <a href="${material.url}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <a href="/data/lesson-materials/${material.url}" target="_blank" class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-external-link-alt me-1"></i>Открыть
                                         </a>
                                         <#if isAdmin>

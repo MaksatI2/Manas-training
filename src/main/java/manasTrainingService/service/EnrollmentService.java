@@ -16,4 +16,6 @@ public interface EnrollmentService {
     List<CourseEnrollmentCardDTO> getStudentCourses();
 
     void hasAccess(Integer courseInstanceId);
+
+    List<CourseEnrollment> findAllEnrollmentsForCourseInstance(Integer courseInstanceId);
 }

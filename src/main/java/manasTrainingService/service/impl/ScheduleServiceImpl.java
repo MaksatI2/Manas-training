@@ -6,6 +6,7 @@ import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.ScheduleNotFouneException;
 import manasTrainingService.repositories.ScheduleRepository;
+import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.ScheduleService;
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +28,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final LessonService lessonService;
     private final CourseInstanceService courseInstanceService;
     private final UserService userService;
+    private final EnrollmentService enrollmentService;
 
     @Override
     public ScheduleDTO getScheduleByLessonId(Integer lessonId) {
@@ -54,9 +58,62 @@ public class ScheduleServiceImpl implements ScheduleService {
         CourseInstance courseInstance = courseInstanceService.getCourseInstanceModelById(schedule.getCourseInstanceId());
         User teacher = userService.getUserById(schedule.getTeacherId());
 
+        CourseModule module = lesson.getModule();
+        Integer moduleMaxHours = module.getDurationHours() != null ? module.getDurationHours() : 0;
+
+        List<Lesson> moduleLessons = module.getLessons();
+
+        Integer totalScheduledHours = moduleLessons.stream()
+                .flatMap(l -> l.getSchedules() != null ? l.getSchedules().stream() : null)
+                .filter(s -> schedule.getId() == null || !s.getId().equals(schedule.getId()))
+                .mapToInt(s -> s.getDurationHours() != null ? s.getDurationHours() : 0)
+                .sum();
+
+        Integer newScheduleHours = schedule.getDurationHours() != null ? schedule.getDurationHours() : 0;
+        Integer totalAfterUpdate = totalScheduledHours + newScheduleHours;
+
+        if (totalAfterUpdate > moduleMaxHours) {
+            throw new IllegalArgumentException(
+                    "Превышен лимит часов модуля. Установлено: " + totalAfterUpdate +
+                            " ч, допустимо: " + moduleMaxHours + " ч."
+            );
+        }
+
+        int teacherHours = scheduleRepository.getTotalTeacherHoursForDate(
+                teacher.getId(), schedule.getLessonDate(), schedule.getId());
+
+        if (teacherHours + schedule.getDurationHours() > 8) {
+            throw new IllegalArgumentException("У преподавателя превышен лимит 8 часов на день");
+        }
+
+        List<CourseEnrollment> enrollments = enrollmentService.findAllEnrollmentsForCourseInstance(courseInstance.getId());
+        List<User> students = enrollments.stream()
+                .map(CourseEnrollment::getStudent)
+                .filter(Objects::nonNull)
+                .toList();
+
+        List<String> violatingStudents = new ArrayList<>();
+
+        for (User student : students) {
+            int studentHours = scheduleRepository.getTotalStudentHoursForDate(
+                    student.getId(), schedule.getLessonDate(), schedule.getId());
+
+            if (studentHours + schedule.getDurationHours() > 8) {
+                violatingStudents.add(student.getName());
+            }
+        }
+
+        if (!violatingStudents.isEmpty()) {
+            throw new IllegalArgumentException("У следующих студентов превышен лимит 8 часов на день: " +
+                    String.join(", ", violatingStudents));
+        }
+
+
+
+
         Schedule entity = schedule.getId() != null
                 ? scheduleRepository.findById(schedule.getId())
-                .orElseThrow(() -> new ScheduleNotFouneException("Schedule not found"))
+                .orElseThrow(() -> new ScheduleNotFouneException("Расписание не найдено"))
                 : new Schedule();
 
         entity.setLesson(lesson);

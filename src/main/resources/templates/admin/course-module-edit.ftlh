@@ -31,11 +31,15 @@
                         <label for="durationHours" class="form-label">
                             <i class="fas fa-hourglass-half me-1"></i>Продолжительность (часы) *
                         </label>
-                        <@spring.formInput "module.durationHours", "class='form-control' id='durationHours' type='number' min='1'" />
+                        <@spring.formInput
+                        "module.durationHours",
+                        "class='form-control only-digits' id='durationHours' type='number' min='1' step='1' inputmode='numeric' pattern='[0-9]*'"
+                        />
                         <div class="error-block text-danger">
                             <@spring.showErrors "durationHours", "error-message" />
                         </div>
                     </div>
+
 
                     <div class="mb-3">
                         <label for="description" class="form-label">
@@ -57,4 +61,6 @@
             </div>
         </div>
     </div>
+    <script src="/static/js/only-digits.js"></script>
+
 </@layout.page>

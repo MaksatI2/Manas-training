@@ -21,16 +21,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="durationMinutes" class="form-label">
-                            <i class="fas fa-clock me-1"></i>Продолжительность (минуты) *
-                        </label>
-                        <@spring.formInput "lessonEditDto.durationMinutes", "class='form-control' id='durationMinutes' type='number' min='1'" />
-                        <div class="error-block text-danger">
-                            <@spring.showErrors "durationMinutes", "error-message" />
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
                         <label for="description" class="form-label">
                             <i class="fas fa-align-left me-1"></i>Описание
                         </label>

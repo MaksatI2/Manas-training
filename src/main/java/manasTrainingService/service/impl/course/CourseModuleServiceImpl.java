@@ -92,7 +92,6 @@ public class CourseModuleServiceImpl implements CourseModuleService {
                                 .id(lesson.getId())
                                 .title(lesson.getTitle())
                                 .description(lesson.getDescription())
-                                .durationMinutes(lesson.getDurationMinutes())
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
@@ -135,16 +134,20 @@ public class CourseModuleServiceImpl implements CourseModuleService {
         CourseModule module = getCourseModuleById(moduleId);
         CourseInstance courseInstance = module.getCourseInstance();
         List<Lesson> lessons = module.getLessons();
-        int totalLessonMinutes = lessons.stream()
-                .mapToInt(Lesson::getDurationMinutes)
+
+
+        Integer newModuleHours = dto.getDurationHours();
+
+        int totalScheduledHours = lessons.stream()
+                .filter(lesson -> lesson.getSchedules() != null && !lesson.getSchedules().isEmpty())
+                .flatMap(lesson -> lesson.getSchedules().stream())
+                .mapToInt(schedule -> schedule.getDurationHours() != null ? schedule.getDurationHours() : 0)
                 .sum();
 
-        int newModuleMinutes = dto.getDurationHours() * 60;
-
-        if (totalLessonMinutes > newModuleMinutes) {
+        if (newModuleHours < totalScheduledHours) {
             throw new IllegalStateException(
-                    "Изменение невозможно " +
-                            "новая продолжительность модуля (" + newModuleMinutes + " мин) меньше общего времени уроков " + totalLessonMinutes + "."
+                    "Невозможно установить продолжительность модуля (" + newModuleHours + " ч), " +
+                            "так как она меньше общей длительности всех расписаний (" + totalScheduledHours + " ч)."
             );
         }
 

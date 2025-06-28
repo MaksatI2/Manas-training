@@ -16,6 +16,4 @@ public class LessonEditDto {
 
     private String description;
 
-    @Min(value = 1, message = "Длительность должна быть не менее 1 минуты")
-    private Integer durationMinutes;
 }

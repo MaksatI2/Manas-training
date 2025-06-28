@@ -25,7 +25,4 @@ public class LessonDTO {
 
     private String description;
 
-    @NotNull(message = "Длительность урока необходима")
-    @Min(value = 1, message = "Длительность должна быть больше 0")
-    private Integer durationMinutes;
 }

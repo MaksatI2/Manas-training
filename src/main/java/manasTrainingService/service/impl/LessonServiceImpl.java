@@ -13,8 +13,6 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class LessonServiceImpl implements LessonService {
@@ -23,14 +21,10 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public Integer createLesson(LessonCreateRequest request, CourseModule module) {
-        int usedMinutes = lessonRepository.getTotalUsedMinutes(module.getId());
-        if (usedMinutes + request.getDurationMinutes() > module.getDurationHours() * 60) {
-            throw new IllegalArgumentException("Превышено допустимое время модуля. " + (module.getDurationHours() * 60 - usedMinutes ));
-        }
+
         Lesson lesson = Lesson.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .durationMinutes(request.getDurationMinutes())
                 .module(module)
                 .build();
 
@@ -45,7 +39,6 @@ public class LessonServiceImpl implements LessonService {
         return LessonDTO.builder()
                 .title(lesson.getTitle())
                 .description(lesson.getDescription())
-                .durationMinutes(lesson.getDurationMinutes())
                 .id(lesson.getId())
                 .moduleId(lesson.getModule().getId())
                 .build();
@@ -56,10 +49,6 @@ public class LessonServiceImpl implements LessonService {
         return lessonRepository.findById(lessonId).orElseThrow(() -> new LessonNotFoundException("Урок не был найден"));
     }
 
-    @Override
-    public int getMinutesLeft(CourseModule module) {
-        return module.getDurationHours() * 60 - lessonRepository.getTotalUsedMinutes(module.getId()) ;
-    }
 
     @Override
     @Transactional
@@ -84,7 +73,6 @@ public class LessonServiceImpl implements LessonService {
         return LessonEditDto.builder()
                 .title(lesson.getTitle())
                 .description(lesson.getDescription())
-                .durationMinutes(lesson.getDurationMinutes())
                 .build();
     }
 
@@ -92,18 +80,9 @@ public class LessonServiceImpl implements LessonService {
     public void updateLesson(Integer id, LessonEditDto dto) {
         Lesson lesson = getLessonModelById(id);
 
-        CourseModule module = lesson.getModule();
-        int usedMinutes = lessonRepository.getTotalUsedMinutes(module.getId());
-        int moduleLimit = module.getDurationHours() * 60;
-        int maxAllowed = moduleLimit - usedMinutes + lesson.getDurationMinutes();
-
-        if (dto.getDurationMinutes() > maxAllowed) {
-            throw new IllegalArgumentException("Превышено допустимое время модуля. Доступно максимум: " + maxAllowed + " минут.");
-        }
 
         lesson.setTitle(dto.getTitle());
         lesson.setDescription(dto.getDescription());
-        lesson.setDurationMinutes(dto.getDurationMinutes());
         lessonRepository.save(lesson);
     }
 

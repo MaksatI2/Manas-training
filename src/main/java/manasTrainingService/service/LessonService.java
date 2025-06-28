@@ -6,7 +6,6 @@ import manasTrainingService.dto.lesson.LessonEditDto;
 import manasTrainingService.entity.CourseModule;
 import manasTrainingService.entity.Lesson;
 
-import java.util.List;
 
 public interface LessonService {
 
@@ -16,7 +15,6 @@ public interface LessonService {
 
     Lesson getLessonModelById(Integer lessonId);
 
-    int getMinutesLeft(CourseModule module);
 
     void deleteById(Integer lessonId);
 
