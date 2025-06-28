@@ -74,27 +74,6 @@
             const typeInput = document.querySelector('#lessonType');
             const submitButton = form.querySelector('button[type="submit"]');
 
-            function updateSubmitButton() {
-                const isValid = dateInput.value && durationInput.value >= 1 && teacherInput.value && typeInput.value;
-                submitButton.disabled = !isValid;
-                submitButton.classList.toggle('btn-primary', isValid);
-                submitButton.classList.toggle('btn-secondary', !isValid);
-            }
-
-            [dateInput, durationInput, teacherInput, typeInput].forEach(input => {
-                input.addEventListener('input', updateSubmitButton);
-            });
-
-            updateSubmitButton();
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.querySelector('form');
-            const dateInput = document.querySelector('#lessonDate');
-            const durationInput = document.querySelector('#durationHours');
-            const teacherInput = document.querySelector('#teacherId');
-            const typeInput = document.querySelector('#lessonType');
-            const submitButton = form.querySelector('button[type="submit"]');
-
             flatpickr("#lessonDate", {
                 dateFormat: "Y-m-d",
                 locale: "ru",
@@ -114,12 +93,14 @@
                 submitButton.classList.toggle('btn-secondary', !isValid);
             }
 
+
             [dateInput, durationInput, teacherInput, typeInput].forEach(input => {
                 input.addEventListener('input', updateSubmitButton);
             });
 
             updateSubmitButton();
         });
+
     </script>
 
     <style>

@@ -62,9 +62,6 @@
                                                                 <p class="card-text text-muted small text-break">
                                                                     ${module.description!''}
                                                                 </p>
-                                                                <p class="card-text text-muted small">
-                                                                    Длительность: ${lesson.durationMinutes} мин.
-                                                                </p>
                                                             </div>
                                                         </div>
                                                     </a>

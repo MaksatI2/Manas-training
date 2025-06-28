@@ -22,19 +22,6 @@
                 <@spring.showErrors  "<br>" "error-message" />
             </div>        </div>
 
-        <div class="mb-3">
-            <label for="lessonDuration" class="form-label">Длительность (мин.) *</label>
-            <@spring.formInput
-            "lessonCreateRequest.durationMinutes",
-            "type='number' min='1' step='1' class='form-control' id='lessonDuration' inputmode='numeric' pattern='[0-9]*'"
-            />
-            <div class="error-block text-danger">
-                <@spring.showErrors  "<br>" "error-message" />
-            </div>
-            <#if minutesLeft??>
-                <small class="text-muted">Доступно минут: ${minutesLeft?string}</small>
-            </#if>
-        </div>
 
         <button type="submit" class="btn btn-primary">Создать урок</button>
         <a href="/admin/course-instances/${courseInstance.id}" class="btn btn-secondary ms-2">Отмена</a>

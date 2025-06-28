@@ -2,13 +2,16 @@ package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.lesson.LessonMaterialDTO;
+import manasTrainingService.entity.FileType;
 import manasTrainingService.entity.Lesson;
 import manasTrainingService.entity.LessonMaterial;
 import manasTrainingService.repositories.LessonMaterialRepository;
 import manasTrainingService.service.LessonMaterialService;
 import manasTrainingService.service.LessonService;
+import manasTrainingService.util.FileUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +22,7 @@ public class LessonMaterialsServiceImpl implements LessonMaterialService {
 
     private final LessonMaterialRepository materialRepository;
     private final LessonService lessonService;
+    private final FileUtil fileUtil;
 
     @Override
     public List<LessonMaterialDTO> getMaterialsByLessonId(Integer lessonId) {
@@ -34,16 +38,19 @@ public class LessonMaterialsServiceImpl implements LessonMaterialService {
 
     @Transactional
     @Override
-    public void addMaterial(LessonMaterialDTO material) {
-        Lesson lesson = lessonService.getLessonModelById(material.getLessonId());
+    public void addMaterial(LessonMaterialDTO dto) {
+        MultipartFile file = dto.getFile();
+        String fileName = fileUtil.saveUploadFile(file, "lesson-materials", FileType.DOCUMENT);
 
-        LessonMaterial entity = LessonMaterial.builder()
+        Lesson lesson = lessonService.getLessonModelById(dto.getLessonId());
+
+        LessonMaterial material = LessonMaterial.builder()
                 .lesson(lesson)
-                .title(material.getTitle())
-                .url(material.getUrl())
+                .title(dto.getTitle())
+                .url(fileName)
                 .build();
 
-        materialRepository.save(entity);
+        materialRepository.save(material);
     }
 
     @Transactional

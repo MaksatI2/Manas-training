@@ -102,4 +102,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             throw new NoAccessException("У вас нет доступа к курсу");
         };
     }
+
+    @Override
+    public List<CourseEnrollment> findAllEnrollmentsForCourseInstance(Integer courseInstanceId) {
+        return enrollmentRepository.findAllByCourseInstanceId(courseInstanceId);
+    }
 }

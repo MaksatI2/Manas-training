@@ -6,6 +6,7 @@ import manasTrainingService.entity.LessonMaterial;
 import manasTrainingService.repositories.LessonMaterialRepository;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.impl.LessonMaterialsServiceImpl;
+import manasTrainingService.util.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,6 +23,7 @@ class LessonMaterialsServiceTest {
 
     private LessonMaterialRepository materialRepository;
     private LessonService lessonService;
+    private FileUtil fileUtil;
 
     private LessonMaterialsServiceImpl lessonMaterialsService;
 
@@ -30,7 +32,7 @@ class LessonMaterialsServiceTest {
         materialRepository = Mockito.mock(LessonMaterialRepository.class);
         lessonService = Mockito.mock(LessonService.class);
 
-        lessonMaterialsService = new LessonMaterialsServiceImpl(materialRepository, lessonService);
+        lessonMaterialsService = new LessonMaterialsServiceImpl(materialRepository, lessonService, fileUtil);
     }
 
     @Test

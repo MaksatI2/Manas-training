@@ -89,7 +89,6 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                                         .id(lesson.getId())
                                         .title(lesson.getTitle())
                                         .description(lesson.getDescription())
-                                        .durationMinutes(lesson.getDurationMinutes())
                                         .build())
                                 .collect(Collectors.toList()))
                         .build())

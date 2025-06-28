@@ -58,4 +58,32 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer>, Jp
             @Param("courseInstanceId") Integer courseInstanceId,
             @Param("newEnd") LocalDate newEnd
     );
+
+    @Query("""
+    SELECT COALESCE(SUM(s.durationHours), 0)
+    FROM Schedule s
+    WHERE s.teacher.id = :teacherId
+      AND s.lessonDate = :lessonDate
+      AND (:excludeId IS NULL OR s.id <> :excludeId)
+""")
+    int getTotalTeacherHoursForDate(@Param("teacherId") Integer teacherId,
+                                    @Param("lessonDate") LocalDate lessonDate,
+                                    @Param("excludeId") Integer excludeId);
+
+    @Query("""
+    SELECT COALESCE(SUM(s.durationHours), 0)
+    FROM Schedule s
+    JOIN s.lesson l
+    JOIN l.module m
+    JOIN m.courseInstance ci
+    JOIN CourseEnrollment ce ON ce.courseInstance.id = ci.id
+    WHERE ce.student.id = :studentId
+      AND s.lessonDate = :lessonDate
+      AND (:excludeId IS NULL OR s.id <> :excludeId)
+""")
+    int getTotalStudentHoursForDate(@Param("studentId") Integer studentId,
+                                    @Param("lessonDate") LocalDate lessonDate,
+                                    @Param("excludeId") Integer excludeId);
+
+
 }

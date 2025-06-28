@@ -90,9 +90,13 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Часы</label>
-                                        <@spring.formInput "moduleListDto.modules[${module?index}].durationHours" 'class="form-control" type="number"  min="1"' />
+                                        <@spring.formInput
+                                        "moduleListDto.modules[${module?index}].durationHours",
+                                        "class='form-control only-digits' type='number' min='1' step='1' inputmode='numeric' pattern='[0-9]*'"
+                                        />
                                         <@spring.showErrors "<br>" "error text-danger small" />
                                     </div>
+
                                     <div class="col-md-3">
                                         <label class="form-label">Описание</label>
                                         <@spring.formTextarea "moduleListDto.modules[${module?index}].description" 'class="form-control" rows="3"' />
@@ -139,6 +143,8 @@
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/static/js/only-digits.js"></script>
+
     <script>
         const courseInstanceId = ${courseInstance.id?json_string};
     </script>

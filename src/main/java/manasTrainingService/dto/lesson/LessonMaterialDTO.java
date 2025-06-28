@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -17,6 +18,8 @@ public class LessonMaterialDTO {
     private Integer lessonId;
     @NotBlank(message = "Название материала необходимо")
     private String title;
-    @NotBlank(message = "URL материала необходим")
+
     private String url;
+    private MultipartFile file;
+
 }

@@ -30,10 +30,6 @@ public class Lesson {
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
-    @Column(name = "duration_minutes")
-    @Builder.Default
-    Integer durationMinutes = 0;
-
     @OneToMany(mappedBy = "lesson", orphanRemoval = true, cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
     List<Schedule> schedules;
 

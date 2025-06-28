@@ -28,7 +28,7 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
 
     @Override
     public List<CourseInstanceTeacherDTO> getTeachersByCourseInstanceId(Integer courseInstanceId) {
-        return repository.findByCourseInstanceIdAndIsPrimaryTrue(courseInstanceId).stream()
+        return repository.findByCourseInstanceId(courseInstanceId).stream()
                 .map(teacher -> CourseInstanceTeacherDTO.builder()
                         .id(teacher.getId())
                         .teacherId(teacher.getTeacher().getId())
