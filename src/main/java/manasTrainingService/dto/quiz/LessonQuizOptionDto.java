@@ -1,4 +1,4 @@
-package manasTrainingService.dto.tests;
+package manasTrainingService.dto.quiz;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OptionDto {
+public class LessonQuizOptionDto {
     private Integer id;
     private Integer questionId;
     @NotBlank(message = "Ответ обязательно должен быть заполнен")

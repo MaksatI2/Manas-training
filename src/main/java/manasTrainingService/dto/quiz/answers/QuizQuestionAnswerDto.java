@@ -1,4 +1,4 @@
-package manasTrainingService.dto.answers;
+package manasTrainingService.dto.quiz.answers;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionAnswerDto {
-    private Integer id;
-    private Integer questionId;
-    private Integer answerId;
+public class QuizQuestionAnswerDto {
+    Integer id;
+    Integer questionId;
+    Integer answerId;
     private BigDecimal points;
 }

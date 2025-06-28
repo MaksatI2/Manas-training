@@ -11,6 +11,12 @@
                 У вас пока нет курсов.
             </div>
         <#else>
+            <#if successMessage??>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
+                    ${successMessage}
+                </div>
+            </#if>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 <#list courses as course>
                     <div class="col">
@@ -26,6 +32,18 @@
                                 <a href="/teacher/course/${course.courseInstanceId}" class="btn btn-outline-primary w-100">
                                     Перейти к курсу
                                 </a>
+                                <#if course.courseTest??>
+                                    <a href="/test/${course.courseTest.id}/edit" class="btn btn-outline-primary w-100">
+                                        Редактировать итоговый тест
+                                    </a>
+                                    <a href="/test/${course.courseTest.id}/delete" class="btn btn-outline-danger w-100">
+                                        Удалить итоговый тест
+                                    </a>
+                                    <#else>
+                                        <a href="/test/create/${course.courseInstanceId}" class="btn btn-outline-primary w-100">
+                                            Создать итоговый тест
+                                        </a>
+                                </#if>
                             </div>
                         </div>
                     </div>

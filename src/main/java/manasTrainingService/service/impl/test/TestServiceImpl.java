@@ -3,6 +3,8 @@ package manasTrainingService.service.impl.test;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.answers.QuestionAnswerDto;
 import manasTrainingService.dto.answers.TestAnswerDto;
+import manasTrainingService.dto.answers.TestResultDto;
+import manasTrainingService.dto.quiz.answers.QuizResultDto;
 import manasTrainingService.dto.tests.QuestionDto;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.entity.Test;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +40,8 @@ public class TestServiceImpl implements TestService {
     @Override
     public void createTest(TestDto testDto){
 
-        LocalDateTime scheduledStart = parseDateRange(testDto.getRange()).get(0);
-        LocalDateTime scheduledEnd = parseDateRange(testDto.getRange()).get(1);
+        LocalDateTime scheduledStart = parseDateRange(testDto).get(0);
+        LocalDateTime scheduledEnd = parseDateRange(testDto).get(1);
 
         if(LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)){
             throw new IncorrectDateException("Дата не может быть в прошлом");
@@ -70,8 +74,8 @@ public class TestServiceImpl implements TestService {
         Test test = testRepository.findById(testDto.getId())
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
 
-        LocalDateTime scheduledStart = parseDateRange(testDto.getRange()).get(0);
-        LocalDateTime scheduledEnd = parseDateRange(testDto.getRange()).get(1);
+        LocalDateTime scheduledStart = parseDateRange(testDto).get(0);
+        LocalDateTime scheduledEnd = parseDateRange(testDto).get(1);
 
         if(LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)){
             throw new IncorrectDateException("Дата не может быть в прошлом");
@@ -93,9 +97,7 @@ public class TestServiceImpl implements TestService {
             test.setIsActive(testDto.getIsActive());
         }
         testRepository.saveAndFlush(test);
-        for (QuestionDto testQuestion : testDto.getQuestions()){
-            questionService.editQuestions(testQuestion);
-        }
+        questionService.editQuestions(testDto.getQuestions());
     }
 
     @Override
@@ -108,11 +110,43 @@ public class TestServiceImpl implements TestService {
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .isActive(test.getIsActive())
-                .range(convertToString(test.getScheduledStart(), test.getScheduledEnd()))
+                .startDate(test.getScheduledStart().toLocalDate())
+                .endDate(test.getScheduledEnd().toLocalDate())
+                .startTime(test.getScheduledStart().toLocalTime())
+                .endTime(test.getScheduledEnd().toLocalTime())
                 .courseInstanceId(test.getCourse().getId())
                 .passingScore(test.getPassingScore().intValue())
                 .questions(questionService.getQuestionsByTestId(test.getId()))
                 .build();
+    }
+
+    @Override
+    public TestDto getTestByCourseId(int id){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        Test test = testRepository.findByCourseId(id)
+                .orElse(null);
+        if(test == null){
+            return null;
+        }
+        return TestDto.builder()
+                .id(test.getId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .isActive(test.getIsActive())
+                .startDate(test.getScheduledStart().toLocalDate())
+                .endDate(test.getScheduledEnd().toLocalDate())
+                .startTime(test.getScheduledStart().toLocalTime())
+                .endTime(test.getScheduledEnd().toLocalTime())
+                .courseInstanceId(test.getCourse().getId())
+                .passingScore(test.getPassingScore().intValue())
+                .questions(questionService.getQuestionsByTestId(test.getId()))
+                .build();
+    }
+
+    @Override
+    public Test getTestEntityByCourseId(int id){
+        return testRepository.findByCourseId(id)
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
     }
 
     @Override
@@ -122,56 +156,55 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public void checkTestResunt(TestAnswerDto result){
+    public TestResultDto checkTestResult(TestAnswerDto result){
+        LocalDateTime endTime = LocalDateTime.now();
+
         int resultScore = result.getQuestionAnswers()
                 .stream()
                 .filter(a -> optionService.getOptionById(a.getAnswerId()).getIsCorrect())
-                .mapToInt(QuestionAnswerDto::getPoints)
+                .mapToInt(a -> a.getPoints().intValue())
                 .sum();
+
         boolean isPassed = true;
         if(getTestById(result.getTestId()).getPassingScore() > resultScore){
             isPassed = false;
         }
-        TestResult savedTestResult = testResultService.saveTestResult(result, resultScore, isPassed);
+        TestResult savedTestResult = testResultService.saveTestResult(result, resultScore, isPassed, endTime);
         testAnswerService.saveTestAnswers(result, savedTestResult);
+
+        return TestResultDto.builder()
+                .correctAnswersCount((int) result.getQuestionAnswers()
+                        .stream()
+                        .filter(a -> a.getAnswerId() != null)
+                        .filter(a -> optionService.getOptionById(a.getAnswerId()).getIsCorrect())
+                        .count())
+                .wrongAnswersCount((int) result.getQuestionAnswers()
+                        .stream()
+                        .filter(a -> a.getAnswerId() != null)
+                        .filter(a -> !optionService.getOptionById(a.getAnswerId()).getIsCorrect())
+                        .count())
+                .totalPoints(resultScore)
+                .withoutAnswersCount((int) result.getQuestionAnswers()
+                        .stream()
+                        .filter(a -> a.getAnswerId() == null)
+                        .count())
+                .questionsCount(result.getQuestionAnswers().size())
+                .passingTime(endTime.minusMinutes(result.getPassingStart().getMinute()).getMinute())
+                .isPassed(isPassed)
+                .build();
     }
 
-    private List<LocalDateTime> parseDateRange(String range){
-        if(range.contains(" - ")){
-            List<LocalDateTime> dates = new ArrayList<>();
-            String[] parsedString = range.split(" - ");
-            String parsedStart = parsedString[0];
-            String parsedEnd = parsedString[1];
-
-            String parsedStartDate = parsedStart.split(" ")[0];
-            String parsedStartTime = parsedStart.split(" ")[1];
-
-            String parsedEndDate = parsedEnd.split(" ")[0];
-            String parsedEndTime = parsedEnd.split(" ")[1];
-
-            dates.add(LocalDateTime.of(
-                    LocalDate.now().getYear(),
-                    Integer.parseInt(parsedStartDate.split("-")[1]),
-                    Integer.parseInt(parsedStartDate.split("-")[2]),
-                    Integer.parseInt(parsedStartTime.split(":")[0]),
-                    Integer.parseInt(parsedStartTime.split(":")[1]),
-                    0
-            ));
-            dates.add(LocalDateTime.of(
-                    LocalDate.now().getYear(),
-                    Integer.parseInt(parsedEndDate.split("-")[1]),
-                    Integer.parseInt(parsedEndDate.split("-")[2]),
-                    Integer.parseInt(parsedEndTime.split(":")[0]),
-                    Integer.parseInt(parsedEndTime.split(":")[1]),
-                    0
-            ));
-            return dates;
-        }else {
-            throw new IncorrectDateException("Неверный диапозон дат");
-        }
+    @Override
+    public void deleteTest(int id){
+        testRepository.deleteById(id);
     }
 
-    private String convertToString(LocalDateTime startDate, LocalDateTime endDate){
-        return startDate.toString() + " - " + endDate.toString();
+    private List<LocalDateTime> parseDateRange(TestDto testDto){
+        LocalDateTime start = testDto.getStartDate().atTime(testDto.getStartTime());
+        LocalDateTime end = testDto.getEndDate().atTime(testDto.getEndTime());
+        List<LocalDateTime> dates = new ArrayList<>();
+        dates.add(start);
+        dates.add(end);
+        return dates;
     }
 }

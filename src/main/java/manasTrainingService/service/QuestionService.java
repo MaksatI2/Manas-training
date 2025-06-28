@@ -9,7 +9,7 @@ import java.util.List;
 public interface QuestionService {
     void saveQuestions(List<QuestionDto> questions, Test test);
 
-    void editQuestions(QuestionDto questionDto);
+    void editQuestions(List<QuestionDto> questions);
 
     List<QuestionDto> getQuestionsByTestId(int testId);
 

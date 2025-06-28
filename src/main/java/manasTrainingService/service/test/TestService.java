@@ -1,6 +1,7 @@
 package manasTrainingService.service.test;
 
 import manasTrainingService.dto.answers.TestAnswerDto;
+import manasTrainingService.dto.answers.TestResultDto;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.entity.Test;
 
@@ -11,7 +12,13 @@ public interface TestService {
 
     TestDto getTestById(int id);
 
+    TestDto getTestByCourseId(int id);
+
+    Test getTestEntityByCourseId(int id);
+
     Test getTestEntityById(int id);
 
-    void checkTestResunt(TestAnswerDto result);
+    TestResultDto checkTestResult(TestAnswerDto result);
+
+    void deleteTest(int id);
 }

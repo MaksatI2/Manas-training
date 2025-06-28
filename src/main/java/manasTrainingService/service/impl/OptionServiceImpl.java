@@ -7,6 +7,10 @@ import manasTrainingService.entity.TestQuestion;
 import manasTrainingService.exceptions.nsee.QuestionOptionNotFoundException;
 import manasTrainingService.repositories.QuestionOptionRepository;
 import manasTrainingService.service.OptionService;
+import manasTrainingService.service.QuestionService;
+import manasTrainingService.service.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,33 +19,57 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OptionServiceImpl implements OptionService {
     private final QuestionOptionRepository questionOptionRepository;
+    private QuestionService questionService;
+
+    @Autowired
+    public void setQuestionService(@Lazy QuestionService questionService) {
+        this.questionService = questionService;
+    }
 
     @Override
-    public void saveQuestionOptions(List<OptionDto> options, TestQuestion testQuestion){
-        for (OptionDto optionDto : options){
+    public void saveQuestionOptions(List<OptionDto> options, TestQuestion testQuestion, Integer correctOptionIndex){
+        for(int i = 0; i<options.size(); i++){
             QuestionOption questionOption = new QuestionOption();
             questionOption.setQuestion(testQuestion);
-            questionOption.setOptionText(optionDto.getOptionText());
-            if(optionDto.getIsCorrect() == null){
-                questionOption.setIsCorrect(false);
+            questionOption.setOptionText(options.get(i).getOptionText());
+            if(correctOptionIndex != null && i == correctOptionIndex){
+                questionOption.setIsCorrect(true);
             }else{
-                questionOption.setIsCorrect(optionDto.getIsCorrect());
+                questionOption.setIsCorrect(false);
             }
             questionOptionRepository.saveAndFlush(questionOption);
         }
     }
 
     @Override
-    public void editOption(OptionDto option){
-        QuestionOption questionOption = questionOptionRepository.findById(option.getId())
+    public void editOption(List<OptionDto> options, Integer correctOptionIndex){
+        for(int i = 0; i<options.size(); i++) {
+            if (options.get(i).getId() != null){
+                QuestionOption questionOption = questionOptionRepository.findById(options.get(i).getId())
                         .orElseThrow(() -> new QuestionOptionNotFoundException("Вариант ответа не найден"));
-        questionOption.setOptionText(option.getOptionText());
-        if(option.getIsCorrect() == null){
-            questionOption.setIsCorrect(false);
-        }else{
-            questionOption.setIsCorrect(option.getIsCorrect());
+                if(options.get(i).getIsRemoved() != null && options.get(i).getIsRemoved()){
+                    questionOptionRepository.deleteById(options.get(i).getId());
+                    continue;
+                }
+                questionOption.setOptionText(options.get(i).getOptionText());
+                if(correctOptionIndex != null && i == correctOptionIndex){
+                    questionOption.setIsCorrect(true);
+                }else{
+                    questionOption.setIsCorrect(false);
+                }
+                questionOptionRepository.saveAndFlush(questionOption);
+            }else {
+                QuestionOption questionOption = new QuestionOption();
+                if(correctOptionIndex != null && i == correctOptionIndex){
+                    questionOption.setIsCorrect(true);
+                }else{
+                    questionOption.setIsCorrect(false);
+                }
+                questionOption.setOptionText(options.get(i).getOptionText());
+                questionOption.setQuestion(questionService.getQuestionById(options.get(i).getQuestionId()));
+                questionOptionRepository.saveAndFlush(questionOption);
+            }
         }
-        questionOptionRepository.saveAndFlush(questionOption);
     }
 
     @Override
@@ -55,6 +83,7 @@ public class OptionServiceImpl implements OptionService {
                     .questionId(o.getQuestion().getId())
                     .build()).toList();
     }
+
 
     @Override
     public QuestionOption getOptionById(int id){
