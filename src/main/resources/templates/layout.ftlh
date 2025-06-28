@@ -40,18 +40,14 @@
         </a>
     </div>
 
-    <div class="sidebar-content">
-        <div class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">Основное</div>
-                <#if !known || !isAdmin>
-                    <div class="nav-item">
-                        <a href="/" class="nav-link" data-tooltip="Главная">
-                            <i class="fas fa-home"></i>
-                            <span>Главная</span>
-                        </a>
-                    </div>
-                </#if>
+        <div class="sidebar-content">
+            <div class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="/" class="nav-link" data-tooltip="Главная">
+                        <i class="fas fa-home"></i>
+                        <span>Главная</span>
+                    </a>
+                </div>
                 <div class="nav-item">
                     <a href="/courses" class="nav-link" data-tooltip="Курсы">
                         <i class="fas fa-book"></i>
@@ -64,171 +60,136 @@
                         <span>Преподаватели</span>
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a href="/schedules" class="nav-link" data-tooltip="Расписание">
+                        <i class="fas fa-calendar"></i>
+                        <span>Расписание</span>
+                    </a>
+                </div>
+                <#if isAdmin?? && isAdmin>
+                    <div class="nav-item">
+                        <a href="/admin/users" class="nav-link" data-tooltip="Пользователи">
+                            <i class="fas fa-users"></i>
+                            <span>Пользователи</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/#" class="nav-link" data-tooltip="Отчеты">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Отчеты</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/admin/courses
+
+" class="nav-link" data-tooltip="Управление курсами">
+                            <i class="fas fa-book-open"></i>
+                            <span>Управление курсами</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/admin/categories" class="nav-link" data-tooltip="Категории курсов">
+                            <i class="fas fa-tags"></i>
+                            <span>Категории курсов</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/admin/course-instances" class="nav-link" data-tooltip="Потоки курсов">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Потоки курсов</span>
+                        </a>
+                    </div>
+                </#if>
+                <#if isTeacher?? && isTeacher>
+                    <div class="nav-item">
+                        <a href="/#" class="nav-link" data-tooltip="Тесты">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Тесты</span>
+                        </a>
+                    </div>
+                </#if>
+                <#if isOrganization?? && isOrganization>
+                    <div class="nav-item">
+                        <a href="/organization/students" class="nav-link" data-tooltip="Сотрудники">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Сотрудники</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/#" class="nav-link" data-tooltip="Курсы">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Курсы</span>
+                        </a>
+                    </div>
+                </#if>
+                <#if isStudent?? && isStudent>
+                    <div class="nav-item">
+                        <a href="/student/my-courses" class="nav-link" data-tooltip="Мои курсы">
+                            <i class="fas fa-book-open"></i>
+                            <span>Мои курсы</span>
+                        </a>
+                    </div>
+                </#if>
             </div>
 
-            <#if known>
-                <#if isAdmin>
-                    <div class="nav-section">
-                        <div class="nav-section-title">Администрирование</div>
-                        <div class="nav-item">
-                            <a href="/admin/users" class="nav-link" data-tooltip="Пользователи">
-                                <i class="fas fa-users"></i>
-                                <span>Пользователи</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="/#" class="nav-link" data-tooltip="Отчеты">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Отчеты</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="/schedules" class="nav-link" data-tooltip="Расписание">
-                                <i class="fas fa-calendar"></i>
-                                <span>Расписание</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="/admin/courses" class="nav-link" data-tooltip="Управление курсами">
-                                <i class="fas fa-book-open"></i>
-                                <span>Управление курсами</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="/admin/categories" class="nav-link" data-tooltip="Категории курсов">
-                                <i class="fas fa-tags"></i>
-                                <span>Категории курсов</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="/admin/course-instances" class="nav-link" data-tooltip="Потоки курсов">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Потоки курсов</span>
-                            </a>
-                        </div>
-                    </div>
-                </#if>
+            <div class="sidebar-profile">
+                <select class="language-selector" id="languageSelector">
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="ky">🇰🇬 Кыргызча</option>
+                    <option value="en">🇬🇧 English</option>
+                </select>
 
-                <#if isTeacher>
-                    <div class="nav-section">
-                        <div class="nav-section-title">Преподавание</div>
-                        <div class="nav-item">
-                            <a href="/#" class="nav-link" data-tooltip="Тесты">
-                                <i class="fas fa-question-circle"></i>
-                                <span>Тесты</span>
-                            </a>
+                <#if known>
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            ${name?substring(0, 1)?upper_case}
                         </div>
-                        <div class="nav-item">
-                            <a href="/schedules" class="nav-link" data-tooltip="Расписание">
-                                <i class="fas fa-calendar"></i>
-                                <span>Расписание</span>
-                            </a>
+                        <div>
+                            <div class="profile-name">${name}</div>
+                            <div class="profile-role">
+                                <#if isAdmin>Администратор</#if>
+                                <#if isTeacher>Преподаватель</#if>
+                                <#if isStudent>Студент</#if>
+                                <#if isOrganization>Организация</#if>
+                            </div>
                         </div>
                     </div>
-                </#if>
 
-                <#if isOrganization>
-                    <div class="nav-section">
-                        <div class="nav-section-title">Организация</div>
-                        <div class="nav-item">
-                            <a href="/organization/students" class="nav-link" data-tooltip="Сотрудники">
-                                <i class="fas fa-user-tie"></i>
-                                <span>Сотрудники</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="/#" class="nav-link" data-tooltip="Курсы">
-                                <i class="fas fa-graduation-cap"></i>
-                                <span>Курсы</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="#" class="nav-link" data-tooltip="Расписание">
-                                <i class="fas fa-calendar"></i>
-                                <span>Расписание</span>
-                            </a>
-                        </div>
-                    </div>
-                </#if>
+                    <div class="profile-actions">
+                        <#assign profileUrl = "/profile">
+                        <#if isAdmin>
+                            <#assign profileUrl = "/admin/profile">
+                        <#elseif isTeacher>
+                            <#assign profileUrl = "/teacher/profile">
+                        <#elseif isStudent>
+                            <#assign profileUrl = "/student/profile">
+                        <#elseif isOrganization>
+                            <#assign profileUrl = "/organization/profile">
+                        </#if>
 
-                <#if isStudent>
-                    <div class="nav-section">
-                        <div class="nav-section-title">Обучение</div>
-                        <div class="nav-item">
-                            <a href="/student/my-courses" class="nav-link" data-tooltip="Мои курсы">
-                                <i class="fas fa-book-open"></i>
-                                <span>Мои курсы</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="/schedules" class="nav-link" data-tooltip="Расписание">
-                                <i class="fas fa-calendar"></i>
-                                <span>Расписание</span>
-                            </a>
-                        </div>
+                        <a href="${profileUrl}" class="profile-btn">
+                            <i class="fas fa-user"></i> <span>Профиль</span>
+                        </a>
+                        <form action="/logout" method="post" style="width: 100%;">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            <button type="submit" class="profile-btn" style="width: 100%; background: none; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                <i class="fas fa-sign-out-alt"></i> <span>Выйти</span>
+                            </button>
+                        </form>
+                    </div>
+                <#else>
+                    <div class="profile-actions">
+                        <a href="/auth/login" class="profile-btn">
+                            <i class="fas fa-sign-in-alt"></i> <span>Войти</span>
+                        </a>
+                        <a href="/auth/register" class="profile-btn">
+                            <i class="fas fa-user-plus"></i> <span>Регистрация</span>
+                        </a>
                     </div>
                 </#if>
-            </#if>
+            </div>
         </div>
-
-        <div class="sidebar-profile">
-            <select class="language-selector" id="languageSelector">
-                <option value="ru">🇷🇺 Русский</option>
-                <option value="ky">🇰🇬 Кыргызча</option>
-                <option value="en">🇬🇧 English</option>
-            </select>
-
-            <#if known>
-                <div class="profile-info">
-                    <div class="profile-avatar">
-                        ${name?substring(0, 1)?upper_case}
-                    </div>
-                    <div>
-                        <div class="profile-name">${name}</div>
-                        <div class="profile-role">
-                            <#if isAdmin>Администратор</#if>
-                            <#if isTeacher>Преподаватель</#if>
-                            <#if isStudent>Студент</#if>
-                            <#if isOrganization>Организация</#if>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="profile-actions">
-                    <#assign profileUrl = "/profile">
-                    <#if isAdmin>
-                        <#assign profileUrl = "/admin/profile">
-                    <#elseif isTeacher>
-                        <#assign profileUrl = "/teacher/profile">
-                    <#elseif isStudent>
-                        <#assign profileUrl = "/student/profile">
-                    <#elseif isOrganization>
-                        <#assign profileUrl = "/organization/profile">
-                    </#if>
-
-                    <a href="${profileUrl}" class="profile-btn">
-                        <i class="fas fa-user"></i> <span>Профиль</span>
-                    </a>
-                    <form action="/logout" method="post" style="width: 100%;">
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                        <button type="submit" class="profile-btn" style="width: 100%; background: none; border: 1px solid rgba(255, 255, 255, 0.2);">
-                            <i class="fas fa-sign-out-alt"></i> <span>Выйти</span>
-                        </button>
-                    </form>
-                </div>
-            <#else>
-                <div class="profile-actions">
-                    <a href="/auth/login" class="profile-btn">
-                        <i class="fas fa-sign-in-alt"></i> <span>Войти</span>
-                    </a>
-                    <a href="/auth/register" class="profile-btn">
-                        <i class="fas fa-user-plus"></i> <span>Регистрация</span>
-                    </a>
-                </div>
-            </#if>
-        </div>
-    </div>
-</nav>
+    </nav>
 
 <div class="main-wrapper" id="mainWrapper">
     <header class="top-header">
@@ -464,20 +425,16 @@
         min-height: 0;
     }
 
-    .nav-section {
-        margin-bottom: 2rem;
+    .sidebar-nav {
+        flex: 1;
+        padding: 1rem 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-height: 0;
     }
 
-    .nav-section-title {
-        color: var(--light-blue);
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 0 1.5rem;
-        margin-bottom: 1rem;
-        opacity: 0.8;
-        transition: all 0.3s ease;
+    .nav-item {
+        margin-bottom: 0.5rem;
     }
 
     .sidebar.collapsed .nav-section-title {
