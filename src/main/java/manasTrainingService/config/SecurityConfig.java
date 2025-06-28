@@ -33,7 +33,11 @@ public class SecurityConfig {
                         .requestMatchers("/student/**").hasAuthority("STUDENT")
                         .requestMatchers("/test/create/*").hasAuthority("TEACHER")
                         .requestMatchers("/test/{id}/edit").hasAuthority("TEACHER")
+                        .requestMatchers("/test/{id}/delete").hasAuthority("TEACHER")
                         .requestMatchers("/test/{id}/passing").hasAuthority("STUDENT")
+                        .requestMatchers("/quiz/create/*").hasAuthority("TEACHER")
+                        .requestMatchers("/quiz/{id}/edit").hasAuthority("TEACHER")
+                        .requestMatchers("/quiz/{id}/passing").hasAuthority("STUDENT")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

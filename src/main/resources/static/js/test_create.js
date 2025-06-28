@@ -1,6 +1,6 @@
 let createQuestionButton = document.getElementById("createQuestion");
-let testForm = document.getElementById("test");
-let questionId = questionIndex+1;
+let testFormDiv = document.getElementById("test");
+let questionId = questionIndex;
 
 const optionCounters = {};
 
@@ -37,26 +37,52 @@ function createLabel(name, text) {
     return label;
 }
 
-function createInput(name, type) {
+function createInput(name, type, className) {
     let input = document.createElement("input");
     input.setAttribute("type", type);
-    input.setAttribute("class", "form-control");
+    input.setAttribute("class", className);
+    input.setAttribute("name", name);
+    input.setAttribute("id", name);
+    if (className.includes('points')){
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            if (parseInt(input.value) > 100) {
+                input.value = '100';
+            }
+        })
+    }
+    return input;
+}
+
+function createOptionInput(name, type) {
+    let input = document.createElement("input");
+    input.setAttribute("type", type);
+    input.setAttribute("class", "form-control me-2");
+    input.setAttribute("placeholder", "Вариант ответа")
+    input.setAttribute("aria-describedby", "button-addon2")
     input.setAttribute("name", name);
     input.setAttribute("id", name);
     return input;
 }
 
-function createInputContainer(labelName, labelText, inputName, inputType){
+function createInputContainer(labelName, labelText, inputName, inputType, inputClassName){
     let div = document.createElement("div")
     div.setAttribute("class", "mb-3")
     div.append(createLabel(labelName, labelText));
-    div.append(createInput(inputName, inputType));
+    div.append(createInput(inputName, inputType, inputClassName));
+    return div;
+}
+
+function createOptionInputContainer(inputName, inputType, className){
+    let div = document.createElement("div")
+    div.setAttribute("class", className)
+    div.append(createOptionInput(inputName, inputType));
     return div;
 }
 
 function createEmptyContainer(element1, element2){
     let div = document.createElement("div")
-    div.setAttribute("class", "mb-3")
+    div.setAttribute("class", "form-check d-flex align-items-center mb-0")
     div.append(element1)
     if(element2){
         div.append(element2)
@@ -67,17 +93,47 @@ function createEmptyContainer(element1, element2){
 function createCheckBox(name) {
     let checkBox = document.createElement("input");
     checkBox.setAttribute("type", "checkbox");
-    checkBox.setAttribute("class", "form-check-input fs-4");
+    checkBox.setAttribute("class", "form-check-input fs-4 me-2");
     checkBox.setAttribute("name", name);
     checkBox.setAttribute("id", name);
+    checkBox.setAttribute("checked", "true");
     return checkBox;
 }
 
-function createRemoveButton(id, text) {
+function createRadio(name, questionId, optionId, isChecked) {
+    let radio = document.createElement("input");
+    radio.setAttribute("type", "radio");
+    radio.setAttribute("class", "form-check-input fs-4 me-2");
+    radio.setAttribute("name", name);
+    radio.setAttribute("id", "questions[" + questionId + "].options[" + optionId + "]");
+    radio.setAttribute("value", optionId)
+    if(isChecked && isChecked === true){
+        radio.setAttribute("checked", "true")
+    }
+    return radio;
+}
+
+function createRemoveQuestionButton(id) {
+    let div = document.createElement("div")
+    div.setAttribute("class", "text-end")
     let button = document.createElement("button");
     button.setAttribute("type", "button");
-    button.setAttribute("class", "btn btn-danger ms-2 px-4 py-2 rounded-5");
-    button.innerText = text;
+    button.setAttribute("class", "btn btn-outline-danger");
+    button.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+    button.addEventListener("click", () => {
+        const element = document.getElementById(id);
+        if (element) element.remove();
+    });
+    div.append(button)
+    return div;
+}
+
+function createOptionRemoveButton(id) {
+    let button = document.createElement("button");
+    button.setAttribute("type", "button");
+    button.setAttribute("class", "btn btn-outline-danger");
+    button.setAttribute("id", "button-addon2");
+    button.innerHTML = `<i class="fa-solid fa-trash"></i>`;
     button.addEventListener("click", () => {
         const element = document.getElementById(id);
         if (element) element.remove();
@@ -85,26 +141,35 @@ function createRemoveButton(id, text) {
     return button;
 }
 
-function createQuestionOption(questionId, optionId) {
+function createQuestionOption(questionId, optionId, isChecked) {
     let optionsCount = document.querySelectorAll(`[id^="questionId"][id*="optionId-"]`).length;
     let id = `questionId-${questionId}-optionId-${optionsCount}`;
     let div = document.createElement("div");
-    div.setAttribute("class", "feature-card");
+    div.setAttribute("class", "d-flex align-items-center mt-3");
     div.setAttribute("id", id);
 
-    div.append(createInputContainer(
-        "questions[" + questionId + "].options[" + optionId + "].optionText",
-        "Вариант ответа",
-        "questions[" + questionId + "].options[" + optionId + "].optionText",
-        "text",
-    ))
     div.append(createEmptyContainer(
-        createCheckBox("questions[" + questionId + "].options[" + optionId + "].isCorrect"),
-        createLabel("questions[" + questionId + "].options[" + optionId + "].isCorrect", "Верный ответ?")
+        createRadio("questions[" + questionId + "].correctOptionIndex", questionId, optionId, isChecked),
     ))
+    let optionContainer;
     if (optionId > 0){
-        div.append(createEmptyContainer(createRemoveButton(id, "Удалить вариант ответа")));
+        optionContainer = createOptionInputContainer(
+            "questions[" + questionId + "].options[" + optionId + "].optionText",
+            "text",
+            "d-flex flex-grow-1 align-items-center"
+            )
+    }else {
+        optionContainer = createOptionInputContainer(
+            "questions[" + questionId + "].options[" + optionId + "].optionText",
+            "text",
+            "flex-grow-1 me-5"
+        )
     }
+    if (optionId > 0){
+        optionContainer.append(createOptionRemoveButton(id))
+    }
+
+    div.append(optionContainer)
     return div;
 }
 
@@ -127,52 +192,16 @@ function createAddButton(questionId, optionsContainer, optionIdRef) {
     button.setAttribute("class", "btn btn-primary-custom");
     button.innerText = "Добавить вариант ответа";
 
+    let div = document.createElement("div")
+    div.setAttribute("class", "my-3")
+
     button.addEventListener("click", () => {
         const newOption = createQuestionOption(questionId, optionIdRef.value);
-        optionsContainer.insertBefore(newOption, button);
+        optionsContainer.insertBefore(newOption, div);
         optionIdRef.value++;
     });
 
-    return button;
-}
-
-function createQuestionBlock(questionId) {
-    const optionIdRef = { value: 0 }; // локальный "счетчик" для вариантов
-    let div = document.createElement("div");
-    div.setAttribute("class", "feature-card");
-    div.setAttribute("id", `questionId-${questionId}`);
-
-    div.append(createInputContainer(
-        "questions[" + questionId + "].question",
-        "Введите текст вопроса",
-        "questions[" + questionId + "].question",
-        "text"
-        ))
-    div.append(createInputContainer(
-        "questions[" + questionId + "].points",
-        "Количество баллов за правильный ответ",
-        "questions[" + questionId + "].points",
-        "number"
-    ))
-
-    let optionsContainer = document.createElement("div");
-    optionsContainer.setAttribute("class", "mt-3");
-    optionsContainer.setAttribute("id", `options-questionId-${questionId}`);
-
-    optionsContainer.append(createQuestionOption(questionId, optionIdRef.value));
-    optionIdRef.value++;
-
-    const addButton = createAddButton(questionId, optionsContainer, optionIdRef);
-    optionsContainer.append(addButton);
-
-    div.append(optionsContainer);
-    div.append(createEmptyContainer(
-        createCheckBox("questions[" + questionId + "].isRequired"),
-        createLabel("questions[" + questionId + "].isRequired", "Обязательный?")
-    ))
-    div.append(createEmptyContainer(
-        createRemoveButton(`questionId-${questionId}`, "Удалить вопрос")
-    ))
+    div.append(button)
 
     return div;
 }
@@ -185,9 +214,14 @@ function deleteQuestion(id){
     });
 }
 
-function deleteOption(id){
+function deleteOption(id, errorId){
     let button = document.getElementById(id);
     let div = document.getElementById(id);
+    let err;
+    if(errorId){
+        err = document.querySelectorAll("."+errorId)
+        err.forEach(e => e.remove())
+    }
     button.addEventListener('click', () => {
         div.remove();
     });
@@ -195,6 +229,6 @@ function deleteOption(id){
 
 createQuestionButton.addEventListener("click", () => {
     const newQuestion = createQuestionBlock(questionId);
-    testForm.insertBefore(newQuestion, createQuestionButton);
+    testFormDiv.insertBefore(newQuestion, createQuestionButton);
     questionId++;
 });

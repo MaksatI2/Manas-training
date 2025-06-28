@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
@@ -33,15 +34,14 @@ public class TestResultServiceImpl implements TestResultService {
     }
 
     @Override
-    public TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultPoints, boolean isPassed) {
-        LocalDateTime submittedAt = LocalDateTime.now();
-        int duration = (int) Duration.between(testAnswerDto.getPassingStart(), submittedAt).toMinutes();
+    public TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultPoints, boolean isPassed, LocalDateTime endTime) {
+        int duration = (int) Duration.between(testAnswerDto.getPassingStart(), endTime).toMinutes();
         TestResult testResult = new TestResult();
         testResult.setTest(testService.getTestEntityById(testAnswerDto.getTestId()));
         testResult.setStudent(userService.getAuthorizedUser());
         testResult.setScore(BigDecimal.valueOf(resultPoints));
         testResult.setStartedAt(testAnswerDto.getPassingStart());
-        testResult.setSubmittedAt(submittedAt);
+        testResult.setSubmittedAt(endTime);
         testResult.setTimeSpentMinutes(duration);
         testResult.setIsPassed(isPassed);
         return testResultRepository.saveAndFlush(testResult);

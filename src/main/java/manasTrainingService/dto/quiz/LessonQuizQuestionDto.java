@@ -1,14 +1,10 @@
-package manasTrainingService.dto.tests;
+package manasTrainingService.dto.quiz;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -16,15 +12,14 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionDto {
+public class LessonQuizQuestionDto {
     private Integer id;
-    private Integer testId;
+    private Integer quizId;
     @NotBlank(message = "Вопрос обязателен для заполнения")
     private String question;
     private BigDecimal points;
-    private Boolean isRequired;
     @Valid
-    private List<OptionDto> options = new ArrayList<>();
+    private List<LessonQuizOptionDto> options;
     private Integer correctOptionIndex;
     private Boolean isRemoved;
 }

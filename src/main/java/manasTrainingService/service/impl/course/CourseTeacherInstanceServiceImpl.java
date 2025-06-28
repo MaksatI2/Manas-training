@@ -11,6 +11,7 @@ import manasTrainingService.exceptions.nsee.user.UserNotFoundException;
 import manasTrainingService.repositories.course.CourseInstanceTeacherRepository;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
+import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     private final CourseInstanceTeacherRepository repository;
     private final CourseInstanceService courseInstanceService;
     private final UserService userService;
+    private final TestService testService;
 
     @Override
     public List<CourseInstanceTeacherDTO> getTeachersByCourseInstanceId(Integer courseInstanceId) {
@@ -81,6 +83,7 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
                             .startDate(ci.getStartDate())
                             .endDate(ci.getEndDate())
                             .isPrimary(relation.getIsPrimary())
+                            .courseTest(testService.getTestByCourseId(ci.getCourse().getId()))
                             .build();
                 })
                 .collect(Collectors.toList());

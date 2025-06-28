@@ -329,6 +329,10 @@
                         <div class="detail-value">${teacher.bio}</div>
                     </div>
                 </#if>
+                <a href="/teacher/my-courses" class="edit-button">
+                    <i class="fas fa-edit"></i>
+                    Мои курсы
+                </a>
             </div>
         </div>
     </div>
