@@ -167,6 +167,13 @@ class CourseModuleServiceTest {
     @Test
     void updateModule_shouldUpdateCorrectly() {
         Integer moduleId = 1;
+
+        Schedule schedule1 = Schedule.builder().durationHours(1).build();
+        Schedule schedule2 = Schedule.builder().durationHours(2).build();
+
+        Lesson lesson1 = Lesson.builder().schedules(List.of(schedule1)).build();
+        Lesson lesson2 = Lesson.builder().schedules(List.of(schedule2)).build();
+
         CourseInstance courseInstance = CourseInstance.builder()
                 .course(Course.builder().durationHours(100).build())
                 .modules(new ArrayList<>())
@@ -175,10 +182,7 @@ class CourseModuleServiceTest {
         CourseModule module = CourseModule.builder()
                 .id(moduleId)
                 .courseInstance(courseInstance)
-                .lessons(Arrays.asList(
-                        Lesson.builder().durationMinutes(30).build(),
-                        Lesson.builder().durationMinutes(45).build()
-                ))
+                .lessons(List.of(lesson1, lesson2))
                 .durationHours(3)
                 .build();
 
@@ -186,7 +190,7 @@ class CourseModuleServiceTest {
 
         CourseModuleUpdateDTO updateDTO = new CourseModuleUpdateDTO();
         updateDTO.setTitle("Обновленное название");
-        updateDTO.setDurationHours(1);
+        updateDTO.setDurationHours(1); // меньше 3
         updateDTO.setDescription("Обновленное описание");
 
         when(courseModuleRepository.findById(moduleId)).thenReturn(Optional.of(module));
@@ -195,7 +199,7 @@ class CourseModuleServiceTest {
             service.updateModule(moduleId, updateDTO);
         });
 
-        assertTrue(ex.getMessage().contains("новая продолжительность модуля"));
+        assertTrue(ex.getMessage().contains("меньше общей длительности всех расписаний"));
 
         updateDTO.setDurationHours(3);
 
@@ -221,17 +225,23 @@ class CourseModuleServiceTest {
         assertEquals("Обновленное описание", saved.getDescription());
     }
 
+
     @Test
-    void updateModule_shouldThrowWhenDurationLessThanLessonsTotal() {
+    void updateModule_shouldThrowWhenDurationLessThanScheduleTotal() {
         Integer moduleId = 1;
+
+        Lesson lesson1 = Lesson.builder().schedules(List.of(
+                Schedule.builder().durationHours(2).build()
+        )).build();
+
+        Lesson lesson2 = Lesson.builder().schedules(List.of(
+                Schedule.builder().durationHours(1).build()
+        )).build();
 
         CourseModule module = CourseModule.builder()
                 .id(moduleId)
                 .durationHours(5)
-                .lessons(Arrays.asList(
-                        Lesson.builder().durationMinutes(90).build(),
-                        Lesson.builder().durationMinutes(60).build()
-                ))
+                .lessons(List.of(lesson1, lesson2))
                 .courseInstance(CourseInstance.builder()
                         .modules(Collections.emptyList())
                         .course(Course.builder().durationHours(10).build())
@@ -247,8 +257,9 @@ class CourseModuleServiceTest {
             service.updateModule(moduleId, updateDTO);
         });
 
-        assertTrue(ex.getMessage().contains("Изменение невозможно"));
+        assertTrue(ex.getMessage().contains("так как она меньше общей длительности всех расписаний"));
     }
+
 
 
 }
