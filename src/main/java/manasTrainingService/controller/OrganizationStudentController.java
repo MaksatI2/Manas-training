@@ -2,8 +2,6 @@ package manasTrainingService.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.CourseDto;
-import manasTrainingService.dto.organization.AssignCourseDto;
 import manasTrainingService.dto.organization.CreateStudentByOrganizationDto;
 import manasTrainingService.dto.organization.StudentCourseInfoDto;
 import manasTrainingService.dto.organization.StudentEditByOrganizationDto;
@@ -112,36 +110,6 @@ public class OrganizationStudentController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/organization/students";
-    }
-
-    @GetMapping("/{studentId}/assign")
-    public String showAssignCourseForm(@PathVariable Long studentId, Model model) {
-        AssignCourseDto dto = AssignCourseDto.builder().studentId(studentId).build();
-        model.addAttribute("assignDto", dto);
-
-        List<CourseDto> availableCourses = courseService.getAvailableCoursesForOrganization(userService.getAuthorizedUser());
-        System.out.println("Available courses: " + availableCourses.size());
-
-        model.addAttribute("courses", availableCourses);
-        return "organization/students/assign-course";
-    }
-
-
-    @PostMapping("/{studentId}/assign")
-    public String assignCourse(@PathVariable Long studentId, @Valid @ModelAttribute("assignDto") AssignCourseDto dto, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        if (bindingResult.hasErrors()) {
-            return "organization/students/assign-course";
-        }
-
-        try {
-            dto.setStudentId(studentId);
-            organizationService.assignStudentToCourse(dto, userService.getAuthorizedUser());
-            redirectAttributes.addFlashAttribute("successMessage", "Курс успешно назначен");
-            return "redirect:/organization/students";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "organization/students/assign-course";
-        }
     }
 
     @PostMapping("/enrollment/{enrollmentId}/remove")

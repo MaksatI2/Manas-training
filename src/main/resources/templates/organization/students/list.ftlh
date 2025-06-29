@@ -86,10 +86,6 @@
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </form>
-                                <a href="/organization/students/${sid}/assign"
-                                   class="btn btn-sm btn-outline-success">
-                                    <i class="fa fa-book"></i>
-                                </a>
                             </td>
                         </tr>
                     </#list>

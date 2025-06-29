@@ -14,21 +14,24 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
+
     Boolean existsByEmail(String email);
+
     Boolean existsByPhone(String phoneNumber);
+
     Boolean existsByName(String name);
 
     Page<User> findByRole_Name(String roleName, Pageable pageable);
 
     @Query("SELECT u FROM User u WHERE " +
-           "(:role IS NULL OR :role = '' OR u.role.name = :role) AND " +
-           "(:status IS NULL OR :status = '' OR " +
-           "  (:status = 'active' AND u.isActive = true) OR " +
-           "  (:status = 'inactive' AND u.isActive = false)) AND " +
-           "(:search IS NULL OR :search = '' OR " +
-           "  LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "  LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "  LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))")
+            "(:role IS NULL OR :role = '' OR u.role.name = :role) AND " +
+            "(:status IS NULL OR :status = '' OR " +
+            "  (:status = 'active' AND u.isActive = true) OR " +
+            "  (:status = 'inactive' AND u.isActive = false)) AND " +
+            "(:search IS NULL OR :search = '' OR " +
+            "  LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "  LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "  LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<User> findUsersWithFilters(@Param("role") String role,
                                     @Param("status") String status,
                                     @Param("search") String search,
@@ -38,5 +41,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<String> findAllDistinctRoleNames();
 
     long countByRole_NameAndIsActiveTrue(String roleName);
+
+    List<User> findAllByRole_Name(String roleName);
 
 }
