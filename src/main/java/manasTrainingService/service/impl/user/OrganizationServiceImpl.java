@@ -2,9 +2,9 @@ package manasTrainingService.service.impl.user;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.application.EmployeeShortDto;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.edit.OrganizationProfileEditDto;
-import manasTrainingService.dto.organization.AssignCourseDto;
 import manasTrainingService.dto.organization.CreateStudentByOrganizationDto;
 import manasTrainingService.dto.organization.StudentCourseInfoDto;
 import manasTrainingService.dto.organization.StudentEditByOrganizationDto;
@@ -196,35 +196,6 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public void assignStudentToCourse(AssignCourseDto dto, User organizationUser) {
-        User student = userRepository.findById(dto.getStudentId().intValue())
-                .orElseThrow(() -> new UserNotFoundException("Студент не найден"));
-
-        Organization organization = organizationRepository.findByUserId(organizationUser.getId())
-                .orElseThrow(() -> new OrganizationNotFoundException("Организация не найдена"));
-        Organization studentOrg = student.getStudentProfile() != null
-                ? student.getStudentProfile().getOrganization()
-                : null;
-        if (studentOrg == null || !studentOrg.getId().equals(organization.getId())) {
-            throw new AccessDeniedException("Невозможно назначить курс студенту из другой организации");
-        }
-
-        if (courseEnrollmentRepository.existsByStudentIdAndCourseInstanceId(student.getId(), dto.getCourseInstanceId())) {
-            throw new UserAlreadyExistsException("Этот студент уже записан на выбранный курс");
-        }
-        CourseInstance courseInstance = courseInstanceRepository.findById(dto.getCourseInstanceId())
-                .orElseThrow(() -> new IllegalArgumentException("Курс не найден"));
-
-        CourseEnrollment enrollment = CourseEnrollment.builder()
-                .student(student)
-                .courseInstance(courseInstance)
-                .status(Status.ENROLLED)
-                .build();
-
-        courseEnrollmentRepository.save(enrollment);
-    }
-
-    @Override
     public void removeStudentFromCourse(Integer enrollmentId, User organizationUser) {
         CourseEnrollment enrollment = courseEnrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new CourseEnrollmentNotFoundException("Запись на курс не найдена"));
@@ -338,4 +309,43 @@ public class OrganizationServiceImpl implements OrganizationService {
         profile.setOrganization(organization);
         studentProfileRepository.save(profile);
     }
+
+    @Override
+    public List<EmployeeShortDto> getMyEmployees(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+
+        Organization organization = organizationRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new OrganizationNotFoundException("Организация не найдена"));
+
+        List<StudentProfile> profiles = studentProfileRepository.findAllByOrganization(organization);
+        return profiles.stream().map(p -> {
+            User student = p.getUser();
+            return EmployeeShortDto.builder()
+                    .id(student.getId())
+                    .fullName(student.getName() + " " + student.getLastName())
+                    .email(student.getEmail())
+                    .build();
+        }).toList();
+    }
+
+    @Override
+    public OrganizationProfileDto getAuthorizedUserOrganizationByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        return getAuthorizedUserOrganization(user);
+    }
+
+    @Override
+    public List<EmployeeShortDto> getAllTeachersShortDto() {
+        return userRepository.findAllByRole_Name("TEACHER").stream().map(u -> {
+            EmployeeShortDto dto = new EmployeeShortDto();
+            dto.setId(u.getId());
+            dto.setFullName(u.getName() + " " + u.getLastName());
+            dto.setEmail(u.getEmail());
+            return dto;
+        }).toList();
+    }
+
+
 }

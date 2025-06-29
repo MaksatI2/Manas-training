@@ -3,6 +3,7 @@ package manasTrainingService.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import manasTrainingService.dto.CourseInstanceCreationDTO;
+import manasTrainingService.dto.application.CourseApplicationCreateDto;
 import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 
 import java.time.LocalDate;
@@ -16,14 +17,15 @@ public class EndDateAfterStartDateValidator implements ConstraintValidator<EndDa
         LocalDate startDate = null;
         LocalDate endDate = null;
 
-        if (obj instanceof CourseInstanceCreationDTO) {
-            CourseInstanceCreationDTO dto = (CourseInstanceCreationDTO) obj;
+        if (obj instanceof CourseInstanceCreationDTO dto) {
             startDate = dto.getStartDate();
             endDate = dto.getEndDate();
-        } else if (obj instanceof CourseInstanceUpdateDTO) {
-            CourseInstanceUpdateDTO dto = (CourseInstanceUpdateDTO) obj;
+        } else if (obj instanceof CourseInstanceUpdateDTO dto) {
             startDate = dto.getStartDate();
             endDate = dto.getEndDate();
+        } else if (obj instanceof CourseApplicationCreateDto dto) {
+            startDate = dto.getPreferredStartDate();
+            endDate = dto.getPreferredEndDate();
         } else {
             return true; //На будущее, если вам понадобится для валидации
         }
@@ -34,12 +36,11 @@ public class EndDateAfterStartDateValidator implements ConstraintValidator<EndDa
 
         if (!isValid) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("Дата конца должна быть после начала")
-                    .addPropertyNode("endDate")
+            context.buildConstraintViolationWithTemplate("Дата окончания должна быть после даты начала")
+                    .addPropertyNode("preferredEndDate")
                     .addConstraintViolation();
         }
 
         return isValid;
     }
-
 }

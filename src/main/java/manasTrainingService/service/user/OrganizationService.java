@@ -1,8 +1,8 @@
 package manasTrainingService.service.user;
 
+import manasTrainingService.dto.application.EmployeeShortDto;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.edit.OrganizationProfileEditDto;
-import manasTrainingService.dto.organization.AssignCourseDto;
 import manasTrainingService.dto.organization.CreateStudentByOrganizationDto;
 import manasTrainingService.dto.organization.StudentCourseInfoDto;
 import manasTrainingService.dto.organization.StudentEditByOrganizationDto;
@@ -35,8 +35,6 @@ public interface OrganizationService {
 
     void editStudentProfileByOrganization(StudentEditByOrganizationDto dto);
 
-    void assignStudentToCourse(AssignCourseDto dto, User organizationUser);
-
     void removeStudentFromCourse(Integer enrollmentId, User organizationUser);
 
     void deleteStudentFromOrganization(Integer studentId, User organizationUser);
@@ -44,5 +42,12 @@ public interface OrganizationService {
     void createStudentByOrganization(CreateStudentByOrganizationDto dto, User organizationUser);
 
     void attachStudentToOrganization(Integer studentId, User organizationUser);
+
+    List<EmployeeShortDto> getMyEmployees(String email);
+
+    OrganizationProfileDto getAuthorizedUserOrganizationByEmail(String email);
+
+    List<EmployeeShortDto> getAllTeachersShortDto();
+
 
 }

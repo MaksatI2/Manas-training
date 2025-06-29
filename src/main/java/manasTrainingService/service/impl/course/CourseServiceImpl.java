@@ -91,12 +91,23 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<CourseDto> getAvailableCoursesForOrganization(User organizationUser) {
         return courseInstanceRepository.findAllByIsActiveTrue().stream()
-                .map(instance -> CourseDto.builder()
-                        .id(instance.getId())
-                        .title(instance.getCourse().getTitle())
-                        .build())
-                .toList();
+                .map(instance -> {
+                    Course course = instance.getCourse();
+                    return CourseDto.builder()
+                            .id(course.getId())
+                            .title(course.getTitle())
+                            .code(course.getCode())
+                            .description(course.getDescription())
+                            .duration(course.getDurationHours())
+                            .individual(course.getIsIndividual())
+                            .active(course.getIsActive())
+                            .createdAt(course.getCreatedAt())
+                            .updatedAt(course.getUpdatedAt())
+                            .categoryId(course.getCategory().getId())
+                            .instanceTitle(instance.getTitle())
+                            .instanceStartDate(instance.getStartDate().toLocalDate())
+                            .instanceEndDate(instance.getEndDate().toLocalDate())
+                            .build();
+                }).toList();
     }
-
-
 }

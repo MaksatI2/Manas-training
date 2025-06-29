@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -44,4 +45,11 @@ public class CourseDto {
 
     @NotNull(message = "Категория обязательна")
     private Integer categoryId;
+
+    private String instanceTitle;
+
+    private LocalDate instanceStartDate;
+
+    private LocalDate instanceEndDate;
+
 }

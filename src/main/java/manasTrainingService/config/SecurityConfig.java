@@ -28,6 +28,8 @@ public class SecurityConfig {
                                 "/teachers/**",
                                 "/data/images/**"
                         ).permitAll()
+                        .requestMatchers("/applications/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/applications/organization/**").hasAuthority("ORGANIZATION")
                         .requestMatchers("/schedules/**").hasAnyAuthority("ADMIN", "STUDENT", "TEACHER")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/student/**").hasAuthority("STUDENT")
