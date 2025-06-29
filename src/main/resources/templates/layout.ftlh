@@ -60,17 +60,17 @@
                         <span>Преподаватели</span>
                     </a>
                 </div>
-                <div class="nav-item">
-                    <a href="/schedules" class="nav-link" data-tooltip="Расписание">
-                        <i class="fas fa-calendar"></i>
-                        <span>Расписание</span>
-                    </a>
-                </div>
                 <#if isAdmin?? && isAdmin>
                     <div class="nav-item">
                         <a href="/admin/users" class="nav-link" data-tooltip="Пользователи">
                             <i class="fas fa-users"></i>
                             <span>Пользователи</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/schedules" class="nav-link" data-tooltip="Расписание">
+                            <i class="fas fa-calendar"></i>
+                            <span>Расписание</span>
                         </a>
                     </div>
                     <div class="nav-item">
@@ -107,6 +107,12 @@
                             <span>Тесты</span>
                         </a>
                     </div>
+                    <div class="nav-item">
+                        <a href="/schedules" class="nav-link" data-tooltip="Расписание">
+                            <i class="fas fa-calendar"></i>
+                            <span>Расписание</span>
+                        </a>
+                    </div>
                 </#if>
                 <#if isOrganization?? && isOrganization>
                     <div class="nav-item">
@@ -127,6 +133,12 @@
                         <a href="/student/my-courses" class="nav-link" data-tooltip="Мои курсы">
                             <i class="fas fa-book-open"></i>
                             <span>Мои курсы</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/schedules" class="nav-link" data-tooltip="Расписание">
+                            <i class="fas fa-calendar"></i>
+                            <span>Расписание</span>
                         </a>
                     </div>
                 </#if>
