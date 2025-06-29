@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +33,7 @@ class LessonMaterialsServiceTest {
     void setUp() {
         materialRepository = Mockito.mock(LessonMaterialRepository.class);
         lessonService = Mockito.mock(LessonService.class);
+        fileUtil = Mockito.mock(FileUtil.class);
 
         lessonMaterialsService = new LessonMaterialsServiceImpl(materialRepository, lessonService, fileUtil);
     }
@@ -55,10 +58,19 @@ class LessonMaterialsServiceTest {
 
     @Test
     void addMaterial_shouldSaveMaterial() {
+        when(fileUtil.saveUploadFile(any(MultipartFile.class), anyString(), any()))
+                .thenReturn("new-url");
+        MultipartFile file = new MockMultipartFile(
+                "file",
+                "example.txt",
+                "text/plain",
+                "Содержимое файла".getBytes()
+        );
         LessonMaterialDTO dto = LessonMaterialDTO.builder()
                 .lessonId(1)
                 .title("New Title")
                 .url("new-url")
+                .file(file)
                 .build();
 
         Lesson lesson = Lesson.builder().id(1).build();

@@ -76,7 +76,7 @@ public class CourseTeacherInstanceServiceTest {
                 .isPrimary(true)
                 .build();
 
-        when(repository.findByCourseInstanceIdAndIsPrimaryTrue(courseInstanceId))
+        when(repository.findByCourseInstanceId(courseInstanceId))
                 .thenReturn(Collections.singletonList(entity));
 
         List<?> result = service.getTeachersByCourseInstanceId(courseInstanceId);
