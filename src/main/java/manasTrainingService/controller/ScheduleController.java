@@ -141,14 +141,12 @@ public class ScheduleController {
             @RequestParam(value = "courseTitle", required = false) String courseTitle,
             @RequestParam(value = "courseInstanceTitle", required = false) String courseInstanceTitle,
             @RequestParam(value = "teacherName", required = false) String teacherName,
-            @RequestParam(value = "lessonType", required = false) String lessonType,
-            @RequestParam(value = "sortBy", required = false, defaultValue = "date") String sortBy,
-            @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir) {
+            @RequestParam(value = "lessonType", required = false) String lessonType) {
 
         try {
             User currentUser = userService.getUserEntityByEmail(authentication.getName());
-            List<ScheduleViewDTO> schedules = scheduleService.getFilteredAndSortedSchedules(
-                    courseTitle, courseInstanceTitle, teacherName, lessonType, sortBy, sortDir);
+            List<ScheduleViewDTO> schedules = scheduleService.getFilteredSchedules(
+                    courseTitle, courseInstanceTitle, teacherName, lessonType);
 
             String userRole = currentUser.getRole().getName().toLowerCase();
             model.addAttribute("userRole", userRole);
@@ -163,8 +161,6 @@ public class ScheduleController {
             model.addAttribute("selectedCourseInstanceTitle", courseInstanceTitle);
             model.addAttribute("selectedTeacherName", teacherName);
             model.addAttribute("selectedLessonType", lessonType);
-            model.addAttribute("selectedSortBy", sortBy);
-            model.addAttribute("selectedSortDir", sortDir);
 
             model.addAttribute("schedulesJson", convertSchedulesToJson(schedules));
             model.addAttribute("schedules", schedules != null ? schedules : new ArrayList<>());

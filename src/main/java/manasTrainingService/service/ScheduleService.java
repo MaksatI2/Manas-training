@@ -13,7 +13,6 @@ public interface ScheduleService {
     void deleteSchedule(Integer scheduleId);
     boolean canUserEditSchedule(Integer userId, String userRole, Integer scheduleId);
     List<ScheduleViewDTO> getFilteredSchedules(String courseTitle, String courseInstanceTitle, String teacherName, String lessonType);
-    List<ScheduleViewDTO> getFilteredAndSortedSchedules(String courseTitle, String courseInstanceTitle, String teacherName, String lessonType, String sortBy, String sortDir);
 
     boolean hasSchedulesBeforeDateRange(Integer courseInstanceId, LocalDate newStart);
 

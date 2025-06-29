@@ -311,6 +311,10 @@
             border: 1px solid rgba(0, 102, 204, 0.1);
             position: relative;
             overflow: hidden;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .feature-card-enhanced::before {
@@ -359,6 +363,12 @@
             color: var(--text-dark);
             line-height: 1.6;
             opacity: 0.8;
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
         }
 
         .stats-section {
@@ -431,6 +441,11 @@
         .feature-card-enhanced:nth-child(6) { animation-delay: 0.6s; }
 
         @media (max-width: 768px) {
+            .feature-card-enhanced {
+                padding: 2rem 1.5rem;
+                min-height: 250px;
+            }
+
             .hero-section-enhanced {
                 background-attachment: scroll;
                 min-height: 60vh;
