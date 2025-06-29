@@ -1,6 +1,5 @@
 package manasTrainingService.service.impl.user;
 
-import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.profile.StudentProfileDto;
 import manasTrainingService.entity.StudentProfile;
@@ -10,19 +9,18 @@ import manasTrainingService.exceptions.nsee.user.StudentProfileNotFoundException
 import manasTrainingService.repositories.user.StudentProfileRepository;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
 
     private final StudentProfileRepository studentProfileRepository;
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    public void setUserService(@Lazy UserService userService) {
+    public StudentServiceImpl(StudentProfileRepository studentProfileRepository,
+                              @Lazy UserService userService) {
+        this.studentProfileRepository = studentProfileRepository;
         this.userService = userService;
     }
 

@@ -1,6 +1,5 @@
 package manasTrainingService.service.impl.user;
 
-import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.dto.create.CreateTeacherDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
@@ -12,7 +11,6 @@ import manasTrainingService.exceptions.nsee.user.UserNotFoundException;
 import manasTrainingService.repositories.user.TeacherProfileRepository;
 import manasTrainingService.service.user.TeacherService;
 import manasTrainingService.service.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,13 +20,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class TeacherServiceImpl implements TeacherService {
     private final TeacherProfileRepository teacherProfileRepository;
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    public void setUserService(@Lazy UserService userService) {
+    public TeacherServiceImpl(TeacherProfileRepository teacherProfileRepository,
+                              @Lazy UserService userService) {
+        this.teacherProfileRepository = teacherProfileRepository;
         this.userService = userService;
     }
 

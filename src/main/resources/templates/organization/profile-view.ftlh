@@ -191,17 +191,10 @@
 
     <div class="profile-container">
         <#if successMessage??>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
-                ${successMessage}
-            </div>
+            <div id="successMessage" data-message="${successMessage?js_string}"></div>
         </#if>
-
         <#if errorMessage??>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
-                ${errorMessage}
-            </div>
+            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
         <h1 class="page-title">
             <i class="fas fa-user-circle" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
