@@ -1,4 +1,4 @@
-<#macro page>
+<#macro page title="">
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -99,6 +99,12 @@
                             <span>Потоки курсов</span>
                         </a>
                     </div>
+                    <div class="nav-item">
+                        <a href="/applications/admin" class="nav-link" data-tooltip="Заявки на курсы">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Заявки на курсы</span>
+                        </a>
+                    </div>
                 </#if>
                 <#if isTeacher?? && isTeacher>
                     <div class="nav-item">
@@ -125,6 +131,12 @@
                         <a href="/#" class="nav-link" data-tooltip="Курсы">
                             <i class="fas fa-graduation-cap"></i>
                             <span>Курсы</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/applications/organization" class="nav-link" data-tooltip="Заявки на курсы">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Заявки на курсы</span>
                         </a>
                     </div>
                 </#if>
