@@ -76,7 +76,7 @@
                                             <i class="fas fa-external-link-alt me-1"></i>Открыть
                                         </a>
                                         <#if isAdmin>
-                                            <form action="<@spring.url '/admin/lessons/${lesson.id}/materials/${material.id}/delete'/>"
+                                            <form action="<@spring.url '/lessons/${lesson.id}/materials/${material.id}/delete'/>"
                                                   method="post" class="d-inline"
                                                   onsubmit="return confirm('Удалить материал?')">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
