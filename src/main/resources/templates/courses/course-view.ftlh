@@ -25,7 +25,7 @@
         </#if>
         <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <h5 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-eye me-2"></i>
+                <i class="fas fa-book me-2"></i>
                 Информация о курсе
             </h5>
             <div>
@@ -95,7 +95,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <div class="course-meta">
+                    <div class="course建材:course-meta">
                         <div class="meta-card">
                             <h6 class="meta-title">
                                 <i class="fas fa-info-circle me-2" style="color: #0066cc;"></i>

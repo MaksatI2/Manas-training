@@ -2,7 +2,7 @@
 
 <@layout.page>
     <div class="hero-section">
-        <h1 class="hero-title">Мои курсы</h1>
+        <h1 class="hero-title"><i class="fas fa-book me-2"></i>Мои курсы</h1>
     </div>
 
     <div class="container mt-4">
@@ -18,8 +18,7 @@
                                     <h5 class="card-title">${course.courseTitle}</h5>
                                     <h6 class="card-subtitle mb-2 text-muted">${course.instanceTitle}</h6>
                                     <p class="card-text">
-                                        Статус: <strong>${course.status}</strong><br>
-                                        Срок: ${course.startDate.toLocalDate()} – ${course.endDate.toLocalDate()}
+                                        Статус: <strong>${course.status}</strong>
                                     </p>
                                 </div>
                             </div>
