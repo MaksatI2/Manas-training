@@ -1,0 +1,32 @@
+image: maven:3.9.4-eclipse-temurin-17
+
+stages:
+  - build
+  - deploy
+
+cache:
+  paths:
+    - .m2/repository
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+build:
+  stage: build
+  script:
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+
+deploy:
+  stage: deploy
+  only:
+    - dev
+  script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan -H 157.245.67.28 >> ~/.ssh/known_hosts
+    - scp target/*.jar root@157.245.67.28:/root/app.jar
+    - ssh root@157.245.67.28 "systemctl restart app"
