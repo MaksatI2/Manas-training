@@ -14,7 +14,7 @@ variables:
 build:
   stage: build
   script:
-    - mvn clean package -DskipTests
+    - mvn clean package
   artifacts:
     paths:
       - target/*.jar
