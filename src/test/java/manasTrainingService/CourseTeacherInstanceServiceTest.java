@@ -7,6 +7,7 @@ import manasTrainingService.exceptions.nsee.user.UserNotFoundException;
 import manasTrainingService.repositories.course.CourseInstanceTeacherRepository;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.impl.course.CourseTeacherInstanceServiceImpl;
+import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ public class CourseTeacherInstanceServiceTest {
     private CourseInstanceTeacherRepository repository;
     private CourseInstanceService courseInstanceService;
     private UserService userService;
+    private TestService testService;
 
     private CourseTeacherInstanceServiceImpl service;
 
@@ -32,8 +34,9 @@ public class CourseTeacherInstanceServiceTest {
         repository = Mockito.mock(CourseInstanceTeacherRepository.class);
         courseInstanceService = Mockito.mock(CourseInstanceService.class);
         userService = Mockito.mock(UserService.class);
+        testService = Mockito.mock(TestService.class);
 
-        service = new CourseTeacherInstanceServiceImpl(repository, courseInstanceService, userService);
+        service = new CourseTeacherInstanceServiceImpl(repository, courseInstanceService, userService, testService);
     }
 
     @Test
