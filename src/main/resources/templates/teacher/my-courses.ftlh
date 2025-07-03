@@ -2,7 +2,7 @@
 
 <@layout.page>
     <div class="hero-section py-4 text-center bg-light border-bottom">
-        <h1 class="hero-title">Мои курсы</h1>
+        <h1 class="hero-title"><i class="fas fa-book me-2"></i>Мои курсы</h1>
     </div>
 
     <div class="container my-5">
@@ -39,10 +39,10 @@
                                     <a href="/test/${course.courseTest.id}/delete" class="btn btn-outline-danger w-100">
                                         Удалить итоговый тест
                                     </a>
-                                    <#else>
-                                        <a href="/test/create/${course.courseInstanceId}" class="btn btn-outline-primary w-100">
-                                            Создать итоговый тест
-                                        </a>
+                                <#else>
+                                    <a href="/test/create/${course.courseInstanceId}" class="btn btn-outline-primary w-100">
+                                        Создать итоговый тест
+                                    </a>
                                 </#if>
                             </div>
                         </div>
