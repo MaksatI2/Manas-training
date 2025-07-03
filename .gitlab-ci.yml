@@ -1,20 +1,30 @@
 image: maven:3.9.4-eclipse-temurin-17
 
-stages:
-  - build
-  - deploy
+services:
+  - name: postgres:15
+    alias: db
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+  SPRING_DATASOURCE_USERNAME: postgres
+  SPRING_DATASOURCE_PASSWORD: qwerty
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: qwerty
 
 cache:
   paths:
     - .m2/repository
 
-variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+stages:
+  - build
+  - deploy
 
 build:
   stage: build
   script:
-    - mvn clean package
+    - mvn clean verify
   artifacts:
     paths:
       - target/*.jar
