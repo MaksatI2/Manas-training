@@ -34,6 +34,7 @@ deploy:
   only:
     - dev
   script:
+    - apt-get update && apt-get install -y openssh-client
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
     - chmod 600 ~/.ssh/id_ed25519
