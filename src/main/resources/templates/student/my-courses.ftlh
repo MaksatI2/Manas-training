@@ -2,7 +2,7 @@
 
 <@layout.page>
     <div class="hero-section">
-        <h1 class="hero-title">Мои курсы</h1>
+        <h1 class="hero-title"><i class="fas fa-book me-2"></i>Мои курсы</h1>
     </div>
 
     <div class="container mt-4">

@@ -3,7 +3,7 @@
 
 <@layout.page>
     <div class="hero-section">
-        <h1 class="hero-title">${courseInstance.title}</h1>
+        <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
         <p class="hero-subtitle">
             Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
             Категория: <strong>${courseInstance.category!'-'}</strong>
@@ -47,7 +47,6 @@
                                                                 <p class="card-text text-muted small">
                                                                     ${lesson.description!''}
                                                                 </p>
-
                                                             </div>
                                                         </div>
                                                     </a>

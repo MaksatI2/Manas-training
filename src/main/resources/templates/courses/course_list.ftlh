@@ -3,7 +3,7 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex filter-panel">
             <h5 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-graduation-cap me-2"></i>
+                <i class="fas fa-book me-2"></i>
                 Каталог курсов
             </h5>
             <div class="filter-controls">
