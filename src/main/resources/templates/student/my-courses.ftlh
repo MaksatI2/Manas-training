@@ -18,7 +18,7 @@
                                     <h5 class="card-title">${course.courseTitle}</h5>
                                     <h6 class="card-subtitle mb-2 text-muted">${course.instanceTitle}</h6>
                                     <p class="card-text">
-                                        Статус: <strong>${course.status}</strong><br>
+                                        Статус: <strong>${course.localizedStatus}</strong><br>
                                         Срок: ${course.startDate.toLocalDate()} – ${course.endDate.toLocalDate()}
                                     </p>
                                 </div>

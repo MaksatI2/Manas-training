@@ -23,5 +23,6 @@ public class CourseEnrollmentCardDTO {
     private LocalDateTime endDate;
     private Status status;
     private BigDecimal progress;
+    private String localizedStatus;
 }
 
