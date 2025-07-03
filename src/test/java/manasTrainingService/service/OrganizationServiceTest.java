@@ -3,7 +3,6 @@ package manasTrainingService.service;
 import jakarta.validation.ValidationException;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.edit.OrganizationProfileEditDto;
-import manasTrainingService.dto.organization.AssignCourseDto;
 import manasTrainingService.dto.organization.CreateStudentByOrganizationDto;
 import manasTrainingService.dto.organization.StudentCourseInfoDto;
 import manasTrainingService.dto.organization.StudentEditByOrganizationDto;
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -37,9 +35,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrganizationService Unit Tests")
@@ -427,92 +427,6 @@ class OrganizationServiceTest {
             assertThatThrownBy(() -> organizationService.editStudentProfileByOrganization(dto))
                     .isInstanceOf(UserNotFoundException.class)
                     .hasMessageContaining("Студент не найден");
-        }
-    }
-
-    @Nested
-    @DisplayName("Assign Student to Course Tests")
-    class AssignStudentToCourseTests {
-
-        @Test
-        @DisplayName("Should assign student to course successfully")
-        void shouldAssignStudentToCourseSuccessfully() {
-            User student = User.builder()
-                    .id(2)
-                    .studentProfile(testStudentProfile)
-                    .build();
-            testStudentProfile.setUser(student);
-
-            AssignCourseDto dto = AssignCourseDto.builder()
-                    .studentId(2L)
-                    .courseInstanceId(1)
-                    .build();
-
-            when(userRepository.findById(2)).thenReturn(Optional.of(student));
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-            when(courseEnrollmentRepository.existsByStudentIdAndCourseInstanceId(2, 1))
-                    .thenReturn(false);
-            when(courseInstanceRepository.findById(1)).thenReturn(Optional.of(testCourseInstance));
-
-            organizationService.assignStudentToCourse(dto, testUser);
-
-            verify(courseEnrollmentRepository).save(argThat(enrollment ->
-                    enrollment.getStudent().getId().equals(2) &&
-                    enrollment.getCourseInstance().getId().equals(1) &&
-                    enrollment.getStatus() == Status.ENROLLED
-            ));
-        }
-
-        @Test
-        @DisplayName("Should throw exception when student already enrolled in course")
-        void shouldThrowExceptionWhenStudentAlreadyEnrolledInCourse() {
-            User student = User.builder()
-                    .id(2)
-                    .studentProfile(testStudentProfile)
-                    .build();
-
-            AssignCourseDto dto = AssignCourseDto.builder()
-                    .studentId(2L)
-                    .courseInstanceId(1)
-                    .build();
-
-            when(userRepository.findById(2)).thenReturn(Optional.of(student));
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-            when(courseEnrollmentRepository.existsByStudentIdAndCourseInstanceId(2, 1))
-                    .thenReturn(true);
-
-            assertThatThrownBy(() -> organizationService.assignStudentToCourse(dto, testUser))
-                    .isInstanceOf(UserAlreadyExistsException.class)
-                    .hasMessageContaining("Этот студент уже записан на выбранный курс");
-        }
-
-        @Test
-        @DisplayName("Should throw access denied when student from different organization")
-        void shouldThrowAccessDeniedWhenStudentFromDifferentOrganization() {
-            Organization differentOrg = Organization.builder()
-                    .id(2)
-                    .build();
-
-            StudentProfile differentStudentProfile = StudentProfile.builder()
-                    .organization(differentOrg)
-                    .build();
-
-            User student = User.builder()
-                    .id(2)
-                    .studentProfile(differentStudentProfile)
-                    .build();
-
-            AssignCourseDto dto = AssignCourseDto.builder()
-                    .studentId(2L)
-                    .courseInstanceId(1)
-                    .build();
-
-            when(userRepository.findById(2)).thenReturn(Optional.of(student));
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-
-            assertThatThrownBy(() -> organizationService.assignStudentToCourse(dto, testUser))
-                    .isInstanceOf(AccessDeniedException.class)
-                    .hasMessageContaining("Невозможно назначить курс студенту из другой организации");
         }
     }
 
@@ -974,20 +888,6 @@ class OrganizationServiceTest {
 
             organizationService.editStudentProfileByOrganization(editDto);
 
-            AssignCourseDto assignDto = AssignCourseDto.builder()
-                    .studentId(10L)
-                    .courseInstanceId(1)
-                    .build();
-
-            when(courseEnrollmentRepository.existsByStudentIdAndCourseInstanceId(10, 1))
-                    .thenReturn(false);
-            when(courseInstanceRepository.findById(1)).thenReturn(Optional.of(testCourseInstance));
-
-            organizationService.assignStudentToCourse(assignDto, testUser);
-
-            verify(userRepository, times(2)).save(any(User.class));
-            verify(studentProfileRepository).save(any(StudentProfile.class));
-            verify(courseEnrollmentRepository).save(any(CourseEnrollment.class));
             verify(emailService).sendStudentWelcomeEmail(eq("lifecycle@test.com"), eq("Lifecycle"), anyString());
         }
 

@@ -291,32 +291,53 @@ class CourseServiceTest {
         @Test
         @DisplayName("Should return available courses for organization")
         void shouldReturnAvailableCoursesForOrganization() {
-            CourseInstance instance2 = CourseInstance.builder()
-                    .id(2)
-                    .course(Course.builder()
-                            .id(2)
-                            .title("Spring Boot")
-                            .build())
-                    .isActive(true)
+            CourseCategory testCategory = CourseCategory.builder()
+                    .id(10)
+                    .name("Backend")
                     .build();
 
-            when(courseInstanceRepository.findAllByIsActiveTrue())
-                    .thenReturn(Arrays.asList(testCourseInstance, instance2));
+            Course course1 = Course.builder()
+                    .id(1)
+                    .title("Java Основы")
+                    .code("JAVA-101")
+                    .description("Базовый курс по Java")
+                    .durationHours(40)
+                    .isActive(true)
+                    .isIndividual(false)
+                    .createdAt(LocalDateTime.now().minusDays(10))
+                    .updatedAt(LocalDateTime.now().minusDays(5))
+                    .category(testCategory)
+                    .build();
+
+            CourseInstance instance1 = CourseInstance.builder()
+                    .id(1)
+                    .course(course1)
+                    .title("Java Group 1")
+                    .isActive(true)
+                    .startDate(LocalDateTime.now().plusDays(1))
+                    .endDate(LocalDateTime.now().plusDays(30))
+                    .build();
+
+            when(courseInstanceRepository.findAllByIsActiveTrue()).thenReturn(List.of(instance1));
 
             List<CourseDto> result = courseService.getAvailableCoursesForOrganization(testUser);
 
-            assertThat(result).hasSize(2);
+            assertThat(result).hasSize(1);
 
-            CourseDto firstDto = result.get(0);
-            assertThat(firstDto.getId()).isEqualTo(1);
-            assertThat(firstDto.getTitle()).isEqualTo("Java Основы");
-
-            CourseDto secondDto = result.get(1);
-            assertThat(secondDto.getId()).isEqualTo(2);
-            assertThat(secondDto.getTitle()).isEqualTo("Spring Boot");
+            CourseDto dto = result.get(0);
+            assertThat(dto.getId()).isEqualTo(1);
+            assertThat(dto.getTitle()).isEqualTo("Java Основы");
+            assertThat(dto.getCode()).isEqualTo("JAVA-101");
+            assertThat(dto.getDescription()).isEqualTo("Базовый курс по Java");
+            assertThat(dto.getDuration()).isEqualTo(40);
+            assertThat(dto.getCategoryId()).isEqualTo(10);
+            assertThat(dto.getInstanceTitle()).isEqualTo("Java Group 1");
+            assertThat(dto.getInstanceStartDate()).isEqualTo(instance1.getStartDate().toLocalDate());
+            assertThat(dto.getInstanceEndDate()).isEqualTo(instance1.getEndDate().toLocalDate());
 
             verify(courseInstanceRepository).findAllByIsActiveTrue();
         }
+
 
         @Test
         @DisplayName("Should return empty list when no active course instances exist")
@@ -333,14 +354,26 @@ class CourseServiceTest {
         @Test
         @DisplayName("Should handle null user parameter")
         void shouldHandleNullUserParameter() {
+            testCourse.setCategory(testCategory);
+            testCourse.setIsActive(true);
+            testCourse.setIsIndividual(false);
+            testCourse.setCreatedAt(LocalDateTime.now().minusDays(5));
+            testCourse.setUpdatedAt(LocalDateTime.now().minusDays(1));
+
+            testCourseInstance.setCourse(testCourse);
+            testCourseInstance.setTitle("Java Group");
+            testCourseInstance.setStartDate(LocalDateTime.now().plusDays(2));
+            testCourseInstance.setEndDate(LocalDateTime.now().plusDays(10));
+
             when(courseInstanceRepository.findAllByIsActiveTrue())
-                    .thenReturn(Arrays.asList(testCourseInstance));
+                    .thenReturn(List.of(testCourseInstance));
 
             List<CourseDto> result = courseService.getAvailableCoursesForOrganization(null);
 
             assertThat(result).hasSize(1);
             assertThat(result.get(0).getId()).isEqualTo(1);
             assertThat(result.get(0).getTitle()).isEqualTo("Java Основы");
+            assertThat(result.get(0).getInstanceTitle()).isEqualTo("Java Group");
 
             verify(courseInstanceRepository).findAllByIsActiveTrue();
         }
@@ -483,12 +516,22 @@ class CourseServiceTest {
         @Test
         @DisplayName("Should work together with all dependencies")
         void shouldWorkTogetherWithAllDependencies() {
-            when(courseRepository.findAll()).thenReturn(Arrays.asList(testCourse));
+            testCourse.setCategory(testCategory);
+            testCourse.setCreatedAt(LocalDateTime.now().minusDays(5));
+            testCourse.setUpdatedAt(LocalDateTime.now().minusDays(1));
+            testCourse.setIsActive(true);
+            testCourse.setIsIndividual(false);
+
+            testCourseInstance.setCourse(testCourse);
+            testCourseInstance.setStartDate(LocalDateTime.now().plusDays(2));
+            testCourseInstance.setEndDate(LocalDateTime.now().plusDays(20));
+            testCourseInstance.setTitle("Test Group");
+
+            when(courseRepository.findAll()).thenReturn(List.of(testCourse));
             when(courseRepository.findById(1)).thenReturn(Optional.of(testCourse));
-            when(categoryService.getAllCategories()).thenReturn(Arrays.asList(testCategoryDto));
+            when(categoryService.getAllCategories()).thenReturn(List.of(testCategoryDto));
             when(categoryAdminService.convertToDto(testCategory)).thenReturn(testCategoryDto);
-            when(courseInstanceRepository.findAllByIsActiveTrue())
-                    .thenReturn(Arrays.asList(testCourseInstance));
+            when(courseInstanceRepository.findAllByIsActiveTrue()).thenReturn(List.of(testCourseInstance));
 
             List<CourseDto> allCourses = courseService.getAllCourses();
             CourseDto courseById = courseService.getById(1);
@@ -501,6 +544,7 @@ class CourseServiceTest {
             assertThat(categories).hasSize(1);
             assertThat(courseEntity.getId()).isEqualTo(1);
             assertThat(availableCourses).hasSize(1);
+            assertThat(availableCourses.get(0).getInstanceTitle()).isEqualTo("Test Group");
 
             verify(courseRepository).findAll();
             verify(courseRepository, times(2)).findById(1);
@@ -508,6 +552,7 @@ class CourseServiceTest {
             verify(categoryAdminService).convertToDto(testCategory);
             verify(courseInstanceRepository).findAllByIsActiveTrue();
         }
+
 
         @Test
         @DisplayName("Should handle error scenarios gracefully")
