@@ -4,7 +4,7 @@
 <@layout.page>
     <h1>Создать урок в модуле "${module.title}"</h1>
 
-    <form action="/admin/course-instances/${courseInstance.id}/modules/${module.id}/lessons" method="post">
+    <form action="/course-instances/${courseInstance.id}/modules/${module.id}/lessons" method="post">
         <input type="hidden" name="_csrf" value="${_csrf.token}" />
 
         <div class="mb-3">

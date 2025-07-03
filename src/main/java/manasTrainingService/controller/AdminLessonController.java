@@ -24,52 +24,51 @@ public class AdminLessonController {
     private final LessonService lessonService;
     private final CourseModuleService courseModuleService;
     private final CourseInstanceService courseInstanceService;
-    private final LessonMaterialService lessonMaterialService;
 
-    @GetMapping("/course-instances/{instanceId}/modules/{moduleId}/lessons/new")
-    public String showCreateLessonForm(@PathVariable Integer instanceId,
-                                       @PathVariable Integer moduleId,
-                                       Model model) {
-
-        if (!model.containsAttribute("lessonCreateRequest")) {
-
-            model.addAttribute("lessonCreateRequest", new LessonCreateRequest());
-        }
-        if (!courseModuleService.getCourseModuleById(moduleId).getCourseInstance().getId().equals(instanceId)) {
-            throw new IllegalStateException("Данный модуль не относится к этому курсу");
-        }
-        model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
-        model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
-        return "admin/lesson-create";
-    }
-
-    @PostMapping("/course-instances/{instanceId}/modules/{moduleId}/lessons")
-    public String createLesson(@PathVariable Integer instanceId,
-                               @PathVariable Integer moduleId,
-                               @Valid @ModelAttribute("lessonCreateRequest") LessonCreateRequest request,
-                               BindingResult bindingResult,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("lessonCreateRequest", request);
-            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
-            model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
-            return "admin/lesson-create";
-        }
-
-        try {
-            Integer courseInstanceId = lessonService.createLesson(request, courseModuleService.getCourseModuleById(moduleId));
-            redirectAttributes.addFlashAttribute("successMessage", "Урок успешно создан");
-            return "redirect:/admin/course-instances/" + courseInstanceId;
-        } catch (IllegalArgumentException e) {
-
-            model.addAttribute("lessonCreateRequest", request);
-            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
-            model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
-
-            return "admin/lesson-create";
-        }
-    }
+//    @GetMapping("/course-instances/{instanceId}/modules/{moduleId}/lessons/new")
+//    public String showCreateLessonForm(@PathVariable Integer instanceId,
+//                                       @PathVariable Integer moduleId,
+//                                       Model model) {
+//
+//        if (!model.containsAttribute("lessonCreateRequest")) {
+//
+//            model.addAttribute("lessonCreateRequest", new LessonCreateRequest());
+//        }
+//        if (!courseModuleService.getCourseModuleById(moduleId).getCourseInstance().getId().equals(instanceId)) {
+//            throw new IllegalStateException("Данный модуль не относится к этому курсу");
+//        }
+//        model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
+//        model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
+//        return "admin/lesson-create";
+//    }
+//
+//    @PostMapping("/course-instances/{instanceId}/modules/{moduleId}/lessons")
+//    public String createLesson(@PathVariable Integer instanceId,
+//                               @PathVariable Integer moduleId,
+//                               @Valid @ModelAttribute("lessonCreateRequest") LessonCreateRequest request,
+//                               BindingResult bindingResult,
+//                               Model model,
+//                               RedirectAttributes redirectAttributes) {
+//        if (bindingResult.hasErrors()) {
+//            model.addAttribute("lessonCreateRequest", request);
+//            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
+//            model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
+//            return "admin/lesson-create";
+//        }
+//
+//        try {
+//            Integer courseInstanceId = lessonService.createLesson(request, courseModuleService.getCourseModuleById(moduleId));
+//            redirectAttributes.addFlashAttribute("successMessage", "Урок успешно создан");
+//            return "redirect:/admin/course-instances/" + courseInstanceId;
+//        } catch (IllegalArgumentException e) {
+//
+//            model.addAttribute("lessonCreateRequest", request);
+//            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
+//            model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
+//
+//            return "admin/lesson-create";
+//        }
+//    }
 
 
     @PostMapping("/lessons/{id}/delete")

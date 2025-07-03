@@ -2,6 +2,7 @@ package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.config.CustomUserDetails;
+import manasTrainingService.entity.CourseModule;
 import manasTrainingService.entity.Lesson;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.EnrollmentService;
@@ -45,6 +46,21 @@ public class LessonAccessServiceImpl implements LessonAccessService {
         }
         if (user.hasRole("TEACHER")) {
             courseInstanceTeacherService.hasAccess(lesson.getModule().getCourseInstance().getId());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canAccessModuleCreation(CourseModule module) {
+        CustomUserDetails user = (CustomUserDetails)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (user.hasRole("ADMIN")) {
+            return true;
+        }
+        if (user.hasRole("TEACHER")) {
+            courseInstanceTeacherService.hasAccess(module.getCourseInstance().getId());
             return true;
         }
         return false;
