@@ -25,8 +25,7 @@
                                 <h5 class="card-title mb-2">${course.courseTitle}</h5>
                                 <h6 class="card-subtitle mb-3 text-muted">${course.instanceTitle}</h6>
                                 <p class="card-text mt-auto">
-                                    <span class="d-block text-muted small">Срок: ${course.startDate.toLocalDate()?string("dd-MM-yyyy")} – ${course.endDate.toLocalDate()?string("dd-MM-yyyy")}</span>
-                                    <span class="d-block text-muted small">Статус: <strong>${course.status}</strong></span>
+                                    <span class="d-block text-muted small">Срок: ${course.startDate.toLocalDate()} – ${course.endDate.toLocalDate()}</span>
                                 </p>
                             </a>
                             <div class="card-body pt-0 px-3 pb-3">
