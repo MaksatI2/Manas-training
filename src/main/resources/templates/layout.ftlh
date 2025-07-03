@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title}</title>
+        <title>Манас Тренинг Центр</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -30,10 +30,13 @@
         <i class="fas fa-bars"></i>
     </button>
 
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="/" class="sidebar-brand">
                 <i class="fas fa-graduation-cap"></i>
+                <span>Манас Тренинг Центр</span>
             </a>
         </div>
 
@@ -77,7 +80,9 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/admin/courses" class="nav-link" data-tooltip="Управление курсами">
+                        <a href="/admin/courses
+
+" class="nav-link" data-tooltip="Управление курсами">
                             <i class="fas fa-book-open"></i>
                             <span>Управление курсами</span>
                         </a>
@@ -150,39 +155,13 @@
                     </div>
                 </#if>
             </div>
-
             <div class="sidebar-profile">
                 <select class="language-selector" id="languageSelector">
                     <option value="ru">🇷🇺 Русский</option>
                     <option value="ky">🇰🇬 Кыргызча</option>
                     <option value="en">🇬🇧 English</option>
                 </select>
-
-                <#if known>
-                    <div class="profile-info">
-                        <div class="profile-avatar">
-                            ${name?substring(0, 1)?upper_case}
-                        </div>
-                        <div>
-                            <div class="profile-name">${name}</div>
-                            <div class="profile-role">
-                                <#if isAdmin>Администратор</#if>
-                                <#if isTeacher>Преподаватель</#if>
-                                <#if isStudent>Студент</#if>
-                                <#if isOrganization>Организация</#if>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="profile-actions">
-                        <form action="/logout" method="post" style="width: 100%;">
-                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                            <button type="submit" class="profile-btn" style="width: 100%; background: none; border: 1px solid rgba(255, 255, 255, 0.2);">
-                                <i class="fas fa-sign-out-alt"></i> <span>Выйти</span>
-                            </button>
-                        </form>
-                    </div>
-                <#else>
+                <#if !known?? || !known>
                     <div class="profile-actions">
                         <a href="/auth/login" class="profile-btn">
                             <i class="fas fa-sign-in-alt"></i> <span>Войти</span>
@@ -197,7 +176,19 @@
     </nav>
 
     <div class="main-wrapper" id="mainWrapper">
-        <header class="top-header">
+        <header class="top-header d-md-flex justify-content-between align-items-center px-3 py-2">
+
+            <div class="d-flex align-items-center w-100 justify-content-between d-md-none">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="text-center flex-grow-1 m-0" style="color: var(--primary-blue); font-size: 1.1rem;">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    Манас Тренинг Центр
+                </h1>
+                <span style="width: 44px;"></span>
+            </div>
+
             <#if known>
                 <#assign profileUrl = "/profile">
                 <#if isAdmin>
@@ -209,9 +200,62 @@
                 <#elseif isOrganization>
                     <#assign profileUrl = "/organization/profile">
                 </#if>
-                <a href="${profileUrl}" class="profile-btn header-profile-btn" style="position: absolute; top: 10px; right: 20px; width: auto; padding: 0.5rem 1.5rem;">
-                    <i class="fas fa-user"></i> <span>Профиль</span>
-                </a>
+
+                <div class="d-md-none mt-2 d-flex gap-2 justify-content-center">
+                    <a href="${profileUrl}" class="btn d-flex align-items-center justify-content-center"
+                       style="width: 44px; height: 44px; border-radius: 25px; background: white; color: var(--primary-blue); border: 2px solid var(--primary-blue);">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <form action="/logout" method="post">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        <button type="submit" class="btn d-flex align-items-center justify-content-center text-white"
+                                style="width: 44px; height: 44px; border-radius: 25px; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); border: none;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </#if>
+
+            <#if known>
+                <#assign profileUrl = "/profile">
+                <#if isAdmin>
+                    <#assign profileUrl = "/admin/profile">
+                <#elseif isTeacher>
+                    <#assign profileUrl = "/teacher/profile">
+                <#elseif isStudent>
+                    <#assign profileUrl = "/student/profile">
+                <#elseif isOrganization>
+                    <#assign profileUrl = "/organization/profile">
+                </#if>
+
+                <div class="d-none d-md-flex align-items-center ms-auto rounded-pill overflow-hidden"
+                     style="box-shadow: 0 0 5px rgba(0,0,0,0.1); background: var(--primary-blue); height: 48px;">
+                    <a href="${profileUrl}" class="d-flex align-items-center text-white px-3 text-decoration-none">
+                        <div class="rounded-circle d-flex justify-content-center align-items-center me-2"
+                             style="width: 36px; height: 36px; background: var(--light-blue); color: var(--dark-blue); font-weight: bold;">
+                            ${name?substring(0, 1)?upper_case}
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                            <span class="fw-semibold" style="font-size: 0.85rem;">${name}</span>
+                            <small style="font-size: 0.7rem; color: var(--light-blue);">
+                                <#if isAdmin>Администратор</#if>
+                                <#if isTeacher>Преподаватель</#if>
+                                <#if isStudent>Студент</#if>
+                                <#if isOrganization>Организация</#if>
+                            </small>
+                        </div>
+                    </a>
+
+                    <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 0.5rem;"></div>
+
+                    <form action="/logout" method="post" class="d-flex">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        <button type="submit" class="d-flex align-items-center justify-content-center text-white"
+                                style="width: 44px; height: 48px; background: transparent; border: none;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
+                </div>
             </#if>
         </header>
 
@@ -226,14 +270,17 @@
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
         const mainWrapper = document.getElementById('mainWrapper');
 
         function toggleMobileSidebar() {
             sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
         }
 
         function closeMobileSidebar() {
             sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
         }
 
         function toggleDesktopSidebar() {
@@ -256,6 +303,7 @@
         }
 
         sidebarToggle.addEventListener('click', toggleDesktopSidebar);
+        sidebarOverlay.addEventListener('click', closeMobileSidebar);
 
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
@@ -297,6 +345,7 @@
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) {
                 sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
             } else {
                 sidebar.classList.remove('collapsed');
                 sidebarToggle.classList.remove('collapsed');
@@ -334,7 +383,7 @@
             left: 0;
             height: 100vh;
             width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--primary-blue), var(--dark-blue));
+            background: linear-gradient(180deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
             z-index: 1000;
             transition: all 0.3s ease;
             box-shadow: var(--shadow);
@@ -433,6 +482,26 @@
             min-height: 0;
         }
 
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
         .nav-item {
             margin-bottom: 0.5rem;
         }
@@ -500,6 +569,10 @@
             font-size: 1.1rem;
             width: 20px;
             text-align: center;
+        }
+
+        .sidebar.collapsed .nav-link {
+            position: relative;
         }
 
         .sidebar.collapsed .nav-link::after {
@@ -616,26 +689,6 @@
             box-sizing: border-box;
         }
 
-        .header-profile-btn {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            color: var(--white);
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .header-profile-btn:hover {
-            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-        }
-
         .sidebar.collapsed .profile-btn {
             width: 40px;
             height: 40px;
@@ -694,11 +747,7 @@
             background: var(--white);
             padding: 1rem 2rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            position: relative;
-            min-height: 60px;
+            display: none;
         }
 
         .main-content {
@@ -845,11 +894,24 @@
                 max-height: none;
                 overflow-x: hidden;
             }
+        }
 
-            .header-profile-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
     </body>
