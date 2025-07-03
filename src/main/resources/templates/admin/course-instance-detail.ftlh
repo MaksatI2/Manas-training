@@ -12,6 +12,10 @@
     <div class="hero-section">
         <h1 class="hero-title">${courseInstance.title}</h1>
         <p class="hero-subtitle">
+            Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
+            Категория: <strong>${courseInstance.category!'-'}</strong>
+        </p>
+        <p class="hero-subtitle">
             Начало: ${courseInstance.startDate} |
             Окончание: ${courseInstance.endDate} |
             Статус: <#if courseInstance.isActive>Активен<#else>Завершен</#if>
