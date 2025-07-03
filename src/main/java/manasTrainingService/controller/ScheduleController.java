@@ -60,6 +60,9 @@ public class ScheduleController {
                     .build();
         }
 
+        Map<String, String> lessonTypesLocalized = Arrays.stream(LessonType.values())
+                .collect(Collectors.toMap(LessonType::name, LessonType::getValue));
+
         Map<String, String> teachers = courseTeacherInstanceService.getTeachersByCourseInstanceId(courseInstance.getId()).stream()
                 .sorted(Comparator.comparing(CourseInstanceTeacherDTO::getIsPrimary, Comparator.reverseOrder()))
                 .collect(Collectors.toMap(
@@ -73,7 +76,7 @@ public class ScheduleController {
         model.addAttribute("courseInstance", courseInstance);
         model.addAttribute("schedule", schedule);
         model.addAttribute("teachers", teachers);
-        model.addAttribute("lessonTypes", LessonType.values());
+        model.addAttribute("lessonTypes", lessonTypesLocalized);
         return "lessons/schedule-form";
     }
 
@@ -106,7 +109,9 @@ public class ScheduleController {
             model.addAttribute("lesson", lessonService.getLessonById(lessonId));
             model.addAttribute("courseInstance", courseInstance);
             model.addAttribute("teachers", teachers);
-            model.addAttribute("lessonTypes", LessonType.values());
+            Map<String, String> lessonTypesLocalized = Arrays.stream(LessonType.values())
+                    .collect(Collectors.toMap(LessonType::name, LessonType::getValue));
+            model.addAttribute("lessonTypes", lessonTypesLocalized);
             model.addAttribute("errorMessage", "Пожалуйста, исправьте ошибки в форме");
             return "lessons/schedule-form";
         }
@@ -129,7 +134,9 @@ public class ScheduleController {
             model.addAttribute("lesson", lessonService.getLessonById(lessonId));
             model.addAttribute("courseInstance", courseInstance);
             model.addAttribute("teachers", teachers);
-            model.addAttribute("lessonTypes", LessonType.values());
+            Map<String, String> lessonTypesLocalized = Arrays.stream(LessonType.values())
+                    .collect(Collectors.toMap(LessonType::name, LessonType::getValue));
+            model.addAttribute("lessonTypes", lessonTypesLocalized);
             return "lessons/schedule-form";
         }
     }

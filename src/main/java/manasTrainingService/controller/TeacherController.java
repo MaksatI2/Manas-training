@@ -80,7 +80,7 @@ public class TeacherController {
         courseTeacherInstanceService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
         model.addAttribute("courseInstance", courseInstanceDto);
-        return "student/course-detail";
+        return "teacher/course-detail";
     }
 
     @GetMapping

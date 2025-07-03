@@ -103,9 +103,9 @@
                 <h4 class="fw-bold">Расписание</h4>
                 <#if isAdmin>
                     <#if schedule??>
-                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm">Редактировать расписание</a>
+                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm rounded-pill">Редактировать расписание</a>
                     <#else>
-                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm">Создать расписание</a>
+                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm rounded-pill">Создать расписание</a>
                     </#if>
                 </#if>
             </div>
@@ -118,7 +118,7 @@
                             <li><i class="fas fa-calendar me-1"></i><strong>Дата:</strong> ${schedule.lessonDate}</li>
                             <li><i class="fas fa-clock me-1"></i><strong>Длительность:</strong> ${schedule.durationHours} ч.</li>
                             <li><i class="fas fa-user me-1"></i><strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}</li>
-                            <li><i class="fas fa-chalkboard me-1"></i><strong>Тип урока:</strong> ${schedule.lessonType}</li>
+                            <li><i class="fas fa-chalkboard me-1"></i><strong>Тип урока:</strong> ${schedule.lessonType.value}</li>
                             <#if schedule.meetingUrl?has_content>
                                 <li><i class="fas fa-link me-1"></i><strong>Ссылка:</strong> <a href="${schedule.meetingUrl}" target="_blank" class="text-primary">Присоединиться</a></li>
                             </#if>

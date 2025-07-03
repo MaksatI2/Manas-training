@@ -18,4 +18,9 @@ public class CourseTeacherDTO {
     private Integer teacherId;
     private String teacherName;
     private LocalDateTime createdAt;
+    private Integer courseId;
+    private String courseTitle;
+    private String courseCode;
+    private Boolean isActive;
+    private LocalDateTime assignedAt;
 }

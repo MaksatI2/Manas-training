@@ -58,6 +58,8 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .endDate(courseInstance.getEndDate().toLocalDate())
                 .durationHours(courseInstance.getCourse().getDurationHours())
                 .isActive(courseInstance.getIsActive())
+                .category(courseInstance.getCourse().getCategory().getName())
+                .courseTitle(courseInstance.getCourse().getTitle())
                 .build();
     }
 
@@ -103,6 +105,8 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .modules(moduleDtos)
                 .durationHours(courseInstance.getCourse().getDurationHours())
                 .courseId(courseInstance.getCourse().getId())
+                .category(courseInstance.getCourse().getCategory().getName())
+                .courseTitle(courseInstance.getCourse().getTitle())
                 .build();
     }
 

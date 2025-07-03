@@ -14,6 +14,7 @@ import manasTrainingService.service.course.CourseApplicationEmployeeService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.user.UserService;
+import manasTrainingService.util.StatusUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -91,6 +92,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                         .startDate(enrollment.getCourseInstance().getStartDate())
                         .endDate(enrollment.getCourseInstance().getEndDate())
                         .status(enrollment.getStatus())
+                        .localizedStatus(StatusUtil.localize(enrollment.getStatus()))
                         .build())
                 .toList();
     }

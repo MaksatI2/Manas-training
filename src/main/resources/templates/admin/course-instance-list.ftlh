@@ -56,6 +56,7 @@
                     <th>ID</th>
                     <th>Курс</th>
                     <th>Название потока</th>
+                    <th>Категория</th>
                     <th>Дата начала</th>
                     <th>Дата окончания</th>
                     <th>Статус</th>
@@ -65,10 +66,11 @@
                 <tbody>
                 <#if courseInstances?has_content>
                     <#list courseInstances as instance>
-                        <tr>
+                        <tr style="cursor: pointer;" data-id="${instance.id}">
                             <td>${instance.id}</td>
-                            <td>${instance.title!"-"}</td>
+                            <td>${instance.courseTitle!"-"}</td>
                             <td>${instance.title}</td>
+                            <td>${instance.category}</td>
                             <td>${instance.startDate}</td>
                             <td>${instance.endDate}</td>
                             <td>
@@ -79,10 +81,6 @@
                                 </#if>
                             </td>
                             <td>
-                                <a href="/admin/course-instances/${instance.id}" class="btn btn-sm btn-info"
-                                   title="Просмотр">
-                                    <i class="fas fa-eye"></i>
-                                </a>
                                 <a href="/admin/course-instances/${instance.id}/edit" class="btn btn-sm btn-primary"
                                    title="Редактировать">
                                     <i class="fas fa-edit"></i>
@@ -106,7 +104,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
     </div>
 
     <div class="modal fade" id="deleteCourseInstanceModal" tabindex="-1" aria-hidden="true">
@@ -281,7 +278,7 @@
             });
 
             $('#statusFilter').on('change', function () {
-                table.column(5).search(this.value).draw();
+                table.column(6).search(this.value).draw();
             });
 
             $('.dt-buttons').addClass('btn-group');

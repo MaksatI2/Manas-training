@@ -2,6 +2,7 @@ package manasTrainingService.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.dto.lesson.LessonMaterialDTO;
 import manasTrainingService.exceptions.nsee.NoAccessException;
@@ -9,6 +10,11 @@ import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.LessonMaterialService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.ScheduleService;
+import manasTrainingService.service.course.CourseInstanceService;
+import manasTrainingService.service.course.CourseModuleService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +33,8 @@ public class PublicLessonController {
     private final ScheduleService scheduleService;
     private final LessonAccessService lessonAccessService;
     private final LessonMaterialService lessonMaterialService;
+    private final CourseModuleService courseModuleService;
+    private final CourseInstanceService courseInstanceService;
 
     @GetMapping("/lessons/{lessonId}")
     public String showLessonDetails(@PathVariable Integer lessonId, Model model) {
@@ -85,5 +93,63 @@ public class PublicLessonController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/lessons/" + lessonId;
+    }
+
+    @GetMapping("/course-instances/{instanceId}/modules/{moduleId}/lessons/new")
+    public String showCreateLessonForm(@PathVariable Integer instanceId,
+                                       @PathVariable Integer moduleId,
+                                       Model model) {
+        if (!lessonAccessService.canAccessModuleCreation(courseModuleService.getCourseModuleById(moduleId))) {
+            throw new NoAccessException("У вас нет доступа к созданию уроков");
+        }
+        if (!model.containsAttribute("lessonCreateRequest")) {
+            model.addAttribute("lessonCreateRequest", new LessonCreateRequest());
+        }
+        if (!courseModuleService.getCourseModuleById(moduleId).getCourseInstance().getId().equals(instanceId)) {
+            throw new IllegalStateException("Данный модуль не относится к этому курсу");
+        }
+        model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
+        model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
+        return "admin/lesson-create";
+    }
+
+    @PostMapping("/course-instances/{instanceId}/modules/{moduleId}/lessons")
+    public String createLesson(@PathVariable Integer instanceId,
+                               @PathVariable Integer moduleId,
+                               @Valid @ModelAttribute("lessonCreateRequest") LessonCreateRequest request,
+                               BindingResult bindingResult,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ADMIN"));
+        boolean isTeacher = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("TEACHER"));
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("lessonCreateRequest", request);
+            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
+            model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
+            return "admin/lesson-create";
+        }
+
+        try {
+            Integer courseInstanceId = lessonService.createLesson(request, courseModuleService.getCourseModuleById(moduleId));
+            redirectAttributes.addFlashAttribute("successMessage", "Урок успешно создан");
+            if (isAdmin) {
+                return "redirect:/admin/course-instances/" + courseInstanceId;
+            } else if (isTeacher) {
+                return "redirect:/teacher/course/" + courseInstanceId;
+            }
+            return "redirect:/";
+        } catch (IllegalArgumentException e) {
+
+            model.addAttribute("lessonCreateRequest", request);
+            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
+            model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
+
+            return "admin/lesson-create";
+        }
     }
 }

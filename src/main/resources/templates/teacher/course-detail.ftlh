@@ -2,8 +2,14 @@
 <#import "/spring.ftl" as spring/>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <div class="hero-section">
-        <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
+        <h1 class="hero-title">${courseInstance.title}</h1>
         <p class="hero-subtitle">
             Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
             Категория: <strong>${courseInstance.category!'-'}</strong>
@@ -30,6 +36,9 @@
                                         aria-controls="collapse${module.id}">
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
+                                <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-primary btn-sm ms-3">
+                                    + Урок
+                                </a>
                             </div>
                             <div id="collapse${module.id}" class="accordion-collapse collapse"
                                  aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
@@ -47,6 +56,7 @@
                                                                 <p class="card-text text-muted small">
                                                                     ${lesson.description!''}
                                                                 </p>
+
                                                             </div>
                                                         </div>
                                                     </a>

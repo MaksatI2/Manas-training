@@ -113,16 +113,41 @@
         }
     </style>
 
+    <#assign known = Session.SPRING_SECURITY_CONTEXT??>
+    <#if known>
+        <#assign user = Session.SPRING_SECURITY_CONTEXT.authentication.principal>
+        <#assign name = user.getFullName()>
+        <#assign roles = user.getAuthorities()?join(",")>
+        <#assign isAdmin = roles?contains("ADMIN")>
+    </#if>
+
+    <#if successMessage??>
+    <div id="successMessage" data-message="${successMessage?js_string}"></div>
+</#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <div class="page-title-block">
         <h1 class="page-title">
             <i class="fas fa-user-graduate"></i>Информация о преподавателе
         </h1>
+
+
     </div>
 
     <div class="teacher-profile-container">
         <div class="teacher-photo">
             <img src="<#if teacher.teacher.avatarUrl??>/data/images/${teacher.teacher.avatarUrl}<#else>/static/images/default_avatar.jpg</#if>"
                  alt="${teacher.teacher.name} ${teacher.teacher.lastName}">
+            <#if isAdmin>
+                <div style="margin-top: 1rem; text-align: center;" class="w-100">
+                    <a href="/admin/teachers/${teacher.teacher.id}/manage-courses"
+                       class="btn btn-primary w-100">
+                        Управлять курсами
+                    </a>
+                </div>
+            </#if>
         </div>
 
         <div class="teacher-info-block">

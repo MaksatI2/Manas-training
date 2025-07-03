@@ -1,10 +1,10 @@
 package manasTrainingService.entity;
 
 public enum LessonType {
-    LECTURE("lecture"),
-    PRACTICAL("practical"),
-    EXAM("exam"),
-    CONSULTATION("consultation");
+    LECTURE("Лекция"),
+    PRACTICAL("Практическое занятие"),
+    EXAM("Экзамен"),
+    CONSULTATION("Консультация");
 
     private final String value;
 

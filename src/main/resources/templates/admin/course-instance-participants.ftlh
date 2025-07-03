@@ -29,7 +29,6 @@
                     <tr>
                         <th scope="col" style="width: 30%;">Имя участника</th>
                         <th scope="col" style="width: 20%;">Дата зачисления</th>
-                        <th scope="col" style="width: 20%;">Статус</th>
                         <th scope="col" style="width: 10%;">Оценка</th>
                     </tr>
                     </thead>
@@ -38,7 +37,6 @@
                         <tr data-enrollment-id="${enrollment.id}">
                             <td>${enrollment.studentName!''}</td>
                             <td>${enrollment.enrollmentDate.toLocalDate()}</td>
-                            <td>${enrollment.status}</td>
                             <td>${(enrollment.finalGrade?string['0.##'])!'–'}</td>
                         </tr>
                     </#list>
@@ -60,14 +58,11 @@
                                         <div class="col-md-1">
                                             <input type="checkbox" class="form-check-input" name="pendingEmployeeIds" value="${employee.id}" checked>
                                         </div>
-                                        <div class="col-md-5">
+                                        <div class="col-md-6">
                                             <span>${employee.employeeName!''}</span>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-5">
                                             <span>Заявка #${employee.applicationId}</span>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <span>${employee.applicationStatus}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -81,14 +76,11 @@
                                     <div class="col-md-1">
                                         <input type="checkbox" class="form-check-input" name="pendingEmployeeIds" value="${employee.id}">
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-md-6">
                                         <span>${employee.employeeName!''}</span>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <span>Заявка #${employee.applicationId}</span>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <span>${employee.applicationStatus}</span>
                                     </div>
                                 </div>
                             </div>

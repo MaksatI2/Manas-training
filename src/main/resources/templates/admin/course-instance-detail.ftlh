@@ -12,6 +12,10 @@
     <div class="hero-section">
         <h1 class="hero-title">${courseInstance.title}</h1>
         <p class="hero-subtitle">
+            Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
+            Категория: <strong>${courseInstance.category!'-'}</strong>
+        </p>
+        <p class="hero-subtitle">
             Начало: ${courseInstance.startDate} |
             Окончание: ${courseInstance.endDate} |
             Статус: <#if courseInstance.isActive>Активен<#else>Завершен</#if>
@@ -40,7 +44,7 @@
                                         aria-controls="collapse${module.id}">
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
-                                <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-success btn-sm ms-3">
+                                <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-primary btn-sm ms-3">
                                     + Урок
                                 </a>
                             </div>

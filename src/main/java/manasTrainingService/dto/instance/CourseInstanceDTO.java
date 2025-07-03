@@ -23,4 +23,6 @@ public class CourseInstanceDTO {
     private Integer durationHours;
     private List<CourseModuleDTO> modules;
     private Boolean isActive;
+    private String category;
+    private String courseTitle;
 }

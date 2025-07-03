@@ -118,6 +118,12 @@
                 </#if>
                 <#if isTeacher?? && isTeacher>
                     <div class="nav-item">
+                        <a href="/teacher/my-courses" class="nav-link" data-tooltip="Мои курсы">
+                            <i class="fas fa-book-open"></i>
+                            <span>Мои курсы</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
                         <a href="/#" class="nav-link" data-tooltip="Тесты">
                             <i class="fas fa-question-circle"></i>
                             <span>Тесты</span>
