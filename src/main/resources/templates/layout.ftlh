@@ -2,8 +2,18 @@
     <!DOCTYPE html>
     <html lang="ru">
     <head>
+        <style>
+            body {
+                visibility: hidden;
+                display: none;
+            }
+        </style>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
         <title>Манас Тренинг Центр</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -914,6 +924,12 @@
             visibility: visible;
         }
     </style>
+    <script>
+        window.addEventListener('load', function () {
+            document.body.style.visibility = 'visible';
+            document.body.style.display = 'block';
+        });
+    </script>
     </body>
     </html>
 </#macro>
