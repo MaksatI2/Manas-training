@@ -31,4 +31,5 @@ echo -e "${YELLOW}📝 Последние логи приложения:${NC}"
 docker-compose logs --tail=50 app
 
 
-echo -e "${GREEN}🎉 Деплой завершен успешно!${NC}"
+echo -e "${GREEN} Деплой завершен успешно!${NC}"
+echo -e "${GREEN}🌐 Приложение доступно по адресу: http://mtc.edu.kg${NC}"
