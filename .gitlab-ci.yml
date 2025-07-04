@@ -39,5 +39,4 @@ deploy:
     - head -n 5 ~/.ssh/id_ed25519
     - cat ~/.ssh/id_ed25519 | head -n 5
     - ssh-keyscan -H 157.245.67.28 >> ~/.ssh/known_hosts
-    - scp -i ~/.ssh/id_ed25519 target/*.jar root@157.245.67.28:/root/app.jar
-    - ssh -i ~/.ssh/id_ed25519 root@157.245.67.28 "systemctl restart app"
+    - ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no root@157.245.67.28 "echo OK"
