@@ -1,6 +1,10 @@
 <#import "../layout.ftlh" as layout>
-
+<#import "../RoadMap.ftlh" as roadmap>
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Расписание", "url": ""}
+    ] />
     <div class="calendar-container">
         <div class="calendar-header">
             <h1 class="calendar-title">

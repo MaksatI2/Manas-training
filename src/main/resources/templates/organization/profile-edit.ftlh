@@ -1,5 +1,6 @@
 <#import "/spring.ftl" as spring />
 <#include "../layout.ftlh">
+<#import "../RoadMap.ftlh" as roadmap>
 <style>
 
     .error-block {
@@ -9,6 +10,11 @@
     }
 </style>
 <@page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Профиль", "url": "/organization/profile"},
+    {"label": "Редактирование", "url": ""}
+    ] />
     <div class="hero-section">
         <h1 class="hero-title">
             <i class="fas fa-user-graduate me-3"></i>

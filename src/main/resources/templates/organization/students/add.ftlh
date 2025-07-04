@@ -1,5 +1,11 @@
-<#import "/layout.ftlh" as layout>
+<#import "/templates/layout.ftlh" as layout>
+<#import "/templates/RoadMap.ftlh" as roadmap>
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Студенты", "url": "/organization/students"},
+    {"label": "Добавить студента", "url": ""}
+    ] />
     <style>
         :root {
             --primary-blue: #0066cc;

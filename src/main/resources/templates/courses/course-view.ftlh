@@ -1,4 +1,5 @@
 <#import "../layout.ftlh" as layout>
+<#import "../RoadMap.ftlh" as roadmap>
 <#assign known = Session.SPRING_SECURITY_CONTEXT??>
 <#if known>
     <#assign user = Session.SPRING_SECURITY_CONTEXT.authentication.principal>
@@ -16,6 +17,11 @@
 </#if>
 
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Курсы", "url": "/courses"},
+    {"label": "${course.title}", "url": ""}
+    ] />
     <div class="card shadow mb-4">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>

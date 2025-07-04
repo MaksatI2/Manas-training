@@ -1,6 +1,12 @@
 <#import "/spring.ftl" as spring />
 <#include "../layout.ftlh">
+<#import "../RoadMap.ftlh" as roadmap>
 <@page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Урок #${lesson.id}", "url": "/lessons/${lesson.id}"},
+    {"label": "Добавить материал", "url": ""}
+    ] />
     <style>
         .upload-container {
             max-width: 800px;

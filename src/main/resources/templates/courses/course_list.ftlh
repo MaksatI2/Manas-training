@@ -1,5 +1,10 @@
 <#import "../layout.ftlh" as layout>
+<#import "../RoadMap.ftlh" as roadmap>
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Курсы", "url": ""}
+    ] />
     <div class="card shadow mb-4">
         <div class="card-header d-flex filter-panel">
             <h5 class="m-0 font-weight-bold text-white">

@@ -1,5 +1,6 @@
 <#import "../layout.ftlh" as layout>
 <#import "/spring.ftl" as spring>
+<#import "../RoadMap.ftlh" as roadmap>
 
 <#assign known = Session.SPRING_SECURITY_CONTEXT??>
 <#if known>
@@ -13,6 +14,10 @@
 </#if>
 
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Урок #${lesson.id}", "url": ""}
+    ] />
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
     </#if>

@@ -1,7 +1,13 @@
 <#import "../layout.ftlh" as layout>
 <#import "/spring.ftl" as spring>
+<#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Потоки курсов", "url": "/admin/course-instances"},
+    {"label": "Поток #${courseInstance.id}", "url": ""}
+    ] />
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
     </#if>

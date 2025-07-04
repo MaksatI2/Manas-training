@@ -1,7 +1,12 @@
 <#import "../layout.ftlh" as layout>
+<#import "../RoadMap.ftlh" as roadmap>
 <#setting datetime_format="dd.MM.yyyy HH:mm">
 <#setting date_format="dd.MM.yyyy">
 <@layout.page title="Заявки на курсы">
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Заявки на курсы", "url": ""}
+    ] />
     <div class="card shadow mb-4">
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
