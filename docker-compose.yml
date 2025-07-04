@@ -27,8 +27,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - POSTGRES_PASSWORD=qwerty
-      - MAIL_USERNAME=${MAIL_USERNAME}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_USERNAME=zer0icemax@gmail.com
+      - MAIL_PASSWORD=chfe zivr epbv zbc
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=qwerty

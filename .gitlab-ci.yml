@@ -29,12 +29,12 @@ deploy:
   before_script:
     - apt-get update -qq && apt-get install -y -qq openssh-client sshpass rsync
   script:
-    - echo "Деплой на сервер $SERVER_IP"
-    - sshpass -p "$SERVER_PASSWORD" rsync -avz --delete ./ root@$SERVER_IP:/root/manas-training-service/
-    - sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no root@$SERVER_IP "cd /root/manas-training-service && chmod +x simple-deploy.sh && ./simple-deploy.sh"
+    - echo "Деплой на сервер 157.245.67.28"
+    - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" rsync -avz --delete ./ root@157.245.67.28:/root/manas-training-service/
+    - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" ssh -o StrictHostKeyChecking=no root@157.245.67.28 "cd /root/manas-training-service && chmod +x simple-deploy.sh && ./simple-deploy.sh"
   environment:
     name: production
-    url: http://$SERVER_IP:8089
+    url: http://157.245.67.28:8089
   only:
     - dev
   when: manual
