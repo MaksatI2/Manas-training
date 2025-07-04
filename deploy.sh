@@ -9,11 +9,6 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}🚀 Начинаем деплой приложения...${NC}"
 
-if [ -z "$POSTGRES_PASSWORD" ]; then
-    echo -e "${RED}❌ Не установлена переменная POSTGRES_PASSWORD${NC}"
-    exit 1
-fi
-
 if [ -z "$MAIL_USERNAME" ]; then
     echo -e "${RED}❌ Не установлена переменная MAIL_USERNAME${NC}"
     exit 1
