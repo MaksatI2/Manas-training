@@ -9,16 +9,6 @@ NC='\033[0m'
 
 echo -e "${GREEN}🚀 Начинаем деплой приложения...${NC}"
 
-if [ -z "$MAIL_USERNAME" ]; then
-    echo -e "${RED}❌ Не установлена переменная MAIL_USERNAME${NC}"
-    exit 1
-fi
-
-if [ -z "$MAIL_PASSWORD" ]; then
-    echo -e "${RED}❌ Не установлена переменная MAIL_PASSWORD${NC}"
-    exit 1
-fi
-
 echo -e "${YELLOW}🛑 Остановка старых контейнеров...${NC}"
 docker-compose down --remove-orphans
 
