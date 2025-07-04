@@ -30,8 +30,8 @@ deploy:
     - apt-get update -qq && apt-get install -y -qq openssh-client sshpass rsync
   script:
     - echo "Деплой на сервер 157.245.67.28"
-    - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" rsync -avz -e "ssh -o StrictHostKeyChecking=no" --delete ./ root@157.245.67.28:/root/manas-training-service/manas-training-service/
-    - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" ssh -o StrictHostKeyChecking=no root@157.245.67.28 "cd /root/manas-training-service/manas-training-service && chmod +x deploy.sh && ./deploy.sh"
+    - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" rsync -avz -e "ssh -o StrictHostKeyChecking=no" --delete ./ root@157.245.67.28:/root/manas-training-service/
+    - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" ssh -o StrictHostKeyChecking=no root@157.245.67.28 "cd /root/manas-training-service && chmod +x deploy.sh && ./deploy.sh"
   environment:
     name: production
     url: http://157.245.67.28:8089
