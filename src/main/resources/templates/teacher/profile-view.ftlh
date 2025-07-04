@@ -1,5 +1,11 @@
 <#import "../layout.ftlh" as layout>
+<#import "../RoadMap.ftlh" as roadmap>
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Преподаватели", "url": "/teacher"},
+    {"label": "Профиль", "url": ""}
+    ] />
     <style>
         .profile-container {
             max-width: 800px;

@@ -1,6 +1,12 @@
 <#import "/spring.ftl" as spring />
 <#include "../layout.ftlh">
+<#import "../RoadMap.ftlh" as roadmap>
 <@page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Мои курсы", "url": "/teacher/my-courses"},
+    {"label": "Редактировать тест", "url": ""}
+    ] />
     <#if test.questions?? && 0 < test.questions?size>
         <#assign questionlastIndex = test.questions?size - 1>
     <#else>

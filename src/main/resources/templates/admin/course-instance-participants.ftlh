@@ -1,7 +1,14 @@
 <#import "../layout.ftlh" as layout>
 <#import "/spring.ftl" as spring>
+<#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Потоки курсов", "url": "/admin/course-instances"},
+    {"label": "Поток #${courseInstance.id}", "url": "/admin/course-instances/${courseInstance.id}"},
+    {"label": "Участники", "url": ""}
+    ] />
     <div class="container mb-4">
         <div class="d-flex flex-wrap gap-2">
             <a href="/admin/course-instances/${courseInstance.id}" class="btn btn-secondary">Назад</a>

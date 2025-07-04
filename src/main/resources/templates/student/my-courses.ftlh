@@ -1,6 +1,10 @@
 <#import "../layout.ftlh" as layout>
-
+<#import "../RoadMap.ftlh" as roadmap>
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Мои курсы", "url": ""}
+    ] />
     <div class="hero-section">
         <h1 class="hero-title"><i class="fas fa-book me-2"></i>Мои курсы</h1>
     </div>
