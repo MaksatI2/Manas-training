@@ -21,7 +21,7 @@ build:
       - target/*.jar
     expire_in: 1 day
   only:
-    - main
+    - dev
 
 deploy:
   stage: deploy
@@ -36,5 +36,5 @@ deploy:
     name: production
     url: http://$SERVER_IP:8089
   only:
-    - main
+    - dev
   when: manual
