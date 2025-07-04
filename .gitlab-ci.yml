@@ -21,22 +21,24 @@ variables:
 build:
   stage: build
   script:
-    - mvn clean package
+    - mvn clean package -DskipTests
   artifacts:
     paths:
       - target/*.jar
+    expire_in: 1 hour
 
 deploy:
   stage: deploy
-  only:
-    - dev
-  script:
+  before_script:
     - apt-get update && apt-get install -y openssh-client
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY_B64" | base64 -d > ~/.ssh/id_ed25519
-    - chmod 600 ~/.ssh/id_ed25519
-    - ls -l ~/.ssh
-    - head -n 5 ~/.ssh/id_ed25519
-    - cat ~/.ssh/id_ed25519 | head -n 5
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H 157.245.67.28 >> ~/.ssh/known_hosts
-    - ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no root@157.245.67.28 "echo OK"
+  script:
+    - scp target/*.jar root@157.245.67.28:/opt/manas-training-service/manas-training-service/
+
+    - ssh root@157.245.67.28 "cd /opt/manas-training-service/manas-training-service && ./deploy.sh"
+  only:
+    - main
+  when: manual
