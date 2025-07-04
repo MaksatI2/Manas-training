@@ -5,19 +5,18 @@ services:
     image: postgres:15
     container_name: manas-postgres
     environment:
-      POSTGRES_DB: manasdb
-      POSTGRES_USER: manasdb
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: qwerty
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432"
+      - "8888:5432"
     networks:
       - manas-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U manasdb" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -31,7 +30,7 @@ services:
       - MAIL_USERNAME=zer0icemax@gmail.com
       - MAIL_PASSWORD=chfe zivr epbv zbcp
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=manasdb
+      - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=qwerty
     ports:
       - "8089:8089"
@@ -43,7 +42,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./logs:/app/logs
-      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8089/actuator/health || exit 1"]
       interval: 30s
