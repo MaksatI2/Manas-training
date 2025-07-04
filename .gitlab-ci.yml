@@ -8,8 +8,15 @@ cache:
   paths:
     - .m2/repository
 
+services:
+  - name: postgres:15
+    alias: postgres
+
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  POSTGRES_DB: testdb
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
 
 build:
   stage: build
