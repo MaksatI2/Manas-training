@@ -35,6 +35,8 @@ deploy:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
     - chmod 600 ~/.ssh/id_ed25519
+    - ls -l ~/.ssh
+    - cat ~/.ssh/id_ed25519 | head -n 5
     - ssh-keyscan -H 157.245.67.28 >> ~/.ssh/known_hosts
     - scp -i ~/.ssh/id_ed25519 target/*.jar root@157.245.67.28:/root/app.jar
     - ssh -i ~/.ssh/id_ed25519 root@157.245.67.28 "systemctl restart app"
