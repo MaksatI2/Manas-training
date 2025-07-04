@@ -32,4 +32,4 @@ docker-compose logs --tail=50 app
 
 
 echo -e "${GREEN} Деплой завершен успешно!${NC}"
-echo -e "${GREEN}🌐 Приложение доступно по адресу: http://mtc.edu.kg${NC}"
+echo -e "${GREEN}🌐 Приложение доступно по адресу: http://localhost:8089${NC}"

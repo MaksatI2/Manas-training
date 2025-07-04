@@ -34,7 +34,7 @@ deploy:
     - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" ssh -o StrictHostKeyChecking=no root@157.245.67.28 "cd /root/manas-training-service && chmod +x deploy.sh && ./deploy.sh"
   environment:
     name: production
-    url: http://mtc.edu.kg
+    url: http://157.245.67.28:8089
   only:
     - dev
   when: manual
