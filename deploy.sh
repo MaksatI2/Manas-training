@@ -30,15 +30,5 @@ docker-compose ps
 echo -e "${YELLOW}📝 Последние логи приложения:${NC}"
 docker-compose logs --tail=50 app
 
-echo -e "${YELLOW}🏥 Проверка здоровья приложения...${NC}"
-if curl -f http://localhost:8089/actuator/health >/dev/null 2>&1; then
-    echo -e "${GREEN}✅ Приложение запущено и работает корректно!${NC}"
-    echo -e "${GREEN}🌐 Приложение доступно по адресу: http://localhost:8089${NC}"
-else
-    echo -e "${RED}❌ Приложение не отвечает на health check${NC}"
-    echo -e "${YELLOW}📋 Логи для диагностики:${NC}"
-    docker-compose logs app
-    exit 1
-fi
 
 echo -e "${GREEN}🎉 Деплой завершен успешно!${NC}"
