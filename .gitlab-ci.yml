@@ -1,0 +1,40 @@
+stages:
+- build
+- deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+
+build:
+  stage: build
+  image: maven:3.8.6-openjdk-17
+  script:
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 day
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: ubuntu:20.04
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq openssh-client sshpass rsync
+  script:
+    - echo "Деплой на сервер $SERVER_IP"
+    - sshpass -p "$SERVER_PASSWORD" rsync -avz --delete ./ root@$SERVER_IP:/root/manas-training-service/
+    - sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no root@$SERVER_IP "cd /root/manas-training-service && chmod +x simple-deploy.sh && ./simple-deploy.sh"
+  environment:
+    name: production
+    url: http://$SERVER_IP:8089
+  only:
+    - main
+  when: manual
