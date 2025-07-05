@@ -141,7 +141,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<StudentProfile> profiles = studentProfileRepository.findAllByOrganization(organization);
         List<User> students = profiles.stream().map(StudentProfile::getUser).toList();
 
-        List<CourseEnrollment> enrollments = courseEnrollmentRepository.findByStudentIn(students);
+        List<CourseEnrollment> enrollments = courseEnrollmentRepository.findWithCourseByStudentIn(students);
+
 
         return students.stream()
                 .flatMap(student -> {

@@ -2,6 +2,7 @@ package manasTrainingService.service.impl.course;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseInstanceCreationDTO;
+import manasTrainingService.dto.application.CourseInstanceCalendarDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
@@ -11,10 +12,11 @@ import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.CourseModule;
 import manasTrainingService.entity.Lesson;
 import manasTrainingService.exceptions.nsee.course.CourseNotFoundException;
+import manasTrainingService.repositories.ScheduleRepository;
 import manasTrainingService.repositories.course.CourseInstanceRepository;
+import manasTrainingService.service.LessonService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
-import manasTrainingService.service.LessonService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,7 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     private final CourseInstanceRepository courseInstanceRepository;
     private final CourseService courseService;
     private final LessonService lessonService;
+    private final ScheduleRepository scheduleRepository;
 
     @Override
     public Integer createCourseInstance(CourseInstanceCreationDTO dto) {
@@ -65,7 +68,7 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
 
     @Override
     public CourseInstanceDTO getCourseInstanceById(Integer id) {
-        CourseInstance course =  courseInstanceRepository.findById(id)
+        CourseInstance course = courseInstanceRepository.findById(id)
                 .orElseThrow(() -> new CourseNotFoundException("Поток курса не был найден"));
         return convertToDto(course);
     }
@@ -154,6 +157,22 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
         }
 
         courseInstanceRepository.deleteById(id);
+    }
+
+    @Override
+    public List<CourseInstanceCalendarDTO> getAllInstancesForCalendar() {
+        return courseInstanceRepository.findAll().stream()
+                .map(instance -> CourseInstanceCalendarDTO.builder()
+                        .id(instance.getId())
+                        .courseInstanceTitle(instance.getTitle())
+                        .courseTitle(instance.getCourse().getTitle())
+                        .category(instance.getCourse().getCategory().getName())
+                        .startDate(instance.getStartDate().toLocalDate())
+                        .endDate(instance.getEndDate().toLocalDate())
+                        .status(instance.getIsActive() ? "Активен" : "Неактивен")
+                        .color("#3f51b5")
+                        .build())
+                .toList();
     }
 
 }

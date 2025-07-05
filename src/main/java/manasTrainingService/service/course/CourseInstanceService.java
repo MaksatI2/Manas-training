@@ -1,6 +1,7 @@
 package manasTrainingService.service.course;
 
 import manasTrainingService.dto.CourseInstanceCreationDTO;
+import manasTrainingService.dto.application.CourseInstanceCalendarDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 import manasTrainingService.entity.CourseInstance;
@@ -23,4 +24,7 @@ public interface CourseInstanceService {
     void updateCourseInstance(Integer id, CourseInstanceUpdateDTO dto);
 
     void deleteCourseInstance(Integer id);
+
+    List<CourseInstanceCalendarDTO> getAllInstancesForCalendar();
+
 }

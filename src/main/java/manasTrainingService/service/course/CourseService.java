@@ -2,6 +2,7 @@ package manasTrainingService.service.course;
 
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.entity.Course;
 import manasTrainingService.entity.User;
 
@@ -19,5 +20,5 @@ public interface CourseService {
 
     List<CourseDto> getAvailableCoursesForOrganization(User organizationUser);
 
-
+    List<TeacherCardDto> getTeachersByCourse(Integer courseId);
 }

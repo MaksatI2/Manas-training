@@ -4,6 +4,8 @@ import manasTrainingService.entity.CourseEnrollment;
 import manasTrainingService.entity.Status;
 import manasTrainingService.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,6 +34,14 @@ public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollme
     List<CourseEnrollment> findByStudentIn(List<User> students);
 
     List<CourseEnrollment> findByStudent(User student);
+
+    @Query("""
+                SELECT e FROM CourseEnrollment e
+                JOIN FETCH e.courseInstance ci
+                JOIN FETCH ci.course
+                WHERE e.student IN :students
+            """)
+    List<CourseEnrollment> findWithCourseByStudentIn(@Param("students") List<User> students);
 
 
 }

@@ -1,76 +1,164 @@
 <#import "../layout.ftlh" as layout>
 <#assign dateFormat = "dd.MM.yyyy">
 <#assign dateTimeFormat = "dd.MM.yyyy HH:mm">
+
 <@layout.page title="Детали заявки">
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center"
-             style="background: linear-gradient(135deg, #0066cc, #003d7a);">
-            <h5 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-file-alt me-2"></i>
-                Заявка №${application.id}
+    <style>
+        :root {
+            --primary-blue: #0066cc;
+            --dark-blue: #003d7a;
+        }
+
+        .card-custom {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            padding: 1rem 1.25rem;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 0.375rem;
+            padding: 0.35em 0.65em;
+        }
+
+        .bg-warning { background-color: #ffc107 !important; color: #212529 !important; }
+        .bg-success { background-color: #28a745 !important; }
+        .bg-danger { background-color: #dc3545 !important; }
+        .bg-secondary { background-color: #6c757d !important; }
+
+        .me-1 { margin-right: 0.25rem; }
+        .me-2 { margin-right: 0.5rem; }
+
+        .btn-light:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-blue);
+        }
+
+        .employee-list {
+            padding-left: 0.25rem;
+        }
+
+        .employee-item {
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed #ddd;
+            font-size: 0.95rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .employee-item:last-child {
+            border-bottom: none;
+        }
+
+        .employee-item i {
+            color: #6c757d;
+            margin-right: 0.5rem;
+        }
+    </style>
+
+    <div class="card-custom">
+        <div class="card-header-custom">
+            <h5 class="m-0">
+                <i class="fas fa-file-alt me-2"></i> Заявка №${application.id}
             </h5>
             <a href="/applications/organization" class="btn btn-light btn-sm"
-               style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад
+               style="border-radius: 25px; background: white; color: var(--primary-blue); border: 1px solid var(--primary-blue);">
+                <i class="fas fa-arrow-left me-1" style="color: var(--primary-blue);"></i> Назад
             </a>
         </div>
 
-        <div class="card-body">
-            <div class="mb-3">
-                <strong>Курс:</strong> ${application.courseTitle!"—"}
-            </div>
-            <div class="mb-3">
-                <strong>Код компании:</strong> ${application.outgoingCode!"—"}
-            </div>
-            <div class="mb-3">
-                <strong>Статус:</strong>
-                <span class="badge
-                    <#if application.status == "PENDING">bg-warning
-                    <#elseif application.status == "APPROVED">bg-success
-                    <#elseif application.status == "REJECTED">bg-danger
-                    <#else>bg-secondary</#if>">
-                    ${application.localizedStatus!"—"}
-                </span>
-            </div>
-            <div class="mb-3">
-                <strong>Дата подачи:</strong> ${application.formattedSubmittedAt!"—"}
-            </div>
-
-            <#if application.preferredTeacher??>
-                <div class="mb-3">
-                    <strong>Предпочтительный преподаватель:</strong>
-                    ${application.preferredTeacher.name} ${application.preferredTeacher.lastName}
+        <div class="card-body-custom">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <strong>Курс:</strong><br>
+                    ${application.courseTitle!"—"}
                 </div>
-            </#if>
-
-            <#if application.formattedPreferredStartDate??>
-                <div class="mb-3">
-                    <strong>Желаемая дата начала:</strong> ${application.formattedPreferredStartDate}
+                <div class="col-md-6 mb-3">
+                    <strong>Код компании:</strong><br>
+                    ${application.outgoingCode!"—"}
                 </div>
-            </#if>
-
-            <#if application.formattedPreferredEndDate??>
-                <div class="mb-3">
-                    <strong>Желаемая дата окончания:</strong> ${application.formattedPreferredEndDate}
+                <div class="col-md-6 mb-3">
+                    <strong>Статус:</strong><br>
+                    <span class="badge
+                        <#if application.status == "PENDING">bg-warning
+                        <#elseif application.status == "APPROVED">bg-success
+                        <#elseif application.status == "REJECTED">bg-danger
+                        <#else>bg-secondary</#if>">
+                        ${application.localizedStatus!"—"}
+                    </span>
                 </div>
-            </#if>
+                <div class="col-md-6 mb-3">
+                    <strong>Дата подачи:</strong><br>
+                    ${application.formattedSubmittedAt!"—"}
+                </div>
 
-            <h6 class="mt-4 fw-bold">
-                <i class="fas fa-users me-2" style="color: #0066cc;"></i>Сотрудники
+                <#if application.preferredTeacher??>
+                    <div class="col-md-6 mb-3">
+                        <strong>Предпочтительный преподаватель:</strong><br>
+                        ${application.preferredTeacher.name} ${application.preferredTeacher.lastName}
+                    </div>
+                </#if>
+
+                <#if application.formattedPreferredStartDate??>
+                    <div class="col-md-6 mb-3">
+                        <strong>Желаемая дата начала:</strong><br>
+                        ${application.formattedPreferredStartDate}
+                    </div>
+                </#if>
+
+                <#if application.formattedPreferredEndDate??>
+                    <div class="col-md-6 mb-3">
+                        <strong>Желаемая дата окончания:</strong><br>
+                        ${application.formattedPreferredEndDate}
+                    </div>
+                </#if>
+            </div>
+
+            <h6 class="mt-4 section-title">
+                <i class="fas fa-users me-2 text-primary"></i>Сотрудники
             </h6>
-            <ul class="list-group mb-4">
+            <div class="employee-list mb-4">
                 <#list application.employees as emp>
-                    <li class="list-group-item">${emp.fullName} &lt;${emp.email}&gt;</li>
+                    <div class="employee-item">
+                        <i class="fas fa-user"></i>
+                        <span>${emp.fullName} &lt;${emp.email}&gt;</span>
+                    </div>
                 </#list>
-            </ul>
+            </div>
         </div>
     </div>
 
-    <div class="card shadow">
-        <div class="card-header bg-light fw-semibold">
-            <i class="fas fa-comments me-2"></i>Комментарии
+    <div class="card-custom">
+        <div class="card-header-custom" style="background: #f8f9fa; color: #333; font-weight: 600;">
+            <i class="fas fa-comments me-2 text-secondary"></i>Комментарии
         </div>
-        <div class="card-body">
+        <div class="card-body-custom">
             <#if comments?size == 0>
                 <p class="text-muted">Комментариев пока нет.</p>
             <#else>
@@ -86,36 +174,4 @@
             </#if>
         </div>
     </div>
-
-    <style>
-        .badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 0.375rem;
-            padding: 0.35em 0.65em;
-        }
-
-        .bg-warning { background-color: #ffc107 !important; color: #212529 !important; }
-        .bg-success { background-color: #28a745 !important; }
-        .bg-danger { background-color: #dc3545 !important; }
-        .bg-secondary { background-color: #6c757d !important; }
-
-        .btn-light:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
-        }
-
-        .btn-sm {
-            font-size: 0.875rem;
-            padding: 0.375rem 0.75rem;
-        }
-
-        .me-1 {
-            margin-right: 0.25rem;
-        }
-
-        .me-2 {
-            margin-right: 0.5rem;
-        }
-    </style>
 </@layout.page>
