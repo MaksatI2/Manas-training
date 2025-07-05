@@ -1,70 +1,38 @@
 <#macro breadcrumbs items>
     <nav aria-label="breadcrumb" class="mb-4">
-        <div class="card shadow" style="border-radius: 10px; box-shadow: 0 4px 15px rgba(0,102,204,0.1);">
-            <div class="card-header py-2" style="background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); border-radius: 10px 10px 0 0; border-left: 4px solid var(--primary-blue);">
-                <ol class="breadcrumb m-0">
-                    <#list items as item>
-                        <li class="breadcrumb-item <#if item?is_last>active</#if>" aria-current="<#if item?is_last>page</#if>">
-                            <#if !item?is_last>
-                                <a href="${item.url}" class="text-white" style="text-decoration: none; transition: all 0.3s ease;">
-                                    ${item.label}
-                                </a>
-                            <#else>
-                                <span class="text-white">${item.label}</span>
-                            </#if>
-                        </li>
+        <div class="d-flex align-items-center px-4 py-2 shadow-sm"
+             style="border-radius: 12px; background: linear-gradient(135deg, #0066cc, #003d7a); box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);">
+            <ol class="breadcrumb mb-0 d-flex align-items-center flex-wrap" style="background: transparent;">
+                <#list items as item>
+                    <li class="breadcrumb-item <#if item?is_last>active</#if>" aria-current="<#if item?is_last>page</#if>"
+                        style="color: white; font-weight: <#if item?is_last>600<#else>500</#if>; font-size: 1rem;">
                         <#if !item?is_last>
-                            <li class="breadcrumb-item separator">
-                                <i class="fas fa-angle-right text-white" style="font-size: 0.9rem;"></i>
-                            </li>
+                            <a href="${item.url}" class="text-white text-decoration-none" style="transition: color 0.2s;">
+                                ${item.label}
+                            </a>
+                        <#else>
+                            ${item.label}
                         </#if>
-                    </#list>
-                </ol>
-            </div>
+                    </li>
+                    <#if !item?is_last>
+                        <li class="mx-2 text-white d-flex align-items-center" aria-hidden="true">
+                            <svg width="10" height="10" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 5L12 10L7 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </li>
+                    </#if>
+                </#list>
+            </ol>
         </div>
     </nav>
 
     <style>
-        :root {
-            --primary-blue: #0066cc;
-            --dark-blue: #003d7a;
-            --white: #ffffff;
-        }
-
-        .breadcrumb {
-            background: transparent;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .breadcrumb-item a:hover {
-            transform: translateY(-1px);
-            text-decoration: underline;
-            color: var(--white);
-        }
-
-        .breadcrumb-item.active span {
-            font-weight: 600;
-        }
-
-        .breadcrumb-item.separator {
-            display: flex;
-            align-items: center;
-            margin: 0 0.5rem;
-        }
-
         @media (max-width: 768px) {
             .breadcrumb {
                 font-size: 0.9rem;
             }
-
-            .card-header {
-                padding: 0.5rem 1rem;
-            }
-
-            .breadcrumb-item.separator {
-                margin: 0 0.3rem;
+            .breadcrumb li {
+                margin-bottom: 2px;
             }
         }
     </style>
