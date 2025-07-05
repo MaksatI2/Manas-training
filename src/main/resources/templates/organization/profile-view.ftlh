@@ -233,10 +233,6 @@
                         ${organization.user.email}
                     </p>
                     <div class="user-role-and-edit">
-                    <span class="user-role">
-                        <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                    Тип аккаунта: Менеджер организации
-                    </span>
                     <a href="/organization/profile/edit" class="edit-button">
                         <i class="fas fa-edit"></i>
                         Редактировать профиль

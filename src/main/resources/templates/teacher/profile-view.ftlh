@@ -265,10 +265,6 @@
                         ${teacher.teacher.email}
                     </p>
                     <div class="user-role-and-edit">
-                    <span class="user-role">
-                        <i class="fas fa-chalkboard-teacher" style="margin-right: 0.5rem;"></i>
-                        Тип аккаунта Преподаватель
-                    </span>
                     <a href="/teacher/profile/edit" class="edit-button">
                         <i class="fas fa-edit"></i>
                         Редактировать профиль
