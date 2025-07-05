@@ -140,7 +140,7 @@
                     <div class="nav-item">
                         <a href="/organization/students" class="nav-link" data-tooltip="Сотрудники">
                             <i class="fas fa-user-tie"></i>
-                            <span>Сотрудники</span>
+                            <span>Студенты</span>
                         </a>
                     </div>
                     <div class="nav-item">
