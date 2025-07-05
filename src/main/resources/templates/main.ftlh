@@ -1,10 +1,6 @@
 <#import "layout.ftlh" as layout>
-<#import "RoadMap.ftlh" as roadmap>
 
 <@layout.page>
-    <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": ""}
-    ] />
     <div class="hero-section-enhanced parallax">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
