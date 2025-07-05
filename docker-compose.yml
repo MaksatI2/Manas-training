@@ -32,6 +32,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=qwerty
+      - JITSI_DOMAIN=157.245.67.28
     ports:
       - "8089:8089"
     depends_on:
@@ -48,10 +49,121 @@ services:
       timeout: 10s
       retries: 3
 
+  jitsi-web:
+    image: jitsi/web:stable
+    container_name: manas-jitsi-web
+    ports:
+      - "8080:80"
+      - "8443:443"
+    environment:
+      - ENABLE_LETSENCRYPT=0
+      - ENABLE_HTTP_REDIRECT=0
+      - DISABLE_HTTPS=1
+      - JICOFO_AUTH_USER=focus
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_BOSH_URL_BASE=http://prosody:5280
+      - XMPP_MUC_DOMAIN=muc.meet.jitsi
+      - TZ=Asia/Bishkek
+      - JVB_TCP_HARVESTER_DISABLED=true
+    networks:
+      - manas-network
+    volumes:
+      - jitsi-web-config:/config
+      - jitsi-web-transcripts:/usr/share/jitsi-meet/transcripts
+    depends_on:
+      - prosody
+      - jicofo
+      - jvb
+
+  prosody:
+    image: jitsi/prosody:stable
+    container_name: manas-prosody
+    environment:
+      - AUTH_TYPE=internal
+      - ENABLE_GUESTS=1
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_MUC_DOMAIN=muc.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - JICOFO_COMPONENT_SECRET=jicofo-secret
+      - JVB_AUTH_USER=jvb
+      - JVB_AUTH_PASSWORD=jvb-password
+      - JICOFO_AUTH_USER=focus
+      - JICOFO_AUTH_PASSWORD=focus-password
+      - TZ=Asia/Bishkek
+      - ENABLE_LOBBY=1
+    networks:
+      - manas-network
+    volumes:
+      - prosody-config:/config
+      - prosody-plugins:/prosody-plugins-custom
+    ports:
+      - "5222:5222"
+      - "5280:5280"
+
+  jicofo:
+    image: jitsi/jicofo:stable
+    container_name: manas-jicofo
+    environment:
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - JICOFO_COMPONENT_SECRET=jicofo-secret
+      - JICOFO_AUTH_USER=focus
+      - JICOFO_AUTH_PASSWORD=focus-password
+      - JVB_BREWERY_MUC=jvbbrewery
+      - JIGASI_BREWERY_MUC=jigasibrewery
+      - JIGASI_SIP_URI=test@sip2sip.info
+      - TZ=Asia/Bishkek
+    networks:
+      - manas-network
+    volumes:
+      - jicofo-config:/config
+    depends_on:
+      - prosody
+
+  jvb:
+    image: jitsi/jvb:stable
+    container_name: manas-jvb
+    environment:
+      - DOCKER_HOST_ADDRESS=157.245.67.28
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_SERVER=prosody
+      - JVB_AUTH_USER=jvb
+      - JVB_AUTH_PASSWORD=jvb-password
+      - JVB_BREWERY_MUC=jvbbrewery
+      - JVB_PORT=10000
+      - JVB_TCP_HARVESTER_DISABLED=true
+      - JVB_STUN_SERVERS=stun.l.google.com:19302,stun1.l.google.com:19302,stun2.l.google.com:19302
+      - TZ=Asia/Bishkek
+    networks:
+      - manas-network
+    volumes:
+      - jvb-config:/config
+    ports:
+      - "10000:10000/udp"
+      - "4443:4443"
+    depends_on:
+      - prosody
+
 networks:
   manas-network:
     driver: bridge
 
 volumes:
   postgres_data:
+    driver: local
+  jitsi-web-config:
+    driver: local
+  jitsi-web-transcripts:
+    driver: local
+  prosody-config:
+    driver: local
+  prosody-plugins:
+    driver: local
+  jicofo-config:
+    driver: local
+  jvb-config:
     driver: local
