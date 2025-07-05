@@ -26,7 +26,6 @@
         </div>
     </nav>
 
-
     <style>
         @media (max-width: 768px) {
             .breadcrumb {
