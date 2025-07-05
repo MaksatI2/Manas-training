@@ -1,7 +1,13 @@
 <#import "../layout.ftlh" as layout>
 <#import "/spring.ftl" as spring />
+<#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Потоки курсов", "url": "/admin/course-instances"},
+    {"label": "Добавить поток", "url": ""}
+    ] />
     <div class="container">
         <h2 class="section-title">Создать поток курса</h2>
         <div class="card feature-card-enhanced">

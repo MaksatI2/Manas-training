@@ -76,6 +76,7 @@ public class StudentController {
         enrollmentService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
         model.addAttribute("courseInstance", courseInstanceDto);
+        model.addAttribute("userRole", userService.getAuthorizedUser().getRole());
         return "student/course-detail";
     }
 

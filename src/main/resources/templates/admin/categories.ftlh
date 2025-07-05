@@ -1,5 +1,10 @@
 <#import "../layout.ftlh" as layout>
+<#import "../RoadMap.ftlh" as roadmap>
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Управление категориями", "url": ""}
+    ] />
     <div class="card shadow mb-4">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>

@@ -1,7 +1,13 @@
 <#import "../layout.ftlh" as layout>
 <#import "/spring.ftl" as spring />
+<#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Потоки курсов", "url": "/admin/course-instances"},
+    {"label": "Редактировать урок", "url": ""}
+    ] />
     <div class="container">
         <h2 class="section-title">Редактировать урок</h2>
 

@@ -1,6 +1,12 @@
 <#import "/spring.ftl" as spring />
 <#include "../layout.ftlh">
+<#import "../RoadMap.ftlh" as roadmap>
 <@page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Тест #${test.id}", "url": "/test/${test.id}/passing"},
+    {"label": "Результаты", "url": ""}
+    ] />
     <div class="hero-section">
         <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Результаты прохождения теста</h1>
     </div>

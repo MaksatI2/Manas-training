@@ -1,5 +1,11 @@
 <#import "../layout.ftlh" as layout>
+<#import "../RoadMap.ftlh" as roadmap>
 <@layout.page title="Просмотр заявки">
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Заявки на курсы", "url": "/applications/admin"},
+    {"label": "Заявка №${application.id}", "url": ""}
+    ] />
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center"
              style="background: linear-gradient(135deg, #0066cc, #003d7a);">
