@@ -119,30 +119,42 @@ class CourseApplicationServiceImplTest {
         CourseApplication app = new CourseApplication();
         app.setId(1);
         app.setStatus(Status.PENDING);
+
         Course course = new Course();
         course.setId(10);
         app.setCourse(course);
 
-        CourseInstance instance = new CourseInstance();
-        instance.setId(100);
+        User emp1 = new User();
+        emp1.setId(100);
+        emp1.setName("Emp1");
 
-        User emp = new User();
-        emp.setId(200);
+        User emp2 = new User();
+        emp2.setId(101);
+        emp2.setName("Emp2");
 
-        CourseApplicationEmployee cae = new CourseApplicationEmployee();
-        cae.setEmployee(emp);
-        cae.setApplication(app);
+        CourseApplicationEmployee cae1 = new CourseApplicationEmployee();
+        cae1.setId(1);
+        cae1.setEmployee(emp1);
+        cae1.setApplication(app);
+        cae1.setApplicationStatus(Status.APPROVED);
+
+        CourseApplicationEmployee cae2 = new CourseApplicationEmployee();
+        cae2.setId(2);
+        cae2.setEmployee(emp2);
+        cae2.setApplication(app);
+        cae2.setApplicationStatus(Status.APPROVED);
+
+        List<CourseApplicationEmployee> employeeList = List.of(cae1, cae2);
 
         when(applicationRepository.findById(1)).thenReturn(Optional.of(app));
-        when(instanceRepository.findByCourseId(10)).thenReturn(List.of(instance));
-        when(employeeRepository.findByApplicationId(1)).thenReturn(List.of(cae));
-        when(enrollmentRepository.existsByStudentIdAndCourseInstanceId(200, 100)).thenReturn(false);
+        when(employeeRepository.findByApplicationId(1)).thenReturn(employeeList);
 
         ApplicationStatusUpdateDto dto = new ApplicationStatusUpdateDto(Status.APPROVED, null);
+
         service.updateApplicationStatus(1, dto, "admin@example.com");
 
         assertEquals(Status.APPROVED, app.getStatus());
-        verify(enrollmentRepository).save(any());
+        verify(applicationRepository).save(app);
     }
 
     @Test

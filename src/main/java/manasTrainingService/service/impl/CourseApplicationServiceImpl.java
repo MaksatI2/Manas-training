@@ -124,54 +124,56 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         CourseApplication app = courseApplicationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Заявка не найдена"));
 
-        if (dto.getNewStatus() == Status.REJECTED && (dto.getComment() == null || dto.getComment().isBlank())) {
+        Status newStatus = dto.getNewStatus();
+        if (app.getStatus() == Status.REJECTED && newStatus != Status.REJECTED) {
+            throw new BadRequestException("Нельзя изменить статус отклонённой заявки");
+        }
+        if (newStatus == Status.REJECTED && (dto.getComment() == null || dto.getComment().isBlank())) {
             throw new BadRequestException("Комментарий обязателен при отклонении");
         }
-
-        app.setStatus(dto.getNewStatus());
-        courseApplicationRepository.save(app);
 
         if (dto.getComment() != null && !dto.getComment().isBlank()) {
             addCommentToApplication(id, dto.getComment(), adminEmail);
         }
 
-        if (dto.getNewStatus() == Status.APPROVED) {
-            List<CourseInstance> instances = courseInstanceRepository.findByCourseId(app.getCourse().getId());
+        if (newStatus == Status.REJECTED) {
+            app.setStatus(Status.REJECTED);
+            courseApplicationRepository.save(app);
 
-            if (instances.isEmpty()) {
-                throw new BadRequestException("У курса нет потоков для зачисления студентов");
-            }
-            CourseInstance instance = instances.get(0);
             List<CourseApplicationEmployee> applicationEmployees = courseApplicationEmployeeRepository
                     .findByApplicationId(app.getId());
 
             for (CourseApplicationEmployee cae : applicationEmployees) {
-                cae.setApplicationStatus(Status.APPROVED);
-
-                User student = cae.getEmployee();
-
-                boolean alreadyEnrolled = courseEnrollmentRepository
-                        .existsByStudentIdAndCourseInstanceId(student
-                                .getId(), instance
-                                .getId());
-
-                if (!alreadyEnrolled) {
-                    CourseEnrollment enrollment = CourseEnrollment.builder()
-                            .student(student)
-                            .courseInstance(instance)
-                            .status(Status.ENROLLED)
-                            .build();
-                    courseEnrollmentRepository.save(enrollment);
-                }
+                cae.setApplicationStatus(Status.REJECTED);
             }
+            courseApplicationEmployeeRepository.saveAll(applicationEmployees);
+
+        } else if (newStatus == Status.APPROVED) {
+            List<CourseApplicationEmployee> applicationEmployees = courseApplicationEmployeeRepository
+                    .findByApplicationId(app.getId());
+
+            boolean allApproved = applicationEmployees.stream().allMatch(cae
+                    -> cae.getApplicationStatus() == Status.APPROVED);
+
+            if (!allApproved) {
+                throw new BadRequestException("Нельзя одобрить заявку, пока все сотрудники не зачислены на поток курса. "
+                        + "Пожалуйста, перейдите в раздел 'Потоки курсов' и назначьте студентов вручную.");
+            }
+
+            app.setStatus(Status.APPROVED);
+            courseApplicationRepository.save(app);
+
+        } else {
+            app.setStatus(newStatus);
+            courseApplicationRepository.save(app);
         }
     }
 
 
     @Override
     public void addCommentToApplication(Integer appId, String comment, String authorEmail) {
-        User author = userRepository.findByEmail(authorEmail)
-                .orElseThrow(() -> new NotFoundException("Автор комментария не найден"));
+        User author = userRepository.findByEmail(authorEmail).orElseThrow(()
+                -> new NotFoundException("Автор комментария не найден"));
 
         CourseApplication app = courseApplicationRepository.findById(appId)
                 .orElseThrow(() -> new NotFoundException("Заявка не найдена"));
@@ -209,7 +211,8 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         CourseApplicationViewDto dto = new CourseApplicationViewDto();
         dto.setId(app.getId());
         dto.setCourseTitle(app.getCourse().getTitle());
-        dto.setOrganizationName("Орг. " + app.getOrganization().getCode());
+        dto.setOrganizationName(app.getOrganization().getUser().getName());
+        dto.setOrganizationCode(app.getOrganization().getCode());
         dto.setSubmittedAt(app.getSubmittedAt());
         dto.setFormattedSubmittedAt(app.getSubmittedAt() != null ? app.getSubmittedAt().format(dtf) : null);
         dto.setStatus(app.getStatus());
@@ -224,12 +227,15 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         dto.setFormattedPreferredStartDate(start != null ? start.format(df) : null);
         dto.setFormattedPreferredEndDate(end != null ? end.format(df) : null);
 
-        List<User> employees = courseApplicationEmployeeRepository.findEmployeesByApplicationId(app.getId());
-        dto.setEmployees(employees.stream().map(e -> {
+        List<CourseApplicationEmployee> caeList = courseApplicationEmployeeRepository.findByApplicationId(app.getId());
+
+        dto.setEmployees(caeList.stream().map(cae -> {
+            User e = cae.getEmployee();
             EmployeeShortDto edto = new EmployeeShortDto();
             edto.setId(e.getId());
             edto.setFullName(e.getName() + " " + e.getLastName());
             edto.setEmail(e.getEmail());
+            edto.setApplicationStatus(cae.getApplicationStatus());
             return edto;
         }).collect(Collectors.toList()));
 

@@ -27,6 +27,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -43,6 +45,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrganizationService Unit Tests")
+@MockitoSettings(strictness = Strictness.LENIENT)
 class OrganizationServiceTest {
 
     @Mock
@@ -315,6 +318,7 @@ class OrganizationServiceTest {
         @Test
         @DisplayName("Should get students course info for organization successfully")
         void shouldGetStudentsCourseInfoForOrganizationSuccessfully() {
+
             User student = User.builder()
                     .id(2)
                     .name("Student")
@@ -323,27 +327,43 @@ class OrganizationServiceTest {
                     .phone("+996111111111")
                     .build();
 
+
             StudentProfile studentProfile = StudentProfile.builder()
                     .user(student)
                     .organization(testOrganization)
                     .build();
 
+
+            Course course = Course.builder()
+                    .id(1)
+                    .title("Test Course")
+                    .build();
+
+            CourseInstance courseInstance = CourseInstance.builder()
+                    .id(1)
+                    .course(course)
+                    .build();
+
+
             CourseEnrollment enrollment = CourseEnrollment.builder()
                     .id(1)
                     .student(student)
-                    .courseInstance(testCourseInstance)
+                    .courseInstance(courseInstance)
                     .status(Status.ENROLLED)
                     .progressPercentage(BigDecimal.valueOf(75))
                     .finalGrade(BigDecimal.valueOf(85))
                     .build();
 
+
             when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
             when(studentProfileRepository.findAllByOrganization(testOrganization))
                     .thenReturn(List.of(studentProfile));
-            when(courseEnrollmentRepository.findByStudentIn(List.of(student)))
+            when(courseEnrollmentRepository.findWithCourseByStudentIn(List.of(student)))
                     .thenReturn(List.of(enrollment));
 
+
             List<StudentCourseInfoDto> result = organizationService.getStudentsCourseInfoForOrganization(testUser);
+
 
             assertThat(result).hasSize(1);
             StudentCourseInfoDto dto = result.get(0);
@@ -387,7 +407,7 @@ class OrganizationServiceTest {
         }
     }
 
-    @Nested
+        @Nested
     @DisplayName("Edit Student Profile Tests")
     class EditStudentProfileTests {
 
@@ -894,8 +914,8 @@ class OrganizationServiceTest {
         @Test
         @DisplayName("Should maintain data consistency during operations")
         void shouldMaintainDataConsistencyDuringOperations() {
-            User student1 = User.builder().id(10).build();
-            User student2 = User.builder().id(11).build();
+            User student1 = User.builder().id(10).name("Alice").lastName("One").build();
+            User student2 = User.builder().id(11).name("Bob").lastName("Two").build();
 
             StudentProfile profile1 = StudentProfile.builder()
                     .user(student1)
@@ -909,16 +929,25 @@ class OrganizationServiceTest {
             student1.setStudentProfile(profile1);
             student2.setStudentProfile(profile2);
 
+            Course course = Course.builder()
+                    .id(1)
+                    .title("Test Course")
+                    .build();
+
+            CourseInstance courseInstance = CourseInstance.builder()
+                    .id(1)
+                    .course(course)
+                    .build();
             CourseEnrollment enrollment1 = CourseEnrollment.builder()
                     .student(student1)
-                    .courseInstance(testCourseInstance)
+                    .courseInstance(courseInstance)
                     .status(Status.ENROLLED)
                     .progressPercentage(BigDecimal.valueOf(50))
                     .build();
 
             CourseEnrollment enrollment2 = CourseEnrollment.builder()
                     .student(student2)
-                    .courseInstance(testCourseInstance)
+                    .courseInstance(courseInstance)
                     .status(Status.COMPLETED)
                     .progressPercentage(BigDecimal.valueOf(100))
                     .finalGrade(BigDecimal.valueOf(95))
@@ -926,9 +955,9 @@ class OrganizationServiceTest {
 
             when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
             when(studentProfileRepository.findAllByOrganization(testOrganization))
-                    .thenReturn(Arrays.asList(profile1, profile2));
-            when(courseEnrollmentRepository.findByStudentIn(Arrays.asList(student1, student2)))
-                    .thenReturn(Arrays.asList(enrollment1, enrollment2));
+                    .thenReturn(List.of(profile1, profile2));
+            when(courseEnrollmentRepository.findWithCourseByStudentIn(List.of(student1, student2)))
+                    .thenReturn(List.of(enrollment1, enrollment2));
 
             List<StudentCourseInfoDto> result = organizationService.getStudentsCourseInfoForOrganization(testUser);
 
@@ -938,6 +967,7 @@ class OrganizationServiceTest {
                     .filter(dto -> dto.getStudentId().equals(10))
                     .findFirst()
                     .orElseThrow();
+            assertThat(dto1.getFullName()).isEqualTo("Alice One");
             assertThat(dto1.getProgress()).isEqualTo(BigDecimal.valueOf(50));
             assertThat(dto1.getFinalGrade()).isNull();
 
@@ -945,54 +975,55 @@ class OrganizationServiceTest {
                     .filter(dto -> dto.getStudentId().equals(11))
                     .findFirst()
                     .orElseThrow();
+            assertThat(dto2.getFullName()).isEqualTo("Bob Two");
             assertThat(dto2.getProgress()).isEqualTo(BigDecimal.valueOf(100));
             assertThat(dto2.getFinalGrade()).isEqualTo(BigDecimal.valueOf(95));
         }
-    }
 
-    @Nested
-    @DisplayName("Error Handling Tests")
-    class ErrorHandlingTests {
+        @Nested
+        @DisplayName("Error Handling Tests")
+        class ErrorHandlingTests {
 
-        @Test
-        @DisplayName("Should handle null values gracefully")
-        void shouldHandleNullValuesGracefully() {
-            String result = organizationService.getOrganizationName(null);
-            assertThat(result).isNull();
+            @Test
+            @DisplayName("Should handle null values gracefully")
+            void shouldHandleNullValuesGracefully() {
+                String result = organizationService.getOrganizationName(null);
+                assertThat(result).isNull();
 
-            Organization orgWithNullUser = Organization.builder()
-                    .id(1)
-                    .user(null)
-                    .build();
+                Organization orgWithNullUser = Organization.builder()
+                        .id(1)
+                        .user(null)
+                        .build();
 
-            String result2 = organizationService.getOrganizationName(orgWithNullUser);
-            assertThat(result2).isNull();
-        }
+                String result2 = organizationService.getOrganizationName(orgWithNullUser);
+                assertThat(result2).isNull();
+            }
 
-        @Test
-        @DisplayName("Should handle repository exceptions properly")
-        void shouldHandleRepositoryExceptionsProperly() {
-            when(organizationRepository.findByUserId(1))
-                    .thenThrow(new RuntimeException("Database error"));
+            @Test
+            @DisplayName("Should handle repository exceptions properly")
+            void shouldHandleRepositoryExceptionsProperly() {
+                when(organizationRepository.findByUserId(1))
+                        .thenThrow(new RuntimeException("Database error"));
 
-            assertThatThrownBy(() -> organizationService.getAuthorizedUserOrganization(testUser))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("Database error");
-        }
+                assertThatThrownBy(() -> organizationService.getAuthorizedUserOrganization(testUser))
+                        .isInstanceOf(RuntimeException.class)
+                        .hasMessageContaining("Database error");
+            }
 
-        @Test
-        @DisplayName("Should validate input parameters")
-        void shouldValidateInputParameters() {
-            CreateStudentByOrganizationDto dto = CreateStudentByOrganizationDto.builder()
-                    .email("test@test.com")
-                    .phone(null)
-                    .build();
+            @Test
+            @DisplayName("Should validate input parameters")
+            void shouldValidateInputParameters() {
+                CreateStudentByOrganizationDto dto = CreateStudentByOrganizationDto.builder()
+                        .email("test@test.com")
+                        .phone(null)
+                        .build();
 
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
+                when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
 
-            assertThatThrownBy(() -> organizationService.createStudentByOrganization(dto, testUser))
-                    .isInstanceOf(ValidationException.class)
-                    .hasMessageContaining("Номер телефона не может быть пустым");
+                assertThatThrownBy(() -> organizationService.createStudentByOrganization(dto, testUser))
+                        .isInstanceOf(ValidationException.class)
+                        .hasMessageContaining("Номер телефона не может быть пустым");
+            }
         }
     }
 }

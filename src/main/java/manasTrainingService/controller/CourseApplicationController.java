@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.dto.application.*;
+import manasTrainingService.exceptions.nsee.BadRequestException;
 import manasTrainingService.service.CourseApplicationService;
+import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.user.OrganizationService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
@@ -24,6 +27,7 @@ public class CourseApplicationController {
     private final CourseApplicationService applicationService;
     private final CourseService courseService;
     private final OrganizationService organizationService;
+    private final CourseInstanceService courseInstanceService;
 
     @GetMapping("/organization")
     @PreAuthorize("hasRole('organization')")
@@ -38,16 +42,14 @@ public class CourseApplicationController {
     @PreAuthorize("hasRole('organization')")
     public String showCreateForm(Model model, Principal principal) {
         List<CourseDto> courses = courseService
-                .getAvailableCoursesForOrganization(organizationService
-                        .getAuthorizedUserOrganizationByEmail(principal
-                                .getName()).getUser());
+                .getAvailableCoursesForOrganization(
+                        organizationService.getAuthorizedUserOrganizationByEmail(principal.getName()).getUser()
+                );
         List<EmployeeShortDto> employees = organizationService.getMyEmployees(principal.getName());
-        List<EmployeeShortDto> teachers = organizationService.getAllTeachersShortDto();
+
         model.addAttribute("courses", courses);
         model.addAttribute("employees", employees);
-        model.addAttribute("teachers", teachers);
         model.addAttribute("application", new CourseApplicationCreateDto());
-
         return "organization/organization_applications_create";
     }
 
@@ -107,9 +109,25 @@ public class CourseApplicationController {
     @PostMapping("/admin/{id}/status")
     @PreAuthorize("hasRole('admin')")
     public String updateStatus(@PathVariable Integer id,
-                               @ModelAttribute ApplicationStatusUpdateDto dto, Principal principal) {
-        applicationService.updateApplicationStatus(id, dto, principal.getName());
-        return "redirect:/applications/admin/" + id + "?statusUpdated";
+                               @ModelAttribute ApplicationStatusUpdateDto dto,
+                               Principal principal,
+                               RedirectAttributes redirectAttributes,
+                               Model model) {
+        try {
+            applicationService.updateApplicationStatus(id, dto, principal.getName());
+            redirectAttributes.addFlashAttribute("successMessage", "Статус заявки успешно обновлён.");
+        } catch (BadRequestException ex) {
+            CourseApplicationViewDto app = applicationService.getApplicationDetailsForAdmin(id);
+            List<ApplicationCommentDto> comments = applicationService.getCommentsForApplication(id);
+
+            model.addAttribute("application", app);
+            model.addAttribute("comments", comments);
+            model.addAttribute("statusUpdateDto", dto);
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "admin/admin_applications_detail";
+        }
+
+        return "redirect:/applications/admin/" + id;
     }
 
     @PostMapping("/admin/{id}/comment")
@@ -118,4 +136,17 @@ public class CourseApplicationController {
         applicationService.addCommentToApplication(id, comment, principal.getName());
         return "redirect:/applications/admin/" + id + "?commentAdded";
     }
+
+    @GetMapping("/organization/calendar")
+    @PreAuthorize("hasRole('organization')")
+    public String showCourseInstanceCalendarForOrg(Model model, Principal principal) {
+        List<CourseInstanceCalendarDTO> calendarItems =
+                courseInstanceService.getAllInstancesForCalendar();
+
+        model.addAttribute("calendarItems", calendarItems);
+        model.addAttribute("userRole", "organization");
+        return "organization/organization_course_instances_calendar";
+    }
+
+
 }

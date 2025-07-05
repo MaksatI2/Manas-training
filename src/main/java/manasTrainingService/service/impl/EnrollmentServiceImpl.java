@@ -3,16 +3,12 @@ package manasTrainingService.service.impl;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseEnrollmentDTO;
-import manasTrainingService.entity.CourseApplicationEmployee;
-import manasTrainingService.entity.CourseEnrollment;
-import manasTrainingService.entity.CourseInstance;
-import manasTrainingService.entity.Status;
-import manasTrainingService.entity.User;
+import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.repositories.course.CourseEnrollmentRepository;
+import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.course.CourseApplicationEmployeeService;
 import manasTrainingService.service.course.CourseInstanceService;
-import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.StatusUtil;
 import org.springframework.stereotype.Service;
@@ -39,7 +35,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 continue;
             }
 
-            User student = userService.getUserById(employeeId);
+            User student = employee.getEmployee();
 
             if (!enrollmentRepository.existsByCourseInstanceIdAndStudentId(courseInstanceId, student.getId())) {
                 CourseEnrollment enrollment = CourseEnrollment.builder()

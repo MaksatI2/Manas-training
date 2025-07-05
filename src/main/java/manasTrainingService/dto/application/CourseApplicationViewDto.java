@@ -28,5 +28,6 @@ public class CourseApplicationViewDto {
     private String formattedSubmittedAt;
     private String formattedPreferredStartDate;
     private String formattedPreferredEndDate;
+    private String organizationCode;
 
 }
