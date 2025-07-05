@@ -21,7 +21,6 @@
                 <div class="d-flex align-items-center flex-wrap gap-2">
                     <div id="usersTable_buttons"></div>
                     <div class="d-flex align-items-center flex-wrap gap-2">
-
                         <div class="input-group input-group-sm" style="width: 180px;">
                              <span class="input-group-text" style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
                                <i class="fas fa-filter"></i>
@@ -36,7 +35,6 @@
                                 </#list>
                             </select>
                         </div>
-
 
                         <div class="input-group input-group-sm" style="width: 180px;">
                           <span class="input-group-text" style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
@@ -84,7 +82,7 @@
                     <tbody>
                     <#if users?has_content>
                         <#list users as user>
-                            <tr>
+                            <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}'">
                                 <td>${user.id}</td>
                                 <td>${user.name}</td>
                                 <td>${user.lastName!"-"}</td>
@@ -101,9 +99,6 @@
                                     </#if>
                                 </td>
                                 <td>
-                                    <a href="/admin/users/${user.id}" class="btn btn-sm btn-info" title="Просмотр">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
                                     <#if !user.isActive>
                                         <a href="/admin/users/${user.id}/activate"
                                            class="btn btn-sm btn-success"
@@ -118,6 +113,16 @@
                                             <i class="fas fa-ban"></i>
                                         </a>
                                     </#if>
+                                    <a href="/admin/users/${user.id}/edit" class="btn btn-sm btn-primary"
+                                       title="Редактировать">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-danger delete-user-btn"
+                                            data-user-id="${user.id}"
+                                            data-user-name="${user.name} ${user.lastName!'unknown'}"
+                                            title="Удалить">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         </#list>
@@ -141,6 +146,41 @@
         </div>
     </div>
 
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteUserModalLabel">Подтверждение удаления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите удалить пользователя <strong id="userName"></strong>?</p>
+                    <p class="text-warning">Это действие необратимо. Пожалуйста, проверьте связанные данные:</p>
+                    <ul id="userRelationsList" class="list-group">
+                        <li class="list-group-item"><strong>Расписания:</strong> <span id="schedulesCount">0</span></li>
+                        <li class="list-group-item"><strong>Сотрудники:</strong> <span id="employeesCount">0</span></li>
+                        <li class="list-group-item"><strong>Заявки на курсы:</strong> <span id="courseApplicationEmployeesCount">0</span></li>
+                        <li class="list-group-item"><strong>Результаты тестов:</strong> <span id="testResultsCount">0</span></li>
+                        <li class="list-group-item"><strong>Посещения:</strong> <span id="attendancesAsStudentCount">0</span></li>
+                        <li class="list-group-item"><strong>Отмеченные посещения:</strong> <span id="attendancesMarkedByCount">0</span></li>
+                        <li class="list-group-item"><strong>Сертификаты:</strong> <span id="certificatesAsStudentCount">0</span></li>
+                        <li class="list-group-item"><strong>Выданные сертификаты:</strong> <span id="certificatesIssuedByUserCount">0</span></li>
+                        <li class="list-group-item"><strong>Преподаватели потоков:</strong> <span id="courseInstanceTeachersCount">0</span></li>
+                        <li class="list-group-item"><strong>Преподаватели курсов:</strong> <span id="courseTeachersCount">0</span></li>
+                        <li class="list-group-item"><strong>Записи на курсы:</strong> <span id="enrollmentsCount">0</span></li>
+                    </ul>
+                    <div id="relationsError" class="alert alert-danger d-none mt-3">
+                        Не удалось загрузить связанные данные. Пожалуйста, попробуйте снова.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Удалить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
@@ -155,7 +195,7 @@
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         $(document).ready(function() {
@@ -307,10 +347,45 @@
             $('.dropdown-toggle').dropdown();
 
             $('#resetFilters').on('click', function () {
-                $('#categoryFilter').prop('selectedIndex', 0).trigger('change');
-                $('#typeFilter').prop('selectedIndex', 0).trigger('change');
+                $('#roleFilter').prop('selectedIndex', 0).trigger('change');
                 $('#statusFilter').prop('selectedIndex', 0).trigger('change');
                 table.search('').columns().search('').draw();
+            });
+
+            $('.delete-user-btn').on('click', function() {
+                event.stopPropagation();
+
+                const userId = $(this).data('user-id');
+                const userName = $(this).data('user-name');
+
+                $('#userName').text(userName);
+                $('#confirmDeleteBtn').attr('href', '/admin/users/' + userId + '/delete');
+
+                $('#userRelationsList span').text('0');
+                $('#relationsError').addClass('d-none');
+
+                $.ajax({
+                    url: '/api/users/' + userId + '/relations-count',
+                    method: 'GET',
+                    success: function(data) {
+                        $('#schedulesCount').text(data.schedules);
+                        $('#employeesCount').text(data.employees);
+                        $('#courseApplicationEmployeesCount').text(data.courseApplicationEmployees);
+                        $('#testResultsCount').text(data.testResults);
+                        $('#attendancesAsStudentCount').text(data.attendancesAsStudent);
+                        $('#attendancesMarkedByCount').text(data.attendancesMarkedBy);
+                        $('#certificatesAsStudentCount').text(data.certificatesAsStudent);
+                        $('#certificatesIssuedByUserCount').text(data.certificatesIssuedByUser);
+                        $('#courseInstanceTeachersCount').text(data.courseInstanceTeachers);
+                        $('#courseTeachersCount').text(data.courseTeachers);
+                        $('#enrollmentsCount').text(data.enrollments);
+                    },
+                    error: function() {
+                        $('#relationsError').removeClass('d-none');
+                    }
+                });
+
+                $('#deleteUserModal').modal('show');
             });
         });
     </script>
@@ -433,7 +508,6 @@
         .form-select-sm {
             padding-right: 2rem !important;
         }
-
 
         .form-select:focus {
             box-shadow: none;

@@ -1,5 +1,7 @@
 package manasTrainingService.service.user;
 
+import manasTrainingService.dto.UserEditDto;
+import manasTrainingService.dto.UserRelationsCountDto;
 import manasTrainingService.dto.edit.OrganizationProfileEditDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
 import manasTrainingService.dto.edit.UserProfileEditDto;
@@ -9,6 +11,7 @@ import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -56,4 +59,13 @@ public interface UserService {
     long countActiveAdmins();
 
 
+    void deleteUserById(Integer userId);
+
+    @Transactional(readOnly = true)
+    UserRelationsCountDto getUserRelationsCount(Integer userId);
+
+    UserEditDto getUserEditDtoById(Integer userId);
+
+    @Transactional
+    void updateUser(UserEditDto userEditDto);
 }
