@@ -3,6 +3,7 @@ package manasTrainingService.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.config.CustomUserDetails;
+import manasTrainingService.dto.UserEditDto;
 import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.user.EmailAlreadyExistsException;
@@ -108,4 +109,69 @@ public class AdminController {
         }
         return "redirect:/admin/users";
     }
+
+    @GetMapping("/users/{userId}/delete")
+    public String deleteUser(@PathVariable Integer userId, RedirectAttributes redirectAttributes) {
+        try {
+            CustomUserDetails currentUser = (CustomUserDetails)
+                    SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            Integer currentUserId = currentUser.getUser().getId();
+
+            if (currentUserId.equals(userId)) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Вы не можете удалить самого себя.");
+                return "redirect:/admin/users";
+            }
+
+            userService.deleteUserById(userId);
+            redirectAttributes.addFlashAttribute("successMessage", "Пользователь успешно удален.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении пользователя: " + e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/users/{userId}/edit")
+    public String showEditUserForm(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            UserEditDto userEditDto = userService.getUserEditDtoById(userId);
+            model.addAttribute("userEditDto", userEditDto);
+            return "admin/edit-user";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Пользователь не найден");
+            return "redirect:/admin/users";
+        }
+    }
+
+    @PostMapping("/users/{userId}/edit")
+    public String updateUser(@PathVariable Integer userId,
+                             @Valid @ModelAttribute("userEditDto") UserEditDto userEditDto,
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "admin/edit-user";
+        }
+
+        try {
+            userEditDto.setId(userId);
+            userService.updateUser(userEditDto);
+            redirectAttributes.addFlashAttribute("successMessage", "Пользователь успешно обновлен");
+            return "redirect:/admin/users";
+        } catch (EmailAlreadyExistsException e) {
+            bindingResult.rejectValue("email", "email.exists", e.getMessage());
+            return "admin/edit-user";
+
+        } catch (PhoneAlreadyExistsException e) {
+            bindingResult.rejectValue("phone", "email.exists", e.getMessage());
+            return "admin/edit-user";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при обновлении пользователя: " + e.getMessage());
+            return "redirect:/admin/users";
+        }
+    }
+
+
+
+
 }

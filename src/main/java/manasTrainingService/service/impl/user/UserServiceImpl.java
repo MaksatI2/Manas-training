@@ -1,6 +1,8 @@
 package manasTrainingService.service.impl.user;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.UserEditDto;
+import manasTrainingService.dto.UserRelationsCountDto;
 import manasTrainingService.dto.create.CreateOrganizationDto;
 import manasTrainingService.dto.create.CreateTeacherDto;
 import manasTrainingService.dto.edit.OrganizationProfileEditDto;
@@ -18,12 +20,14 @@ import manasTrainingService.exceptions.nsee.user.*;
 import manasTrainingService.repositories.user.StudentProfileRepository;
 import manasTrainingService.repositories.user.UserRepository;
 import manasTrainingService.service.user.*;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -266,6 +270,94 @@ public class UserServiceImpl implements UserService {
     public long countActiveAdmins() {
         return userRepository.countByRole_NameAndIsActiveTrue("ADMIN");
     }
+
+
+    @Override
+    @Transactional
+    public void deleteUserById(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
+
+        if ("ADMIN".equals(user.getRole().getName()) && user.getIsActive()) {
+            long activeAdmins = countActiveAdmins();
+            if (activeAdmins <= 1) {
+                throw new IllegalStateException("Нельзя удалить последнего активного администратора.");
+            }
+        }
+
+        userRepository.delete(user);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserRelationsCountDto getUserRelationsCount(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
+
+        Hibernate.initialize(user.getSchedules());
+        Hibernate.initialize(user.getEmployees());
+        Hibernate.initialize(user.getCourseApplicationEmployees());
+        Hibernate.initialize(user.getTestResults());
+        Hibernate.initialize(user.getAttendancesAsStudent());
+        Hibernate.initialize(user.getAttendancesMarkedBy());
+        Hibernate.initialize(user.getCertificatesAsStudent());
+        Hibernate.initialize(user.getCertificatesIssuedByUser());
+        Hibernate.initialize(user.getCourseInstanceTeachers());
+        Hibernate.initialize(user.getCourseTeachers());
+        Hibernate.initialize(user.getEnrollments());
+
+        return UserRelationsCountDto.builder()
+                .schedules(user.getSchedules() != null ? user.getSchedules().size() : 0)
+                .employees(user.getEmployees() != null ? user.getEmployees().size() : 0)
+                .courseApplicationEmployees(user.getCourseApplicationEmployees() != null ? user.getCourseApplicationEmployees().size() : 0)
+                .testResults(user.getTestResults() != null ? user.getTestResults().size() : 0)
+                .attendancesAsStudent(user.getAttendancesAsStudent() != null ? user.getAttendancesAsStudent().size() : 0)
+                .attendancesMarkedBy(user.getAttendancesMarkedBy() != null ? user.getAttendancesMarkedBy().size() : 0)
+                .certificatesAsStudent(user.getCertificatesAsStudent() != null ? user.getCertificatesAsStudent().size() : 0)
+                .certificatesIssuedByUser(user.getCertificatesIssuedByUser() != null ? user.getCertificatesIssuedByUser().size() : 0)
+                .courseInstanceTeachers(user.getCourseInstanceTeachers() != null ? user.getCourseInstanceTeachers().size() : 0)
+                .courseTeachers(user.getCourseTeachers() != null ? user.getCourseTeachers().size() : 0)
+                .enrollments(user.getEnrollments() != null ? user.getEnrollments().size() : 0)
+                .build();
+    }
+
+    @Override
+    public UserEditDto getUserEditDtoById(Integer userId) {
+        User user = getUserById(userId);
+
+        return UserEditDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public void updateUser(UserEditDto userEditDto) {
+        User user = userRepository.findById(userEditDto.getId())
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userEditDto.getId() + " не найден"));
+
+        if (!user.getEmail().equals(userEditDto.getEmail())) {
+            if (userRepository.existsByEmail(userEditDto.getEmail())) {
+                throw new EmailAlreadyExistsException("Пользователь с таким Email уже существует");
+            }
+            user.setEmail(userEditDto.getEmail());
+        }
+
+        if (!user.getPhone().equals(userEditDto.getPhone()) && userRepository.existsByPhone(userEditDto.getPhone())) {
+            throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+        }
+
+        user.setName(userEditDto.getName());
+        user.setLastName(userEditDto.getLastName());
+        user.setPhone(userEditDto.getPhone());
+
+        userRepository.save(user);
+    }
+
 
 
 }

@@ -4,9 +4,11 @@ import manasTrainingService.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,5 +45,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     long countByRole_NameAndIsActiveTrue(String roleName);
 
     List<User> findAllByRole_Name(String roleName);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM User u WHERE u.id = :id")
+    void deleteUserById(@Param("id") Integer id);
+
 
 }
