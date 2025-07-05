@@ -1,5 +1,5 @@
-<#import "/templates/layout.ftlh" as layout>
-<#import "/templates/RoadMap.ftlh" as roadmap>
+<#import "/layout.ftlh" as layout>
+<#import "/RoadMap.ftlh" as roadmap>
 <@layout.page>
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},

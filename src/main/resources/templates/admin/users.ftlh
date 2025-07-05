@@ -76,14 +76,14 @@
                         <th>Телефон</th>
                         <th>Роль</th>
                         <th>Статус</th>
-                        <th>Действия</th>
+                        <th class="text-center">Действия</th>
                     </tr>
                     </thead>
                     <tbody>
                     <#if users?has_content>
                         <#list users as user>
-                            <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}'">
-                                <td>${user.id}</td>
+                            <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}/edit'">
+                            <td>${user.id}</td>
                                 <td>${user.name}</td>
                                 <td>${user.lastName!"-"}</td>
                                 <td>${user.email}</td>
@@ -98,7 +98,7 @@
                                         <span class="badge bg-warning">Неактивен</span>
                                     </#if>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <#if !user.isActive>
                                         <a href="/admin/users/${user.id}/activate"
                                            class="btn btn-sm btn-success"
@@ -113,10 +113,6 @@
                                             <i class="fas fa-ban"></i>
                                         </a>
                                     </#if>
-                                    <a href="/admin/users/${user.id}/edit" class="btn btn-sm btn-primary"
-                                       title="Редактировать">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
                                     <button class="btn btn-sm btn-danger delete-user-btn"
                                             data-user-id="${user.id}"
                                             data-user-name="${user.name} ${user.lastName!'unknown'}"

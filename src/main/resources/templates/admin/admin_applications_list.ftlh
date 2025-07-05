@@ -28,15 +28,14 @@
                         <th>Курс</th>
                         <th>Код</th>
                         <th>Преподаватель</th>
-                        <th>Дата начала</th>
+                        <th>Желаемая дата начала</th>
                         <th>Статус</th>
                         <th>Дата подачи</th>
-                        <th>Действия</th>
                     </tr>
                     </thead>
                     <tbody>
                     <#list applications as app>
-                        <tr>
+                        <tr class="clickable-row" data-href="/applications/admin/${app.id}">
                             <td>${app.id}</td>
                             <td>${app.organizationName!"—"}</td>
                             <td>${app.courseTitle!"—"}</td>
@@ -50,20 +49,15 @@
                             </td>
                             <td>${app.formattedPreferredStartDate!"—"}</td>
                             <td>
-                                <span class="badge
-                                    <#if app.status == "PENDING">bg-warning
-                                    <#elseif app.status == "APPROVED">bg-success
-                                    <#elseif app.status == "REJECTED">bg-danger
-                                    <#else>bg-secondary</#if>">
-                                    ${app.localizedStatus!"—"}
-                                </span>
+            <span class="badge
+                <#if app.status == "PENDING">bg-warning
+                <#elseif app.status == "APPROVED">bg-success
+                <#elseif app.status == "REJECTED">bg-danger
+                <#else>bg-secondary</#if>">
+                ${app.localizedStatus!"—"}
+            </span>
                             </td>
                             <td>${app.formattedSubmittedAt!"—"}</td>
-                            <td>
-                                <a href="/applications/admin/${app.id}" class="btn btn-sm btn-info btn-view" title="Открыть">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </td>
                         </tr>
                     </#list>
                     </tbody>
@@ -94,6 +88,10 @@
                 info: false
             });
         });
+        $('.clickable-row').on('click', function () {
+            window.location = $(this).data('href');
+        });
+
     </script>
 
     <style>
@@ -116,6 +114,12 @@
             white-space: nowrap;
             vertical-align: baseline;
             border-radius: 0.375rem;
+        }
+        .badge {
+            min-width: 100px;
+            text-align: center;
+            display: inline-block;
+            white-space: nowrap;
         }
 
         .bg-warning {
@@ -186,6 +190,16 @@
         .table-responsive {
             border-radius: 0.5rem;
         }
+
+        .clickable-row {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .clickable-row:hover {
+            background-color: #f2f8ff;
+        }
+
 
         @media (max-width: 768px) {
             .card-header h5 {
