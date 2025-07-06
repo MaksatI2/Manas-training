@@ -2,9 +2,12 @@ package manasTrainingService.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.config.CustomUserDetails;
 import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.dto.instance.LessonDTO;
+import manasTrainingService.dto.jitsi.MeetingResponseDTO;
 import manasTrainingService.dto.lesson.LessonMaterialDTO;
+import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.LessonMaterialService;
@@ -12,6 +15,7 @@ import manasTrainingService.service.LessonService;
 import manasTrainingService.service.ScheduleService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseModuleService;
+import manasTrainingService.service.jitsi.MeetingService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,16 +39,36 @@ public class PublicLessonController {
     private final LessonMaterialService lessonMaterialService;
     private final CourseModuleService courseModuleService;
     private final CourseInstanceService courseInstanceService;
+    private final MeetingService meetingService;
 
     @GetMapping("/lessons/{lessonId}")
-    public String showLessonDetails(@PathVariable Integer lessonId, Model model) {
+    public String showLessonDetails(@PathVariable Integer lessonId, Model model, Authentication authentication) {
         if (!lessonAccessService.canAccessLesson(lessonService.getLessonModelById(lessonId))) {
             throw new NoAccessException("У вас нет доступа к данному уроку");
         }
+
         LessonDTO lesson = lessonService.getLessonById(lessonId);
         model.addAttribute("lesson", lesson);
         model.addAttribute("materials", lessonMaterialsService.getMaterialsByLessonId(lessonId));
-        model.addAttribute("schedule", scheduleService.getScheduleByLessonId(lessonId));
+
+        ScheduleDTO schedule = scheduleService.getScheduleByLessonId(lessonId);
+        model.addAttribute("schedule", schedule);
+
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            model.addAttribute("currentUserId", userDetails.getUser().getId());
+        }
+
+        if (schedule != null) {
+            boolean isMeetingActive = meetingService.isMeetingActive(schedule.getId());
+            model.addAttribute("isMeetingActive", isMeetingActive);
+
+            if (isMeetingActive) {
+                MeetingResponseDTO activeMeeting = meetingService.getMeetingByScheduleId(schedule.getId());
+                model.addAttribute("activeMeeting", activeMeeting);
+            }
+        }
+
         return "lessons/lesson";
     }
 

@@ -1,6 +1,5 @@
 <#import "../layout.ftlh" as layout>
 <#import "/spring.ftl" as spring>
-<#import "../RoadMap.ftlh" as roadmap>
 
 <#assign known = Session.SPRING_SECURITY_CONTEXT??>
 <#if known>
@@ -11,13 +10,10 @@
     <#assign isTeacher = roles?contains("TEACHER")>
     <#assign isStudent = roles?contains("STUDENT")>
     <#assign isOrganization = roles?contains("ORGANIZATION")>
+    <#assign currentUserId = user.user.id>
 </#if>
 
 <@layout.page>
-    <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Урок #${lesson.id}", "url": ""}
-    ] />
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
     </#if>
@@ -118,7 +114,24 @@
             <#if schedule??>
                 <div class="card shadow-sm border-0 rounded-3">
                     <div class="card-body">
-                        <h6 class="card-title fw-semibold">${schedule.title!lesson.title}</h6>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h6 class="card-title fw-semibold">${schedule.title!lesson.title}</h6>
+
+                            <#if isTeacher && schedule.teacherId?? && schedule.teacherId == currentUserId>
+                                <#if isMeetingActive!false>
+                                    <a href="<@spring.url '/jitsi/meeting/${activeMeeting.meetingId}/join?userId=${currentUserId}&userRole=TEACHER'/>"
+                                       class="btn btn-success btn-sm rounded-pill">
+                                        <i class="fas fa-video me-1"></i>Войти в урок
+                                    </a>
+                                <#else>
+                                    <a href="<@spring.url '/jitsi/schedule/${schedule.id}/start?teacherId=${currentUserId}'/>"
+                                       class="btn btn-success btn-sm rounded-pill">
+                                        <i class="fas fa-play me-1"></i>Начать урок
+                                    </a>
+                                </#if>
+                            </#if>
+                        </div>
+
                         <ul class="list-unstyled small mb-0 text-secondary">
                             <li><i class="fas fa-calendar me-1"></i><strong>Дата:</strong> ${schedule.lessonDate}</li>
                             <li><i class="fas fa-clock me-1"></i><strong>Длительность:</strong> ${schedule.durationHours} ч.</li>
@@ -129,6 +142,9 @@
                             </#if>
                             <#if schedule.notes?has_content>
                                 <li><i class="fas fa-note-sticky me-1"></i><strong>Примечания:</strong> ${schedule.notes}</li>
+                            </#if>
+                            <#if isMeetingActive!false>
+                                <li><i class="fas fa-circle text-success me-1"></i><strong>Статус:</strong> <span class="text-success fw-bold">Урок активен</span></li>
                             </#if>
                         </ul>
                     </div>
@@ -175,6 +191,16 @@
             background: linear-gradient(135deg, #0056b3, #003d7a);
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            border: none;
+            transition: background 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1e7e34, #155724);
+        }
+
         .btn-outline-primary, .btn-outline-warning, .btn-outline-danger {
             transition: all 0.2s ease-in-out;
         }
@@ -197,6 +223,10 @@
 
         .text-secondary {
             color: #6c757d !important;
+        }
+
+        .text-success {
+            color: #28a745 !important;
         }
 
         .list-unstyled li {
