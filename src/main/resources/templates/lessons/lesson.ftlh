@@ -22,12 +22,12 @@
     </#if>
 
     <div class="container my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="display-4 fw-bold">${lesson.title}</h1>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div class="flex-grow-1">
+                <h1 class="display-4 fw-bold text-break">${lesson.title}</h1>
             </div>
             <#if isAdmin || isTeacher>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 flex-shrink-0">
                     <a href="<@spring.url '/admin/lessons/${lesson.id}/edit'/>" class="btn btn-primary btn-sm rounded-pill">
                         <i class="fas fa-edit me-1"></i>Редактировать
                     </a>
@@ -56,10 +56,10 @@
         </div>
 
         <div class="mb-5">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold">Материалы</h4>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+                <h4 class="fw-bold flex-grow-1">Материалы</h4>
                 <#if isAdmin || isTeacher>
-                    <a href="<@spring.url '/lessons/${lesson.id}/materials/new'/>" class="btn btn-primary btn-sm rounded-pill">
+                    <a href="<@spring.url '/lessons/${lesson.id}/materials/new'/>" class="btn btn-primary btn-sm rounded-pill flex-shrink-0">
                         <i class="fas fa-plus me-1"></i>Добавить
                     </a>
                 </#if>
@@ -71,7 +71,7 @@
                         <div class="col">
                             <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
                                 <div class="card-body d-flex flex-column">
-                                    <h6 class="card-title mb-3 fw-semibold">${material.title}</h6>
+                                    <h6 class="card-title mb-3 fw-semibold text-break">${material.title}</h6>
                                     <div class="mt-auto d-flex justify-content-between align-items-center">
                                         <a href="/data/lesson-materials/${material.url}" target="_blank" class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-external-link-alt me-1"></i>Открыть
@@ -100,13 +100,13 @@
         </div>
 
         <div class="mb-5">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold">Расписание</h4>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+                <h4 class="fw-bold flex-grow-1">Расписание</h4>
                 <#if isAdmin>
                     <#if schedule??>
-                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm rounded-pill">Редактировать расписание</a>
+                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm rounded-pill flex-shrink-0">Редактировать расписание</a>
                     <#else>
-                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm rounded-pill">Создать расписание</a>
+                        <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>" class="btn btn-primary btn-sm rounded-pill flex-shrink-0">Создать расписание</a>
                     </#if>
                 </#if>
             </div>
@@ -114,18 +114,18 @@
             <#if schedule??>
                 <div class="card shadow-sm border-0 rounded-3">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h6 class="card-title fw-semibold">${schedule.title!lesson.title}</h6>
+                        <div class="d-flex flex-wrap justify-content-between align-items-start mb-3 gap-3">
+                            <h6 class="card-title fw-semibold flex-grow-1 text-break">${schedule.title!lesson.title}</h6>
 
                             <#if isTeacher && schedule.teacherId?? && schedule.teacherId == currentUserId>
                                 <#if isMeetingActive!false>
                                     <a href="<@spring.url '/jitsi/meeting/${activeMeeting.meetingId}/join?userId=${currentUserId}&userRole=TEACHER'/>"
-                                       class="btn btn-success btn-sm rounded-pill">
+                                       class="btn btn-success btn-sm rounded-pill flex-shrink-0">
                                         <i class="fas fa-video me-1"></i>Войти в урок
                                     </a>
                                 <#else>
                                     <a href="<@spring.url '/jitsi/schedule/${schedule.id}/start?teacherId=${currentUserId}'/>"
-                                       class="btn btn-success btn-sm rounded-pill">
+                                       class="btn btn-success btn-sm rounded-pill flex-shrink-0">
                                         <i class="fas fa-play me-1"></i>Начать урок
                                     </a>
                                 </#if>

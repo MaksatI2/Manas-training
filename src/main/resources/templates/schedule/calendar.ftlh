@@ -289,9 +289,10 @@
                                 lessonDiv.className = 'lesson-item ' + lessonTypeClass;
 
                                 const lessonTitle = lesson.lessonTitle || 'Без названия';
-                                const teacherName = lesson.teacherName || 'Преподаватель не указан';
+                                const displayTitle = lessonTitle.length > 20 ? lessonTitle.substring(0, 17) + '...' : lessonTitle;
+                                lessonDiv.innerHTML = displayTitle;
 
-                                lessonDiv.innerHTML = lessonTitle;
+                                const teacherName = lesson.teacherName || 'Преподаватель не указан';
                                 lessonDiv.title = lessonTitle + ' - ' + teacherName;
 
                                 lessonDiv.onclick = function(e) {
@@ -683,7 +684,6 @@
             border-color: var(--white);
         }
 
-        /* Стили для панели фильтров */
         .filters-panel {
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             border-bottom: 1px solid var(--border-light);
@@ -870,6 +870,7 @@
         }
 
         .day-cell {
+            overflow: hidden;
             min-height: 120px;
             border-right: 1px solid var(--border-light);
             border-bottom: 1px solid var(--border-light);
@@ -919,9 +920,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
+            max-width: 100%;
         }
 
         .lesson-item:hover {
@@ -972,6 +974,8 @@
         }
 
         .modal-content {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
             background-color: var(--white);
             margin: 5% auto;
             padding: 0;
@@ -995,6 +999,8 @@
         }
 
         .modal-title {
+            word-break: break-word;
+            white-space: normal;
             font-size: 1.5rem;
             font-weight: 600;
         }
@@ -1024,7 +1030,6 @@
             padding: 2rem;
         }
 
-        /* Стили для кнопок действий в модальном окне */
         .modal-actions {
             padding: 1.5rem 2rem;
             background: var(--bg-light);
@@ -1092,6 +1097,8 @@
         }
 
         .lesson-title {
+            word-break: break-word;
+            white-space: normal;
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 0.75rem;
@@ -1246,6 +1253,8 @@
             }
 
             .modal-content {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
                 margin: 10% auto;
                 width: 95%;
             }
