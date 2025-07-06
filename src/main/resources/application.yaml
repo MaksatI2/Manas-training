@@ -6,7 +6,7 @@ spring:
     name: manas-training-service
 
   datasource:
-    url: jdbc:postgresql://localhost:8888/postgres
+    url: jdbc:postgresql://postgres:5432/postgres
     username: postgres
     password: qwerty
     driver-class-name: org.postgresql.Driver
