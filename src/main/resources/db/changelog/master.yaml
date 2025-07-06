@@ -158,3 +158,9 @@ databaseChangeLog:
   - include:
       file: db/changelog/features/054_add_meeting_recordings.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/fixes/055_fixes_042_migration.sql
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/features/056_add_remember_me_tokens.sql
+      relativeToChangelogFile: false

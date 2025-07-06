@@ -1,17 +1,22 @@
 package manasTrainingService.config;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.service.user.RememberMeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final RememberMeService rememberMeService;
+    private final RememberMeAuthenticationFilter rememberMeAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,12 +47,23 @@ public class SecurityConfig {
                         .requestMatchers("/quiz/{id}/passing").hasAuthority("STUDENT")
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(rememberMeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/login")
                         .usernameParameter("login")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/", true)
+                        .successHandler((request, response, authentication) -> {
+                            String rememberMe = request.getParameter("rememberMe");
+                            if ("on".equals(rememberMe) || "true".equals(rememberMe)) {
+                                String email = authentication.getName();
+                                String token = rememberMeService.createRememberMeToken(email, request);
+                                if (token != null) {
+                                    rememberMeService.addRememberMeCookie(response, token);
+                                }
+                            }
+                            response.sendRedirect("/");
+                        })
                         .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )
