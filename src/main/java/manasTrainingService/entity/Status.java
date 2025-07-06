@@ -11,6 +11,8 @@ public enum Status {
     PRESENT("present"),
     ABSENT("absent"),
     LATE("late"),
+    ACTIVE("active"),
+    ENDED("ended"),
     EXCUSED("excused");
 
     private final String value;
