@@ -11,6 +11,43 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-5 col-md-7">
+            <#if quickLoginAvailable?? && quickLoginAvailable>
+                <div class="feature-card mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-user-circle fa-3x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-1">Добро пожаловать обратно!</h5>
+                            <p class="mb-0">${quickLoginName}</p>
+                            <small class="text-light">${quickLoginEmail}</small>
+                        </div>
+                    </div>
+                    <p class="small mb-3">
+                        <i class="fas fa-clock me-1"></i>
+                        Прошлый раз вы заходили с этого устройства. Хотите войти снова?
+                    </p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <form action="/auth/quick-login" method="post" class="me-md-2">
+                            <#if _csrf??>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            </#if>
+                            <button type="submit" class="btn btn-light btn-sm">
+                                <i class="fas fa-sign-in-alt me-1"></i>Быстрый вход
+                            </button>
+                        </form>
+                        <form action="/auth/dismiss-quick-login" method="post">
+                            <#if _csrf??>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            </#if>
+                            <button type="submit" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-times me-1"></i>Не я
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </#if>
+
             <div class="feature-card">
                 <#if message??>
                     <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -38,7 +75,7 @@
                             <i class="fas fa-envelope me-1"></i>Email
                         </label>
                         <input type="email" class="form-control" id="login" name="login"
-                               placeholder="Введите ваш email">
+                               placeholder="Введите ваш email" <#if quickLoginEmail??>value="${quickLoginEmail}"</#if>>
                     </div>
 
                     <div class="mb-3">
@@ -54,12 +91,19 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
-                            <label class="form-check-label" for="rememberMe">
-                                Запомнить меня
-                            </label>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                                <label class="form-check-label" for="rememberMe">
+                                    <i class="fas fa-bookmark me-1"></i>Запомнить меня
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="/auth/forgot-password" style="color: var(--primary-blue);" class="small">
+                                <i class="fas fa-key me-1"></i>Забыли пароль?
+                            </a>
                         </div>
                     </div>
 
@@ -67,12 +111,6 @@
                         <button type="submit" class="btn btn-primary-custom">
                             <i class="fas fa-sign-in-alt me-2"></i>Войти
                         </button>
-                    </div>
-
-                    <div class="text-center">
-                        <a href="/auth/forgot-password" style="color: var(--primary-blue);">
-                            <i class="fas fa-key me-1"></i>Забыли пароль?
-                        </a>
                     </div>
                 </form>
             </div>
@@ -109,6 +147,19 @@
             }
         });
 
-        document.getElementById('email').focus();
+        <#if quickLoginEmail??>
+        document.getElementById('password').focus();
+        <#else>
+        document.getElementById('login').focus();
+        </#if>
+
+        document.getElementById('rememberMe').addEventListener('change', function() {
+            const label = document.querySelector('label[for="rememberMe"]');
+            if (this.checked) {
+                label.title = 'Мы запомним вас на этом устройстве на год';
+            } else {
+                label.title = '';
+            }
+        });
     </script>
 </@page>

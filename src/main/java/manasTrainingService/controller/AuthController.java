@@ -1,20 +1,28 @@
 package manasTrainingService.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.register.OrganizationRegisterDto;
 import manasTrainingService.dto.PasswordResetDto;
 import manasTrainingService.dto.register.StudentRegisterDto;
+import manasTrainingService.entity.RememberMeToken;
 import manasTrainingService.exceptions.nsee.user.*;
+import manasTrainingService.service.user.RememberMeService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.WebAttributes;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/auth")
@@ -22,6 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthController {
 
     private final UserService userService;
+    private final RememberMeService rememberMeService;
 
     @GetMapping("/register")
     public String showRegistrationChoice() {
@@ -64,7 +73,41 @@ public class AuthController {
             }
         }
 
+        Optional<String> tokenOpt = rememberMeService.getRememberMeTokenFromCookie(request);
+        if (tokenOpt.isPresent()) {
+            Optional<manasTrainingService.entity.User> userOpt = rememberMeService.validateAndRefreshToken(tokenOpt.get(), request);
+            if (userOpt.isPresent()) {
+                manasTrainingService.entity.User user = userOpt.get();
+                model.addAttribute("quickLoginAvailable", true);
+                model.addAttribute("quickLoginEmail", user.getEmail());
+                model.addAttribute("quickLoginName", user.getName() + " " + user.getLastName());
+            }
+        }
+
         return "auth/login";
+    }
+
+    @PostMapping("/quick-login")
+    public String quickLogin(HttpServletRequest request, HttpServletResponse response,
+                             RedirectAttributes redirectAttributes) {
+        Optional<String> tokenOpt = rememberMeService.getRememberMeTokenFromCookie(request);
+
+        if (tokenOpt.isPresent()) {
+            Optional<manasTrainingService.entity.User> userOpt = rememberMeService.validateAndRefreshToken(tokenOpt.get(), request);
+            if (userOpt.isPresent()) {
+                return "redirect:/";
+            }
+        }
+
+        redirectAttributes.addAttribute("error", "Сессия истекла. Пожалуйста, войдите снова.");
+        rememberMeService.removeRememberMeCookie(response);
+        return "redirect:/auth/login";
+    }
+
+    @PostMapping("/dismiss-quick-login")
+    public String dismissQuickLogin(HttpServletResponse response) {
+        rememberMeService.removeRememberMeCookie(response);
+        return "redirect:/auth/login";
     }
 
     @PostMapping("/register/student")
@@ -213,5 +256,45 @@ public class AuthController {
         return "redirect:/auth/verify-pending?email=" + email;
     }
 
+    @GetMapping("/manage-devices")
+    public String manageDevices(Model model, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/auth/login";
+        }
 
+        String email = authentication.getName();
+        List<RememberMeToken> activeTokens = rememberMeService.getUserActiveTokens(email);
+        model.addAttribute("activeTokens", activeTokens);
+        return "auth/manage-devices";
+    }
+
+    @PostMapping("/revoke-token")
+    public String revokeToken(@RequestParam("tokenId") Long tokenId,
+                              Authentication authentication,
+                              RedirectAttributes redirectAttributes) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/auth/login";
+        }
+
+        redirectAttributes.addFlashAttribute("message", "Устройство успешно отключено.");
+        return "redirect:/auth/manage-devices";
+    }
+
+    @PostMapping("/logout-all-devices")
+    public String logoutAllDevices(Authentication authentication,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   RedirectAttributes redirectAttributes) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            String email = authentication.getName();
+
+            rememberMeService.invalidateAllUserTokens(email);
+
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+
+            redirectAttributes.addFlashAttribute("message", "Вы вышли из всех устройств.");
+        }
+
+        return "redirect:/auth/login";
+    }
 }
