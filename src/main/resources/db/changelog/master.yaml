@@ -164,3 +164,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/features/056_add_remember_me_tokens.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/fixes/057-fix-course-employee.sql
+      relativeToChangelogFile: false
