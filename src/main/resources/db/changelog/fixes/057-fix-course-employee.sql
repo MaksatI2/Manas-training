@@ -5,3 +5,4 @@ ALTER TABLE course_application_employees
 UPDATE course_application_employees
 SET application_status = 'PENDING'
 WHERE application_status = 'pending';
+
