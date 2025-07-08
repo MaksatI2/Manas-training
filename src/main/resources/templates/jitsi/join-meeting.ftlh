@@ -66,6 +66,13 @@
                 </div>
             </div>
         </div>
+
+        <div id="loadingIndicator" class="loading-overlay" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <div class="mt-3">Подключение к конференции...</div>
+        </div>
     </div>
 
     <style>
@@ -169,9 +176,28 @@
             height: 100% !important;
             border: none;
         }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 2000;
+        }
+
+        .meeting-info .badge {
+            margin-left: 10px;
+        }
     </style>
 
-    <script src="http://157.245.67.28/external_api.js"></script>
+    <script src="/external_api.js"></script>
     <script>
         let localStream = null;
         let cameraEnabled = true;
@@ -191,21 +217,34 @@
         }
 
         function initializeMediaPreview() {
-            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: true
+            })
                 .then(stream => {
                     localStream = stream;
-                    document.getElementById('previewVideo').srcObject = stream;
+                    const previewVideo = document.getElementById('previewVideo');
+                    previewVideo.srcObject = stream;
+                    previewVideo.play();
                 })
                 .catch(error => {
                     console.error('Ошибка доступа к медиа:', error);
                     document.getElementById('previewVideo').style.display = 'none';
+                    const previewContainer = document.querySelector('.preview-container');
+                    previewContainer.innerHTML = '<div class="alert alert-warning">Не удается получить доступ к камере/микрофону</div>';
                 });
         }
 
         document.getElementById('toggleCamera').addEventListener('click', function() {
             cameraEnabled = !cameraEnabled;
             if (localStream) {
-                localStream.getVideoTracks()[0].enabled = cameraEnabled;
+                const videoTracks = localStream.getVideoTracks();
+                if (videoTracks.length > 0) {
+                    videoTracks[0].enabled = cameraEnabled;
+                }
             }
             this.classList.toggle('active', !cameraEnabled);
             this.innerHTML = cameraEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
@@ -214,7 +253,10 @@
         document.getElementById('toggleMic').addEventListener('click', function() {
             micEnabled = !micEnabled;
             if (localStream) {
-                localStream.getAudioTracks()[0].enabled = micEnabled;
+                const audioTracks = localStream.getAudioTracks();
+                if (audioTracks.length > 0) {
+                    audioTracks[0].enabled = micEnabled;
+                }
             }
             this.classList.toggle('active', !micEnabled);
             this.innerHTML = micEnabled ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash"></i>';
@@ -225,6 +267,8 @@
         });
 
         function joinMeeting() {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }
@@ -244,15 +288,19 @@
                     prejoinPageEnabled: false,
                     disableDeepLinking: true,
                     hosts: {
-                        domain: '157.245.67.28',
+                        domain: 'meet.jitsi',
                         muc: 'muc.meet.jitsi'
                     },
-                    bosh: 'http://157.245.67.28/http-bind',
-                    websocket: 'ws://157.245.67.28/xmpp-websocket',
+                    bosh: '//157.245.67.28/http-bind',
+                    websocket: 'wss://157.245.67.28/xmpp-websocket',
                     p2p: {
                         enabled: false
                     },
                     useStunTurn: true,
+                    stunServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
+                    ],
                     resolution: 720,
                     constraints: {
                         video: {
@@ -260,9 +308,20 @@
                                 ideal: 720,
                                 max: 1080,
                                 min: 240
+                            },
+                            width: {
+                                ideal: 1280,
+                                max: 1920,
+                                min: 320
                             }
                         }
-                    }
+                    },
+                    channelLastN: 20,
+                    startBitrate: 800,
+                    disableAudioLevels: false,
+                    enableNoAudioDetection: true,
+                    enableNoisyMicDetection: true,
+                    defaultLanguage: 'ru'
                 },
                 interfaceConfigOverwrite: {
                     SHOW_JITSI_WATERMARK: false,
@@ -284,7 +343,9 @@
                         'feedback', 'stats', 'shortcuts',
                         'tileview', 'videobackgroundblur', 'download',
                         'help', 'mute-everyone', 'security'
-                    ]
+                    ],
+                    SETTINGS_SECTIONS: ['devices', 'language', 'moderator', 'profile', 'calendar'],
+                    VIDEO_LAYOUT_FIT: 'both'
                 },
                 userInfo: {
                     displayName: '${name!'Участник'}',
@@ -296,6 +357,7 @@
 
             jitsiAPI.addEventListener('videoConferenceJoined', function(event) {
                 console.log('Подключен к конференции:', event);
+                document.getElementById('loadingIndicator').style.display = 'none';
                 startMeetingTimer();
                 joinMeetingOnServer();
             });
@@ -319,16 +381,16 @@
                 console.log('Готов к закрытию:', event);
                 leaveMeetingOnServer();
             });
-        }
 
-        function startMeetingTimer() {
-            meetingStartTime = new Date();
-            timerInterval = setInterval(function() {
-                const now = new Date();
-                const diff = now - meetingStartTime;
-                const minutes = Math.floor(diff / 60000);
-                const seconds = Math.floor((diff % 60000) / 1000);
-            }, 1000);
+            jitsiAPI.addEventListener('videoConferenceError', function(event) {
+                console.error('Ошибка конференции:', event);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                alert('Ошибка подключения к конференции. Попробуйте еще раз.');
+            });
+
+            jitsiAPI.addEventListener('apiReady', function() {
+                console.log('Jitsi API готов');
+            });
         }
 
         function joinMeetingOnServer() {
@@ -365,31 +427,25 @@
             })
                 .then(() => {
                     console.log('Участник покинул встречу');
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                    }
                     window.location.href = '/lessons/${meeting.lessonId}';
                 })
                 .catch(error => {
                     console.error('Ошибка при выходе:', error);
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                    }
                     window.location.href = '/lessons/${meeting.lessonId}';
                 });
             </#if>
-        }
-
-        function updateParticipantCount() {
-            if (jitsiAPI) {
-                jitsiAPI.getParticipantsInfo().then(participants => {
-                    const count = participants.length;
-                    console.log('Количество участников:', count);
-                });
-            }
         }
 
         document.getElementById('leaveMeetingBtn').addEventListener('click', function() {
             if (confirm('Вы уверены, что хотите покинуть урок?')) {
                 if (jitsiAPI) {
                     jitsiAPI.dispose();
-                }
-                if (timerInterval) {
-                    clearInterval(timerInterval);
                 }
                 leaveMeetingOnServer();
             }
@@ -401,6 +457,14 @@
             }
             if (timerInterval) {
                 clearInterval(timerInterval);
+            }
+        });
+
+        window.addEventListener('orientationchange', function() {
+            if (jitsiAPI) {
+                setTimeout(() => {
+                    jitsiAPI.executeCommand('resizeFilmStrip');
+                }, 500);
             }
         });
     </script>
