@@ -276,7 +276,7 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('preJoinModal'));
             modal.hide();
 
-            const domain = '157.245.67.28';
+            const domain = '157.245.67.28/jitsi';
             const options = {
                 roomName: 'ManasTraining_Meeting_${meeting.meetingId}',
                 width: '100%',
@@ -288,8 +288,8 @@
                     prejoinPageEnabled: false,
                     disableDeepLinking: true,
                     hosts: {
-                        domain: 'meet.jitsi',
-                        muc: 'muc.meet.jitsi'
+                        domain: '157.245.67.28',
+                        muc: 'muc.157.245.67.28'
                     },
                     bosh: '//157.245.67.28/http-bind',
                     websocket: 'wss://157.245.67.28/xmpp-websocket',
@@ -360,6 +360,17 @@
                 document.getElementById('loadingIndicator').style.display = 'none';
                 startMeetingTimer();
                 joinMeetingOnServer();
+            });
+
+            jitsiAPI.addEventListener('connectionFailed', function(event) {
+                console.error('Ошибка подключения:', event);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                alert('Не удалось подключиться к конференции. Проверьте сетевое соединение.');
+            });
+
+            jitsiAPI.addEventListener('conferenceError', function(event) {
+                console.error('Ошибка конференции:', event);
+                document.getElementById('loadingIndicator').style.display = 'none';
             });
 
             jitsiAPI.addEventListener('participantJoined', function(event) {

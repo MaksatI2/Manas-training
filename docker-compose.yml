@@ -91,10 +91,10 @@ services:
     environment:
       - AUTH_TYPE=internal
       - ENABLE_GUESTS=1
-      - XMPP_DOMAIN=meet.jitsi
-      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
-      - XMPP_MUC_DOMAIN=muc.meet.jitsi
-      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_DOMAIN=157.245.67.28
+      - XMPP_AUTH_DOMAIN=auth.157.245.67.28
+      - XMPP_MUC_DOMAIN=muc.157.245.67.28
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.157.245.67.28
       - JICOFO_COMPONENT_SECRET=jicofo-secret
       - JVB_AUTH_USER=jvb
       - JVB_AUTH_PASSWORD=jvb-password
