@@ -64,8 +64,8 @@
                                 </span>
                             </td>
                             <td>
-                                <#if app.formattedSubmittedAt??>
-                                    ${app.formattedSubmittedAt}
+                                <#if app.preferredEndDate??>
+                                    ${app.preferredEndDate}
                                 <#else>
                                     <span class="text-muted">—</span>
                                 </#if>
