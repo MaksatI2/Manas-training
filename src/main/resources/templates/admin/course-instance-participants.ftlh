@@ -37,18 +37,39 @@
                         <th scope="col" style="width: 30%;">Имя участника</th>
                         <th scope="col" style="width: 20%;">Дата зачисления</th>
                         <th scope="col" style="width: 10%;">Оценка</th>
+                        <th scope="col" style="width: 20%;">Статус</th>
+                        <th scope="col" style="width: 20%;">Действие</th>
                     </tr>
                     </thead>
                     <tbody id="current-participants">
                     <#list enrollments as enrollment>
                         <tr data-enrollment-id="${enrollment.id}">
                             <td>${enrollment.studentName!''}</td>
-                            <td>${enrollment.enrollmentDate.toLocalDate()}</td>
+                            <td>${enrollment.formattedEnrollmentDate}</td>
                             <td>${(enrollment.finalGrade?string['0.##'])!'–'}</td>
+                            <td>
+                <span class="badge
+                    <#if enrollment.status == 'ENROLLED'>bg-success<#else>bg-secondary</#if>">
+                    <#if enrollment.status == 'ENROLLED'>Зачислен<#else>Отчислен</#if>
+                </span>
+                            </td>
+                            <td>
+                                <form method="post"
+                                      action="/admin/course-instances/${courseInstance.id}/participants/toggle-status/${enrollment.id}">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <button type="submit"
+                                            class="btn btn-sm
+                            <#if enrollment.status == 'ENROLLED'>btn-outline-danger<#else>btn-outline-success</#if>">
+                                        <#if enrollment.status == 'ENROLLED'>Отчислить<#else>Восстановить</#if>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     </#list>
                     </tbody>
                 </table>
+
+
             </div>
         </div>
 

@@ -23,9 +23,6 @@ public class DateUtil {
         return dateTime.format(DATE_FORMATTER);
     }
 
-    /**
-     * Преобразует LocalDateTime в строку формата "08-08-2025 14:30"
-     */
     public static String formatWithTime(LocalDateTime dateTime) {
         if (dateTime == null) return "";
         return dateTime.format(DATETIME_FORMATTER);

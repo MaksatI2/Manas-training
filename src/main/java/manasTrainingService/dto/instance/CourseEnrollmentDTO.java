@@ -23,4 +23,5 @@ public class CourseEnrollmentDTO {
     private Status status;
     private BigDecimal progressPercentage;
     private BigDecimal finalGrade;
+    private String formattedEnrollmentDate;
 }
