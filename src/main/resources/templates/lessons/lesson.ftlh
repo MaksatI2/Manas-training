@@ -55,6 +55,17 @@
             </div>
         </div>
 
+        <div class="card shadow-sm mb-5 border-0 rounded-3">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold">Содержание урока</h5>
+                <p class="card-text text-secondary mb-0">
+                    <a href="/lessons/${lesson.id}/content-page" target="_blank" class="btn btn-outline-primary">
+                        <i class="fas fa-external-link-alt me-1"></i> Открыть содержимое урока
+                    </a>
+                </p>
+            </div>
+        </div>
+
         <div class="mb-5">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
                 <h4 class="fw-bold flex-grow-1">Материалы</h4>
