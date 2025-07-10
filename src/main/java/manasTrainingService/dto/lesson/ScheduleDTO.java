@@ -35,4 +35,5 @@ public class ScheduleDTO {
     private LessonType lessonType;
     private String meetingUrl;
     private String notes;
+    private String formattedLessonDate;
 }
