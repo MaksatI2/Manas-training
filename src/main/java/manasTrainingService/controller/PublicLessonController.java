@@ -8,6 +8,7 @@ import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.dto.jitsi.MeetingResponseDTO;
 import manasTrainingService.dto.lesson.LessonMaterialDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
+import manasTrainingService.entity.Lesson;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.LessonMaterialService;
@@ -176,4 +177,23 @@ public class PublicLessonController {
             return "admin/lesson-create";
         }
     }
+
+    @GetMapping("/lessons/{lessonId}/content-page")
+    public String getLessonContentPage(@PathVariable Integer lessonId, Model model, Authentication authentication) {
+        Lesson lesson = lessonService.getLessonModelById(lessonId);
+
+        if (!lessonAccessService.canAccessLesson(lesson)) {
+            throw new NoAccessException("У вас нет доступа к содержимому урока");
+        }
+
+        model.addAttribute("lesson", lesson);
+        boolean isTeacherOrAdmin = authentication != null &&
+                authentication.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("TEACHER") || a.getAuthority().equals("ADMIN"));
+
+        model.addAttribute("isTeacherOrAdmin", isTeacherOrAdmin);
+
+        return "lessons/content";
+    }
+
 }
