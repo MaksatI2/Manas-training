@@ -16,15 +16,15 @@
     </#if>
 
     <div class="hero-section">
-        <h1 class="hero-title">${courseInstance.title}</h1>
+        <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
         <p class="hero-subtitle">
             Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
             Категория: <strong>${courseInstance.category!'-'}</strong>
         </p>
         <p class="hero-subtitle">
-            Начало: ${courseInstance.startDate} |
-            Окончание: ${courseInstance.endDate} |
-            Статус: <#if courseInstance.isActive>Активен<#else>Завершен</#if>
+            Начало: <strong>${courseInstance.formattedStartDate}</strong> |
+            Окончание: <strong>${courseInstance.formattedEndDate}</strong> |
+            Статус: <strong><#if courseInstance.isActive>Активен<#else>Завершен</#if></strong>
         </p>
     </div>
 
@@ -131,6 +131,11 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
+        }
+        .hero-subtitle {
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
         }
 
     </style>

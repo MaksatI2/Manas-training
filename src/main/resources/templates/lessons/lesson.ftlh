@@ -133,7 +133,7 @@
                         </div>
 
                         <ul class="list-unstyled small mb-0 text-secondary">
-                            <li><i class="fas fa-calendar me-1"></i><strong>Дата:</strong> ${schedule.lessonDate}</li>
+                            <li><i class="fas fa-calendar me-1"></i><strong>Дата:</strong> ${schedule.formattedLessonDate}</li>
                             <li><i class="fas fa-clock me-1"></i><strong>Длительность:</strong> ${schedule.durationHours} ч.</li>
                             <li><i class="fas fa-user me-1"></i><strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}</li>
                             <li><i class="fas fa-chalkboard me-1"></i><strong>Тип урока:</strong> ${schedule.lessonType.value}</li>

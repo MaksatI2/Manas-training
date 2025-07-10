@@ -15,8 +15,8 @@
             Категория: <strong>${courseInstance.category!'-'}</strong>
         </p>
         <p class="hero-subtitle">
-            Начало: ${courseInstance.startDate} |
-            Окончание: ${courseInstance.endDate} |
+            Начало: ${courseInstance.formattedStartDate} |
+            Окончание: ${courseInstance.formattedEndDate} |
             Статус: <#if courseInstance.isActive>Активен<#else>Завершен</#if>
         </p>
     </div>
@@ -102,6 +102,11 @@
 
         .card-text {
             font-size: 0.875rem;
+        }
+        .hero-subtitle {
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
         }
     </style>
 </@layout.page>
