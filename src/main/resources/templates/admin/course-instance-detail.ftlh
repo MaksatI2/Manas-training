@@ -16,15 +16,15 @@
     </#if>
 
     <div class="hero-section">
-        <h1 class="hero-title">${courseInstance.title}</h1>
+        <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
         <p class="hero-subtitle">
             Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
             Категория: <strong>${courseInstance.category!'-'}</strong>
         </p>
         <p class="hero-subtitle">
-            Начало: ${courseInstance.startDate} |
-            Окончание: ${courseInstance.endDate} |
-            Статус: <#if courseInstance.isActive>Активен<#else>Завершен</#if>
+            Начало: <strong>${courseInstance.formattedStartDate}</strong> |
+            Окончание: <strong>${courseInstance.formattedEndDate}</strong> |
+            Статус: <strong><#if courseInstance.isActive>Активен<#else>Завершен</#if></strong>
         </p>
     </div>
 
@@ -33,7 +33,7 @@
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary">Модули</a>
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary">Участники</a>
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary">Учителя</a>
+        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary">Преподаватели</a>
         <a href="<@spring.url '/admin/course-instances'/>" class="btn btn-secondary">Назад</a>
     </div>
     <div class="container">
@@ -131,6 +131,11 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
+        }
+        .hero-subtitle {
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
         }
 
     </style>

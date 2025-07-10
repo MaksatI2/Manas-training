@@ -25,4 +25,7 @@ public class CourseInstanceDTO {
     private Boolean isActive;
     private String category;
     private String courseTitle;
+    private String formattedStartDate;
+    private String formattedEndDate;
+
 }

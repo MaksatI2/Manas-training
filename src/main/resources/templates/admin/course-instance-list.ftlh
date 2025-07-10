@@ -76,8 +76,8 @@
                             <td>${instance.courseTitle!"-"}</td>
                             <td>${instance.title}</td>
                             <td>${instance.category}</td>
-                            <td>${instance.startDate}</td>
-                            <td>${instance.endDate}</td>
+                            <td>${instance.formattedStartDate}</td>
+                            <td>${instance.formattedEndDate}</td>
                             <td>
                                 <#if instance.isActive>
                                     <span class="badge bg-success">Активен</span>

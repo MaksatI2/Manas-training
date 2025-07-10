@@ -38,4 +38,7 @@ public class Lesson {
 
     @OneToMany(mappedBy = "lesson", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<LessonQuiz> quizzes;
+
+    @OneToOne(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    LessonContent content;
 }

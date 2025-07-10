@@ -55,9 +55,14 @@
             </div>
         </div>
 
+
+
         <div class="mb-5">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
                 <h4 class="fw-bold flex-grow-1">Материалы</h4>
+                <a href="/lessons/${lesson.id}/content-page" target="_blank" class="btn btn-primary btn-sm rounded-pill flex-shrink-0">
+                    <i class="fas fa-external-link-alt me-1"></i>Содержимое урока
+                </a>
                 <#if isAdmin || isTeacher>
                     <a href="<@spring.url '/lessons/${lesson.id}/materials/new'/>" class="btn btn-primary btn-sm rounded-pill flex-shrink-0">
                         <i class="fas fa-plus me-1"></i>Добавить
@@ -132,21 +137,43 @@
                             </#if>
                         </div>
 
-                        <ul class="list-unstyled small mb-0 text-secondary">
-                            <li><i class="fas fa-calendar me-1"></i><strong>Дата:</strong> ${schedule.lessonDate}</li>
-                            <li><i class="fas fa-clock me-1"></i><strong>Длительность:</strong> ${schedule.durationHours} ч.</li>
-                            <li><i class="fas fa-user me-1"></i><strong>Преподаватель:</strong> ${schedule.teacherName!'Не указан'}</li>
-                            <li><i class="fas fa-chalkboard me-1"></i><strong>Тип урока:</strong> ${schedule.lessonType.value}</li>
+                        <div class="lesson-info-grid">
+                            <div class="lesson-info-item">
+                                <span class="lesson-info-label"><i class="fas fa-calendar me-2"></i>Дата:</span>
+                                <span class="lesson-info-value">${schedule.formattedLessonDate}</span>
+                            </div>
+                            <div class="lesson-info-item">
+                                <span class="lesson-info-label"><i class="fas fa-clock me-2"></i>Длительность:</span>
+                                <span class="lesson-info-value">${schedule.durationHours} ч.</span>
+                            </div>
+                            <div class="lesson-info-item">
+                                <span class="lesson-info-label"><i class="fas fa-user me-2"></i>Преподаватель:</span>
+                                <span class="lesson-info-value">${schedule.teacherName!'Не указан'}</span>
+                            </div>
+                            <div class="lesson-info-item">
+                                <span class="lesson-info-label"><i class="fas fa-chalkboard me-2"></i>Тип урока:</span>
+                                <span class="lesson-info-value">${schedule.lessonType.value}</span>
+                            </div>
                             <#if schedule.meetingUrl?has_content>
-                                <li><i class="fas fa-link me-1"></i><strong>Ссылка:</strong> <a href="${schedule.meetingUrl}" target="_blank" class="text-primary">Присоединиться</a></li>
+                                <div class="lesson-info-item">
+                                    <span class="lesson-info-label"><i class="fas fa-link me-2"></i>Ссылка:</span>
+                                    <span class="lesson-info-value"><a href="${schedule.meetingUrl}" target="_blank" class="link-primary">Присоединиться</a></span>
+                                </div>
                             </#if>
                             <#if schedule.notes?has_content>
-                                <li><i class="fas fa-note-sticky me-1"></i><strong>Примечания:</strong> ${schedule.notes}</li>
+                                <div class="lesson-info-item">
+                                    <span class="lesson-info-label"><i class="fas fa-note-sticky me-2"></i>Примечания:</span>
+                                    <span class="lesson-info-value">${schedule.notes}</span>
+                                </div>
                             </#if>
                             <#if isMeetingActive!false>
-                                <li><i class="fas fa-circle text-success me-1"></i><strong>Статус:</strong> <span class="text-success fw-bold">Урок активен</span></li>
+                                <div class="lesson-info-item">
+                                    <span class="lesson-info-label"><i class="fas fa-circle text-success me-2"></i>Статус:</span>
+                                    <span class="lesson-info-value fw-bold text-success">Урок активен</span>
+                                </div>
                             </#if>
-                        </ul>
+                        </div>
+
                     </div>
                 </div>
             <#else>
@@ -158,6 +185,54 @@
     </div>
 
     <style>
+
+        .fr-box.fr-basic {
+            min-height: 300px;
+            padding: 15px;
+        }
+
+        .lesson-info-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+            gap: 0.75rem;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        .lesson-info-item {
+            display: contents;
+        }
+        .lesson-info-label {
+            font-weight: 500;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+        .lesson-info-label i {
+            font-size: 1.1rem;
+            width: 1.5rem;
+            text-align: center;
+        }
+        .lesson-info-value {
+            padding: 0.5rem 0;
+            color: #212529;
+        }
+        .lesson-info-value a {
+            text-decoration: none;
+        }
+        .lesson-info-value a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 576px) {
+            .lesson-info-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            .lesson-info-label,
+            .lesson-info-value {
+                padding: 0.25rem 0;
+            }
+        }
         body {
             background-color: #f8f9fa;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;

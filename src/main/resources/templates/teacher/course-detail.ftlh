@@ -1,7 +1,13 @@
 <#import "../layout.ftlh" as layout>
 <#import "/spring.ftl" as spring/>
+<#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Мои курсы", "url": "/teacher/my-courses"},
+    {"label": "Курс #${courseInstance.id}", "url": ""}
+    ] />
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
     </#if>
@@ -9,14 +15,14 @@
         <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
     <div class="hero-section">
-        <h1 class="hero-title">${courseInstance.title}</h1>
+        <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
         <p class="hero-subtitle">
             Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
             Категория: <strong>${courseInstance.category!'-'}</strong>
         </p>
         <p class="hero-subtitle">
-            Начало: ${courseInstance.startDate} |
-            Окончание: ${courseInstance.endDate} |
+            Начало: ${courseInstance.formattedStartDate} |
+            Окончание: ${courseInstance.formattedEndDate} |
             Статус: <#if courseInstance.isActive>Активен<#else>Завершен</#if>
         </p>
     </div>
@@ -106,6 +112,11 @@
 
         .card-text {
             font-size: 0.875rem;
+        }
+        .hero-subtitle {
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
         }
     </style>
 </@layout.page>

@@ -1,5 +1,6 @@
 package manasTrainingService.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseEnrollmentDTO;
@@ -10,6 +11,7 @@ import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.course.CourseApplicationEmployeeService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.user.UserService;
+import manasTrainingService.util.DateUtil;
 import manasTrainingService.util.StatusUtil;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +67,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         dto.setStudentName(enrollment.getStudent().getName());
         dto.setEnrollmentDate(enrollment.getEnrollmentDate());
         dto.setStatus(enrollment.getStatus());
+        dto.setFormattedEnrollmentDate(
+                DateUtil.formatDateOnly(
+                        enrollment.getEnrollmentDate()
+                )
+        );
         dto.setProgressPercentage(enrollment.getProgressPercentage());
         dto.setFinalGrade(enrollment.getFinalGrade());
         return dto;
@@ -96,7 +103,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public void hasAccess(Integer courseInstanceId) {
         User user = userService.getAuthorizedUser();
-        if (!enrollmentRepository.existsByCourseInstanceIdAndStudentId(courseInstanceId, user.getId())) {
+        if (!enrollmentRepository.existsByCourseInstanceIdAndStudentIdAndStatus(courseInstanceId, user.getId(), Status.ENROLLED)) {
             throw new NoAccessException("У вас нет доступа к курсу");
         };
     }
@@ -105,4 +112,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public List<CourseEnrollment> findAllEnrollmentsForCourseInstance(Integer courseInstanceId) {
         return enrollmentRepository.findAllByCourseInstanceId(courseInstanceId);
     }
+
+    @Override
+    public void changeEnrollmentStatus(Integer enrollmentId, Status newStatus) {
+        CourseEnrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Запись на курс не была найдена"));
+
+        enrollment.setStatus(newStatus);
+
+
+        enrollmentRepository.save(enrollment);
+    }
+
 }
