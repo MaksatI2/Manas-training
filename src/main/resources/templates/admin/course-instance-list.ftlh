@@ -76,8 +76,8 @@
                             <td>${instance.courseTitle!"-"}</td>
                             <td>${instance.title}</td>
                             <td>${instance.category}</td>
-                            <td>${instance.formattedStartDate}</td>
-                            <td>${instance.formattedEndDate}</td>
+                            <td data-order="${instance.startDate}">${instance.formattedStartDate}</td>
+                            <td data-order="${instance.endDate}">${instance.formattedEndDate}</td>
                             <td>
                                 <#if instance.isActive>
                                     <span class="badge bg-success">Активен</span>
@@ -273,6 +273,10 @@
                         targets: [6],
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        targets: [4, 5],
+                        type: 'date'
                     }
                 ],
                 initComplete: function () {
