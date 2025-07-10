@@ -3,7 +3,6 @@
 <@layout.page>
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
-    {"label": "Преподаватели", "url": "/teacher"},
     {"label": "Мои курсы", "url": ""}
     ] />
     <div class="hero-section py-4 text-center bg-light border-bottom">
