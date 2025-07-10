@@ -1,0 +1,217 @@
+<#import "../layout.ftlh" as layout>
+<@layout.page title="Содержимое урока">
+
+    <div class="container mt-5 col-10">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">${(lesson.title)!"Без названия"}</h2>
+                <#if isTeacherOrAdmin?? && isTeacherOrAdmin>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light btn-sm" id="toggleEditor">
+                            <i class="fas fa-eye"></i> Просмотр
+                        </button>
+                        <button id="saveButton" class="btn btn-success btn-sm d-none">
+                            <i class="fas fa-save"></i> Сохранить
+                        </button>
+                    </div>
+                </#if>
+            </div>
+
+            <div class="card-body">
+                <#if isTeacherOrAdmin?? && isTeacherOrAdmin>
+                    <div class="mb-3">
+                        <label for="contentTitle" class="form-label fw-bold">Название содержимого</label>
+                        <input type="text" id="contentTitle" class="form-control" maxlength="200" readonly>
+                    </div>
+                <#else>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Название содержимого</label>
+                        <div class="form-control" style="background-color: #f8f9fa;">${(contentTitle)!"Без названия"}</div>
+                    </div>
+                </#if>
+                <div class="mb-3">
+                    <label for="content" class="form-label fw-bold">Содержимое урока</label>
+                    <div id="content" class="form-control" style="min-height: 300px; padding: 15px;" contenteditable="false"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/froala-editor@4.1.4/css/froala_editor.pkgd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/froala-editor@4.1.4/js/froala_editor.pkgd.min.js"></script>
+    <script>
+        const lessonId = ${(lesson.id)!"0"};
+        const csrfToken = '${(_csrf.token)!"default-csrf"}';
+        const isTeacherOrAdmin = ${isTeacherOrAdmin?string('true', 'false')};
+
+        let editor;
+        let isEditorEnabled = false;
+        const contentDiv = document.getElementById('content');
+        const titleInput = document.getElementById('contentTitle');
+        const saveButton = document.getElementById('saveButton');
+
+        async function loadContent() {
+            try {
+                const res = await fetch(`/lessons/${lessonId}/content`);
+                if (res.ok) {
+                    const data = await res.json();
+                    contentDiv.innerHTML = data.content || '<p>Нет содержимого</p>';
+                    if (titleInput) titleInput.value = data.title || '';
+                    if (editor) editor.html.set(data.content || '');
+                    if (!isTeacherOrAdmin) {
+                        const el = document.getElementById('contentTitle') || document.querySelector('.form-control[style*="background-color"]');
+                        if (el) {
+                            el.innerHTML = data.title || 'Без названия';
+                        }
+                    }
+                } else {
+                    window.showFlashMessage('danger', 'Ошибка при загрузке содержимого', { duration: 6000 });
+                }
+            } catch (error) {
+                window.showFlashMessage('danger', 'Не удалось загрузить содержимое урока', { duration: 6000 });
+                console.error('Error loading content:', error);
+            }
+        }
+
+        async function saveContent(isAutoSave = false) {
+            if (!isTeacherOrAdmin) return;
+            const content = editor ? editor.html.get() : contentDiv.innerHTML;
+            const title = titleInput ? titleInput.value.trim() : '';
+
+            if (!title) {
+                if (!isAutoSave) {
+                    window.showFlashMessage('danger', 'Название содержимого не может быть пустым', { duration: 6000 });
+                }
+                return;
+            }
+
+            try {
+                const res = await fetch(`/lessons/${lessonId}/content`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ title, content })
+                });
+
+                if (res.ok) {
+                    if (!isAutoSave) {
+                        window.showFlashMessage('success', 'Содержимое успешно сохранено', { duration: 4000 });
+                    }
+                } else {
+                    const errorData = await res.json();
+                    window.showFlashMessage('danger', errorData.message || 'Ошибка при сохранении содержимого', { duration: 6000 });
+                }
+            } catch (error) {
+                window.showFlashMessage('danger', 'Ошибка при сохранении содержимого', { duration: 6000 });
+                console.error('Error saving content:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadContent();
+
+            if (isTeacherOrAdmin) {
+                document.getElementById('toggleEditor').addEventListener('click', function () {
+                    if (isEditorEnabled) {
+                        editor.destroy();
+                        contentDiv.contentEditable = false;
+                        contentDiv.classList.add('form-control');
+                        if (titleInput) titleInput.readOnly = true;
+                        this.innerHTML = '<i class="fas fa-eye"></i> Просмотр';
+                        if (saveButton) saveButton.classList.add('d-none');
+                    } else {
+                        contentDiv.classList.remove('form-control');
+                        editor = new FroalaEditor('#content', {
+                            heightMin: 300,
+                            toolbarButtons: [
+                                'bold', 'italic', 'underline', 'strikeThrough', '|',
+                                'fontSize', 'textColor', 'backgroundColor', '|',
+                                'align', 'formatOL', 'formatUL', 'outdent', 'indent', '|',
+                                'insertLink', 'insertImage', 'insertTable', '|',
+                                'undo', 'redo'
+                            ],
+                            quickInsertTags: ['p', 'div', 'h1', 'h2', 'h3'],
+                            placeholderText: 'Введите содержимое урока...'
+                        });
+                        contentDiv.contentEditable = true;
+                        if (titleInput) titleInput.readOnly = false;
+                        this.innerHTML = '<i class="fas fa-pen"></i> Редактировать';
+                        if (saveButton) saveButton.classList.remove('d-none');
+                    }
+                    isEditorEnabled = !isEditorEnabled;
+                });
+
+                if (saveButton) {
+                    saveButton.addEventListener('click', () => saveContent(false));
+                }
+
+                if (titleInput) {
+                    titleInput.addEventListener('input', () => {
+                    });
+                }
+            }
+        });
+    </script>
+
+
+    <style>
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-blue), var--dark-blue);
+            border-bottom: none;
+        }
+        .card-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .form-control {
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .fr-box.fr-basic .fr-element {
+            min-height: 300px;
+            padding: 15px;
+        }
+        #content {
+            min-height: 300px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .alert {
+            min-width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.3s;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+
+</@layout.page>
