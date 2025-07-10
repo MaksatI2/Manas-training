@@ -121,7 +121,7 @@
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/utils.js"
             });
 
-            document.getElementById("studentForm").addEventListener("submit", function(e) {
+            document.getElementById("companyForm").addEventListener("submit", function(e) {
                 const number = iti.getNumber();
                 input.value = number;
             });
