@@ -17,6 +17,7 @@ import manasTrainingService.repositories.course.CourseInstanceRepository;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
+import manasTrainingService.util.DateUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -59,6 +60,8 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .title(courseInstance.getTitle())
                 .startDate(courseInstance.getStartDate().toLocalDate())
                 .endDate(courseInstance.getEndDate().toLocalDate())
+                .formattedEndDate(DateUtil.formatDateOnly(courseInstance.getEndDate()))
+                .formattedStartDate(DateUtil.formatDateOnly(courseInstance.getStartDate()))
                 .durationHours(courseInstance.getCourse().getDurationHours())
                 .isActive(courseInstance.getIsActive())
                 .category(courseInstance.getCourse().getCategory().getName())
@@ -104,6 +107,8 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .title(courseInstance.getTitle())
                 .startDate(courseInstance.getStartDate().toLocalDate())
                 .endDate(courseInstance.getEndDate().toLocalDate())
+                .formattedEndDate(DateUtil.formatDateOnly(courseInstance.getEndDate()))
+                .formattedStartDate(DateUtil.formatDateOnly(courseInstance.getStartDate()))
                 .isActive(courseInstance.getIsActive())
                 .modules(moduleDtos)
                 .durationHours(courseInstance.getCourse().getDurationHours())

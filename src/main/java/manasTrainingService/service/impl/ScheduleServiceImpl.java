@@ -11,6 +11,7 @@ import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.ScheduleService;
 import manasTrainingService.service.user.UserService;
+import manasTrainingService.util.DateUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .lessonType(schedule.getLessonType())
                 .meetingUrl(schedule.getMeetingUrl())
                 .notes(schedule.getNotes())
+                .formattedLessonDate(DateUtil.format(schedule.getLessonDate()))
                 .teacherName(schedule.getTeacher().getName() + " " + schedule.getTeacher().getLastName())
                 .build();
     }
