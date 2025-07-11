@@ -6,28 +6,12 @@ const optionCounters = {};
 
 function getNextOptionId(questionId) {
     if (!(questionId in optionCounters)) {
-        optionCounters[questionId] = 1;
+        optionCounters[questionId] = 2;
     } else {
         optionCounters[questionId]++;
     }
     return optionCounters[questionId];
 }
-
-flatpickr("#dateRange", {
-    mode: "range",
-    enableTime: true,
-    time_24hr: true,
-    dateFormat: "Y-m-d H:i",
-    locale: "ru",
-    onChange: function(selectedDates, dateStr, instance) {
-        if (selectedDates.length === 2) {
-            const formatted = selectedDates.map(d =>
-                instance.formatDate(d, "Y-m-d H:i")
-            ).join(" - ");
-            instance._input.value = formatted;
-        }
-    }
-});
 
 function createLabel(name, text) {
     let label = document.createElement("label");
@@ -128,7 +112,7 @@ function createRemoveQuestionButton(id) {
     return div;
 }
 
-function createOptionRemoveButton(id) {
+function createOptionRemoveButton(id, questionId) {
     let button = document.createElement("button");
     button.setAttribute("type", "button");
     button.setAttribute("class", "btn btn-outline-danger");
@@ -137,13 +121,15 @@ function createOptionRemoveButton(id) {
     button.addEventListener("click", () => {
         const element = document.getElementById(id);
         if (element) element.remove();
+        if(getOptionsCount(questionId) < 4){
+            document.getElementById("add-options-button-question-"+questionId).disabled = false;
+        }
     });
     return button;
 }
 
 function createQuestionOption(questionId, optionId, isChecked) {
-    let optionsCount = document.querySelectorAll(`[id^="questionId"][id*="optionId-"]`).length;
-    let id = `questionId-${questionId}-optionId-${optionsCount}`;
+    let id = `questionId-${questionId}-optionId-${optionId}`;
     let div = document.createElement("div");
     div.setAttribute("class", "d-flex align-items-center mt-3");
     div.setAttribute("id", id);
@@ -152,7 +138,7 @@ function createQuestionOption(questionId, optionId, isChecked) {
         createRadio("questions[" + questionId + "].correctOptionIndex", questionId, optionId, isChecked),
     ))
     let optionContainer;
-    if (optionId > 0){
+    if (optionId > 1){
         optionContainer = createOptionInputContainer(
             "questions[" + questionId + "].options[" + optionId + "].optionText",
             "text",
@@ -165,8 +151,8 @@ function createQuestionOption(questionId, optionId, isChecked) {
             "flex-grow-1 me-5"
         )
     }
-    if (optionId > 0){
-        optionContainer.append(createOptionRemoveButton(id))
+    if (optionId > 1){
+        optionContainer.append(createOptionRemoveButton(id, questionId))
     }
 
     div.append(optionContainer)
@@ -174,7 +160,7 @@ function createQuestionOption(questionId, optionId, isChecked) {
 }
 
 function addOption(questionId) {
-    let optionId = getNextOptionId(questionId);
+    let optionId = getOptionsCount(questionId);
     let newOption = createQuestionOption(questionId, optionId);
     let optionsBlock = document.getElementById("options-questionId-" + questionId);
     if(questionId !== 0){
@@ -184,21 +170,28 @@ function addOption(questionId) {
         let button = document.getElementById("createOption")
         optionsBlock.appendChild(newOption, button);
     }
+    if(getOptionsCount(questionId) === 4){
+        document.getElementById("add-options-button-question-"+questionId).disabled = true;
+    }
 }
 
-function createAddButton(questionId, optionsContainer, optionIdRef) {
+function createAddButton(questionId, optionsContainer) {
     let button = document.createElement("button");
     button.setAttribute("type", "button");
     button.setAttribute("class", "btn btn-primary-custom");
+    button.setAttribute("id", "add-options-button-question-"+questionId)
     button.innerText = "Добавить вариант ответа";
 
     let div = document.createElement("div")
     div.setAttribute("class", "my-3")
 
     button.addEventListener("click", () => {
-        const newOption = createQuestionOption(questionId, optionIdRef.value);
+        let optionId = getOptionsCount(questionId)
+        const newOption = createQuestionOption(questionId, optionId);
         optionsContainer.insertBefore(newOption, div);
-        optionIdRef.value++;
+        if(getOptionsCount(questionId) === 4){
+            button.disabled = true
+        }
     });
 
     div.append(button)
@@ -214,7 +207,7 @@ function deleteQuestion(id){
     });
 }
 
-function deleteOption(id, errorId){
+function deleteOption(id, errorId, questionId){
     let button = document.getElementById(id);
     let div = document.getElementById(id);
     let err;
@@ -224,8 +217,32 @@ function deleteOption(id, errorId){
     }
     button.addEventListener('click', () => {
         div.remove();
+        if(getOptionsCount(questionId) < 4){
+            console.log(getOptionsCount(questionId))
+            document.getElementById("add-options-button-question-"+questionId).disabled = false;
+        }
     });
 }
+
+function getOptionsCount(questionId){
+    let questionBlock = document.getElementById("options-questionId-"+questionId);
+    const pattern = /^questionId-\d+-optionId-\d+$/;
+    let questionOptionCount = questionBlock.querySelectorAll('[id]');
+    const filtredElements = Array.from(questionOptionCount).filter(e => pattern.test(e.id));
+    return (filtredElements.length);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const pattern = /^questionId-\d+$/;
+    let questions = document.querySelectorAll('[id]');
+    const filtredElements = Array.from(questions).filter(e => pattern.test(e.id));
+    for(let question of filtredElements){
+        let index = question.id.split('-')[1];
+        if(getOptionsCount(index) === 4 || getOptionsCount(index) > 4){
+            document.getElementById("add-options-button-question-"+index).disabled = true;
+        }
+    }
+})
 
 createQuestionButton.addEventListener("click", () => {
     const newQuestion = createQuestionBlock(questionId);

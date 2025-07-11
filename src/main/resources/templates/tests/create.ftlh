@@ -115,7 +115,7 @@
                                                            class="form-check-input fs-4"/>
                                                 </#if>
                                             </div>
-                                            <#if option?index != 0>
+                                            <#if 1 < option?index>
                                                 <div class="d-flex flex-grow-1 align-items-center">
                                                     <@spring.formInput "test.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3"
                                                             placeholder="Вариант ответа"
@@ -124,7 +124,7 @@
                                                     <button class="btn btn-outline-danger"
                                                             type="button"
                                                             id="button-addon2"
-                                                            onclick="deleteOption('questionId-${question?index}-optionId-${option?index}', 'option-${option?index}-error')">
+                                                            onclick="deleteOption('questionId-${question?index}-optionId-${option?index}', 'option-${option?index}-error', ${question?index})">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -142,7 +142,7 @@
                                 </div>
                                 <div class="mb-3" id="createOption-questionId-${question?index}">
                                     <button type="button" class="btn btn-primary-custom"
-                                            onclick="addOption(${question?index})">
+                                            onclick="addOption(${question?index})" id="add-options-button-question-${question?index}">
                                         Добавить вариант ответа
                                     </button>
                                 </div>
@@ -180,9 +180,25 @@
                                     <@spring.showErrors "<br>" "error text-danger" />
                                 </div>
                             </div>
+                            <div id="questionId-0-optionId-1" class="mb-3 d-flex align-items-center">
+                                <div class="form-check d-flex align-items-center mb-0">
+                                    <input type="radio"
+                                           name="questions[0].correctOptionIndex"
+                                           value="1"
+                                           id="questions[0].options[1]"
+                                           class="form-check-input fs-4"
+                                    />
+                                </div>
+                                <div class="flex-grow-1 me-5">
+                                    <@spring.formInput "test.questions[0].options[1].optionText" 'class="form-control me-2"
+                                    placeholder="Вариант ответа"
+                                    id="questions[0].options[1].optionText"' />
+                                    <@spring.showErrors "<br>" "error text-danger" />
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3" id="createOption">
-                            <button type="button" class="btn btn-primary-custom" onclick="addOption(0)">
+                            <button type="button" class="btn btn-primary-custom" onclick="addOption(0)" id="add-options-button-question-0">
                                 Добавить вариант ответа
                             </button>
                         </div>
@@ -260,6 +276,8 @@
             optionsContainer.setAttribute("id", "options-questionId-" + questionId);
 
             optionsContainer.append(createQuestionOption(questionId, optionIdRef.value, true));
+            optionIdRef.value++;
+            optionsContainer.append(createQuestionOption(questionId, optionIdRef.value, false));
             optionIdRef.value++;
 
             const addButton = createAddButton(questionId, optionsContainer, optionIdRef);

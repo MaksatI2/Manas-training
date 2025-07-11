@@ -20,5 +20,7 @@ public interface TestService {
 
     TestResultDto checkTestResult(TestAnswerDto result);
 
+    void clearNoData(TestDto testDto);
+
     void deleteTest(int id);
 }

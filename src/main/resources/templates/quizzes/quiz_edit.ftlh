@@ -62,7 +62,8 @@
                                      id="options-questionId-${question?index}">
                                     <#list (question.options)![] as option>
                                         <div class="d-flex align-items-center mt-3"
-                                             id="questionId-${question?index}-optionId-${option?index}">
+                                             id="questionId-${question?index}-optionId-${option?index}"
+                                             <#if option.id?has_content == false>data-new="true"</#if>>
                                             <div class="form-check d-flex align-items-center mb-0">
                                                 <#if (question.correctOptionIndex?? && question.correctOptionIndex == option?index) || (option.isCorrect?? && option.isCorrect == true)>
                                                     <input type="radio"
@@ -79,7 +80,7 @@
                                                            class="form-check-input fs-4"/>
                                                 </#if>
                                             </div>
-                                            <#if option?index != 0>
+                                            <#if 1 < option?index>
                                                 <div class="d-flex flex-grow-1 align-items-center"
                                                      id="question-${question?index}-option-${option?index}-inputBlock">
                                                     <@spring.formInput "lessonQuiz.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3"
@@ -116,7 +117,7 @@
                                 <div class="mb-3" id="createOption-questionId-${question?index}">
                                     <button type="button" class="btn btn-primary-custom"
                                             onclick="addOptionFromEdit(${question?index}, ${question.id!})"
-                                            id="addOptionButton">
+                                            id="add-options-button-question-${question?index}">
                                         Добавить вариант ответа
                                     </button>
                                 </div>
@@ -184,6 +185,8 @@
 
             optionsContainer.append(createQuestionOption(questionIndex, optionIdRef.value, true));
             optionIdRef.value++;
+            optionsContainer.append(createQuestionOption(questionIndex, optionIdRef.value, false));
+            optionIdRef.value++;
 
             const addButton = createAddButton(questionIndex, optionsContainer, optionIdRef);
             optionsContainer.append(addButton);
@@ -238,6 +241,7 @@
         function deleteOptionFromEdit(id, questionIndex, optionIndex, errorId) {
             let div = document.getElementById(id);
             let input = document.createElement("input")
+            let isNew = div.hasAttribute("data-new");
             input.setAttribute("type", "hidden")
             input.setAttribute("name", "questions[" + questionIndex + "].options[" + optionIndex + "].isRemoved")
             input.setAttribute("value", "true")
@@ -261,21 +265,41 @@
                 div.querySelectorAll("button").forEach(button => button.disabled = false)
                 div.classList.remove("opacity-50")
                 div.setAttribute("class", "d-flex flex-grow-1 align-items-center mt-3")
+                if (getOptionsCountForEdit(questionIndex) > 4){
+                    let optionBlock = document.getElementById("options-questionId-"+questionIndex)
+                    let newOptions = optionBlock.querySelectorAll('[data-new="true"]');
+                    if(newOptions.length !== 0){
+                        newOptions[newOptions.length - 1].remove();
+                    }
+                }
                 btn.remove()
                 btnDiv.append(deleteButton)
+                if(getOptionsCountForEdit(questionIndex) === 4){
+                    document.getElementById("add-options-button-question-"+questionIndex).disabled = true;
+                }
             })
 
             let btnDiv = document.getElementById("question-" + questionIndex + "-option-" + optionIndex + "-inputBlock")
-
+            let deletedInput = document.getElementById("questions"+questionIndex+".options"+optionIndex+".optionText")
+            if(!isNew || deletedInput.value.trim() !== ""){
             div.querySelectorAll("input").forEach(input => input.readOnly = true)
             div.querySelectorAll("button").forEach(button => button.disabled = true)
             div.append(input);
             div.setAttribute("class", "d-flex flex-grow-1 align-items-center mt-3 opacity-50")
             btnDiv.append(btn)
+                if(getOptionsCountForEdit(questionIndex) < 4){
+                    document.getElementById("add-options-button-question-"+questionIndex).disabled = false;
+                }
+            } else {
+                div.remove()
+                if(getOptionsCountForEdit(questionIndex) < 4){
+                    document.getElementById("add-options-button-question-"+questionIndex).disabled = false;
+                }
+            }
         }
 
         function addOptionFromEdit(questionIndex, questionId) {
-            let optionIndex = getNextOptionId(questionIndex);
+            let optionIndex = getOptionsCount(questionIndex);
             let newOption = createQuestionOptionFromEdit(questionIndex, optionIndex, questionId);
             let optionsBlock = document.getElementById("options-questionId-" + questionIndex);
             if (questionIndex !== 0) {
@@ -285,20 +309,23 @@
                 let button = document.getElementById("createOption")
                 optionsBlock.appendChild(newOption, button);
             }
+            if(getOptionsCountForEdit(questionIndex) === 4){
+                document.getElementById("add-options-button-question-"+questionIndex).disabled = true;
+            }
         }
 
         function createQuestionOptionFromEdit(questionIndex, optionIndex, questionId, isChecked) {
-            let optionsCount = document.querySelectorAll(`[id^="questionId"][id*="optionId-"]`).length;
-            let id = "questionId-" + questionIndex + "-optionId-" + optionsCount;
+            let id = "questionId-" + questionIndex + "-optionId-" + optionIndex;
             let div = document.createElement("div");
             div.setAttribute("class", "d-flex align-items-center mt-3");
             div.setAttribute("id", id);
+            div.setAttribute("data-new", "true");
 
             div.append(createEmptyContainer(
                 createRadio("questions[" + questionIndex + "].correctOptionIndex", questionIndex, optionIndex, isChecked),
             ))
             let optionContainer;
-            if (optionIndex > 0) {
+            if (optionIndex > 1) {
                 optionContainer = createOptionInputContainer(
                     "questions[" + questionIndex + "].options[" + optionIndex + "].optionText",
                     "text",
@@ -311,8 +338,8 @@
                     "flex-grow-1 me-5"
                 )
             }
-            if (optionIndex > 0) {
-                optionContainer.append(createOptionRemoveButton(id))
+            if (optionIndex > 1) {
+                optionContainer.append(createOptionRemoveButtonFromEdit(id, questionIndex))
             }
 
             let input = document.createElement("input")
@@ -330,6 +357,30 @@
             testFormDiv.insertBefore(newQuestion, createQuestionButtonFromEdit);
             questionId++;
         });
+
+        function createOptionRemoveButtonFromEdit(id, questionId) {
+            let button = document.createElement("button");
+            button.setAttribute("type", "button");
+            button.setAttribute("class", "btn btn-outline-danger");
+            button.setAttribute("id", "button-addon2");
+            button.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+            button.addEventListener("click", () => {
+                const element = document.getElementById(id);
+                if (element) element.remove();
+                if(getOptionsCountForEdit(questionId) < 4){
+                    document.getElementById("add-options-button-question-"+questionId).disabled = false;
+                }
+            });
+            return button;
+        }
+
+        function getOptionsCountForEdit(questionId){
+            let questionBlock = document.getElementById("options-questionId-"+questionId);
+            const pattern = /^questionId-\d+-optionId-\d+$/;
+            let questionOptionCount = questionBlock.querySelectorAll('[id]');
+            const filtredElements = Array.from(questionOptionCount).filter(e => pattern.test(e.id) && !e.classList.contains("opacity-50"));
+            return (filtredElements.length);
+        }
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

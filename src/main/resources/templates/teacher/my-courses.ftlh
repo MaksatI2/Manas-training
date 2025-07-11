@@ -16,10 +16,7 @@
             </div>
         <#else>
             <#if successMessage??>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
-                    ${successMessage}
-                </div>
+                <div id="successMessage" data-message="${successMessage?js_string}"></div>
             </#if>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 <#list courses as course>
@@ -33,20 +30,26 @@
                                 </p>
                             </a>
                             <div class="card-body pt-0 px-3 pb-3">
-                                <a href="/teacher/course/${course.courseInstanceId}" class="btn btn-outline-primary w-100">
+                                <a href="/teacher/course/${course.courseInstanceId}" class="btn btn-outline-primary w-100 mb-2">
                                     Перейти к курсу
                                 </a>
                                 <#if course.courseTest??>
-                                    <a href="/test/${course.courseTest.id}/edit" class="btn btn-outline-primary w-100">
-                                        Редактировать итоговый тест
-                                    </a>
-                                    <a href="/test/${course.courseTest.id}/delete" class="btn btn-outline-danger w-100">
-                                        Удалить итоговый тест
-                                    </a>
-                                <#else>
-                                    <a href="/test/create/${course.courseInstanceId}" class="btn btn-outline-primary w-100">
-                                        Создать итоговый тест
-                                    </a>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <a href="/test/${course.courseTest.id}/edit" class="btn btn-outline-primary w-100 mb-2">
+                                                Редактировать итоговый тест
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <a href="/test/${course.courseTest.id}/delete" class="btn btn-outline-danger w-100 mb-2">
+                                                Удалить итоговый тест
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <#else>
+                                        <a href="/test/create/${course.courseInstanceId}" class="btn btn-outline-primary w-100">
+                                            Создать итоговый тест
+                                        </a>
                                 </#if>
                             </div>
                         </div>
