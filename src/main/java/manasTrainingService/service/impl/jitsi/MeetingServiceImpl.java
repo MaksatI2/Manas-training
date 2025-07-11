@@ -18,7 +18,7 @@ import manasTrainingService.repositories.jitsi.MeetingRepository;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.jitsi.MeetingService;
 import manasTrainingService.service.user.UserService;
-import manasTrainingService.util.JitsiUrlBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,9 +36,18 @@ public class MeetingServiceImpl implements MeetingService {
     private final ScheduleRepository scheduleRepository;
     private final UserService userService;
     private final EnrollmentService enrollmentService;
-    private final JitsiUrlBuilder jitsiUrlBuilder;
 
-    private static final String JITSI_BASE_URL = "https://meet.jit.si/";
+    @Value("${jitsi.domain:localhost}")
+    private String jitsiDomain;
+
+    @Value("${jitsi.port:8443}")
+    private String jitsiPort;
+
+    @Value("${jitsi.protocol:https}")
+    private String jitsiProtocol;
+
+    @Value("${jitsi.room.prefix:ManasTraining}")
+    private String roomPrefix;
 
     @Transactional
     @Override
@@ -58,7 +67,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         String meetingId = generateUniqueMeetingId();
         String roomName = generateRoomName(schedule);
-        String meetingUrl = jitsiUrlBuilder.buildMeetingUrl(roomName);
+        String meetingUrl = buildMeetingUrl(roomName);
 
         Meeting meeting = Meeting.builder()
                 .schedule(schedule)
@@ -76,8 +85,8 @@ public class MeetingServiceImpl implements MeetingService {
         schedule.setMeetingUrl(meetingUrl);
         scheduleRepository.save(schedule);
 
-        log.info("Meeting started: scheduleId={}, meetingId={}, teacherId={}",
-                schedule.getId(), meeting.getId(), teacher.getId());
+        log.info("Meeting started: scheduleId={}, meetingId={}, teacherId={}, roomName={}",
+                schedule.getId(), meeting.getId(), teacher.getId(), roomName);
 
         return mapToMeetingResponseDTO(meeting);
     }
@@ -195,10 +204,33 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     private String generateRoomName(Schedule schedule) {
-        return String.format("lesson_%d_%s_%d",
+        return String.format("%s_Meeting_%d_%s_%d",
+                roomPrefix,
                 schedule.getId(),
                 schedule.getLessonDate().toString().replace("-", ""),
                 System.currentTimeMillis() % 10000);
+    }
+
+    private String buildMeetingUrl(String roomName) {
+        if ("80".equals(jitsiPort) && "http".equals(jitsiProtocol)) {
+            return String.format("%s://%s/%s", jitsiProtocol, jitsiDomain, roomName);
+        } else if ("443".equals(jitsiPort) && "https".equals(jitsiProtocol)) {
+            return String.format("%s://%s/%s", jitsiProtocol, jitsiDomain, roomName);
+        } else {
+            return String.format("%s://%s:%s/%s", jitsiProtocol, jitsiDomain, jitsiPort, roomName);
+        }
+    }
+
+    public String getJitsiDomain() {
+        return jitsiDomain;
+    }
+
+    public String getJitsiPort() {
+        return jitsiPort;
+    }
+
+    public String getJitsiProtocol() {
+        return jitsiProtocol;
     }
 
     private MeetingResponseDTO mapToMeetingResponseDTO(Meeting meeting) {
