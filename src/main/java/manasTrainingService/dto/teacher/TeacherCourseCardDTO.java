@@ -20,8 +20,8 @@ public class TeacherCourseCardDTO {
     Integer courseInstanceId;
     String courseTitle;
     String instanceTitle;
-    LocalDateTime startDate;
-    LocalDateTime endDate;
+    String startDate;
+    String endDate;
     Boolean isPrimary;
     TestDto courseTest;
 }

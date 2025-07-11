@@ -23,7 +23,7 @@
                                     <h6 class="card-subtitle mb-2 text-muted">${course.instanceTitle}</h6>
                                     <p class="card-text">
                                         Статус: <strong>${course.localizedStatus}</strong><br>
-                                        Срок: ${course.startDate.toLocalDate()} – ${course.endDate.toLocalDate()}
+                                        Срок: ${course.startDate} – ${course.endDate}
                                     </p>
                                 </div>
                             </div>

@@ -21,9 +21,9 @@
             Категория: <strong>${courseInstance.category!'-'}</strong>
         </p>
         <p class="hero-subtitle">
-            Начало: ${courseInstance.formattedStartDate} |
-            Окончание: ${courseInstance.formattedEndDate} |
-            Статус: <#if courseInstance.isActive>Активен<#else>Завершен</#if>
+            Начало: <strong>${courseInstance.formattedStartDate}</strong> |
+            Окончание: <strong>${courseInstance.formattedEndDate}</strong> |
+            Статус: <strong><#if courseInstance.isActive>Активен<#else>Завершен</#if></strong>
         </p>
     </div>
 
