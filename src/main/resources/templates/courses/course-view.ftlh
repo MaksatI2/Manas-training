@@ -127,12 +127,12 @@
 
                             <div class="meta-item">
                                 <small class="meta-label">Дата создания:</small>
-                                <span class="meta-value">${course.createdAt.toLocalDate()}</span>
+                                <span class="meta-value">${course.formattedCreatedAt}</span>
                             </div>
 
                             <div class="meta-item">
                                 <small class="meta-label">Последнее обновление:</small>
-                                <span class="meta-value">${course.updatedAt.toLocalDate()}</span>
+                                <span class="meta-value">${course.formattedUpdatedAt}</span>
                             </div>
                         </div>
 
