@@ -197,7 +197,7 @@
         }
     </style>
 
-    <script src="/external_api.js"></script>
+    <script src="/static/js/external_api.js"></script>
     <script>
         let localStream = null;
         let cameraEnabled = true;
@@ -276,7 +276,7 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('preJoinModal'));
             modal.hide();
 
-            const domain = '157.245.67.28/jitsi';
+            const domain = '157.245.67.28';
             const options = {
                 roomName: 'ManasTraining_Meeting_${meeting.meetingId}',
                 width: '100%',
