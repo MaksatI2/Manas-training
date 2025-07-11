@@ -11,6 +11,7 @@ import manasTrainingService.repositories.course.CourseRepository;
 import manasTrainingService.repositories.course.CourseTeacherRepository;
 import manasTrainingService.service.course.CourseCategoryService;
 import manasTrainingService.service.course.CourseService;
+import manasTrainingService.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +88,8 @@ public class CourseServiceImpl implements CourseService {
                 .updatedAt(course.getUpdatedAt())
                 .category(categoryDto)
                 .categoryId(course.getCategory().getId())
+                .formattedCreatedAt(DateUtil.formatDateOnly(course.getCreatedAt()))
+                .formattedUpdatedAt(DateUtil.formatDateOnly(course.getUpdatedAt()))
                 .build();
     }
 
