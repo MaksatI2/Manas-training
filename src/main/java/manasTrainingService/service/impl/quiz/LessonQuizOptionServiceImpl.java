@@ -12,6 +12,7 @@ import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
         this.lessonQuizQuestionService = lessonQuizQuestionService;
     }
 
+    @Transactional
     @Override
     public void saveQuizOptions(List<LessonQuizOptionDto> options, LessonQuizQuestion lessonQuizQuestion, Integer correctOptionIndex){
         for(int i = 0; i<options.size(); i++){
@@ -42,17 +44,19 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
         }
     }
 
+    @Transactional
     @Override
     public void editQuizOptions(List<LessonQuizOptionDto> options, Integer correctOptionIndex){
         for(int i = 0; i<options.size(); i++) {
             if (options.get(i).getId() != null){
-                LessonQuizOption lessonQuizOption = lessonQuizOptionRepository.findById(options.get(i).getId())
-                        .orElseThrow(() -> new LessonQuizOptionNotFoundException("Ответ не найден"));
                 if(options.get(i).getIsRemoved() != null && options.get(i).getIsRemoved()){
-                    lessonQuizOptionRepository.deleteById(options.get(i).getId());
+                    deleteOptionFromEdit(options.get(i));
                     continue;
                 }
+                LessonQuizOption lessonQuizOption = lessonQuizOptionRepository.findById(options.get(i).getId())
+                        .orElseThrow(() -> new LessonQuizOptionNotFoundException("Ответ не найден"));
                 lessonQuizOption.setOptionText(options.get(i).getOptionText());
+
                 if(correctOptionIndex != null && i == correctOptionIndex){
                     lessonQuizOption.setIsCorrect(true);
                 }else{
@@ -89,5 +93,11 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
     public LessonQuizOption getQuizOptionEntityById(int id){
         return lessonQuizOptionRepository.findById(id)
                 .orElseThrow(() -> new LessonQuizOptionNotFoundException("Ответ не найден"));
+    }
+
+    private void deleteOptionFromEdit(LessonQuizOptionDto lessonQuizOptionDto){
+        LessonQuizOption lessonQuizOption = lessonQuizOptionRepository.findById(lessonQuizOptionDto.getId())
+                .orElseThrow(() -> new LessonQuizOptionNotFoundException("Ответ не найден"));
+        lessonQuizOptionRepository.delete(lessonQuizOption);
     }
 }

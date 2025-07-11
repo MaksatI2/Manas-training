@@ -91,6 +91,7 @@ public class TestController {
             return "tests/test_passing";
         }
         model.addAttribute("results", testService.checkTestResult(result));
+        model.addAttribute("test", testService.getTestById(result.getTestId()));
         return "tests/test_passed_page";
     }
 }

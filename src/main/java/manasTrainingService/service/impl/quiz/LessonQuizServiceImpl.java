@@ -12,6 +12,7 @@ import manasTrainingService.service.quiz.LessonQuizOptionService;
 import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 
@@ -24,6 +25,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     private final LessonQuizQuestionService lessonQuizQuestionService;
     private final LessonQuizOptionService lessonQuizOptionService;
 
+    @Transactional
     @Override
     public void createQuiz(LessonQuizDto lessonQuizDto){
 
@@ -42,6 +44,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
         lessonQuizQuestionService.saveQuizQuestions(lessonQuizDto.getQuestions(), savedTest);
     }
 
+    @Transactional
     @Override
     public void editQuiz(LessonQuizDto lessonQuizDto){
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(lessonQuizDto.getId())

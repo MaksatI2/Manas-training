@@ -10,6 +10,8 @@ import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
+import manasTrainingService.service.test.TestService;
+import manasTrainingService.service.user.RoleService;
 import manasTrainingService.service.user.TeacherService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,8 @@ public class TeacherController {
     private final TeacherService teacherService;
     private final CourseTeacherInstanceService courseTeacherInstanceService;
     private final CourseInstanceService courseInstanceService;
+    private final RoleService roleService;
+    private final TestService testService;
 
     @GetMapping("/profile")
     public String viewProfile(Model model) {
@@ -79,6 +83,12 @@ public class TeacherController {
                                     Model model) {
         courseTeacherInstanceService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
+        if(userService.getAuthorizedUser().getRole() == roleService.getTeacherRoleId()){
+            model.addAttribute("role", roleService.getTeacherRoleId().getName());
+        }
+        if(testService.getTestByCourseId(id) != null){
+            model.addAttribute("test", testService.getTestByCourseId(id));
+        }
         model.addAttribute("courseInstance", courseInstanceDto);
         return "teacher/course-detail";
     }
