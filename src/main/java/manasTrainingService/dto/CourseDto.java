@@ -41,6 +41,9 @@ public class CourseDto {
 
     private LocalDateTime updatedAt;
 
+    private String formattedCreatedAt;
+    private String formattedUpdatedAt;
+
     private CourseCategoryDto category;
 
     @NotNull(message = "Категория обязательна")

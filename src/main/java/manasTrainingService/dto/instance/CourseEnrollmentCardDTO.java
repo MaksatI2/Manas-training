@@ -19,8 +19,8 @@ public class CourseEnrollmentCardDTO {
     private Integer courseInstanceId;
     private String courseTitle;
     private String instanceTitle;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private String startDate;
+    private String endDate;
     private Status status;
     private BigDecimal progress;
     private String localizedStatus;
