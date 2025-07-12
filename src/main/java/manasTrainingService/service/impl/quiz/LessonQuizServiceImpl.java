@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.quiz.LessonQuizDto;
 import manasTrainingService.dto.quiz.answers.QuizAnswerDto;
 import manasTrainingService.dto.quiz.answers.QuizResultDto;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.LessonQuiz;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.exceptions.nsee.LessonQuizNotFoundException;
 import manasTrainingService.repositories.quiz.LessonQuizRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.quiz.LessonQuizOptionService;
 import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,8 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     private final LessonQuizRepository lessonQuizRepository;
     private final LessonQuizQuestionService lessonQuizQuestionService;
     private final LessonQuizOptionService lessonQuizOptionService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Transactional
     @Override
@@ -40,8 +46,15 @@ public class LessonQuizServiceImpl implements LessonQuizService {
             lessonQuiz.setIsActive(lessonQuizDto.getIsActive());
         }
 
-        LessonQuiz savedTest = lessonQuizRepository.saveAndFlush(lessonQuiz);
-        lessonQuizQuestionService.saveQuizQuestions(lessonQuizDto.getQuestions(), savedTest);
+        LessonQuiz saved = lessonQuizRepository.saveAndFlush(lessonQuiz);
+        lessonQuizQuestionService.saveQuizQuestions(lessonQuizDto.getQuestions(), saved);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.LESSON_QUIZ,
+                saved.getId()
+        );
     }
 
     @Transactional
@@ -58,9 +71,16 @@ public class LessonQuizServiceImpl implements LessonQuizService {
         }else{
             lessonQuiz.setIsActive(lessonQuizDto.getIsActive());
         }
-        lessonQuizRepository.saveAndFlush(lessonQuiz);
+        LessonQuiz updated = lessonQuizRepository.saveAndFlush(lessonQuiz);
 
         lessonQuizQuestionService.editQuizQuestion(lessonQuizDto.getQuestions());
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.LESSON_QUIZ,
+                updated.getId()
+        );
     }
 
     @Override

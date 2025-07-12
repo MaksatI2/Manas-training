@@ -2,11 +2,14 @@ package manasTrainingService.service.impl.user;
 
 import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.profile.StudentProfileDto;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.StudentProfile;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.exceptions.nsee.user.StudentProfileNotFoundException;
 import manasTrainingService.repositories.user.StudentProfileRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.context.annotation.Lazy;
@@ -17,11 +20,13 @@ public class StudentServiceImpl implements StudentService {
 
     private final StudentProfileRepository studentProfileRepository;
     private final UserService userService;
+    private final ActivityLogService activityLogService;
 
     public StudentServiceImpl(StudentProfileRepository studentProfileRepository,
-                              @Lazy UserService userService) {
+                              @Lazy UserService userService, ActivityLogService activityLogService) {
         this.studentProfileRepository = studentProfileRepository;
         this.userService = userService;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -31,6 +36,12 @@ public class StudentServiceImpl implements StudentService {
                 .organization(studentProfileDto.getOrganization())
                 .build();
         studentProfileRepository.save(studentProfile);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.STUDENT_PROFILE,
+                studentProfile.getId()
+        );
     }
 
     @Override
@@ -49,6 +60,12 @@ public class StudentServiceImpl implements StudentService {
         userService.editStudentInformation(userProfileEditDto);
         studentProfile.setSpecialization(userProfileEditDto.getSpecialization());
         studentProfileRepository.saveAndFlush(studentProfile);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.STUDENT_PROFILE,
+                studentProfile.getId()
+        );
     }
 
     @Override

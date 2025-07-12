@@ -2,9 +2,12 @@ package manasTrainingService.service.impl.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.PasswordResetToken;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.User;
 import manasTrainingService.repositories.user.PasswordResetTokenRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.user.EmailService;
 import manasTrainingService.service.user.PasswordResetService;
 import manasTrainingService.service.user.UserService;
@@ -25,6 +28,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private UserService userService;
+    private final ActivityLogService activityLogService;
 
     @Autowired
     public void setUserService(@Lazy UserService userService) {
@@ -43,6 +47,12 @@ public class PasswordResetServiceImpl implements PasswordResetService {
                 .build();
 
         tokenRepository.save(resetToken);
+        activityLogService.log(
+                user,
+                ActionType.CREATE,
+                TargetType.PASSWORD_RESET_TOKEN,
+                Math.toIntExact(resetToken.getId())
+        );
         emailService.sendPasswordResetEmail(user, token);
     }
 
@@ -57,6 +67,13 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         User user = resetToken.getUser();
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userService.saveUser(user);
+        activityLogService.log(
+                user,
+                ActionType.UPDATE,
+                TargetType.USER,
+                user.getId()
+        );
+
         tokenRepository.delete(resetToken);
 
         return true;

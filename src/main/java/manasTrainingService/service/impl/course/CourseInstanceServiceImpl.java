@@ -7,16 +7,15 @@ import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.LessonDTO;
-import manasTrainingService.entity.Course;
-import manasTrainingService.entity.CourseInstance;
-import manasTrainingService.entity.CourseModule;
-import manasTrainingService.entity.Lesson;
+import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.course.CourseNotFoundException;
 import manasTrainingService.repositories.ScheduleRepository;
 import manasTrainingService.repositories.course.CourseInstanceRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
+import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.DateUtil;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +31,8 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     private final CourseService courseService;
     private final LessonService lessonService;
     private final ScheduleRepository scheduleRepository;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Override
     public Integer createCourseInstance(CourseInstanceCreationDTO dto) {
@@ -43,7 +44,14 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .endDate(dto.getEndDate().atStartOfDay())
                 .isActive(dto.getIsActive())
                 .build();
-        return courseInstanceRepository.save(courseInstance).getId();
+        Integer id = courseInstanceRepository.save(courseInstance).getId();
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.COURSE_INSTANCE,
+                id
+        );
+        return id;
     }
 
     @Override
@@ -150,7 +158,13 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
         instance.setIsActive(Boolean.TRUE.equals(dto.getIsActive()));
         instance.setUpdatedAt(LocalDateTime.now());
 
-        courseInstanceRepository.save(instance);
+        CourseInstance updated = courseInstanceRepository.save(instance);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.COURSE_INSTANCE,
+                updated.getId()
+        );
     }
 
     @Override
@@ -162,6 +176,12 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
         }
 
         courseInstanceRepository.deleteById(id);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.COURSE_INSTANCE,
+                id
+        );
     }
 
     @Override

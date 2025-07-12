@@ -2,10 +2,9 @@ package manasTrainingService.service.impl.course;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.teacher.CourseTeacherDTO;
-import manasTrainingService.entity.Course;
-import manasTrainingService.entity.CourseTeacher;
-import manasTrainingService.entity.User;
+import manasTrainingService.entity.*;
 import manasTrainingService.repositories.course.CourseTeacherRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.course.CourseTeacherService;
@@ -24,6 +23,7 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
     private final CourseInstanceService courseInstanceService;
     private final UserService userService;
     private final CourseService courseService;
+    private final ActivityLogService activityLogService;
 
     @Override
     public List<CourseTeacherDTO> getEligibleTeachersForCourseInstance(Integer courseInstanceId) {
@@ -59,19 +59,30 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
     @Override
     @Transactional
     public void updateTeacherCourses(Integer teacherId, List<Integer> courseIds) {
+        repository.findAllByTeacherId(teacherId).forEach(ct ->
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.DELETE,
+                        TargetType.COURSE_TEACHER,
+                        ct.getId()
+                )
+        );
         repository.deleteByTeacherId(teacherId);
 
-        List<CourseTeacher> list = repository.findAllByTeacherId(teacherId);
         User teacher = userService.getUserById(teacherId);
-
         for (Integer courseId : courseIds) {
             Course course = courseService.getCourseById(courseId);
             CourseTeacher ct = CourseTeacher.builder()
                     .teacher(teacher)
                     .course(course)
                     .build();
-            repository.save(ct);
-
+            CourseTeacher saved = repository.save(ct);
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.COURSE_TEACHER,
+                    saved.getId()
+            );
         }
 
     }
