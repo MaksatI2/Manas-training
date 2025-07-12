@@ -276,7 +276,8 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('preJoinModal'));
             modal.hide();
 
-            const domain = 'localhost:8080';
+            const domain = '157.245.67.28';
+
             const options = {
                 roomName: 'ManasTraining_Meeting_${meeting.meetingId}',
                 width: '100%',
@@ -288,17 +289,15 @@
                     prejoinPageEnabled: false,
                     disableDeepLinking: true,
 
-                    bosh: 'http://157.245.67.28/http-bind',
-                    websocket: 'ws://157.245.67.28/xmpp-websocket',
+                    bosh: '//157.245.67.28/http-bind',
+                    websocket: 'wss://157.245.67.28/xmpp-websocket',
 
                     hosts: {
                         domain: 'meet.jitsi',
-                        muc: 'muc.meet.jitsi',
+                        muc: 'conference.meet.jitsi',
                         focus: 'focus.meet.jitsi'
                     },
-                    p2p: {
-                        enabled: false
-                    },
+
                     useStunTurn: true,
                     stunServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
@@ -389,13 +388,21 @@
                 jitsiAPI.addEventListener('connectionFailed', function(event) {
                     console.error('Ошибка подключения:', event);
                     document.getElementById('loadingIndicator').style.display = 'none';
+<<<<<<< src/main/resources/templates/jitsi/join-meeting.ftlh
+                    showConnectionError('Не удалось подключиться к серверу конференций');
+=======
                     showConnectionError();
+>>>>>>> src/main/resources/templates/jitsi/join-meeting.ftlh
                 });
 
                 jitsiAPI.addEventListener('conferenceError', function(event) {
                     console.error('Ошибка конференции:', event);
                     document.getElementById('loadingIndicator').style.display = 'none';
+<<<<<<< src/main/resources/templates/jitsi/join-meeting.ftlh
+                    showConnectionError('Ошибка при создании конференции');
+=======
                     showConnectionError();
+>>>>>>> src/main/resources/templates/jitsi/join-meeting.ftlh
                 });
 
                 jitsiAPI.addEventListener('participantJoined', function(event) {
@@ -426,13 +433,24 @@
                     if (document.getElementById('loadingIndicator').style.display !== 'none') {
                         console.warn('Долгое подключение к конференции');
                         document.getElementById('loadingIndicator').style.display = 'none';
+<<<<<<< src/main/resources/templates/jitsi/join-meeting.ftlh
+                        showConnectionError('Превышено время ожидания подключения');
+                    }
+                }, 45000);
+=======
                         showConnectionError();
                     }
                 }, 30000);
+>>>>>>> src/main/resources/templates/jitsi/join-meeting.ftlh
 
             } catch (error) {
                 console.error('Ошибка создания Jitsi API:', error);
                 document.getElementById('loadingIndicator').style.display = 'none';
+<<<<<<< src/main/resources/templates/jitsi/join-meeting.ftlh
+                showConnectionError('Ошибка инициализации API: ' + error.message);
+            }
+        }
+=======
                 showConnectionError();
             }
         }
@@ -453,48 +471,25 @@
                 - Использовать другой браузер
             `;
             alert(errorMsg);
+>>>>>>> src/main/resources/templates/jitsi/join-meeting.ftlh
 
-            jitsiAPI.addEventListener('connectionFailed', function(event) {
-                console.error('Ошибка подключения:', event);
-                document.getElementById('loadingIndicator').style.display = 'none';
-                alert('Не удалось подключиться к конференции. Проверьте:\n1. Запущен ли Jitsi Meet на localhost:8080\n2. Принят ли самоподписанный сертификат\n3. Доступен ли сервис');
-            });
+        function showConnectionError(message) {
+            const errorMsg = `
+        ${message || 'Не удалось подключиться к конференции.'}
 
-            jitsiAPI.addEventListener('conferenceError', function(event) {
-                console.error('Ошибка конференции:', event);
-                document.getElementById('loadingIndicator').style.display = 'none';
-                alert('Ошибка конференции: ' + (event.error || 'Неизвестная ошибка'));
-            });
+        Возможные причины:
+        1. Сервер Jitsi Meet недоступен (${domain})
+        2. Проблемы с сетевым подключением
+        3. Блокировка WebRTC в браузере
+        4. Неправильная конфигурация сервера
 
-            jitsiAPI.addEventListener('participantJoined', function(event) {
-                console.log('Участник подключился:', event);
-                updateParticipantCount();
-            });
-
-            jitsiAPI.addEventListener('participantLeft', function(event) {
-                console.log('Участник покинул встречу:', event);
-                updateParticipantCount();
-            });
-
-            jitsiAPI.addEventListener('videoConferenceLeft', function(event) {
-                console.log('Покинул конференцию:', event);
-                leaveMeetingOnServer();
-            });
-
-            jitsiAPI.addEventListener('readyToClose', function(event) {
-                console.log('Готов к закрытию:', event);
-                leaveMeetingOnServer();
-            });
-
-            jitsiAPI.addEventListener('videoConferenceError', function(event) {
-                console.error('Ошибка конференции:', event);
-                document.getElementById('loadingIndicator').style.display = 'none';
-                alert('Ошибка подключения к конференции: ' + (event.error || 'Неизвестная ошибка'));
-            });
-
-            jitsiAPI.addEventListener('apiReady', function() {
-                console.log('Jitsi API готов');
-            });
+        Попробуйте:
+        - Обновить страницу
+        - Проверить подключение к интернету
+        - Использовать другой браузер
+        - Проверить, что Jitsi Meet запущен на порту 8080
+    `;
+            alert(errorMsg);
         }
 
         function joinMeetingOnServer() {
