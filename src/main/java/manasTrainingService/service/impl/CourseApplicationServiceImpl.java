@@ -9,7 +9,9 @@ import manasTrainingService.exceptions.nsee.NotFoundException;
 import manasTrainingService.repositories.course.*;
 import manasTrainingService.repositories.user.OrganizationRepository;
 import manasTrainingService.repositories.user.UserRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.CourseApplicationService;
+import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.StatusUtil;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,8 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
     private final OrganizationRepository organizationRepository;
     private final CourseEnrollmentRepository courseEnrollmentRepository;
     private final CourseInstanceRepository courseInstanceRepository;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Override
     @Transactional
@@ -72,15 +76,27 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         app.setPreferredStartDate(dto.getPreferredStartDate());
         app.setPreferredEndDate(dto.getPreferredEndDate());
 
-        courseApplicationRepository.save(app);
+        CourseApplication savedApp = courseApplicationRepository.save(app);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.COURSE_APPLICATION,
+                savedApp.getId()
+        );
 
         for (Integer empId : dto.getEmployeeIds()) {
             User emp = userRepository.findById(empId)
                     .orElseThrow(() -> new UsernameNotFoundException("Сотрудник не найден"));
             CourseApplicationEmployee cae = new CourseApplicationEmployee();
-            cae.setApplication(app);
+            cae.setApplication(savedApp);
             cae.setEmployee(emp);
-            courseApplicationEmployeeRepository.save(cae);
+            CourseApplicationEmployee savedCae = courseApplicationEmployeeRepository.save(cae);
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.COURSE_APPLICATION_EMPLOYEE,
+                    savedCae.getId()
+            );
         }
     }
 
@@ -149,11 +165,10 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
             courseApplicationEmployeeRepository.saveAll(applicationEmployees);
 
         } else if (newStatus == Status.APPROVED) {
-            List<CourseApplicationEmployee> applicationEmployees = courseApplicationEmployeeRepository
+            List<CourseApplicationEmployee> employees = courseApplicationEmployeeRepository
                     .findByApplicationId(app.getId());
 
-            boolean allApproved = applicationEmployees.stream().allMatch(cae
-                    -> cae.getApplicationStatus() == Status.APPROVED);
+            boolean allApproved = employees.stream().allMatch(e -> e.getApplicationStatus() == Status.APPROVED);
 
             if (!allApproved) {
                 throw new BadRequestException("Нельзя одобрить заявку, пока все сотрудники не зачислены на поток курса. "
@@ -167,6 +182,13 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
             app.setStatus(newStatus);
             courseApplicationRepository.save(app);
         }
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.COURSE_APPLICATION,
+                app.getId()
+        );
     }
 
 
@@ -183,7 +205,13 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         c.setComment(comment);
         c.setAdmin(author);
         c.setCreatedAt(LocalDateTime.now());
-        applicationCommentRepository.save(c);
+        ApplicationComment saved = applicationCommentRepository.save(c);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.APPLICATION_COMMENT,
+                saved.getId()
+        );
     }
 
     @Override

@@ -17,6 +17,7 @@ import manasTrainingService.repositories.course.CourseInstanceRepository;
 import manasTrainingService.repositories.user.OrganizationRepository;
 import manasTrainingService.repositories.user.StudentProfileRepository;
 import manasTrainingService.repositories.user.UserRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.user.EmailService;
 import manasTrainingService.service.user.OrganizationService;
 import manasTrainingService.service.user.RoleService;
@@ -48,6 +49,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final CourseInstanceRepository courseInstanceRepository;
     private final EmailService emailService;
     private UserService userService;
+    private final ActivityLogService activityLogService;
 
     @Autowired
     public void setUserService(@Lazy UserService userService) {
@@ -61,6 +63,12 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .code(generateOrganizationCode())
                 .build();
         organizationRepository.save(organization);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.ORGANIZATION,
+                organization.getId()
+        );
     }
 
     @Override
@@ -69,6 +77,12 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .orElseThrow(() -> new OrganizationNotFoundException("Организация не найдена"));
         organization.setDescription(organizationProfileEditDto.getOrganizationName());
         userService.editManagerInformation(organizationProfileEditDto);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.ORGANIZATION,
+                organization.getId()
+        );
     }
 
     @Override
@@ -194,6 +208,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         user.setEmail(dto.getEmail());
 
         userRepository.save(user);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.STUDENT,
+                user.getId()
+        );
     }
 
     @Override
@@ -212,6 +232,13 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         courseEnrollmentRepository.delete(enrollment);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.ENROLLMENT,
+                enrollment.getId()
+        );
     }
 
     @Override
@@ -236,6 +263,13 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         student.setIsActive(false);
         userRepository.save(student);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.STUDENT,
+                student.getId()
+        );
     }
 
     @Override
@@ -272,6 +306,12 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .organization(organization)
                 .build();
         studentProfileRepository.save(studentProfile);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.STUDENT,
+                student.getId()
+        );
         emailService.sendStudentWelcomeEmail(student.getEmail(), student.getName(), rawPassword);
     }
 
@@ -309,6 +349,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         profile.setOrganization(organization);
         studentProfileRepository.save(profile);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.STUDENT,
+                student.getId()
+        );
     }
 
     @Override

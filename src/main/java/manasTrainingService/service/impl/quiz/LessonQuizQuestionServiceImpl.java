@@ -3,15 +3,19 @@ package manasTrainingService.service.impl.quiz;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.quiz.LessonQuizQuestionDto;
 import manasTrainingService.dto.tests.QuestionDto;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.LessonQuiz;
 import manasTrainingService.entity.LessonQuizQuestion;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.exceptions.nsee.LessonQuizQuestionNotFoundException;
 import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
 import manasTrainingService.repositories.quiz.LessonQuizQuestionRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.quiz.LessonQuizOptionService;
 import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import manasTrainingService.service.test.TestService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,8 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
     private final LessonQuizQuestionRepository lessonQuizQuestionRepository;
     private final LessonQuizOptionService lessonQuizOptionService;
     private LessonQuizService lessonQuizService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Autowired
     public void setLessonQuizService(@Lazy LessonQuizService lessonQuizService) {
@@ -42,6 +48,12 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
             lessonQuizQuestion.setQuiz(lessonQuiz);
             LessonQuizQuestion savedQuizQuestion = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
             lessonQuizOptionService.saveQuizOptions(lessonQuizQuestionDto.getOptions(), savedQuizQuestion, lessonQuizQuestionDto.getCorrectOptionIndex());
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.LESSON_QUIZ_QUESTION,
+                    savedQuizQuestion.getId()
+            );
         }
     }
 
@@ -57,18 +69,28 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
         if(!deletedQuizQuestions.isEmpty()){
             for (LessonQuizQuestionDto question : deletedQuizQuestions){
                 lessonQuizQuestionRepository.deleteById(question.getId());
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.DELETE,
+                        TargetType.LESSON_QUIZ_QUESTION,
+                        question.getId()
+                );
             }
         }
         for(LessonQuizQuestionDto question : changedQuizQuestions){
             if (question.getId() != null){
                 LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(question.getId())
                         .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
-                if(question.getIsRemoved() != null && question.getIsRemoved()){
-                }
                 lessonQuizQuestion.setQuestion(question.getQuestion());
                 lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/changedQuizQuestions.size()));
-                lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
+                LessonQuizQuestion updated = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
                 lessonQuizOptionService.editQuizOptions(question.getOptions(), question.getCorrectOptionIndex());
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.UPDATE,
+                        TargetType.LESSON_QUIZ_QUESTION,
+                        updated.getId()
+                );
             }else {
                 LessonQuizQuestion lessonQuizQuestion = new LessonQuizQuestion();
                 lessonQuizQuestion.setQuestion(question.getQuestion());
@@ -76,6 +98,12 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
                 lessonQuizQuestion.setQuiz(lessonQuizService.getQuizEntityById(question.getQuizId()));
                 LessonQuizQuestion savedQuizQuestion = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
                 lessonQuizOptionService.saveQuizOptions(question.getOptions(), savedQuizQuestion, question.getCorrectOptionIndex());
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.CREATE,
+                        TargetType.LESSON_QUIZ_QUESTION,
+                        savedQuizQuestion.getId()
+                );
             }
         }
     }

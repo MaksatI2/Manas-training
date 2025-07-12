@@ -3,13 +3,17 @@ package manasTrainingService.service.impl;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.tests.OptionDto;
 import manasTrainingService.dto.tests.QuestionDto;
+import manasTrainingService.entity.ActionType;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.Test;
 import manasTrainingService.entity.TestQuestion;
 import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
 import manasTrainingService.repositories.test.TestQuestionRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.OptionService;
 import manasTrainingService.service.QuestionService;
 import manasTrainingService.service.test.TestService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,8 @@ public class QuestionServiceImpl implements QuestionService {
     private final TestQuestionRepository testQuestionRepository;
     private final OptionService optionService;
     private TestService testService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Autowired
     public void setTestService(@Lazy TestService testService) {
@@ -48,6 +54,12 @@ public class QuestionServiceImpl implements QuestionService {
             testQuestion.setTest(test);
             TestQuestion savedTestQuestion = testQuestionRepository.saveAndFlush(testQuestion);
             optionService.saveQuestionOptions(questionDto.getOptions(), savedTestQuestion, questionDto.getCorrectOptionIndex());
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.TEST_QUESTION,
+                    savedTestQuestion.getId()
+            );
         }
 
         for(QuestionDto questionDto : requiredQuestions){
@@ -58,6 +70,12 @@ public class QuestionServiceImpl implements QuestionService {
             testQuestion.setTest(test);
             TestQuestion savedTestQuestion = testQuestionRepository.saveAndFlush(testQuestion);
             optionService.saveQuestionOptions(questionDto.getOptions(), savedTestQuestion, questionDto.getCorrectOptionIndex());
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.TEST_QUESTION,
+                    savedTestQuestion.getId()
+            );
         }
     }
 
@@ -76,6 +94,12 @@ public class QuestionServiceImpl implements QuestionService {
         if (!deletedTestQuestions.isEmpty()){
             for (QuestionDto questionDto : deletedTestQuestions){
                 testQuestionRepository.deleteById(questionDto.getId());
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.DELETE,
+                        TargetType.TEST_QUESTION,
+                        questionDto.getId()
+                );
             }
         }
 
@@ -88,6 +112,12 @@ public class QuestionServiceImpl implements QuestionService {
                 testQuestion.setIsRequired(questionDto.getIsRequired());
                 testQuestionRepository.saveAndFlush(testQuestion);
                 optionService.editOption(questionDto.getOptions(), questionDto.getCorrectOptionIndex());
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.UPDATE,
+                        TargetType.TEST_QUESTION,
+                        testQuestion.getId()
+                );
             }else {
                 TestQuestion testQuestion = new TestQuestion();
                 testQuestion.setQuestion(questionDto.getQuestion());
@@ -96,6 +126,12 @@ public class QuestionServiceImpl implements QuestionService {
                 testQuestion.setIsRequired(questionDto.getIsRequired());
                 TestQuestion savedQuestion = testQuestionRepository.saveAndFlush(testQuestion);
                 optionService.saveQuestionOptions(questionDto.getOptions(), savedQuestion, questionDto.getCorrectOptionIndex());
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.CREATE,
+                        TargetType.TEST_QUESTION,
+                        savedQuestion.getId()
+                );
             }
         }
 
@@ -110,7 +146,13 @@ public class QuestionServiceImpl implements QuestionService {
                 testQuestion.setIsRequired(false);
                 testQuestionRepository.saveAndFlush(testQuestion);
                 optionService.editOption(questionDto.getOptions(), questionDto.getCorrectOptionIndex());
-            }else {
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.UPDATE,
+                        TargetType.TEST_QUESTION,
+                        testQuestion.getId()
+                );
+            } else {
                 TestQuestion testQuestion = new TestQuestion();
                 testQuestion.setQuestion(questionDto.getQuestion());
                 testQuestion.setPoints(BigDecimal.valueOf(10));
@@ -118,6 +160,12 @@ public class QuestionServiceImpl implements QuestionService {
                 testQuestion.setIsRequired(false);
                 TestQuestion savedQuestion = testQuestionRepository.saveAndFlush(testQuestion);
                 optionService.saveQuestionOptions(questionDto.getOptions(), savedQuestion, questionDto.getCorrectOptionIndex());
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.CREATE,
+                        TargetType.TEST_QUESTION,
+                        savedQuestion.getId()
+                );
             }
         }
     }

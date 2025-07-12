@@ -2,10 +2,13 @@ package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.tests.OptionDto;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.QuestionOption;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.TestQuestion;
 import manasTrainingService.exceptions.nsee.QuestionOptionNotFoundException;
 import manasTrainingService.repositories.QuestionOptionRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.OptionService;
 import manasTrainingService.service.QuestionService;
 import manasTrainingService.service.user.UserService;
@@ -20,6 +23,8 @@ import java.util.List;
 public class OptionServiceImpl implements OptionService {
     private final QuestionOptionRepository questionOptionRepository;
     private QuestionService questionService;
+    private final ActivityLogService activityLogService;
+    private UserService userService;
 
     @Autowired
     public void setQuestionService(@Lazy QuestionService questionService) {
@@ -37,18 +42,33 @@ public class OptionServiceImpl implements OptionService {
             }else{
                 questionOption.setIsCorrect(false);
             }
-            questionOptionRepository.saveAndFlush(questionOption);
+            QuestionOption saved = questionOptionRepository.saveAndFlush(questionOption);
+
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.QUESTION_OPTION,
+                    saved.getId()
+            );
         }
     }
 
     @Override
     public void editOption(List<OptionDto> options, Integer correctOptionIndex){
         for(int i = 0; i<options.size(); i++) {
+            OptionDto dto = options.get(i);
+
             if (options.get(i).getId() != null){
                 QuestionOption questionOption = questionOptionRepository.findById(options.get(i).getId())
                         .orElseThrow(() -> new QuestionOptionNotFoundException("Вариант ответа не найден"));
                 if(options.get(i).getIsRemoved() != null && options.get(i).getIsRemoved()){
                     questionOptionRepository.deleteById(options.get(i).getId());
+                    activityLogService.log(
+                            userService.getAuthorizedUser(),
+                            ActionType.DELETE,
+                            TargetType.QUESTION_OPTION,
+                            dto.getId()
+                    );
                     continue;
                 }
                 questionOption.setOptionText(options.get(i).getOptionText());
@@ -57,7 +77,15 @@ public class OptionServiceImpl implements OptionService {
                 }else{
                     questionOption.setIsCorrect(false);
                 }
-                questionOptionRepository.saveAndFlush(questionOption);
+                QuestionOption updated = questionOptionRepository.saveAndFlush(questionOption);
+
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.UPDATE,
+                        TargetType.QUESTION_OPTION,
+                        updated.getId()
+                );
+
             }else {
                 QuestionOption questionOption = new QuestionOption();
                 if(correctOptionIndex != null && i == correctOptionIndex){
@@ -67,7 +95,14 @@ public class OptionServiceImpl implements OptionService {
                 }
                 questionOption.setOptionText(options.get(i).getOptionText());
                 questionOption.setQuestion(questionService.getQuestionById(options.get(i).getQuestionId()));
-                questionOptionRepository.saveAndFlush(questionOption);
+                QuestionOption saved = questionOptionRepository.saveAndFlush(questionOption);
+
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.CREATE,
+                        TargetType.QUESTION_OPTION,
+                        saved.getId()
+                );
             }
         }
     }

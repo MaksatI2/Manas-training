@@ -6,6 +6,7 @@ import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.ScheduleNotFouneException;
 import manasTrainingService.repositories.ScheduleRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.LessonService;
@@ -30,6 +31,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final CourseInstanceService courseInstanceService;
     private final UserService userService;
     private final EnrollmentService enrollmentService;
+    private final ActivityLogService activityLogService;
 
     @Override
     public ScheduleDTO getScheduleByLessonId(Integer lessonId) {
@@ -129,7 +131,14 @@ public class ScheduleServiceImpl implements ScheduleService {
         entity.setNotes(schedule.getNotes());
         entity.setIsActive(true);
 
-        scheduleRepository.save(entity);
+        Schedule saved = scheduleRepository.save(entity);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                schedule.getId() == null ? ActionType.CREATE : ActionType.UPDATE,
+                TargetType.SCHEDULE,
+                saved.getId()
+        );
     }
 
     @Transactional
@@ -138,7 +147,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ScheduleNotFouneException("Schedule not found"));
         schedule.setIsActive(false);
-        scheduleRepository.save(schedule);
+        Schedule saved = scheduleRepository.save(schedule);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.SCHEDULE,
+                saved.getId()
+        );
     }
 
     @Override

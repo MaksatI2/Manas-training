@@ -3,12 +3,11 @@ package manasTrainingService.service.impl.course;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.teacher.CourseInstanceTeacherDTO;
 import manasTrainingService.dto.teacher.TeacherCourseCardDTO;
-import manasTrainingService.entity.CourseInstance;
-import manasTrainingService.entity.CourseInstanceTeacher;
-import manasTrainingService.entity.User;
+import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.user.UserNotFoundException;
 import manasTrainingService.repositories.course.CourseInstanceTeacherRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.test.TestService;
@@ -27,6 +26,7 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     private final CourseInstanceService courseInstanceService;
     private final UserService userService;
     private final TestService testService;
+    private final ActivityLogService activityLogService;
 
     @Override
     public List<CourseInstanceTeacherDTO> getTeachersByCourseInstanceId(Integer courseInstanceId) {
@@ -60,6 +60,12 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
                     .build();
 
             repository.save(entity);
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.COURSE_INSTANCE_TEACHER,
+                    entity.getId()
+            );
         }
     }
 
@@ -69,6 +75,12 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
         CourseInstanceTeacher teacher = repository.findByCourseInstanceIdAndTeacherId(courseInstanceId, teacherId)
                 .orElseThrow(() -> new UserNotFoundException("Назначение учителя не было найдено"));
         repository.delete(teacher);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.COURSE_INSTANCE_TEACHER,
+                teacher.getId()
+        );
     }
 
     @Override
@@ -107,6 +119,12 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
         boolean currentPrimary = Boolean.TRUE.equals(instance.getIsPrimary());
         instance.setIsPrimary(!currentPrimary);
         repository.save(instance);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.COURSE_INSTANCE_TEACHER,
+                instance.getId()
+        );
     }
 
 

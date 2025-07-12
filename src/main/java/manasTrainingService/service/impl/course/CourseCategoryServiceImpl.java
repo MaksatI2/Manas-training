@@ -4,9 +4,13 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.CourseCategory;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.repositories.course.CourseCategoryRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseCategoryService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +23,8 @@ import java.util.stream.Collectors;
 public class CourseCategoryServiceImpl implements CourseCategoryService {
 
     private final CourseCategoryRepository categoryRepository;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Override
     public List<CourseCategoryDto> getAllCategories() {
@@ -52,8 +58,15 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
     public void create(CourseCategoryDto dto) {
         validateCategory(dto);
         CourseCategory category = convertToEntity(dto);
-        categoryRepository.save(category);
+        CourseCategory saved = categoryRepository.save(category);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.COURSE_CATEGORY,
+                saved.getId()
+        );
     }
+
 
     @Override
     @Transactional
@@ -62,7 +75,13 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
         validateCategory(dto);
         category.setName(dto.getName());
         category.setDescription(dto.getDescription());
-        categoryRepository.save(category);
+        CourseCategory updated = categoryRepository.save(category);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.COURSE_CATEGORY,
+                updated.getId()
+        );
     }
 
     @Override
@@ -72,6 +91,12 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
             throw new EntityNotFoundException("Категория с ID " + id + " не найдена");
         }
         categoryRepository.deleteById(id);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.COURSE_CATEGORY,
+                id
+        );
     }
 
     @Override
