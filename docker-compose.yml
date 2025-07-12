@@ -57,8 +57,8 @@ services:
       - "8443:443"
     environment:
       - ENABLE_LETSENCRYPT=0
-      - ENABLE_HTTP_REDIRECT=0
-      - DISABLE_HTTPS=1
+      - ENABLE_HTTP_REDIRECT=1
+      - DISABLE_HTTPS=0
       - JICOFO_AUTH_USER=focus
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
@@ -75,7 +75,7 @@ services:
       - RESOLUTION=720
       - RESOLUTION_MIN=180
       - RESOLUTION_MAX=1080
-      - PUBLIC_URL=http://157.245.67.28
+      - PUBLIC_URL=https://157.245.67.28:8443
     networks:
       - manas-network
     volumes:
@@ -106,7 +106,7 @@ services:
       - LOG_LEVEL=warn
       - ENABLE_XMPP_WEBSOCKET=1
       - ENABLE_SUBDOMAINS=true
-      - PUBLIC_URL=http://157.245.67.28
+      - PUBLIC_URL=https://157.245.67.28:8443
     networks:
       - manas-network
     volumes:
@@ -161,7 +161,7 @@ services:
       - JVB_WS_SERVER_ID=jvb1
       - COLIBRI_REST_ENABLED=true
       - SHUTDOWN_REST_ENABLED=true
-      - PUBLIC_URL=http://157.245.67.28
+      - PUBLIC_URL=https://157.245.67.28:8443
     networks:
       - manas-network
     volumes:
