@@ -301,8 +301,7 @@
                     useStunTurn: true,
                     stunServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' }
+                        { urls: 'stun:stun1.l.google.com:19302' }
                     ],
 
                     resolution: 720,
@@ -326,17 +325,7 @@
                     disableAudioLevels: false,
                     enableNoAudioDetection: true,
                     enableNoisyMicDetection: true,
-                    defaultLanguage: 'ru',
-
-                    disableInviteFunctions: true,
-                    doNotStoreRoom: true,
-                    enableWelcomePage: false,
-                    enableClosePage: false,
-
-                    pcStatsInterval: 10000,
-                    enableRemb: true,
-                    enableTcc: true,
-                    useRoomAsSharedDocumentName: false
+                    defaultLanguage: 'ru'
                 },
 
                 interfaceConfigOverwrite: {
@@ -388,21 +377,13 @@
                 jitsiAPI.addEventListener('connectionFailed', function(event) {
                     console.error('Ошибка подключения:', event);
                     document.getElementById('loadingIndicator').style.display = 'none';
-<<<<<<< src/main/resources/templates/jitsi/join-meeting.ftlh
                     showConnectionError('Не удалось подключиться к серверу конференций');
-=======
-                    showConnectionError();
->>>>>>> src/main/resources/templates/jitsi/join-meeting.ftlh
                 });
 
                 jitsiAPI.addEventListener('conferenceError', function(event) {
                     console.error('Ошибка конференции:', event);
                     document.getElementById('loadingIndicator').style.display = 'none';
-<<<<<<< src/main/resources/templates/jitsi/join-meeting.ftlh
                     showConnectionError('Ошибка при создании конференции');
-=======
-                    showConnectionError();
->>>>>>> src/main/resources/templates/jitsi/join-meeting.ftlh
                 });
 
                 jitsiAPI.addEventListener('participantJoined', function(event) {
@@ -433,52 +414,23 @@
                     if (document.getElementById('loadingIndicator').style.display !== 'none') {
                         console.warn('Долгое подключение к конференции');
                         document.getElementById('loadingIndicator').style.display = 'none';
-<<<<<<< src/main/resources/templates/jitsi/join-meeting.ftlh
                         showConnectionError('Превышено время ожидания подключения');
                     }
                 }, 45000);
-=======
-                        showConnectionError();
-                    }
-                }, 30000);
->>>>>>> src/main/resources/templates/jitsi/join-meeting.ftlh
 
             } catch (error) {
                 console.error('Ошибка создания Jitsi API:', error);
                 document.getElementById('loadingIndicator').style.display = 'none';
-<<<<<<< src/main/resources/templates/jitsi/join-meeting.ftlh
                 showConnectionError('Ошибка инициализации API: ' + error.message);
             }
         }
-=======
-                showConnectionError();
-            }
-        }
-
-        function showConnectionError() {
-            const errorMsg = `
-                Не удалось подключиться к конференции.
-
-                Возможные причины:
-                1. Сервер Jitsi Meet недоступен
-                2. Проблемы с сетевым подключением
-                3. Блокировка WebRTC в браузере
-                4. Неправильная конфигурация сервера
-
-                Попробуйте:
-                - Обновить страницу
-                - Проверить подключение к интернету
-                - Использовать другой браузер
-            `;
-            alert(errorMsg);
->>>>>>> src/main/resources/templates/jitsi/join-meeting.ftlh
 
         function showConnectionError(message) {
             const errorMsg = `
-        ${message || 'Не удалось подключиться к конференции.'}
+        'Не удалось подключиться к конференции.
 
         Возможные причины:
-        1. Сервер Jitsi Meet недоступен (${domain})
+        1. Сервер Jitsi Meet недоступен
         2. Проблемы с сетевым подключением
         3. Блокировка WebRTC в браузере
         4. Неправильная конфигурация сервера
