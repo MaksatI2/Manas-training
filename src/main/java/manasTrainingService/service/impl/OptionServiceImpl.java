@@ -6,6 +6,7 @@ import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.QuestionOption;
 import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.TestQuestion;
+import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.QuestionOptionNotFoundException;
 import manasTrainingService.repositories.QuestionOptionRepository;
 import manasTrainingService.service.ActivityLogService;
@@ -24,7 +25,7 @@ public class OptionServiceImpl implements OptionService {
     private final QuestionOptionRepository questionOptionRepository;
     private QuestionService questionService;
     private final ActivityLogService activityLogService;
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public void setQuestionService(@Lazy QuestionService questionService) {
@@ -33,6 +34,7 @@ public class OptionServiceImpl implements OptionService {
 
     @Override
     public void saveQuestionOptions(List<OptionDto> options, TestQuestion testQuestion, Integer correctOptionIndex){
+        User user = userService.getAuthorizedUser();
         for(int i = 0; i<options.size(); i++){
             QuestionOption questionOption = new QuestionOption();
             questionOption.setQuestion(testQuestion);
@@ -45,7 +47,7 @@ public class OptionServiceImpl implements OptionService {
             QuestionOption saved = questionOptionRepository.saveAndFlush(questionOption);
 
             activityLogService.log(
-                    userService.getAuthorizedUser(),
+                    user,
                     ActionType.CREATE,
                     TargetType.QUESTION_OPTION,
                     saved.getId()

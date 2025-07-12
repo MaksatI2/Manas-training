@@ -7,6 +7,7 @@ import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.Test;
 import manasTrainingService.entity.TestQuestion;
+import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
 import manasTrainingService.repositories.test.TestQuestionRepository;
 import manasTrainingService.service.ActivityLogService;

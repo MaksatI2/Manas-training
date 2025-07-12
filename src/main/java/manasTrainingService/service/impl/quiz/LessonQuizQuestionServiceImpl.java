@@ -8,6 +8,7 @@ import manasTrainingService.entity.LessonQuiz;
 import manasTrainingService.entity.LessonQuizQuestion;
 import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.TestQuestion;
+import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.LessonQuizQuestionNotFoundException;
 import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
 import manasTrainingService.repositories.quiz.LessonQuizQuestionRepository;
@@ -129,7 +130,7 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
                         .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
                 lessonQuizQuestion.setQuestion(question.getQuestion());
                 lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/questions.size()));
-                lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
+                LessonQuizQuestion updated = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
                 lessonQuizOptionService.editQuizOptions(question.getOptions(), question.getCorrectOptionIndex());
                 activityLogService.log(
                         user,

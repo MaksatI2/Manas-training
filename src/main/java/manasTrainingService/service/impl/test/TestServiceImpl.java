@@ -1,5 +1,6 @@
 package manasTrainingService.service.impl.test;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.answers.QuestionAnswerDto;
 import manasTrainingService.dto.answers.TestAnswerDto;
@@ -44,6 +45,11 @@ public class TestServiceImpl implements TestService {
     private final CourseInstanceService courseInstanceService;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+
+    @PostConstruct
+    public void checkInjection() {
+        System.out.println("userService: " + userService);
+    }
 
     @Override
     public void createTest(TestDto testDto) {
