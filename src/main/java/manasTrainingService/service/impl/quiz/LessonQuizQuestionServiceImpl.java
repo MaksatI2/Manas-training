@@ -7,6 +7,7 @@ import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.LessonQuiz;
 import manasTrainingService.entity.LessonQuizQuestion;
 import manasTrainingService.entity.TargetType;
+import manasTrainingService.entity.TestQuestion;
 import manasTrainingService.exceptions.nsee.LessonQuizQuestionNotFoundException;
 import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
 import manasTrainingService.repositories.quiz.LessonQuizQuestionRepository;
@@ -19,8 +20,10 @@ import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -39,6 +42,7 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
         this.lessonQuizService = lessonQuizService;
     }
 
+    @Transactional
     @Override
     public void saveQuizQuestions(List<LessonQuizQuestionDto> questions, LessonQuiz lessonQuiz){
         for(LessonQuizQuestionDto lessonQuizQuestionDto : questions){
@@ -48,15 +52,10 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
             lessonQuizQuestion.setQuiz(lessonQuiz);
             LessonQuizQuestion savedQuizQuestion = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
             lessonQuizOptionService.saveQuizOptions(lessonQuizQuestionDto.getOptions(), savedQuizQuestion, lessonQuizQuestionDto.getCorrectOptionIndex());
-            activityLogService.log(
-                    userService.getAuthorizedUser(),
-                    ActionType.CREATE,
-                    TargetType.LESSON_QUIZ_QUESTION,
-                    savedQuizQuestion.getId()
-            );
         }
     }
 
+    @Transactional
     @Override
     public void editQuizQuestion(List<LessonQuizQuestionDto> questions){
         List<LessonQuizQuestionDto> deletedQuizQuestions = questions.stream()
@@ -67,26 +66,73 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
                 .toList();
 
         if(!deletedQuizQuestions.isEmpty()){
-            for (LessonQuizQuestionDto question : deletedQuizQuestions){
-                lessonQuizQuestionRepository.deleteById(question.getId());
-                activityLogService.log(
-                        userService.getAuthorizedUser(),
-                        ActionType.DELETE,
-                        TargetType.LESSON_QUIZ_QUESTION,
-                        question.getId()
-                );
-            }
+            deleteQuestionsFromEdit(deletedQuizQuestions);
         }
-        for(LessonQuizQuestionDto question : changedQuizQuestions){
+
+        editQuestionsFromEdit(changedQuizQuestions);
+    }
+
+    @Override
+    public List<LessonQuizQuestionDto> getQuizQuestionsByQuizId(int quizId){
+        List<LessonQuizQuestion> lessonQuizQuestions = lessonQuizQuestionRepository.findAllByQuizId(quizId);
+        if (lessonQuizQuestions.size() <= 20) {
+            return lessonQuizQuestions.stream().map(l ->
+                    LessonQuizQuestionDto.builder()
+                            .id(l.getId())
+                            .question(l.getQuestion())
+                            .quizId(l.getQuiz().getId())
+                            .points(l.getPoints())
+                            .options(lessonQuizOptionService.getQuizOptionsByQuestionId(l.getId()))
+                            .build()).toList();
+        } else {
+            Collections.shuffle(lessonQuizQuestions);
+            List<LessonQuizQuestion> randomQuestions = lessonQuizQuestions.stream()
+                    .limit(20)
+                    .toList();
+            return randomQuestions.stream().map(l ->
+                    LessonQuizQuestionDto.builder()
+                            .id(l.getId())
+                            .question(l.getQuestion())
+                            .quizId(l.getQuiz().getId())
+                            .points(l.getPoints())
+                            .options(lessonQuizOptionService.getQuizOptionsByQuestionId(l.getId()))
+                            .build()).toList();
+        }
+    }
+
+    @Override
+    public LessonQuizQuestion getQuizQuestinEntityById(int id){
+        return lessonQuizQuestionRepository.findById(id)
+                .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
+    }
+
+    private void deleteQuestionsFromEdit(List<LessonQuizQuestionDto> lessonQuizQuestions){
+        User user = userService.getAuthorizedUser();
+        for (LessonQuizQuestionDto question : lessonQuizQuestions){
+            LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(question.getId())
+                    .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
+            activityLogService.log(
+                    user,
+                    ActionType.DELETE,
+                    TargetType.LESSON_QUIZ_QUESTION,
+                    question.getId()
+            );
+            lessonQuizQuestionRepository.delete(lessonQuizQuestion);
+        }
+    }
+
+    private void editQuestionsFromEdit(List<LessonQuizQuestionDto> questions){
+        User user = userService.getAuthorizedUser();
+        for(LessonQuizQuestionDto question : questions){
             if (question.getId() != null){
                 LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(question.getId())
                         .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
                 lessonQuizQuestion.setQuestion(question.getQuestion());
-                lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/changedQuizQuestions.size()));
-                LessonQuizQuestion updated = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
+                lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/questions.size()));
+                lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
                 lessonQuizOptionService.editQuizOptions(question.getOptions(), question.getCorrectOptionIndex());
                 activityLogService.log(
-                        userService.getAuthorizedUser(),
+                        user,
                         ActionType.UPDATE,
                         TargetType.LESSON_QUIZ_QUESTION,
                         updated.getId()
@@ -94,36 +140,17 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
             }else {
                 LessonQuizQuestion lessonQuizQuestion = new LessonQuizQuestion();
                 lessonQuizQuestion.setQuestion(question.getQuestion());
-                lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/changedQuizQuestions.size()));
+                lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/questions.size()));
                 lessonQuizQuestion.setQuiz(lessonQuizService.getQuizEntityById(question.getQuizId()));
                 LessonQuizQuestion savedQuizQuestion = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
                 lessonQuizOptionService.saveQuizOptions(question.getOptions(), savedQuizQuestion, question.getCorrectOptionIndex());
                 activityLogService.log(
-                        userService.getAuthorizedUser(),
+                        user,
                         ActionType.CREATE,
                         TargetType.LESSON_QUIZ_QUESTION,
                         savedQuizQuestion.getId()
                 );
             }
         }
-    }
-
-    @Override
-    public List<LessonQuizQuestionDto> getQuizQuestionsByQuizId(int quizId){
-        List<LessonQuizQuestion> lessonQuizQuestions = lessonQuizQuestionRepository.findAllByQuizId(quizId);
-        return lessonQuizQuestions.stream().map(l ->
-                LessonQuizQuestionDto.builder()
-                        .id(l.getId())
-                        .question(l.getQuestion())
-                        .quizId(l.getQuiz().getId())
-                        .points(l.getPoints())
-                        .options(lessonQuizOptionService.getQuizOptionsByQuestionId(l.getId()))
-                        .build()).toList();
-    }
-
-    @Override
-    public LessonQuizQuestion getQuizQuestinEntityById(int id){
-        return lessonQuizQuestionRepository.findById(id)
-                .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
     }
 }

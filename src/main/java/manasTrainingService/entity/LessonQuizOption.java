@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "lesson_quiz_options")
+@Table(name = "lesson_quiz_options", schema = "public")
 public class LessonQuizOption {
 
     @Id

@@ -12,6 +12,7 @@ import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.UserService;
+import manasTrainingService.util.DateUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,8 +93,8 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
                             .courseInstanceId(ci.getId())
                             .courseTitle(ci.getCourse().getTitle())
                             .instanceTitle(ci.getTitle())
-                            .startDate(ci.getStartDate())
-                            .endDate(ci.getEndDate())
+                            .startDate(DateUtil.formatDateOnly(ci.getStartDate()))
+                            .endDate(DateUtil.formatDateOnly(ci.getEndDate()))
                             .isPrimary(relation.getIsPrimary())
                             .courseTest(testService.getTestByCourseId(ci.getCourse().getId()))
                             .build();

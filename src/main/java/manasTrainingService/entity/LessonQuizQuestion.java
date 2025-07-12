@@ -32,7 +32,7 @@ public class LessonQuizQuestion {
     @Builder.Default
     BigDecimal points = new BigDecimal("1.00");
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<LessonQuizOption> options;
 
 }

@@ -16,6 +16,7 @@ import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 
@@ -30,6 +31,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     private final ActivityLogService activityLogService;
     private final UserService userService;
 
+    @Transactional
     @Override
     public void createQuiz(LessonQuizDto lessonQuizDto){
 
@@ -55,6 +57,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
         );
     }
 
+    @Transactional
     @Override
     public void editQuiz(LessonQuizDto lessonQuizDto){
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(lessonQuizDto.getId())

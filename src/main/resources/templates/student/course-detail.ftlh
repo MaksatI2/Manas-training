@@ -15,13 +15,23 @@
             Категория: <strong>${courseInstance.category!'-'}</strong>
         </p>
         <p class="hero-subtitle">
-            Начало: ${courseInstance.formattedStartDate} |
-            Окончание: ${courseInstance.formattedEndDate} |
-            Статус: <#if courseInstance.isActive>Активен<#else>Завершен</#if>
+            Начало: <strong>${courseInstance.formattedStartDate}</strong> |
+            Окончание: <strong>${courseInstance.formattedEndDate}</strong> |
+            Статус: <strong><#if courseInstance.isActive>Активен<#else>Завершен</#if></strong>
         </p>
     </div>
 
     <div class="container mt-4">
+        <#if role?? && role == "TEACHER">
+            <#if test??>
+                <a href="<@spring.url '/test/${test.id}/edit'/>" class="btn btn-primary">Редактировать итоговый тест</a>
+                <a href="<@spring.url '/test/${test.id}/delete'/>" class="btn btn-danger">Удалить итоговый тест</a>
+            <#else>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+                <a href="<@spring.url '/test/create/${courseInstance.id}'/>" class="btn btn-primary">Создать итоговый тест</a>
+            </div>
+            </#if>
+        </#if>
         <h2>Модули курса</h2>
 
         <#if courseInstance.modules?has_content>

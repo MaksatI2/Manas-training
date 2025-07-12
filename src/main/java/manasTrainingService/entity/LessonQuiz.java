@@ -37,6 +37,6 @@ public class LessonQuiz {
     @Builder.Default
     Boolean isActive = true;
 
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<LessonQuizQuestion> questions;
 }

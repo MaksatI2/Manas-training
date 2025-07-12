@@ -16,6 +16,7 @@ import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
         this.lessonQuizQuestionService = lessonQuizQuestionService;
     }
 
+    @Transactional
     @Override
     public void saveQuizOptions(List<LessonQuizOptionDto> options, LessonQuizQuestion lessonQuizQuestion, Integer correctOptionIndex){
         for(int i = 0; i<options.size(); i++){
@@ -54,13 +56,14 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
         }
     }
 
+    @Transactional
     @Override
     public void editQuizOptions(List<LessonQuizOptionDto> options, Integer correctOptionIndex){
         for(int i = 0; i<options.size(); i++) {
             LessonQuizOptionDto dto = options.get(i);
             if (dto.getId() != null){
                 if(dto.getIsRemoved() != null && dto.getIsRemoved()){
-                    lessonQuizOptionRepository.deleteById(dto.getId());
+                    deleteOptionFromEdit(options.get(i));
                     activityLogService.log(
                             userService.getAuthorizedUser(),
                             ActionType.DELETE,
@@ -69,18 +72,12 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
                     );
                     continue;
                 }
-                LessonQuizOption lessonQuizOption = lessonQuizOptionRepository.findById(dto.getId())
+                LessonQuizOption lessonQuizOption = lessonQuizOptionRepository.findById(options.get(i).getId())
                         .orElseThrow(() -> new LessonQuizOptionNotFoundException("Ответ не найден"));
-                lessonQuizOption.setOptionText(dto.getOptionText());
+                lessonQuizOption.setOptionText(options.get(i).getOptionText());
                 lessonQuizOption.setIsCorrect(correctOptionIndex != null && i == correctOptionIndex);
-                LessonQuizOption updated = lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
-                activityLogService.log(
-                        userService.getAuthorizedUser(),
-                        ActionType.UPDATE,
-                        TargetType.LESSON_QUIZ_OPTION,
-                        updated.getId()
-                );
-            } else {
+                lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
+            }else {
                 LessonQuizOption lessonQuizOption = new LessonQuizOption();
                 lessonQuizOption.setOptionText(dto.getOptionText());
                 lessonQuizOption.setIsCorrect(correctOptionIndex != null && i == correctOptionIndex);
@@ -115,5 +112,11 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
     public LessonQuizOption getQuizOptionEntityById(int id){
         return lessonQuizOptionRepository.findById(id)
                 .orElseThrow(() -> new LessonQuizOptionNotFoundException("Ответ не найден"));
+    }
+
+    private void deleteOptionFromEdit(LessonQuizOptionDto lessonQuizOptionDto){
+        LessonQuizOption lessonQuizOption = lessonQuizOptionRepository.findById(lessonQuizOptionDto.getId())
+                .orElseThrow(() -> new LessonQuizOptionNotFoundException("Ответ не найден"));
+        lessonQuizOptionRepository.delete(lessonQuizOption);
     }
 }

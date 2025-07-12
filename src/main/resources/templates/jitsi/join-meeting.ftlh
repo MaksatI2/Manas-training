@@ -197,7 +197,7 @@
         }
     </style>
 
-    <script src="/external_api.js"></script>
+    <script src="/static/js/external_api.js"></script>
     <script>
         let localStream = null;
         let cameraEnabled = true;
@@ -276,7 +276,7 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('preJoinModal'));
             modal.hide();
 
-            const domain = '157.245.67.28/jitsi';
+            const domain = 'localhost:8080';
             const options = {
                 roomName: 'ManasTraining_Meeting_${meeting.meetingId}',
                 width: '100%',
@@ -287,12 +287,6 @@
                     startWithVideoMuted: !cameraEnabled,
                     prejoinPageEnabled: false,
                     disableDeepLinking: true,
-                    hosts: {
-                        domain: '157.245.67.28',
-                        muc: 'muc.157.245.67.28'
-                    },
-                    bosh: '//157.245.67.28/http-bind',
-                    websocket: 'wss://157.245.67.28/xmpp-websocket',
                     p2p: {
                         enabled: false
                     },
@@ -365,12 +359,13 @@
             jitsiAPI.addEventListener('connectionFailed', function(event) {
                 console.error('Ошибка подключения:', event);
                 document.getElementById('loadingIndicator').style.display = 'none';
-                alert('Не удалось подключиться к конференции. Проверьте сетевое соединение.');
+                alert('Не удалось подключиться к конференции. Проверьте:\n1. Запущен ли Jitsi Meet на localhost:8080\n2. Принят ли самоподписанный сертификат\n3. Доступен ли сервис');
             });
 
             jitsiAPI.addEventListener('conferenceError', function(event) {
                 console.error('Ошибка конференции:', event);
                 document.getElementById('loadingIndicator').style.display = 'none';
+                alert('Ошибка конференции: ' + (event.error || 'Неизвестная ошибка'));
             });
 
             jitsiAPI.addEventListener('participantJoined', function(event) {
@@ -396,7 +391,7 @@
             jitsiAPI.addEventListener('videoConferenceError', function(event) {
                 console.error('Ошибка конференции:', event);
                 document.getElementById('loadingIndicator').style.display = 'none';
-                alert('Ошибка подключения к конференции. Попробуйте еще раз.');
+                alert('Ошибка подключения к конференции: ' + (event.error || 'Неизвестная ошибка'));
             });
 
             jitsiAPI.addEventListener('apiReady', function() {
