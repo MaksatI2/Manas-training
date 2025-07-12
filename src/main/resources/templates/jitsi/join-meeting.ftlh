@@ -230,6 +230,31 @@
             initializeMediaPreview();
         }
 
+        function handleMediaError(message) {
+            console.error('Media Error:', message);
+            const previewContainer = document.querySelector('.preview-container');
+            if (previewContainer) {
+                previewContainer.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${message}
+            </div>
+        `;
+            }
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger mt-3';
+            alertDiv.innerHTML = `
+        <strong>Ошибка доступа к медиа:</strong> ${message}
+        <br><small>Вы все равно можете присоединиться к конференции</small>
+    `;
+
+            const modalBody = document.querySelector('#preJoinModal .modal-body');
+            if (modalBody) {
+                modalBody.appendChild(alertDiv);
+            }
+        }
+
         function initializeMediaPreview() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 console.error('getUserMedia не поддерживается в этом браузере');
@@ -253,14 +278,27 @@
                 .then(stream => {
                     localStream = stream;
                     const previewVideo = document.getElementById('previewVideo');
-                    previewVideo.srcObject = stream;
-                    previewVideo.play();
+                    if (previewVideo) {
+                        previewVideo.srcObject = stream;
+                        previewVideo.play().catch(e => {
+                            console.warn('Не удалось запустить превью видео:', e);
+                        });
+                    }
                 })
                 .catch(error => {
                     console.error('Ошибка доступа к медиа:', error);
-                    document.getElementById('previewVideo').style.display = 'none';
-                    const previewContainer = document.querySelector('.preview-container');
-                    previewContainer.innerHTML = '<div class="alert alert-warning">Не удается получить доступ к камере/микрофону</div>';
+
+                    let errorMessage = 'Не удается получить доступ к камере/микрофону';
+
+                    if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                        errorMessage = 'Доступ к камере/микрофону запрещен. Проверьте настройки браузера.';
+                    } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                        errorMessage = 'Камера или микрофон не найдены';
+                    } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                        errorMessage = 'Камера/микрофон уже используется другим приложением';
+                    }
+
+                    handleMediaError(errorMessage);
                 });
         }
 
@@ -306,26 +344,32 @@
             }
 
             const domain = '157.245.67.28';
+            const protocol = 'https://';
+            const port = '';
 
             const options = {
                 roomName: 'ManasTraining_Meeting_${meeting.meetingId}',
                 width: '100%',
                 height: '100%',
                 parentNode: document.getElementById('jitsiContainer'),
+
                 configOverwrite: {
                     startWithAudioMuted: !micEnabled,
                     startWithVideoMuted: !cameraEnabled,
                     prejoinPageEnabled: false,
                     disableDeepLinking: true,
 
-                    bosh: '//157.245.67.28/http-bind',
-                    websocket: 'wss://157.245.67.28/xmpp-websocket',
-
                     hosts: {
-                        domain: 'meet.jitsi',
-                        muc: 'conference.meet.jitsi',
-                        focus: 'focus.meet.jitsi'
+                        domain: domain,
+                        muc: `conference.${domain}`,
+                        focus: `focus.${domain}`
                     },
+
+                    websocket: `wss://${domain}/xmpp-websocket`,
+
+                    bosh: `${protocol}${domain}/http-bind`,
+
+                    serviceUrl: `${protocol}${domain}/`,
 
                     useStunTurn: true,
                     stunServers: [
@@ -354,7 +398,11 @@
                     disableAudioLevels: false,
                     enableNoAudioDetection: true,
                     enableNoisyMicDetection: true,
-                    defaultLanguage: 'ru'
+                    defaultLanguage: 'ru',
+
+                    p2p: {
+                        enabled: false
+                    }
                 },
 
                 interfaceConfigOverwrite: {
@@ -384,12 +432,14 @@
                     HIDE_INVITE_MORE_HEADER: true,
                     DISABLE_JOIN_LEAVE_NOTIFICATIONS: false,
                     DISABLE_PRESENCE_STATUS: false,
-                    GENERATE_ROOMNAMES_ON_WELCOME_PAGE: false
+                    GENERATE_ROOMNAMES_ON_WELCOME_PAGE: false,
+                    DISABLE_FOCUS_INDICATOR: true,
+                    DISABLE_DOMINANT_SPEAKER_INDICATOR: false
                 },
 
                 userInfo: {
-                    displayName: '${name!'Участник'}',
-                    email: '${user.user.email!''}'
+                    displayName: '${name!"Участник"}',
+                    email: '${user.user.email!""}'
                 }
             };
 
