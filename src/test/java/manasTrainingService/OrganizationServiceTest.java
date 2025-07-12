@@ -14,6 +14,7 @@ import manasTrainingService.repositories.course.CourseInstanceRepository;
 import manasTrainingService.repositories.user.OrganizationRepository;
 import manasTrainingService.repositories.user.StudentProfileRepository;
 import manasTrainingService.repositories.user.UserRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.impl.user.OrganizationServiceImpl;
 import manasTrainingService.service.user.EmailService;
 import manasTrainingService.service.user.RoleService;
@@ -62,6 +63,9 @@ class OrganizationServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private ActivityLogService activityLogService;
+
     @InjectMocks
     private OrganizationServiceImpl organizationService;
 
@@ -72,6 +76,8 @@ class OrganizationServiceTest {
 
     @BeforeEach
     void setUp() {
+        organizationService.setUserService(userService);
+
         dto = CreateStudentByOrganizationDto.builder()
                 .name("John")
                 .lastName("Doe")

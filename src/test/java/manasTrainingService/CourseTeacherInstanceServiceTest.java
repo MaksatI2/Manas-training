@@ -5,6 +5,7 @@ import manasTrainingService.entity.CourseInstanceTeacher;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.user.UserNotFoundException;
 import manasTrainingService.repositories.course.CourseInstanceTeacherRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.impl.course.CourseTeacherInstanceServiceImpl;
 import manasTrainingService.service.test.TestService;
@@ -26,6 +27,8 @@ public class CourseTeacherInstanceServiceTest {
     private CourseInstanceService courseInstanceService;
     private UserService userService;
     private TestService testService;
+    private ActivityLogService activityLogService;
+
 
     private CourseTeacherInstanceServiceImpl service;
 
@@ -35,8 +38,15 @@ public class CourseTeacherInstanceServiceTest {
         courseInstanceService = Mockito.mock(CourseInstanceService.class);
         userService = Mockito.mock(UserService.class);
         testService = Mockito.mock(TestService.class);
+        activityLogService = Mockito.mock(ActivityLogService.class);
 
-        service = new CourseTeacherInstanceServiceImpl(repository, courseInstanceService, userService, testService);
+        service = new CourseTeacherInstanceServiceImpl(
+                repository,
+                courseInstanceService,
+                userService,
+                testService,
+                activityLogService
+        );
     }
 
     @Test

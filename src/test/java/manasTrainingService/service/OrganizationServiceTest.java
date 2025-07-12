@@ -75,6 +75,9 @@ class OrganizationServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private ActivityLogService activityLogService;
+
     @InjectMocks
     private OrganizationServiceImpl organizationService;
 

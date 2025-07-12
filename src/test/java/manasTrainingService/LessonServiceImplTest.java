@@ -6,7 +6,9 @@ import manasTrainingService.entity.CourseModule;
 import manasTrainingService.entity.Lesson;
 import manasTrainingService.exceptions.nsee.LessonNotFoundException;
 import manasTrainingService.repositories.LessonRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.impl.LessonServiceImpl;
+import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -21,6 +23,11 @@ class LessonServiceImplTest {
 
     @Mock
     private LessonRepository lessonRepository;
+
+    @Mock
+    private UserService userService;
+    @Mock
+    private ActivityLogService activityLogService;
 
     @InjectMocks
     private LessonServiceImpl service;
