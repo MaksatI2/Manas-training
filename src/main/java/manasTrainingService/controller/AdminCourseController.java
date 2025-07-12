@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
+import manasTrainingService.dto.CourseDeletionDependenciesDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.dto.create.CreateCourseDto;
 import manasTrainingService.dto.edit.CourseEditDto;
@@ -126,11 +127,12 @@ public class AdminCourseController {
     @GetMapping("/delete/{id}")
     public String deleteCourse(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
-            courseAdminService.delete(id);
+            courseAdminService.deleteCourse(id);
             redirectAttributes.addFlashAttribute("successMessage", "Курс успешно удалён");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/admin/courses";
     }
+
 }

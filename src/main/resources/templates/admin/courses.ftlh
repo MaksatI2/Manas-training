@@ -134,11 +134,12 @@
                                        title="Редактировать">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="/admin/courses/delete/${course.id}" class="btn btn-sm btn-danger"
-                                       title="Удалить"
-                                       onclick="return confirm('Вы уверены, что хотите удалить курс?')">
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm js-delete-course-btn"
+                                            data-course-id="${course.id}">
                                         <i class="fas fa-trash"></i>
-                                    </a>
+                                    </button>
+
                                 </td>
                             </tr>
                         </#list>
@@ -152,6 +153,25 @@
                     </#if>
                     </tbody>
                 </table>
+
+                <div id="deleteCourseModal" class="modal fade" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Удаление курса</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="depList"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                <button type="button" id="confirmDeleteCourse" class="btn btn-danger">Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="row mt-3">
                 <div class="col-md-6">
@@ -176,8 +196,104 @@
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const flash = localStorage.getItem('flashMessage');
+            if (flash) {
+                const msg = JSON.parse(flash);
+                window.showFlashMessage(msg.type, msg.text, { duration: msg.duration });
+                localStorage.removeItem('flashMessage');
+            }
+            const modalEl = document.getElementById('deleteCourseModal');
+            const deleteModal = new bootstrap.Modal(modalEl);
+            const depList = document.getElementById('depList');
+            const confirmBtn = document.getElementById('confirmDeleteCourse');
+            const csrfToken  = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+
+            document.querySelectorAll('.js-delete-course-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const courseId = btn.dataset.courseId;
+                    fetch('/admin/courses/api/' + courseId + '/dependencies')
+                        .then(function(res){ return res.json(); })
+                        .then(function(deps) {
+                            depList.innerHTML = '';
+                            if (deps.applications && deps.applications.length) {
+                                let html = '<h6>Заявки:</h6><ul>';
+                                deps.applications.forEach(function(a) {
+                                    html += '<li>'  + (a.name) + '</li>';
+                                });
+                                html += '</ul>';
+                                depList.insertAdjacentHTML('beforeend', html);
+                            }
+
+                            if (deps.instances && deps.instances.length) {
+                                let html = '<h6>Потоки:</h6><ul>';
+                                deps.instances.forEach(function(i) {
+                                    html += '<li>'  + (i.name || i.title) + '</li>';
+                                });
+                                html += '</ul>';
+                                depList.insertAdjacentHTML('beforeend', html);
+                            }
+
+                            if (deps.teachers && deps.teachers.length) {
+                                let html = '<h6>Преподаватели:</h6><ul>';
+                                deps.teachers.forEach(function(t) {
+                                    html += '<li>' + t.name + '</li>';
+                                });
+                                html += '</ul>';
+                                depList.insertAdjacentHTML('beforeend', html);
+                            }
+
+                            const hasDeps =
+                                (deps.applications && deps.applications.length) ||
+                                (deps.instances && deps.instances.length) ||
+                                (deps.teachers && deps.teachers.length);
+
+                            if (hasDeps) {
+                                confirmBtn.disabled = true;
+                                confirmBtn.textContent = 'Удаление невозможно — есть связи';
+                                confirmBtn.onclick = null;
+                            } else {
+                                depList.insertAdjacentHTML('beforeend', '<p>Связей не найдено. Удалить курс?</p>');
+                                confirmBtn.disabled = false;
+                                confirmBtn.textContent = 'Удалить';
+                                confirmBtn.onclick = function(){
+                                    fetch('/admin/courses/api/' + courseId, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            [csrfHeader]: csrfToken
+                                        }
+                                    })
+                                        .then(r => {
+                                            if (r.ok) {
+                                                localStorage.setItem('flashMessage', JSON.stringify({
+                                                    type: 'success',
+                                                    text: 'Курс был успешно удален',
+                                                    duration: 4000
+                                                }));
+                                                location.reload();
+                                            } else {
+                                                return r.json().then(err => { throw new Error(err.message || 'Unknown error') });
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.error('Delete failed:', err);
+                                            alert(err.message);
+                                        });
+
+                                };
+                            }
+
+                            deleteModal.show();
+                        });
+                });
+            });
+        });
         $(document).ready(function () {
             var table = $('#coursesTable').DataTable({
                 language: {

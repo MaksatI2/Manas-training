@@ -1,6 +1,7 @@
 package manasTrainingService.service.impl.course;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.ShortDto;
 import manasTrainingService.dto.teacher.CourseTeacherDTO;
 import manasTrainingService.entity.*;
 import manasTrainingService.repositories.course.CourseTeacherRepository;
@@ -85,6 +86,14 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
             );
         }
 
+    }
+
+    @Override
+    public List<ShortDto> getByCourseId(Integer courseId) {
+        return repository.findByCourseId(courseId)
+                .stream()
+                .map(ct -> new ShortDto(ct.getId(), ct.getTeacher().getName()))
+                .toList();
     }
 
 

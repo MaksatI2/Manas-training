@@ -1,5 +1,6 @@
 package manasTrainingService.service.course;
 
+import manasTrainingService.dto.ShortDto;
 import manasTrainingService.dto.teacher.CourseTeacherDTO;
 
 import java.util.List;
@@ -10,4 +11,6 @@ public interface CourseTeacherService {
     List<CourseTeacherDTO> getCoursesByTeacherId(Integer teacherId);
 
     void updateTeacherCourses(Integer teacherId, List<Integer> courseIds);
+
+    List<ShortDto> getByCourseId(Integer courseId);
 }

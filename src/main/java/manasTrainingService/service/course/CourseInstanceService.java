@@ -1,6 +1,7 @@
 package manasTrainingService.service.course;
 
 import manasTrainingService.dto.CourseInstanceCreationDTO;
+import manasTrainingService.dto.ShortDto;
 import manasTrainingService.dto.application.CourseInstanceCalendarDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
@@ -27,4 +28,5 @@ public interface CourseInstanceService {
 
     List<CourseInstanceCalendarDTO> getAllInstancesForCalendar();
 
+    List<ShortDto> getByCourseId(Integer courseId);
 }

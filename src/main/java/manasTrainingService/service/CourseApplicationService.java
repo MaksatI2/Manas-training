@@ -1,5 +1,6 @@
 package manasTrainingService.service;
 
+import manasTrainingService.dto.ShortDto;
 import manasTrainingService.dto.application.ApplicationCommentDto;
 import manasTrainingService.dto.application.ApplicationStatusUpdateDto;
 import manasTrainingService.dto.application.CourseApplicationCreateDto;
@@ -23,4 +24,6 @@ public interface CourseApplicationService {
     void addCommentToApplication(Integer applicationId, String comment, String authorEmail);
 
     List<ApplicationCommentDto> getCommentsForApplication(Integer applicationId);
+
+    List<ShortDto> getByCourseId(Integer courseId);
 }

@@ -141,18 +141,126 @@
                                 <a href="/admin/courses/edit/${course.id}" class="btn btn-primary btn-sm w-100 mb-2">
                                     <i class="fas fa-edit me-1"></i> Редактировать курс
                                 </a>
-                                <a href="/admin/courses/delete/${course.id}"
-                                   class="btn btn-danger btn-sm w-100"
-                                   onclick="return confirm('Вы уверены, что хотите удалить курс «${course.title}»? Это действие нельзя отменить.')">
+                                <button type="button"
+                                        class="btn btn-danger btn-sm w-100 js-delete-course-btn"
+                                        data-course-id="${course.id}">
                                     <i class="fas fa-trash me-1"></i> Удалить курс
-                                </a>
+                                </button>
                             </div>
                         </#if>
                     </div>
                 </div>
             </div>
+
+            <div id="deleteCourseModal" class="modal fade" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Удаление курса</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="depList"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" id="confirmDeleteCourse" class="btn btn-danger">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const modalEl = document.getElementById('deleteCourseModal');
+            const deleteModal = new bootstrap.Modal(modalEl);
+            const depList = document.getElementById('depList');
+            const confirmBtn = document.getElementById('confirmDeleteCourse');
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+            document.querySelectorAll('.js-delete-course-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const courseId = btn.dataset.courseId;
+                    fetch('/admin/courses/api/' + courseId + '/dependencies')
+                        .then(function(res){ return res.json(); })
+                        .then(function(deps) {
+                            depList.innerHTML = '';
+                            if (deps.applications && deps.applications.length) {
+                                let html = '<h6>Заявки:</h6><ul>';
+                                deps.applications.forEach(function(a) {
+                                    html += '<li>' + (a.name) + '</li>';
+                                });
+                                html += '</ul>';
+                                depList.insertAdjacentHTML('beforeend', html);
+                            }
+
+                            if (deps.instances && deps.instances.length) {
+                                let html = '<h6>Потоки:</h6><ul>';
+                                deps.instances.forEach(function(i) {
+                                    html += '<li>' + (i.name || i.title) + '</li>';
+                                });
+                                html += '</ul>';
+                                depList.insertAdjacentHTML('beforeend', html);
+                            }
+
+                            if (deps.teachers && deps.teachers.length) {
+                                let html = '<h6>Преподаватели:</h6><ul>';
+                                deps.teachers.forEach(function(t) {
+                                    html += '<li>' + t.name + '</li>';
+                                });
+                                html += '</ul>';
+                                depList.insertAdjacentHTML('beforeend', html);
+                            }
+
+                            const hasDeps =
+                                (deps.applications && deps.applications.length) ||
+                                (deps.instances && deps.instances.length) ||
+                                (deps.teachers && deps.teachers.length);
+
+                            if (hasDeps) {
+                                confirmBtn.disabled = true;
+                                confirmBtn.textContent = 'Удаление невозможно — есть связи';
+                                confirmBtn.onclick = null;
+                            } else {
+                                depList.insertAdjacentHTML('beforeend', '<p>Связей не найдено. Удалить курс?</p>');
+                                confirmBtn.disabled = false;
+                                confirmBtn.textContent = 'Удалить';
+                                confirmBtn.onclick = function(){
+                                    fetch('/admin/courses/api/' + courseId, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            [csrfHeader]: csrfToken
+                                        }
+                                    })
+                                        .then(r => {
+                                            if (r.ok) {
+                                                localStorage.setItem('flashMessage', JSON.stringify({
+                                                    type: 'success',
+                                                    text: 'Курс был успешно удален',
+                                                    duration: 4000
+                                                }));
+                                                window.location.href = '/admin/courses';
+                                            } else {
+                                                return r.json().then(err => { throw new Error(err.message || 'Unknown error') });
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.error('Delete failed:', err);
+                                            alert(err.message);
+                                        });
+                                };
+                            }
+
+                            deleteModal.show();
+                        });
+                });
+            });
+        });
+    </script>
 
     <style>
         .card {
