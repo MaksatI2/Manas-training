@@ -57,8 +57,8 @@ services:
       - "8443:443"
     environment:
       - ENABLE_LETSENCRYPT=0
-      - ENABLE_HTTP_REDIRECT=1
-      - DISABLE_HTTPS=0
+      - ENABLE_HTTP_REDIRECT=0
+      - DISABLE_HTTPS=1
       - JICOFO_AUTH_USER=focus
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
@@ -75,12 +75,20 @@ services:
       - RESOLUTION=720
       - RESOLUTION_MIN=180
       - RESOLUTION_MAX=1080
-      - PUBLIC_URL=https://157.245.67.28:8443
+      - PUBLIC_URL=https://157.245.67.28
+      - ENABLE_XMPP_WEBSOCKET=1
+      - XMPP_CROSS_DOMAIN=true
+      - ENABLE_SUBDOMAINS=false
+      - WEBSOCKET_KEEP_ALIVE_URL=https://157.245.67.28/xmpp-websocket
+      - NGINX_RESOLVER=127.0.0.11
+      - NGINX_WORKER_PROCESSES=1
+      - NGINX_WORKER_CONNECTIONS=1024
     networks:
       - manas-network
     volumes:
       - jitsi-web-config:/config
       - jitsi-web-transcripts:/usr/share/jitsi-meet/transcripts
+      - ./jitsi-meet-config:/defaults
     depends_on:
       - prosody
       - jicofo
@@ -105,8 +113,10 @@ services:
       - ENABLE_LOBBY=1
       - LOG_LEVEL=warn
       - ENABLE_XMPP_WEBSOCKET=1
-      - ENABLE_SUBDOMAINS=true
-      - PUBLIC_URL=https://157.245.67.28:8443
+      - ENABLE_SUBDOMAINS=false
+      - PUBLIC_URL=https://157.245.67.28
+      - XMPP_CROSS_DOMAIN=true
+      - XMPP_MODULES=websocket,http_cors
     networks:
       - manas-network
     volumes:
@@ -115,6 +125,7 @@ services:
     ports:
       - "5222:5222"
       - "5280:5280"
+      - "5281:5281"
     restart: unless-stopped
 
   jicofo:
@@ -133,6 +144,7 @@ services:
       - JICOFO_ENABLE_BRIDGE_HEALTH_CHECKS=true
       - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=15000
       - JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT=20000
+      - JICOFO_ENABLE_HEALTH_CHECKS=true
     networks:
       - manas-network
     volumes:
@@ -161,7 +173,9 @@ services:
       - JVB_WS_SERVER_ID=jvb1
       - COLIBRI_REST_ENABLED=true
       - SHUTDOWN_REST_ENABLED=true
-      - PUBLIC_URL=https://157.245.67.28:8443
+      - PUBLIC_URL=https://157.245.67.28
+      - JVB_OCTO_ENABLED=false
+      - JVB_WS_TLS=false
     networks:
       - manas-network
     volumes:
