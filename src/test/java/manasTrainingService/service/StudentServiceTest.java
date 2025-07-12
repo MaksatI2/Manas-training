@@ -34,6 +34,9 @@ class StudentServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private ActivityLogService activityLogService;
+
     @InjectMocks
     private StudentServiceImpl studentService;
 

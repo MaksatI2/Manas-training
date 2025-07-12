@@ -6,6 +6,7 @@ import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.entity.CourseCategory;
 import manasTrainingService.repositories.course.CourseCategoryRepository;
 import manasTrainingService.service.impl.course.CourseCategoryServiceImpl;
+import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,6 +31,10 @@ class CourseCategoryServiceTest {
 
     @Mock
     private CourseCategoryRepository categoryRepository;
+    @Mock
+    private UserService userService;
+    @Mock
+    private ActivityLogService activityLogService;
 
     @InjectMocks
     private CourseCategoryServiceImpl courseCategoryService;

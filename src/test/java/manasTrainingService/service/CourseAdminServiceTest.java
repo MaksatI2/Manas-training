@@ -11,6 +11,7 @@ import manasTrainingService.entity.CourseCategory;
 import manasTrainingService.repositories.course.CourseRepository;
 import manasTrainingService.service.course.CourseCategoryService;
 import manasTrainingService.service.impl.course.CourseAdminServiceImpl;
+import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,6 +39,11 @@ class CourseAdminServiceTest {
 
     @Mock
     private CourseCategoryService categoryService;
+
+    @Mock
+    private UserService userService;
+    @Mock
+    private ActivityLogService activityLogService;
 
     @InjectMocks
     private CourseAdminServiceImpl courseAdminService;

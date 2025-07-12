@@ -7,9 +7,11 @@ import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.CourseModule;
 import manasTrainingService.exceptions.nsee.course.CourseNotFoundException;
 import manasTrainingService.repositories.course.CourseInstanceRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.impl.course.CourseInstanceServiceImpl;
+import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -29,6 +31,11 @@ class CourseInstanceServiceTest {
 
     @Mock
     private LessonService lessonService;
+
+    @Mock
+    private UserService userService;
+    @Mock
+    private ActivityLogService activityLogService;
 
     @InjectMocks
     private CourseInstanceServiceImpl service;

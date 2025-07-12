@@ -4,8 +4,10 @@ import manasTrainingService.dto.instance.*;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.ModuleNotFoundException;
 import manasTrainingService.repositories.course.CourseModuleRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.impl.course.CourseModuleServiceImpl;
+import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,6 +21,8 @@ class CourseModuleServiceTest {
 
     private CourseModuleRepository courseModuleRepository;
     private CourseInstanceService courseInstanceService;
+    private ActivityLogService activityLogService;
+    private UserService userService;
 
     private CourseModuleServiceImpl service;
 
@@ -26,8 +30,9 @@ class CourseModuleServiceTest {
     void setUp() {
         courseModuleRepository = mock(CourseModuleRepository.class);
         courseInstanceService = mock(CourseInstanceService.class);
-
-        service = new CourseModuleServiceImpl(courseModuleRepository, courseInstanceService);
+        activityLogService = mock(ActivityLogService.class);
+        userService = mock(UserService.class);
+        service = new CourseModuleServiceImpl(courseModuleRepository, courseInstanceService, activityLogService, userService);
     }
 
     @Test
@@ -190,10 +195,12 @@ class CourseModuleServiceTest {
 
         CourseModuleUpdateDTO updateDTO = new CourseModuleUpdateDTO();
         updateDTO.setTitle("Обновленное название");
-        updateDTO.setDurationHours(1); // меньше 3
+        updateDTO.setDurationHours(1);
         updateDTO.setDescription("Обновленное описание");
 
         when(courseModuleRepository.findById(moduleId)).thenReturn(Optional.of(module));
+        when(courseModuleRepository.save(any(CourseModule.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
 
         IllegalStateException ex = assertThrows(IllegalStateException.class, () -> {
             service.updateModule(moduleId, updateDTO);

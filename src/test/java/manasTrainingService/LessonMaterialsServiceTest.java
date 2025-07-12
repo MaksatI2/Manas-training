@@ -4,8 +4,10 @@ import manasTrainingService.dto.lesson.LessonMaterialDTO;
 import manasTrainingService.entity.Lesson;
 import manasTrainingService.entity.LessonMaterial;
 import manasTrainingService.repositories.LessonMaterialRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.impl.LessonMaterialsServiceImpl;
+import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,8 @@ class LessonMaterialsServiceTest {
     private LessonMaterialRepository materialRepository;
     private LessonService lessonService;
     private FileUtil fileUtil;
+    private ActivityLogService activityLogService;
+    private UserService userService;
 
     private LessonMaterialsServiceImpl lessonMaterialsService;
 
@@ -34,8 +38,16 @@ class LessonMaterialsServiceTest {
         materialRepository = Mockito.mock(LessonMaterialRepository.class);
         lessonService = Mockito.mock(LessonService.class);
         fileUtil = Mockito.mock(FileUtil.class);
+        activityLogService = Mockito.mock(ActivityLogService.class);
+        userService = Mockito.mock(UserService.class);
 
-        lessonMaterialsService = new LessonMaterialsServiceImpl(materialRepository, lessonService, fileUtil);
+        lessonMaterialsService = new LessonMaterialsServiceImpl(
+                materialRepository,
+                lessonService,
+                fileUtil,
+                activityLogService,
+                userService
+        );
     }
 
     @Test
@@ -73,8 +85,16 @@ class LessonMaterialsServiceTest {
                 .file(file)
                 .build();
 
+
         Lesson lesson = Lesson.builder().id(1).build();
+        LessonMaterial materialToReturn = LessonMaterial.builder()
+                .id(123)
+                .title("New Title")
+                .url("new-url")
+                .lesson(lesson)
+                .build();
         when(lessonService.getLessonModelById(dto.getLessonId())).thenReturn(lesson);
+        when(materialRepository.save(any(LessonMaterial.class))).thenReturn(materialToReturn);
 
         lessonMaterialsService.addMaterial(dto);
 

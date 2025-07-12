@@ -8,7 +8,9 @@ import manasTrainingService.exceptions.nsee.BadRequestException;
 import manasTrainingService.repositories.course.*;
 import manasTrainingService.repositories.user.OrganizationRepository;
 import manasTrainingService.repositories.user.UserRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.impl.CourseApplicationServiceImpl;
+import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +46,10 @@ class CourseApplicationServiceImplTest {
     private CourseEnrollmentRepository enrollmentRepository;
     @Mock
     private CourseInstanceRepository instanceRepository;
+    @Mock
+    private UserService userService;
+    @Mock
+    private ActivityLogService activityLogService;
 
     @InjectMocks
     private CourseApplicationServiceImpl service;
@@ -54,6 +60,7 @@ class CourseApplicationServiceImplTest {
 
     @BeforeEach
     void setup() {
+
         orgUser = new User();
         orgUser.setId(1);
         orgUser.setEmail("org@example.com");
@@ -80,6 +87,17 @@ class CourseApplicationServiceImplTest {
         when(courseRepository.getReferenceById(10)).thenReturn(course);
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(new User()));
 
+        when(applicationRepository.save(any())).thenAnswer(invocation -> {
+            CourseApplication app = invocation.getArgument(0);
+            app.setId(1);
+            return app;
+        });
+
+        when(employeeRepository.save(any())).thenAnswer(invocation -> {
+            CourseApplicationEmployee cae = invocation.getArgument(0);
+            cae.setId(1);
+            return cae;
+        });
         service.createApplicationForOrganization(dto, "org@example.com");
 
         verify(applicationRepository).save(any());
@@ -169,6 +187,11 @@ class CourseApplicationServiceImplTest {
 
         when(userRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(admin));
         when(applicationRepository.findById(1)).thenReturn(Optional.of(app));
+        when(commentRepository.save(any())).thenAnswer(invocation -> {
+            ApplicationComment comment = invocation.getArgument(0);
+            comment.setId(1);
+            return comment;
+        });
 
         service.addCommentToApplication(1, "Тест", "admin@example.com");
 

@@ -69,6 +69,8 @@ class UserServiceTest {
     private Authentication authentication;
     @Mock
     private UserDetails userDetails;
+    @Mock
+    private ActivityLogService activityLogService;
 
     @InjectMocks
     private UserServiceImpl userService;
