@@ -101,7 +101,6 @@
         this.iframe.style.height = this.height + (typeof this.height === 'number' ? 'px' : '');
         this.iframe.style.border = '0';
         this.iframe.setAttribute('allow', 'camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write; autoplay');
-        this.iframe.setAttribute('allowfullscreen', 'true');
 
         const url = this.buildUrl();
         this.iframe.src = url;
