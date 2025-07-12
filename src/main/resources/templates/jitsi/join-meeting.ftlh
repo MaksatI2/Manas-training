@@ -230,41 +230,14 @@
             initializeMediaPreview();
         }
 
-        function handleMediaError(message) {
-            console.error('Media Error:', message);
-            const previewContainer = document.querySelector('.preview-container');
-            if (previewContainer) {
-                previewContainer.innerHTML = `
-            <div class="alert alert-warning">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                ${message}
-            </div>
-        `;
-            }
-
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-danger mt-3';
-            alertDiv.innerHTML = `
-        <strong>Ошибка доступа к медиа:</strong> ${message}
-        <br><small>Вы все равно можете присоединиться к конференции</small>
-    `;
-
-            const modalBody = document.querySelector('#preJoinModal .modal-body');
-            if (modalBody) {
-                modalBody.appendChild(alertDiv);
-            }
-        }
-
         function initializeMediaPreview() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 console.error('getUserMedia не поддерживается в этом браузере');
-                handleMediaError('Ваш браузер не поддерживает доступ к камере/микрофону');
                 return;
             }
 
             if (!window.isSecureContext) {
                 console.error('getUserMedia требует безопасного контекста (HTTPS)');
-                handleMediaError('Доступ к камере/микрофону возможен только через HTTPS');
                 return;
             }
 
@@ -298,7 +271,6 @@
                         errorMessage = 'Камера/микрофон уже используется другим приложением';
                     }
 
-                    handleMediaError(errorMessage);
                 });
         }
 
