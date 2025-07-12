@@ -3,16 +3,21 @@ package manasTrainingService.service.impl.quiz;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.quiz.LessonQuizQuestionDto;
 import manasTrainingService.dto.tests.QuestionDto;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.LessonQuiz;
 import manasTrainingService.entity.LessonQuizQuestion;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.TestQuestion;
+import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.LessonQuizQuestionNotFoundException;
 import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
 import manasTrainingService.repositories.quiz.LessonQuizQuestionRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.quiz.LessonQuizOptionService;
 import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import manasTrainingService.service.test.TestService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -30,6 +35,8 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
     private final LessonQuizQuestionRepository lessonQuizQuestionRepository;
     private final LessonQuizOptionService lessonQuizOptionService;
     private LessonQuizService lessonQuizService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Autowired
     public void setLessonQuizService(@Lazy LessonQuizService lessonQuizService) {
@@ -101,22 +108,36 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
     }
 
     private void deleteQuestionsFromEdit(List<LessonQuizQuestionDto> lessonQuizQuestions){
+        User user = userService.getAuthorizedUser();
         for (LessonQuizQuestionDto question : lessonQuizQuestions){
             LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(question.getId())
                     .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
+            activityLogService.log(
+                    user,
+                    ActionType.DELETE,
+                    TargetType.LESSON_QUIZ_QUESTION,
+                    question.getId()
+            );
             lessonQuizQuestionRepository.delete(lessonQuizQuestion);
         }
     }
 
     private void editQuestionsFromEdit(List<LessonQuizQuestionDto> questions){
+        User user = userService.getAuthorizedUser();
         for(LessonQuizQuestionDto question : questions){
             if (question.getId() != null){
                 LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(question.getId())
                         .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
                 lessonQuizQuestion.setQuestion(question.getQuestion());
                 lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/questions.size()));
-                lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
+                LessonQuizQuestion updated = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
                 lessonQuizOptionService.editQuizOptions(question.getOptions(), question.getCorrectOptionIndex());
+                activityLogService.log(
+                        user,
+                        ActionType.UPDATE,
+                        TargetType.LESSON_QUIZ_QUESTION,
+                        updated.getId()
+                );
             }else {
                 LessonQuizQuestion lessonQuizQuestion = new LessonQuizQuestion();
                 lessonQuizQuestion.setQuestion(question.getQuestion());
@@ -124,6 +145,12 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
                 lessonQuizQuestion.setQuiz(lessonQuizService.getQuizEntityById(question.getQuizId()));
                 LessonQuizQuestion savedQuizQuestion = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
                 lessonQuizOptionService.saveQuizOptions(question.getOptions(), savedQuizQuestion, question.getCorrectOptionIndex());
+                activityLogService.log(
+                        user,
+                        ActionType.CREATE,
+                        TargetType.LESSON_QUIZ_QUESTION,
+                        savedQuizQuestion.getId()
+                );
             }
         }
     }

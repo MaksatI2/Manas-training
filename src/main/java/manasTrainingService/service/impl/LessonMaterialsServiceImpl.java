@@ -2,12 +2,12 @@ package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.lesson.LessonMaterialDTO;
-import manasTrainingService.entity.FileType;
-import manasTrainingService.entity.Lesson;
-import manasTrainingService.entity.LessonMaterial;
+import manasTrainingService.entity.*;
 import manasTrainingService.repositories.LessonMaterialRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.LessonMaterialService;
 import manasTrainingService.service.LessonService;
+import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.FileUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +23,8 @@ public class LessonMaterialsServiceImpl implements LessonMaterialService {
     private final LessonMaterialRepository materialRepository;
     private final LessonService lessonService;
     private final FileUtil fileUtil;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Override
     public List<LessonMaterialDTO> getMaterialsByLessonId(Integer lessonId) {
@@ -50,7 +52,14 @@ public class LessonMaterialsServiceImpl implements LessonMaterialService {
                 .url(fileName)
                 .build();
 
-        materialRepository.save(material);
+        LessonMaterial saved = materialRepository.save(material);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.LESSON_MATERIAL,
+                saved.getId()
+        );
     }
 
     @Transactional
@@ -59,5 +68,12 @@ public class LessonMaterialsServiceImpl implements LessonMaterialService {
         LessonMaterial material = materialRepository.findById(materialId)
                 .orElseThrow(() -> new IllegalArgumentException("Material not found"));
         materialRepository.delete(material);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.LESSON_MATERIAL,
+                materialId
+        );
     }
 }

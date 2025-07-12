@@ -7,6 +7,7 @@ import manasTrainingService.dto.instance.CourseEnrollmentDTO;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.repositories.course.CourseEnrollmentRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.course.CourseApplicationEmployeeService;
 import manasTrainingService.service.course.CourseInstanceService;
@@ -25,7 +26,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final CourseInstanceService courseInstanceService;
     private final CourseApplicationEmployeeService courseApplicationEmployeeService;
     private final UserService userService;
-
+    private final ActivityLogService activityLogService;
 
     @Override
     public void enrollEmployees(Integer courseInstanceId, List<Integer> employeeIds) {
@@ -33,9 +34,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         for (Integer employeeId : employeeIds) {
             CourseApplicationEmployee employee = courseApplicationEmployeeService.getEmployeeById(employeeId);
-            if (employee.getApplicationStatus() != Status.PENDING) {
+            if (employee.getApplicationStatus() != Status.PENDING)
                 continue;
-            }
 
             User student = employee.getEmployee();
 
@@ -45,7 +45,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                         .student(student)
                         .status(Status.ENROLLED)
                         .build();
-                enrollmentRepository.save(enrollment);
+                CourseEnrollment saved = enrollmentRepository.save(enrollment);
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.CREATE,
+                        TargetType.COURSE_ENROLLMENT,
+                        saved.getId()
+                );
 
                 employee.setApplicationStatus(Status.APPROVED);
                 courseApplicationEmployeeService.save(employee);
@@ -119,9 +125,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .orElseThrow(() -> new EntityNotFoundException("Запись на курс не была найдена"));
 
         enrollment.setStatus(newStatus);
-
-
-        enrollmentRepository.save(enrollment);
+        CourseEnrollment saved = enrollmentRepository.save(enrollment);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.COURSE_ENROLLMENT,
+                saved.getId()
+        );
     }
 
 }

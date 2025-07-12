@@ -6,13 +6,13 @@ import manasTrainingService.dto.instance.CourseModuleCreationDTO;
 import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.CourseModuleUpdateDTO;
 import manasTrainingService.dto.instance.LessonDTO;
-import manasTrainingService.entity.CourseInstance;
-import manasTrainingService.entity.CourseModule;
-import manasTrainingService.entity.Lesson;
+import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.ModuleNotFoundException;
 import manasTrainingService.repositories.course.CourseModuleRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseModuleService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +26,8 @@ public class CourseModuleServiceImpl implements CourseModuleService {
 
     private final CourseModuleRepository courseModuleRepository;
     private final CourseInstanceService courseInstanceService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Transactional
     @Override
@@ -63,7 +65,15 @@ public class CourseModuleServiceImpl implements CourseModuleService {
             modules.add(module);
         }
 
-        courseModuleRepository.saveAll(modules);
+        List<CourseModule> saved = courseModuleRepository.saveAll(modules);
+        for (CourseModule m : saved) {
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.COURSE_MODULE,
+                    m.getId()
+            );
+        }
     }
 
     @Transactional
@@ -72,6 +82,12 @@ public class CourseModuleServiceImpl implements CourseModuleService {
             throw new IllegalArgumentException("Модуль не был найден: " + moduleId);
         }
         courseModuleRepository.deleteById(moduleId);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.COURSE_MODULE,
+                moduleId
+        );
     }
 
     @Override
@@ -117,6 +133,12 @@ public class CourseModuleServiceImpl implements CourseModuleService {
             throw new IllegalStateException("У модуля есть уроки");
         }
         courseModuleRepository.deleteById(moduleId);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.COURSE_MODULE,
+                moduleId
+        );
     }
 
     @Override
@@ -134,7 +156,6 @@ public class CourseModuleServiceImpl implements CourseModuleService {
         CourseModule module = getCourseModuleById(moduleId);
         CourseInstance courseInstance = module.getCourseInstance();
         List<Lesson> lessons = module.getLessons();
-
 
         Integer newModuleHours = dto.getDurationHours();
 
@@ -162,7 +183,14 @@ public class CourseModuleServiceImpl implements CourseModuleService {
         module.setTitle(dto.getTitle());
         module.setDurationHours(dto.getDurationHours());
         module.setDescription(dto.getDescription());
-        courseModuleRepository.save(module);
+        CourseModule updated = courseModuleRepository.save(module);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.COURSE_MODULE,
+                updated.getId()
+        );
     }
 
     private void validateTotalDuration(CourseInstance courseInstance, Integer updatingModuleId, int totalNewDuration) {

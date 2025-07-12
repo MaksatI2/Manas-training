@@ -2,9 +2,12 @@ package manasTrainingService.service.impl.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.EmailVerificationToken;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.User;
 import manasTrainingService.repositories.user.EmailVerificationTokenRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.user.EmailService;
 import manasTrainingService.service.user.EmailVerificationService;
 import manasTrainingService.service.user.UserService;
@@ -23,6 +26,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private final EmailVerificationTokenRepository tokenRepository;
     private final EmailService emailService;
     private UserService userService;
+    private final ActivityLogService activityLogService;
 
     @Autowired
     public void setUserService(@Lazy UserService userService) {
@@ -40,6 +44,12 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                 .expiryDate(LocalDateTime.now().plusDays(1))
                 .build();
         tokenRepository.save(emailToken);
+        activityLogService.log(
+                user,
+                ActionType.CREATE,
+                TargetType.EMAIL_VERIFICATION_TOKEN,
+                Math.toIntExact(emailToken.getId())
+        );
         emailService.sendVerificationEmail(user, token);
     }
 
@@ -54,6 +64,12 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         User user = emailToken.getUser();
         user.setIsActive(true);
         userService.saveUser(user);
+        activityLogService.log(
+                user,
+                ActionType.UPDATE,
+                TargetType.USER,
+                user.getId()
+        );
         tokenRepository.delete(emailToken);
 
         return true;

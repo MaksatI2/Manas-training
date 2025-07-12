@@ -7,11 +7,15 @@ import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.dto.create.CreateCourseDto;
 import manasTrainingService.dto.edit.CourseEditDto;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.Course;
 import manasTrainingService.entity.CourseCategory;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.repositories.course.CourseRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseAdminService;
 import manasTrainingService.service.course.CourseCategoryService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +30,8 @@ public class CourseAdminServiceImpl implements CourseAdminService {
 
     private final CourseRepository courseRepository;
     private final CourseCategoryService categoryService;
-
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
     @Override
     public CourseEditDto prepareEditDtoWithRequestParams(CourseEditDto updateCourseDto, String[] activeValues, String[] individualValues) {
         Boolean active = false;
@@ -97,6 +102,12 @@ public class CourseAdminServiceImpl implements CourseAdminService {
                 .build();
 
         Course savedCourse = courseRepository.save(course);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.COURSE,
+                savedCourse.getId()
+        );
         return convertToDto(savedCourse);
     }
 
@@ -127,6 +138,12 @@ public class CourseAdminServiceImpl implements CourseAdminService {
         existingCourse.setUpdatedAt(LocalDateTime.now());
 
         Course updatedCourse = courseRepository.save(existingCourse);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.COURSE,
+                updatedCourse.getId()
+        );
         return convertToDto(updatedCourse);
     }
 
@@ -137,6 +154,12 @@ public class CourseAdminServiceImpl implements CourseAdminService {
             throw new EntityNotFoundException("Курс с ID " + id + " не найден");
         }
         courseRepository.deleteById(id);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.COURSE,
+                id
+        );
     }
 
     @Override

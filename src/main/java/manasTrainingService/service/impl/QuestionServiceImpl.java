@@ -3,13 +3,18 @@ package manasTrainingService.service.impl;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.tests.OptionDto;
 import manasTrainingService.dto.tests.QuestionDto;
+import manasTrainingService.entity.ActionType;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.Test;
 import manasTrainingService.entity.TestQuestion;
+import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
 import manasTrainingService.repositories.test.TestQuestionRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.OptionService;
 import manasTrainingService.service.QuestionService;
 import manasTrainingService.service.test.TestService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -27,6 +32,8 @@ public class QuestionServiceImpl implements QuestionService {
     private final TestQuestionRepository testQuestionRepository;
     private final OptionService optionService;
     private TestService testService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Autowired
     public void setTestService(@Lazy TestService testService) {
@@ -58,7 +65,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .filter(q -> q.getIsRemoved() == null && !q.getIsRequired())
                 .toList();
 
-        if (!deletedTestQuestions.isEmpty()) {
+        if (!deletedTestQuestions.isEmpty()){
             deleteQuestionsFromTest(deletedTestQuestions);
         }
 
@@ -67,8 +74,31 @@ public class QuestionServiceImpl implements QuestionService {
         editQuestionFromTest(changedBonusTestQuestions, false);
     }
 
+    private void createQuestionsForTest(List<QuestionDto> questions, boolean isRequired, Test test) {
+        User user = userService.getAuthorizedUser();
+        for (QuestionDto questionDto : questions) {
+            TestQuestion testQuestion = new TestQuestion();
+            testQuestion.setQuestion(questionDto.getQuestion());
+            if (isRequired) {
+                testQuestion.setPoints(BigDecimal.valueOf(100 / questions.size()));
+            } else {
+                testQuestion.setPoints(BigDecimal.valueOf(10));
+            }
+            testQuestion.setIsRequired(false);
+            testQuestion.setTest(test);
+            TestQuestion savedTestQuestion = testQuestionRepository.saveAndFlush(testQuestion);
+            activityLogService.log(
+                    user,
+                    ActionType.CREATE,
+                    TargetType.TEST_QUESTION,
+                    savedTestQuestion.getId()
+            );
+            optionService.saveQuestionOptions(questionDto.getOptions(), savedTestQuestion, questionDto.getCorrectOptionIndex());
+        }
+    }
+
     @Override
-    public List<QuestionDto> getQuestionsByTestId(int testId) {
+    public List<QuestionDto> getQuestionsByTestId(int testId){
         List<TestQuestion> questions = testQuestionRepository.findAllByTestId(testId);
         if (questions.size() <= 20) {
             return questions.stream().map(q ->
@@ -100,20 +130,28 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public TestQuestion getQuestionById(int id) {
+    public TestQuestion getQuestionById(int id){
         return testQuestionRepository.findById(id)
                 .orElseThrow(() -> new TestQuestionNotFoundException("Вопрос не найден"));
     }
 
     private void deleteQuestionsFromTest(List<QuestionDto> questions) {
+        User user = userService.getAuthorizedUser();
         for (QuestionDto questionDto : questions) {
             TestQuestion testQuestion = testQuestionRepository.findById(questionDto.getId())
                     .orElseThrow(() -> new TestQuestionNotFoundException("Вопрос не найден"));
             testQuestionRepository.delete(testQuestion);
+            activityLogService.log(
+                    user,
+                    ActionType.DELETE,
+                    TargetType.TEST_QUESTION,
+                    testQuestion.getId()
+            );
         }
     }
 
     private void editQuestionFromTest(List<QuestionDto> questions, boolean isRequired) {
+        User user = userService.getAuthorizedUser();
         for (QuestionDto questionDto : questions) {
             if (questionDto.getId() != null) {
                 TestQuestion testQuestion = testQuestionRepository.findById(questionDto.getId())
@@ -127,6 +165,12 @@ public class QuestionServiceImpl implements QuestionService {
                 testQuestion.setIsRequired(questionDto.getIsRequired());
                 testQuestionRepository.saveAndFlush(testQuestion);
                 optionService.editOption(questionDto.getOptions(), questionDto.getCorrectOptionIndex());
+                activityLogService.log(
+                        user,
+                        ActionType.UPDATE,
+                        TargetType.TEST_QUESTION,
+                        testQuestion.getId()
+                );
             } else {
                 TestQuestion testQuestion = new TestQuestion();
                 testQuestion.setQuestion(questionDto.getQuestion());
@@ -139,23 +183,13 @@ public class QuestionServiceImpl implements QuestionService {
                 testQuestion.setIsRequired(questionDto.getIsRequired());
                 TestQuestion savedQuestion = testQuestionRepository.saveAndFlush(testQuestion);
                 optionService.saveQuestionOptions(questionDto.getOptions(), savedQuestion, questionDto.getCorrectOptionIndex());
+                activityLogService.log(
+                        user,
+                        ActionType.UPDATE,
+                        TargetType.TEST_QUESTION,
+                        testQuestion.getId()
+                );
             }
-        }
-    }
-
-    private void createQuestionsForTest(List<QuestionDto> questions, boolean isRequired, Test test) {
-        for (QuestionDto questionDto : questions) {
-            TestQuestion testQuestion = new TestQuestion();
-            testQuestion.setQuestion(questionDto.getQuestion());
-            if (isRequired) {
-                testQuestion.setPoints(BigDecimal.valueOf(100 / questions.size()));
-            } else {
-                testQuestion.setPoints(BigDecimal.valueOf(10));
-            }
-            testQuestion.setIsRequired(false);
-            testQuestion.setTest(test);
-            TestQuestion savedTestQuestion = testQuestionRepository.saveAndFlush(testQuestion);
-            optionService.saveQuestionOptions(questionDto.getOptions(), savedTestQuestion, questionDto.getCorrectOptionIndex());
         }
     }
 }

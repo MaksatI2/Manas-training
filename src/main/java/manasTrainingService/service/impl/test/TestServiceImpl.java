@@ -1,11 +1,16 @@
 package manasTrainingService.service.impl.test;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.answers.QuestionAnswerDto;
 import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.answers.TestResultDto;
+import manasTrainingService.dto.quiz.answers.QuizResultDto;
 import manasTrainingService.dto.tests.OptionDto;
 import manasTrainingService.dto.tests.QuestionDto;
 import manasTrainingService.dto.tests.TestDto;
+import manasTrainingService.entity.ActionType;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.Test;
 import manasTrainingService.entity.TestResult;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
@@ -17,10 +22,13 @@ import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.test.TestAnswerService;
 import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +43,13 @@ public class TestServiceImpl implements TestService {
     private final TestResultService testResultService;
     private final TestAnswerService testAnswerService;
     private final CourseInstanceService courseInstanceService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
+
+    @PostConstruct
+    public void checkInjection() {
+        System.out.println("userService: " + userService);
+    }
 
     @Override
     public void createTest(TestDto testDto) {
@@ -70,6 +85,13 @@ public class TestServiceImpl implements TestService {
 
         Test savedTest = testRepository.saveAndFlush(test);
         questionService.saveQuestions(testDto.getQuestions(), savedTest);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.TEST,
+                savedTest.getId()
+        );
     }
 
     @Override
@@ -103,8 +125,15 @@ public class TestServiceImpl implements TestService {
         } else {
             test.setIsActive(testDto.getIsActive());
         }
-        testRepository.saveAndFlush(test);
+        Test updated = testRepository.saveAndFlush(test);
         questionService.editQuestions(testDto.getQuestions());
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.TEST,
+                updated.getId()
+        );
     }
 
     @Override
@@ -222,6 +251,12 @@ public class TestServiceImpl implements TestService {
     @Override
     public void deleteTest(int id) {
         testRepository.deleteById(id);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.TEST,
+                id
+        );
     }
 
     private List<LocalDateTime> parseDateRange(TestDto testDto) {

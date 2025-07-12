@@ -2,13 +2,17 @@ package manasTrainingService.service.impl.quiz;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.quiz.LessonQuizOptionDto;
+import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.LessonQuizOption;
 import manasTrainingService.entity.LessonQuizQuestion;
+import manasTrainingService.entity.TargetType;
 import manasTrainingService.exceptions.nsee.LessonQuizOptionNotFoundException;
 import manasTrainingService.repositories.quiz.LessonQuizOptionRepository;
+import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.QuestionService;
 import manasTrainingService.service.quiz.LessonQuizOptionService;
 import manasTrainingService.service.quiz.LessonQuizQuestionService;
+import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,8 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
 
     private final LessonQuizOptionRepository lessonQuizOptionRepository;
     private LessonQuizQuestionService lessonQuizQuestionService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     @Autowired
     public void setLessonQuizQuestionService(@Lazy LessonQuizQuestionService lessonQuizQuestionService) {
@@ -40,7 +46,13 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
             }else{
                 lessonQuizOption.setIsCorrect(false);
             }
-            lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
+            LessonQuizOption saved = lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.CREATE,
+                    TargetType.LESSON_QUIZ_OPTION,
+                    saved.getId()
+            );
         }
     }
 
@@ -48,34 +60,41 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
     @Override
     public void editQuizOptions(List<LessonQuizOptionDto> options, Integer correctOptionIndex){
         for(int i = 0; i<options.size(); i++) {
-            if (options.get(i).getId() != null){
-                if(options.get(i).getIsRemoved() != null && options.get(i).getIsRemoved()){
+            LessonQuizOptionDto dto = options.get(i);
+            if (dto.getId() != null){
+                if(dto.getIsRemoved() != null && dto.getIsRemoved()){
                     deleteOptionFromEdit(options.get(i));
+                    activityLogService.log(
+                            userService.getAuthorizedUser(),
+                            ActionType.DELETE,
+                            TargetType.LESSON_QUIZ_OPTION,
+                            dto.getId()
+                    );
                     continue;
                 }
                 LessonQuizOption lessonQuizOption = lessonQuizOptionRepository.findById(options.get(i).getId())
                         .orElseThrow(() -> new LessonQuizOptionNotFoundException("Ответ не найден"));
                 lessonQuizOption.setOptionText(options.get(i).getOptionText());
-
-                if(correctOptionIndex != null && i == correctOptionIndex){
-                    lessonQuizOption.setIsCorrect(true);
-                }else{
-                    lessonQuizOption.setIsCorrect(false);
-                }
+                lessonQuizOption.setIsCorrect(correctOptionIndex != null && i == correctOptionIndex);
                 lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
             }else {
                 LessonQuizOption lessonQuizOption = new LessonQuizOption();
-                if(correctOptionIndex != null && i == correctOptionIndex){
-                    lessonQuizOption.setIsCorrect(true);
-                }else{
-                    lessonQuizOption.setIsCorrect(false);
-                }
-                lessonQuizOption.setOptionText(options.get(i).getOptionText());
-                lessonQuizOption.setQuestion(lessonQuizQuestionService.getQuizQuestinEntityById(options.get(i).getQuestionId()));
-                lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
+                lessonQuizOption.setOptionText(dto.getOptionText());
+                lessonQuizOption.setIsCorrect(correctOptionIndex != null && i == correctOptionIndex);
+                lessonQuizOption.setQuestion(
+                        lessonQuizQuestionService.getQuizQuestinEntityById(dto.getQuestionId())
+                );
+                LessonQuizOption saved = lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.CREATE,
+                        TargetType.LESSON_QUIZ_OPTION,
+                        saved.getId()
+                );
             }
         }
     }
+
 
     @Override
     public List<LessonQuizOptionDto> getQuizOptionsByQuestionId(int questionId){
