@@ -205,18 +205,44 @@
         let meetingStartTime = new Date();
         let timerInterval;
         let jitsiAPI = null;
+        let modalInstance = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             showPreJoinModal();
         });
 
         function showPreJoinModal() {
-            const modal = new bootstrap.Modal(document.getElementById('preJoinModal'));
-            modal.show();
+            const modalElement = document.getElementById('preJoinModal');
+            modalInstance = new bootstrap.Modal(modalElement);
+
+            modalElement.addEventListener('shown.bs.modal', function () {
+                this.removeAttribute('aria-hidden');
+            });
+
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
+            });
+
+            modalInstance.show();
             initializeMediaPreview();
         }
 
         function initializeMediaPreview() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.error('getUserMedia не поддерживается в этом браузере');
+                handleMediaError('Ваш браузер не поддерживает доступ к камере/микрофону');
+                return;
+            }
+
+            if (!window.isSecureContext) {
+                console.error('getUserMedia требует безопасного контекста (HTTPS)');
+                handleMediaError('Доступ к камере/микрофону возможен только через HTTPS');
+                return;
+            }
+
             navigator.mediaDevices.getUserMedia({
                 video: {
                     width: { ideal: 1280 },
@@ -263,6 +289,7 @@
         });
 
         document.getElementById('joinMeetingBtn').addEventListener('click', function() {
+            this.blur();
             joinMeeting();
         });
 
@@ -271,10 +298,12 @@
 
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
             }
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById('preJoinModal'));
-            modal.hide();
+            if (modalInstance) {
+                modalInstance.hide();
+            }
 
             const domain = '157.245.67.28';
 
@@ -426,8 +455,7 @@
         }
 
         function showConnectionError(message) {
-            const errorMsg = `
-        'Не удалось подключиться к конференции.
+            const errorMsg = `Не удалось подключиться к конференции.
 
         Возможные причины:
         1. Сервер Jitsi Meet недоступен
@@ -508,6 +536,9 @@
             }
             if (timerInterval) {
                 clearInterval(timerInterval);
+            }
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
             }
         });
 
