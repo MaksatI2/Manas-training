@@ -287,14 +287,25 @@
                     startWithVideoMuted: !cameraEnabled,
                     prejoinPageEnabled: false,
                     disableDeepLinking: true,
+
+                    bosh: 'http://157.245.67.28/http-bind',
+                    websocket: 'ws://157.245.67.28/xmpp-websocket',
+
+                    hosts: {
+                        domain: 'meet.jitsi',
+                        muc: 'muc.meet.jitsi',
+                        focus: 'focus.meet.jitsi'
+                    },
                     p2p: {
                         enabled: false
                     },
                     useStunTurn: true,
                     stunServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' }
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' }
                     ],
+
                     resolution: 720,
                     constraints: {
                         video: {
@@ -310,13 +321,25 @@
                             }
                         }
                     },
+
                     channelLastN: 20,
                     startBitrate: 800,
                     disableAudioLevels: false,
                     enableNoAudioDetection: true,
                     enableNoisyMicDetection: true,
-                    defaultLanguage: 'ru'
+                    defaultLanguage: 'ru',
+
+                    disableInviteFunctions: true,
+                    doNotStoreRoom: true,
+                    enableWelcomePage: false,
+                    enableClosePage: false,
+
+                    pcStatsInterval: 10000,
+                    enableRemb: true,
+                    enableTcc: true,
+                    useRoomAsSharedDocumentName: false
                 },
+
                 interfaceConfigOverwrite: {
                     SHOW_JITSI_WATERMARK: false,
                     SHOW_WATERMARK_FOR_GUESTS: false,
@@ -328,33 +351,108 @@
                     SHOW_DEEP_LINKING_IMAGE: false,
                     MOBILE_APP_PROMO: false,
                     ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT: 15000,
+
                     TOOLBAR_BUTTONS: [
                         'microphone', 'camera', 'desktop', 'fullscreen',
-                        'fodeviceselection', 'hangup', 'profile', 'info',
-                        'chat', 'recording', 'livestreaming', 'etherpad',
-                        'sharedvideo', 'settings', 'raisehand',
-                        'videoquality', 'filmstrip', 'invite',
-                        'feedback', 'stats', 'shortcuts',
-                        'tileview', 'videobackgroundblur', 'download',
-                        'help', 'mute-everyone', 'security'
+                        'fodeviceselection', 'hangup', 'profile',
+                        'chat', 'settings', 'raisehand',
+                        'videoquality', 'filmstrip',
+                        'stats', 'shortcuts', 'tileview',
+                        'videobackgroundblur', 'help', 'mute-everyone'
                     ],
-                    SETTINGS_SECTIONS: ['devices', 'language', 'moderator', 'profile', 'calendar'],
-                    VIDEO_LAYOUT_FIT: 'both'
+
+                    SETTINGS_SECTIONS: ['devices', 'language', 'moderator', 'profile'],
+                    VIDEO_LAYOUT_FIT: 'both',
+
+                    HIDE_INVITE_MORE_HEADER: true,
+                    DISABLE_JOIN_LEAVE_NOTIFICATIONS: false,
+                    DISABLE_PRESENCE_STATUS: false,
+                    GENERATE_ROOMNAMES_ON_WELCOME_PAGE: false
                 },
+
                 userInfo: {
                     displayName: '${name!'Участник'}',
                     email: '${user.user.email!''}'
                 }
             };
 
-            jitsiAPI = new JitsiMeetExternalAPI(domain, options);
+            try {
+                jitsiAPI = new JitsiMeetExternalAPI(domain, options);
 
-            jitsiAPI.addEventListener('videoConferenceJoined', function(event) {
-                console.log('Подключен к конференции:', event);
+                jitsiAPI.addEventListener('videoConferenceJoined', function(event) {
+                    console.log('Подключен к конференции:', event);
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    startMeetingTimer();
+                    joinMeetingOnServer();
+                });
+
+                jitsiAPI.addEventListener('connectionFailed', function(event) {
+                    console.error('Ошибка подключения:', event);
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    showConnectionError();
+                });
+
+                jitsiAPI.addEventListener('conferenceError', function(event) {
+                    console.error('Ошибка конференции:', event);
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    showConnectionError();
+                });
+
+                jitsiAPI.addEventListener('participantJoined', function(event) {
+                    console.log('Участник подключился:', event);
+                    updateParticipantCount();
+                });
+
+                jitsiAPI.addEventListener('participantLeft', function(event) {
+                    console.log('Участник покинул встречу:', event);
+                    updateParticipantCount();
+                });
+
+                jitsiAPI.addEventListener('videoConferenceLeft', function(event) {
+                    console.log('Покинул конференцию:', event);
+                    leaveMeetingOnServer();
+                });
+
+                jitsiAPI.addEventListener('readyToClose', function(event) {
+                    console.log('Готов к закрытию:', event);
+                    leaveMeetingOnServer();
+                });
+
+                jitsiAPI.addEventListener('apiReady', function() {
+                    console.log('Jitsi API готов');
+                });
+
+                setTimeout(() => {
+                    if (document.getElementById('loadingIndicator').style.display !== 'none') {
+                        console.warn('Долгое подключение к конференции');
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                        showConnectionError();
+                    }
+                }, 30000);
+
+            } catch (error) {
+                console.error('Ошибка создания Jitsi API:', error);
                 document.getElementById('loadingIndicator').style.display = 'none';
-                startMeetingTimer();
-                joinMeetingOnServer();
-            });
+                showConnectionError();
+            }
+        }
+
+        function showConnectionError() {
+            const errorMsg = `
+                Не удалось подключиться к конференции.
+
+                Возможные причины:
+                1. Сервер Jitsi Meet недоступен
+                2. Проблемы с сетевым подключением
+                3. Блокировка WebRTC в браузере
+                4. Неправильная конфигурация сервера
+
+                Попробуйте:
+                - Обновить страницу
+                - Проверить подключение к интернету
+                - Использовать другой браузер
+            `;
+            alert(errorMsg);
 
             jitsiAPI.addEventListener('connectionFailed', function(event) {
                 console.error('Ошибка подключения:', event);
