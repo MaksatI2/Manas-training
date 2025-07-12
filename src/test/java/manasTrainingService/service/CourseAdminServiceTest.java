@@ -3,13 +3,17 @@ package manasTrainingService.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import manasTrainingService.dto.CourseCategoryDto;
+import manasTrainingService.dto.CourseDeletionDependenciesDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.dto.create.CreateCourseDto;
 import manasTrainingService.dto.edit.CourseEditDto;
 import manasTrainingService.entity.Course;
 import manasTrainingService.entity.CourseCategory;
+import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.repositories.course.CourseRepository;
 import manasTrainingService.service.course.CourseCategoryService;
+import manasTrainingService.service.course.CourseInstanceService;
+import manasTrainingService.service.course.CourseTeacherService;
 import manasTrainingService.service.impl.course.CourseAdminServiceImpl;
 import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +44,13 @@ class CourseAdminServiceTest {
 
     @Mock
     private CourseCategoryService categoryService;
+
+    @Mock
+    private CourseApplicationService courseApplicationService;
+    @Mock
+    private CourseInstanceService courseInstanceService;
+    @Mock
+    private CourseTeacherService courseTeacherService;
 
     @Mock
     private UserService userService;
@@ -417,12 +429,21 @@ class CourseAdminServiceTest {
         @Test
         @DisplayName("Should delete course successfully")
         void shouldDeleteCourseSuccessfully() {
-            when(courseRepository.existsById(1)).thenReturn(true);
+            Integer courseId = 1;
 
-            courseAdminService.delete(1);
+            when(courseRepository.existsById(courseId)).thenReturn(true);
 
-            verify(courseRepository).existsById(1);
-            verify(courseRepository).deleteById(1);
+            when(courseApplicationService.getByCourseId(courseId)).thenReturn(Collections.emptyList());
+            when(courseInstanceService.getByCourseId(courseId)).thenReturn(Collections.emptyList());
+            when(courseTeacherService.getByCourseId(courseId)).thenReturn(Collections.emptyList());
+
+            courseAdminService.deleteCourse(courseId);
+
+            verify(courseRepository, times(2)).existsById(courseId);
+            verify(courseApplicationService, times(1)).getByCourseId(courseId);
+            verify(courseInstanceService, times(1)).getByCourseId(courseId);
+            verify(courseTeacherService, times(1)).getByCourseId(courseId);
+            verify(courseRepository, times(1)).deleteById(courseId);
         }
 
         @Test
@@ -430,9 +451,9 @@ class CourseAdminServiceTest {
         void shouldThrowEntityNotFoundExceptionWhenCourseNotFoundForDeletion() {
             when(courseRepository.existsById(999)).thenReturn(false);
 
-            assertThatThrownBy(() -> courseAdminService.delete(999))
+            assertThatThrownBy(() -> courseAdminService.deleteCourse(999))
                     .isInstanceOf(EntityNotFoundException.class)
-                    .hasMessage("Курс с ID 999 не найден");
+                    .hasMessage("Курс с id=999 не найден");
 
             verify(courseRepository).existsById(999);
             verify(courseRepository, never()).deleteById(any());
@@ -650,7 +671,7 @@ class CourseAdminServiceTest {
             assertThat(updated.getTitle()).isEqualTo("Updated Course");
 
             when(courseRepository.existsById(10)).thenReturn(true);
-            courseAdminService.delete(10);
+            courseAdminService.deleteCourse(10);
 
             verify(courseRepository).deleteById(10);
         }

@@ -2,6 +2,7 @@ package manasTrainingService.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.ShortDto;
 import manasTrainingService.dto.application.*;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.BadRequestException;
@@ -272,6 +273,14 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         }
 
         return dto;
+    }
+
+    @Override
+    public List<ShortDto> getByCourseId(Integer courseId) {
+        return courseApplicationRepository.findByCourseId(courseId)
+                .stream()
+                .map(a -> new ShortDto(a.getId(), a.getSubmittedBy().getName()))
+                .toList();
     }
 
 }

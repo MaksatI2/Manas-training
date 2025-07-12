@@ -4,18 +4,25 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
+import manasTrainingService.dto.CourseDeletionDependenciesDto;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.dto.ShortDto;
 import manasTrainingService.dto.create.CreateCourseDto;
 import manasTrainingService.dto.edit.CourseEditDto;
 import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.Course;
 import manasTrainingService.entity.CourseCategory;
+import manasTrainingService.exceptions.nsee.course.CourseDeletionException;
 import manasTrainingService.entity.TargetType;
 import manasTrainingService.repositories.course.CourseRepository;
 import manasTrainingService.service.ActivityLogService;
+import manasTrainingService.repositories.course.CourseTeacherRepository;
+import manasTrainingService.service.CourseApplicationService;
 import manasTrainingService.service.course.CourseAdminService;
 import manasTrainingService.service.course.CourseCategoryService;
 import manasTrainingService.service.user.UserService;
+import manasTrainingService.service.course.CourseInstanceService;
+import manasTrainingService.service.course.CourseTeacherService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +37,10 @@ public class CourseAdminServiceImpl implements CourseAdminService {
 
     private final CourseRepository courseRepository;
     private final CourseCategoryService categoryService;
+    private final CourseApplicationService courseApplicationService;
+    private final CourseTeacherService courseTeacherService;
+    private final CourseInstanceService courseInstanceService;
+
     private final ActivityLogService activityLogService;
     private final UserService userService;
     @Override
@@ -147,21 +158,6 @@ public class CourseAdminServiceImpl implements CourseAdminService {
         return convertToDto(updatedCourse);
     }
 
-    @Transactional
-    @Override
-    public void delete(Integer id) {
-        if (!courseRepository.existsById(id)) {
-            throw new EntityNotFoundException("Курс с ID " + id + " не найден");
-        }
-        courseRepository.deleteById(id);
-        activityLogService.log(
-                userService.getAuthorizedUser(),
-                ActionType.DELETE,
-                TargetType.COURSE,
-                id
-        );
-    }
-
     @Override
     public boolean existsByCode(String code) {
         return courseRepository.existsByCode(code);
@@ -171,6 +167,40 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     public boolean existsByCodeAndIdNot(String code, Integer id) {
         return courseRepository.existsByCodeAndIdNot(code, id);
     }
+
+
+    @Transactional(readOnly = true)
+    @Override
+    public CourseDeletionDependenciesDto getDeletionDependencies(Integer courseId) {
+        if (!courseRepository.existsById(courseId))
+            throw new EntityNotFoundException("Курс с id=" + courseId + " не найден");
+
+        List<ShortDto> applications = courseApplicationService.getByCourseId(courseId);
+        List<ShortDto> instances = courseInstanceService.getByCourseId(courseId);
+        List<ShortDto> teachers = courseTeacherService.getByCourseId(courseId);
+
+        return new CourseDeletionDependenciesDto(applications, instances, teachers);
+    }
+
+    @Transactional
+    @Override
+    public void deleteCourse(Integer courseId) {
+        if (!courseRepository.existsById(courseId))
+            throw new EntityNotFoundException("Курс с id=" + courseId + " не найден");
+
+        var deps = getDeletionDependencies(courseId);
+        if (deps.hasAny())
+            throw new CourseDeletionException("Невозможно удалить курс: найдены связанные элементы");
+
+        courseRepository.deleteById(courseId);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.COURSE,
+                courseId
+        );
+    }
+
 
     public CourseDto convertToDto(Course course) {
         CourseCategoryDto categoryDto = categoryService.convertToDto(course.getCategory());

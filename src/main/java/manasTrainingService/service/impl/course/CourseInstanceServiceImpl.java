@@ -2,6 +2,7 @@ package manasTrainingService.service.impl.course;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseInstanceCreationDTO;
+import manasTrainingService.dto.ShortDto;
 import manasTrainingService.dto.application.CourseInstanceCalendarDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
@@ -197,6 +198,14 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                         .status(instance.getIsActive() ? "Активен" : "Неактивен")
                         .color("#3f51b5")
                         .build())
+                .toList();
+    }
+
+    @Override
+    public List<ShortDto> getByCourseId(Integer courseId) {
+        return courseInstanceRepository.findByCourseId(courseId)
+                .stream()
+                .map(ci -> new ShortDto(ci.getId(), ci.getTitle()))
                 .toList();
     }
 
