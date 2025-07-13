@@ -23,20 +23,20 @@
                 <table id="adminApplicationsTable" class="table table-hover table-bordered align-middle display nowrap" width="100%">
                     <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th>№</th>
                         <th>Компания</th>
                         <th>Курс</th>
                         <th>Код</th>
                         <th>Преподаватель</th>
-                        <th>Желаемая дата начала</th>
+                        <th class="wrap-date">Желаемая дата начала</th>
+                        <th class="wrap-date">Желаемая дата окончания</th>
                         <th>Статус</th>
-                        <th>Дата подачи</th>
                     </tr>
                     </thead>
                     <tbody>
                     <#list applications as app>
                         <tr class="clickable-row" data-href="/applications/admin/${app.id}">
-                            <td>${app.id}</td>
+                            <td>${app?index + 1}</td>
                             <td>${app.organizationName!"—"}</td>
                             <td>${app.courseTitle!"—"}</td>
                             <td>${app.outgoingCode!"—"}</td>
@@ -48,6 +48,7 @@
                                 </#if>
                             </td>
                             <td>${app.formattedPreferredStartDate!"—"}</td>
+                            <td>${app.formattedPreferredEndDate!"—"}</td>
                             <td>
             <span class="badge
                 <#if app.status == "PENDING">bg-warning
@@ -57,7 +58,7 @@
                 ${app.localizedStatus!"—"}
             </span>
                             </td>
-                            <td>${app.formattedSubmittedAt!"—"}</td>
+
                         </tr>
                     </#list>
                     </tbody>
@@ -103,6 +104,13 @@
         .card-header {
             border-bottom: none;
         }
+        .wrap-date {
+            white-space: normal !important;
+            word-break: break-word;
+            min-width: 90px;
+            max-width: 120px;
+        }
+
 
         .badge {
             display: inline-block;
