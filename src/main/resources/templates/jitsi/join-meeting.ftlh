@@ -236,11 +236,6 @@
                 return;
             }
 
-            if (!window.isSecureContext) {
-                console.error('getUserMedia требует безопасного контекста (HTTPS)');
-                return;
-            }
-
             navigator.mediaDevices.getUserMedia({
                 video: {
                     width: { ideal: 1280 },
@@ -257,6 +252,7 @@
                             console.warn('Не удалось запустить превью видео:', e);
                         });
                     }
+                    console.log('Медиа поток получен успешно');
                 })
                 .catch(error => {
                     console.error('Ошибка доступа к медиа:', error);
@@ -304,7 +300,7 @@
                 modalInstance.hide();
             }
 
-            const domain = '157.245.67.28';
+            const domain = 'localhost';
             const options = {
                 roomName: 'ManasTraining_Meeting_${meeting.meetingId}',
                 width: '100%',
@@ -318,11 +314,11 @@
                     disableDeepLinking: true,
 
                     hosts: {
-                        domain: '157.245.67.28',
-                        muc: 'muc.157.245.67.28'
+                        domain: 'localhost',
+                        muc: 'muc.localhost'
                     },
-                    bosh: 'https://157.245.67.28/http-bind',
-                    websocket: 'wss://157.245.67.28/xmpp-websocket',
+                    bosh: 'http://localhost/http-bind',
+                    websocket: 'ws://localhost/xmpp-websocket',
 
                     useStunTurn: true,
                     stunServers: [
