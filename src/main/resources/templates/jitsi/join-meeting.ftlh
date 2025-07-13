@@ -233,13 +233,11 @@
         function initializeMediaPreview() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 console.error('getUserMedia не поддерживается в этом браузере');
-                handleMediaError('getUserMedia не поддерживается в этом браузере');
                 return;
             }
 
             if (!window.isSecureContext) {
                 console.error('getUserMedia требует безопасного контекста (HTTPS)');
-                handleMediaError('Требуется HTTPS для доступа к камере/микрофону');
                 return;
             }
 
@@ -262,42 +260,7 @@
                 })
                 .catch(error => {
                     console.error('Ошибка доступа к медиа:', error);
-                    handleMediaError(error);
                 });
-        }
-
-        function handleMediaError(error) {
-            let errorMessage = 'Не удается получить доступ к камере/микрофону';
-
-            if (typeof error === 'string') {
-                errorMessage = error;
-            } else if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-                errorMessage = 'Доступ к камере/микрофону запрещен. Проверьте настройки браузера.';
-            } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-                errorMessage = 'Камера или микрофон не найдены';
-            } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
-                errorMessage = 'Камера/микрофон уже используется другим приложением';
-            } else if (error.name === 'NotSupportedError') {
-                errorMessage = 'Браузер не поддерживает доступ к медиа устройствам';
-            }
-
-            const previewVideo = document.getElementById('previewVideo');
-            if (previewVideo) {
-                previewVideo.style.display = 'none';
-            }
-
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'alert alert-warning';
-            errorDiv.innerHTML = `
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                ${errorMessage}
-                <br><small>Вы можете продолжить без превью</small>
-            `;
-
-            const previewContainer = document.querySelector('.preview-container');
-            if (previewContainer) {
-                previewContainer.appendChild(errorDiv);
-            }
         }
 
         document.getElementById('toggleCamera').addEventListener('click', function() {
