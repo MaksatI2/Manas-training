@@ -1,12 +1,13 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+
 <#assign dateFormat = "dd.MM.yyyy">
 <#assign dateTimeFormat = "dd.MM.yyyy HH:mm">
 
 <@layout.page title="Детали заявки">
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
-    {"label": "Заявки на курсы", "url": "/applications/organization"},
+    {"label": "Мои заявки", "url": "/applications/student/applications"},
     {"label": "Заявка №${application.id}", "url": ""}
     ] />
 
@@ -94,7 +95,7 @@
             <h5 class="m-0">
                 <i class="fas fa-file-alt me-2"></i> Заявка №${application.id}
             </h5>
-            <a href="/applications/organization" class="btn btn-light btn-sm"
+            <a href="/applications/student/applications" class="btn btn-light btn-sm"
                style="border-radius: 25px; background: white; color: var(--primary-blue); border: 1px solid var(--primary-blue);">
                 <i class="fas fa-arrow-left me-1" style="color: var(--primary-blue);"></i> Назад
             </a>
@@ -105,10 +106,6 @@
                 <div class="col-md-6 mb-3">
                     <strong>Курс:</strong><br>
                     ${application.courseTitle!"—"}
-                </div>
-                <div class="col-md-6 mb-3">
-                    <strong>Код компании:</strong><br>
-                    ${application.outgoingCode!"—"}
                 </div>
                 <div class="col-md-6 mb-3">
                     <strong>Статус:</strong><br>
@@ -145,18 +142,16 @@
                         ${application.formattedPreferredEndDate}
                     </div>
                 </#if>
-            </div>
 
-            <h6 class="mt-4 section-title">
-                <i class="fas fa-users me-2 text-primary"></i>Сотрудники
-            </h6>
-            <div class="employee-list mb-4">
-                <#list application.employees as emp>
-                    <div class="employee-item">
-                        <i class="fas fa-user"></i>
-                        <span>${emp.fullName} &lt;${emp.email}&gt;</span>
+                <#if application.employees?? && application.employees?size == 1>
+                    <div class="col-md-6 mb-3">
+                        <strong>Студент:</strong><br>
+                        <div class="employee-item">
+                            <i class="fas fa-user"></i>
+                            <span>${application.employees[0].fullName} &lt;${application.employees[0].email}&gt;</span>
+                        </div>
                     </div>
-                </#list>
+                </#if>
             </div>
         </div>
     </div>

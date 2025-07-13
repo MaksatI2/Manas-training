@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -146,6 +147,177 @@ public class CourseApplicationController {
         model.addAttribute("calendarItems", calendarItems);
         model.addAttribute("userRole", "organization");
         return "organization/organization_course_instances_calendar";
+    }
+
+    @GetMapping("/student/applications")
+    @PreAuthorize("hasRole('STUDENT')")
+    public String viewStudentApplications(Model model, Principal principal) {
+        List<CourseApplicationViewDto> applications = applicationService
+                .getAllApplicationsByStudent(principal.getName());
+
+        model.addAttribute("applications", applications);
+        return "student/student_applications_list";
+    }
+
+    @GetMapping("/organization/{id}/edit")
+    @PreAuthorize("hasRole('organization')")
+    public String showEditOrganizationForm(@PathVariable Integer id,
+                                           Principal principal,
+                                           Model model) {
+        CourseApplicationViewDto application = applicationService.getApplicationDetails(id, principal.getName());
+
+        CourseApplicationCreateDto dto = new CourseApplicationCreateDto();
+        dto.setCourseId(application.getCourseId());
+        dto.setPreferredStartDate(application.getPreferredStartDate());
+        dto.setPreferredEndDate(application.getPreferredEndDate());
+        dto.setOutgoingCode(application.getOutgoingCode());
+
+        if (application.getPreferredTeacher() != null) {
+            dto.setPreferredTeacherId(application.getPreferredTeacher().getId());
+        }
+
+        dto.setEmployeeIds(
+                application.getEmployees().stream()
+                        .map(EmployeeShortDto::getId)
+                        .collect(Collectors.toList())
+        );
+
+        model.addAttribute("application", dto);
+        model.addAttribute("id", id);
+        model.addAttribute("courses", courseService
+                .getAvailableCoursesForOrganization(
+                        organizationService.getAuthorizedUserOrganizationByEmail(principal.getName()).getUser()));
+        model.addAttribute("employees", organizationService.getMyEmployees(principal.getName()));
+        model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+
+        return "organization/organization_applications_edit";
+    }
+
+    @PostMapping("/organization/{id}/edit")
+    @PreAuthorize("hasRole('organization')")
+    public String updateOrganizationApplication(@PathVariable Integer id,
+                                                @ModelAttribute("application") @Valid CourseApplicationCreateDto dto,
+                                                BindingResult bindingResult,
+                                                Principal principal,
+                                                Model model,
+                                                RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courses", courseService
+                    .getAvailableCoursesForOrganization(
+                            organizationService.getAuthorizedUserOrganizationByEmail(principal.getName()).getUser()));
+            model.addAttribute("employees", organizationService.getMyEmployees(principal.getName()));
+            model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            return "organization/organization_applications_edit";
+        }
+
+        applicationService.updateApplicationForOrganization(id, dto, principal.getName());
+
+        redirectAttributes.addFlashAttribute("successMessage", "Заявка успешно обновлена!");
+        return "redirect:/applications/organization";
+    }
+
+
+    @GetMapping("/student/applications/{id}")
+    @PreAuthorize("hasRole('STUDENT')")
+    public String viewStudentApplicationDetails(@PathVariable Integer id,
+                                                Principal principal,
+                                                Model model) {
+        CourseApplicationViewDto application = applicationService
+                .getApplicationDetails(id, principal.getName());
+        List<ApplicationCommentDto> comments = applicationService.getCommentsForApplication(id);
+
+        model.addAttribute("application", application);
+        model.addAttribute("comments", comments);
+        return "student/student_applications_detail";
+    }
+
+    @GetMapping("/student/applications/create")
+    @PreAuthorize("hasRole('STUDENT')")
+    public String showStudentApplicationForm(Model model) {
+        model.addAttribute("application", new StudentCourseApplicationCreateDto());
+        model.addAttribute("courses", courseService.getAllCourses());
+        model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+        return "student/student_applications_create";
+    }
+
+    @PostMapping("/student/applications")
+    @PreAuthorize("hasRole('STUDENT')")
+    public String createStudentApplication(@ModelAttribute("application") @Valid StudentCourseApplicationCreateDto dto,
+                                           BindingResult bindingResult,
+                                           Principal principal,
+                                           Model model,
+                                           RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("application", dto);
+            model.addAttribute("courses", courseService.getAllCourses());
+            model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            model.addAttribute("errors", bindingResult);
+            return "student/student_applications_create";
+        }
+
+        applicationService.createApplicationFromStudent(dto, principal.getName());
+        redirectAttributes.addFlashAttribute("successMessage", "Заявка успешно отправлена!");
+        return "redirect:/applications/student/applications";
+    }
+
+    @GetMapping("/student/applications/{id}/edit")
+    @PreAuthorize("hasRole('STUDENT')")
+    public String showEditStudentForm(@PathVariable Integer id,
+                                      Principal principal,
+                                      Model model) {
+        CourseApplicationViewDto application = applicationService.getApplicationDetails(id, principal.getName());
+        StudentCourseApplicationCreateDto dto = new StudentCourseApplicationCreateDto();
+
+        dto.setCourseId(application.getCourseId());
+        dto.setPreferredStartDate(application.getPreferredStartDate());
+        dto.setPreferredEndDate(application.getPreferredEndDate());
+        if (application.getPreferredTeacher() != null) {
+            dto.setPreferredTeacherId(application.getPreferredTeacher().getId());
+        }
+
+        model.addAttribute("application", dto);
+        model.addAttribute("courses", courseService.getAllCourses());
+        model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+        return "student/student_applications_edit";
+    }
+
+    @PostMapping("/student/applications/{id}/edit")
+    @PreAuthorize("hasRole('STUDENT')")
+    public String updateStudentApplication(@PathVariable Integer id,
+                                           @ModelAttribute("application") @Valid StudentCourseApplicationCreateDto dto,
+                                           BindingResult bindingResult,
+                                           Principal principal,
+                                           RedirectAttributes redirectAttributes,
+                                           Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courses", courseService.getAllCourses());
+            model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            return "student/student_applications_edit";
+        }
+
+        applicationService.updateApplicationFromStudent(id, dto, principal.getName());
+        redirectAttributes.addAttribute("successMessage", "Заявка успешно обновлена!");
+        return "redirect:/applications/student/applications";
+    }
+
+    @PostMapping("/student/applications/{id}/delete")
+    @PreAuthorize("hasRole('STUDENT')")
+    public String deleteStudentApplication(@PathVariable Integer id,
+                                           Principal principal,
+                                           RedirectAttributes redirectAttributes) {
+        applicationService.deleteApplicationById(id, principal.getName());
+        redirectAttributes.addFlashAttribute("successMessage", "Заявка удалена.");
+        return "redirect:/applications/student/applications";
+    }
+
+    @PostMapping("/organization/{id}/delete")
+    @PreAuthorize("hasRole('organization')")
+    public String deleteOrganizationApplication(@PathVariable Integer id,
+                                                Principal principal,
+                                                RedirectAttributes redirectAttributes) {
+        applicationService.deleteApplicationById(id, principal.getName());
+        redirectAttributes.addFlashAttribute("successMessage", "Заявка удалена.");
+        return "redirect:/applications/organization";
     }
 
 

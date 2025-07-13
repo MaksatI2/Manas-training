@@ -51,6 +51,6 @@ public class AdminTeacherController {
                                        RedirectAttributes redirectAttributes) {
         courseTeacherService.updateTeacherCourses(teacherId, courseIds != null ? courseIds : Collections.emptyList());
         redirectAttributes.addFlashAttribute("successMessage", "Курсы преподавателя успешно обновлены!");
-        return "redirect:/admin/teachers/" + teacherId;
+        return "redirect:/admin/teachers/" + teacherId + "/manage-courses";
     }
 }

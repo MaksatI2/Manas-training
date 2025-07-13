@@ -5,13 +5,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
-<@layout.page title="Создание заявки на курс">
-    <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Заявки на курсы", "url": "/applications/organization"},
-    {"label": "Создание заявки", "url": ""}
-    ] />
-
+<@layout.page title="Редактировать заявку на курс">
 
     <style>
         :root {
@@ -76,10 +70,16 @@
         .me-2 { margin-right: 0.5rem; }
     </style>
 
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Заявки на курсы", "url": "/applications/organization"},
+    {"label": "Редактировать заявку", "url": ""}
+    ] />
+
     <div class="card-custom mb-4">
         <div class="card-header-custom">
             <h5 class="m-0">
-                <i class="fas fa-file-signature me-2"></i>Создание заявки на курс
+                <i class="fas fa-edit me-2"></i> Редактировать заявку
             </h5>
             <div class="d-flex align-items-center">
                 <a href="/applications/organization/calendar" class="btn btn-light btn-sm me-2"
@@ -94,64 +94,54 @@
         </div>
 
         <div class="card-body-custom">
-            <#if errors?? && errors.hasGlobalErrors()>
-                <div class="alert alert-danger small">
-                    <#list errors.globalErrors as err>
-                        ${err.defaultMessage}<br/>
-                    </#list>
-                </div>
-            </#if>
-
-            <form action="/applications/organization" method="post">
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <form method="post" action="/applications/organization/${id}/edit">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="courseId" class="form-label fw-bold">Курс <span class="text-danger">*</span></label>
-                            <select id="courseId" name="courseId" class="form-select" required>
-                                <option value="">Выберите курс</option>
+                            <label for="courseId" class="form-label fw-bold">Курс</label>
+                            <select class="form-select" name="courseId" id="courseId" required>
+                                <option value="">-- Выберите курс --</option>
                                 <#list courses as course>
-                                    <option value="${course.id}"
-                                            <#if application?? && application.courseId?? && application.courseId == course.id>selected</#if>>
+                                    <option value="${course.id}" <#if course.id == application.courseId>selected</#if>>
                                         ${course.title}
                                     </option>
                                 </#list>
                             </select>
-                            <#if errors?? && errors.hasFieldErrors("courseId")>
-                                <div class="text-danger small mt-1">${errors.getFieldError("courseId").defaultMessage}</div>
-                            </#if>
                         </div>
 
                         <div class="mb-3">
                             <label for="preferredTeacherId" class="form-label fw-bold">Предпочтительный преподаватель</label>
-                            <select id="preferredTeacherId" name="preferredTeacherId" class="form-select">
-                                <option value="">Не выбрано</option>
+                            <select class="form-select" name="preferredTeacherId" id="preferredTeacherId">
+                                <option value="">-- Без предпочтений --</option>
+                                <#list teachers as teacher>
+                                    <option value="${teacher.id}"
+                                            <#if application.preferredTeacherId?? && teacher.id == application.preferredTeacherId>
+                                    selected
+                                            </#if>>
+                                        ${teacher.fullName}
+                                    </option>
+                                </#list>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label for="preferredStartDate" class="form-label fw-bold">Желаемая дата начала</label>
-                            <input type="date" id="preferredStartDate" name="preferredStartDate" class="form-control"
+                            <input type="date" class="form-control" name="preferredStartDate" id="preferredStartDate"
                                    value="${(application.preferredStartDate)?if_exists}">
-                            <#if errors?? && errors.hasFieldErrors("preferredStartDate")>
-                                <div class="text-danger small mt-1">${errors.getFieldError("preferredStartDate").defaultMessage}</div>
-                            </#if>
                         </div>
 
                         <div class="mb-3">
                             <label for="preferredEndDate" class="form-label fw-bold">Желаемая дата окончания</label>
-                            <input type="date" id="preferredEndDate" name="preferredEndDate" class="form-control"
+                            <input type="date" class="form-control" name="preferredEndDate" id="preferredEndDate"
                                    value="${(application.preferredEndDate)?if_exists}">
-                            <#if errors?? && errors.hasFieldErrors("preferredEndDate")>
-                                <div class="text-danger small mt-1">${errors.getFieldError("preferredEndDate").defaultMessage}</div>
-                            </#if>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="employeeIds" class="form-label fw-bold">Сотрудники <span class="text-danger">*</span></label>
+                            <label for="employeeIds" class="form-label fw-bold">Сотрудники</label>
                             <select id="employeeIds" name="employeeIds" class="form-select" multiple required>
                                 <#list employees as emp>
                                     <option value="${emp.id}"
@@ -160,25 +150,19 @@
                                     </option>
                                 </#list>
                             </select>
-                            <#if errors?? && errors.hasFieldErrors("employeeIds")>
-                                <div class="text-danger small mt-1">${errors.getFieldError("employeeIds").defaultMessage}</div>
-                            </#if>
                         </div>
 
                         <div class="mb-3">
-                            <label for="outgoingCode" class="form-label fw-bold">Исходящий код компании <span class="text-danger">*</span></label>
-                            <input type="text" id="outgoingCode" name="outgoingCode" class="form-control"
-                                   value="${(application.outgoingCode)!''}" required>
-                            <#if errors?? && errors.hasFieldErrors("outgoingCode")>
-                                <div class="text-danger small mt-1">${errors.getFieldError("outgoingCode").defaultMessage}</div>
-                            </#if>
+                            <label for="outgoingCode" class="form-label fw-bold">Исходящий код</label>
+                            <input type="text" class="form-control" name="outgoingCode" id="outgoingCode"
+                                   value="${application.outgoingCode!}" required>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary shadow-sm">
-                        <i class="fas fa-paper-plane me-1"></i> Отправить заявку
+                        <i class="fa-solid fa-floppy-disk me-1"></i> Сохранить изменения
                     </button>
                 </div>
             </form>
@@ -195,28 +179,32 @@
                 placeholder: true,
                 shouldSort: false,
             });
-        });
 
-        document.getElementById('courseId').addEventListener('change', function () {
-            const courseId = this.value;
+            const courseSelect = document.getElementById('courseId');
             const teacherSelect = document.getElementById('preferredTeacherId');
-            teacherSelect.innerHTML = '<option value="">Не выбрано</option>';
 
-            if (courseId) {
-                fetch('/api/courses/' + courseId + '/teachers')
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(teacher => {
-                            const option = document.createElement('option');
-                            option.value = teacher.id;
-                            option.textContent = teacher.fullName + ' (' + teacher.email + ')';
-                            teacherSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при загрузке преподавателей:', error);
-                    });
+            function loadTeachers(courseId) {
+                teacherSelect.innerHTML = '<option value="">-- Без предпочтений --</option>';
+                if (courseId) {
+                    fetch('/api/courses/' + courseId + '/teachers')
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(teacher => {
+                                const option = document.createElement('option');
+                                option.value = teacher.id;
+                                option.textContent = teacher.fullName + ' (' + teacher.email + ')';
+                                teacherSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Ошибка при загрузке преподавателей:', error));
+                }
+            }
+
+            courseSelect.addEventListener('change', () => loadTeachers(courseSelect.value));
+            if (courseSelect.value) {
+                loadTeachers(courseSelect.value);
             }
         });
     </script>
+
 </@layout.page>

@@ -144,12 +144,6 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/#" class="nav-link" data-tooltip="Курсы">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span>Курсы</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
                         <a href="/applications/organization" class="nav-link" data-tooltip="Заявки на курсы">
                             <i class="fas fa-file-alt"></i>
                             <span>Заявки на курсы</span>
@@ -167,6 +161,12 @@
                         <a href="/schedules" class="nav-link" data-tooltip="Расписание">
                             <i class="fas fa-calendar"></i>
                             <span>Расписание</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/applications/student/applications" class="nav-link" data-tooltip="Мои заявки">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Мои заявки</span>
                         </a>
                     </div>
                 </#if>

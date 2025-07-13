@@ -10,6 +10,7 @@ import manasTrainingService.repositories.user.OrganizationRepository;
 import manasTrainingService.repositories.user.UserRepository;
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.impl.CourseApplicationServiceImpl;
+import manasTrainingService.service.user.EmailService;
 import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,9 @@ class CourseApplicationServiceImplTest {
     private CourseEnrollmentRepository enrollmentRepository;
     @Mock
     private CourseInstanceRepository instanceRepository;
+    @Mock
+    private EmailService emailService;
+
     @Mock
     private UserService userService;
     @Mock
@@ -173,6 +177,8 @@ class CourseApplicationServiceImplTest {
 
         assertEquals(Status.APPROVED, app.getStatus());
         verify(applicationRepository).save(app);
+        verify(emailService).sendApplicationStatusUpdateEmail(app);
+
     }
 
     @Test
@@ -196,7 +202,9 @@ class CourseApplicationServiceImplTest {
         service.addCommentToApplication(1, "Тест", "admin@example.com");
 
         verify(commentRepository).save(any());
+        verify(emailService).sendNewCommentNotification(eq(app), eq("Тест"), eq(admin));
     }
+
 
     @Test
     void getComments_success() {

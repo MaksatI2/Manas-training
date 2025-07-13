@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CourseApplicationViewDto {
     private Integer id;
+    private Integer courseId;
     private String courseTitle;
     private String organizationName;
     private String outgoingCode;

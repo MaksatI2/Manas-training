@@ -1,10 +1,7 @@
 package manasTrainingService.service;
 
+import manasTrainingService.dto.application.*;
 import manasTrainingService.dto.ShortDto;
-import manasTrainingService.dto.application.ApplicationCommentDto;
-import manasTrainingService.dto.application.ApplicationStatusUpdateDto;
-import manasTrainingService.dto.application.CourseApplicationCreateDto;
-import manasTrainingService.dto.application.CourseApplicationViewDto;
 
 import java.util.List;
 
@@ -26,4 +23,15 @@ public interface CourseApplicationService {
     List<ApplicationCommentDto> getCommentsForApplication(Integer applicationId);
 
     List<ShortDto> getByCourseId(Integer courseId);
+
+    void updateApplicationForOrganization(Integer id, CourseApplicationCreateDto dto, String email);
+
+    List<CourseApplicationViewDto> getAllApplicationsByStudent(String email);
+
+    void createApplicationFromStudent(StudentCourseApplicationCreateDto dto, String email);
+
+    void updateApplicationFromStudent(Integer id, StudentCourseApplicationCreateDto dto, String email);
+
+    void deleteApplicationById(Integer id, String email);
+
 }

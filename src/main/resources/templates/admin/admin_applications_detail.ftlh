@@ -1,8 +1,26 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
 <@layout.page title="Просмотр заявки">
+    <#if errorMessage??>
+        <div class="custom-toast show bg-danger text-white">
+            <div class="d-flex align-items-center p-2">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span>${errorMessage}</span>
+            </div>
+        </div>
+    </#if>
 
-<@roadmap.breadcrumbs items=[
+    <#if successMessage??>
+        <div class="custom-toast show bg-success text-white">
+            <div class="d-flex align-items-center p-2">
+                <i class="fas fa-check-circle me-2"></i>
+                <span>${successMessage}</span>
+            </div>
+        </div>
+    </#if>
+
+
+    <@roadmap.breadcrumbs items=[
   {"label": "Главная", "url": "/"},
   {"label": "Заявки на курсы", "url": "/applications/admin"},
   {"label": "Заявка №${application.id}", "url": ""}
@@ -43,6 +61,26 @@
         border-radius: 0.375rem;
         padding: 0.35em 0.65em;
     }
+
+    .custom-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1080;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+        min-width: 320px;
+        max-width: 400px;
+        font-size: 0.95rem;
+    }
+
+    .custom-toast.hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+
 
     .bg-warning { background-color: #ffc107 !important; color: #212529 !important; }
     .bg-success { background-color: #28a745 !important; }
@@ -128,47 +166,58 @@
             </#if>
         </div>
 
-        <h6 class="mt-4 section-title"><i class="fas fa-users me-2 text-primary"></i>Сотрудники</h6>
-        <div class="employee-list mb-4">
-            <#list application.employees as emp>
-                <div class="employee-item">
-                    <span><i class="fas fa-user me-1 text-muted"></i>${emp.fullName} &lt;${emp.email}&gt;</span>
-                    <span class="badge
-                        <#if emp.applicationStatus == "APPROVED">bg-success
-                        <#elseif emp.applicationStatus == "REJECTED">bg-danger
-                        <#elseif emp.applicationStatus == "PENDING">bg-warning
-                        <#else>bg-secondary</#if>">
-                        <#if emp.applicationStatus == "APPROVED">Одобрен
-                        <#elseif emp.applicationStatus == "REJECTED">Отклонён
-                        <#elseif emp.applicationStatus == "PENDING">В ожидании
-                        <#else>Неизвестно</#if>
-                    </span>
-                </div>
-            </#list>
-        </div>
-        <div class="card-body-custom">
-            <form action="/applications/admin/${application.id}/status" method="post">
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="newStatus" class="form-label">Изменить статус</label>
-                        <select id="newStatus" name="newStatus" class="form-select form-select-sm" required>
-                            <option value="">Выберите</option>
-                            <option value="APPROVED">Одобрена</option>
-                            <option value="REJECTED">Отклонена</option>
-                            <option value="IN_PROGRESS">В работе</option>
-                        </select>
+        <div class="col-md-12 mb-3">
+            <strong>Участники заявки:</strong>
+            <div class="row">
+                <#list application.employees as emp>
+                    <div class="col-md-6 d-flex align-items-center justify-content-between py-1">
+                <span>
+                    <i class="fas fa-user me-1 text-muted"></i>
+                    ${emp.fullName} &lt;${emp.email}&gt;
+                </span>
+                        <span class="badge
+                    <#if emp.applicationStatus == "APPROVED">bg-success
+                    <#elseif emp.applicationStatus == "REJECTED">bg-danger
+                    <#elseif emp.applicationStatus == "PENDING">bg-warning
+                    <#else>bg-secondary</#if>">
+                    <#if emp.applicationStatus == "APPROVED">Одобрен
+                    <#elseif emp.applicationStatus == "REJECTED">Отклонён
+                    <#elseif emp.applicationStatus == "PENDING">В ожидании
+                    <#else>Неизвестно</#if>
+                </span>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="comment" class="form-label">Комментарий (обязателен при отклонении)</label>
-                        <textarea id="comment" name="comment" rows="3" class="form-control form-control-sm"></textarea>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-save me-1"></i> Сохранить
-                </button>
-            </form>
+                </#list>
+            </div>
         </div>
+        <#if application.status != "APPROVED">
+            <div class="card-body-custom">
+                <form action="/applications/admin/${application.id}/status" method="post">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="newStatus" class="form-label">Изменить статус</label>
+                            <select id="newStatus" name="newStatus" class="form-select form-select-sm" required>
+                                <option value="">Выберите</option>
+                                <option value="APPROVED">Одобрена</option>
+                                <option value="REJECTED">Отклонена</option>
+                                <option value="IN_PROGRESS">В работе</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="comment" class="form-label">Комментарий (обязателен при отклонении)</label>
+                            <textarea id="comment" name="comment" rows="3" class="form-control form-control-sm"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary shadow-sm">
+                        <i class="fas fa-save me-1"></i> Сохранить
+                    </button>
+                </form>
+            </div>
+        <#else>
+            <div class="alert alert-info mt-3">
+                Заявка уже <strong>одобрена</strong>, её статус изменить нельзя.
+            </div>
+        </#if>
     </div>
 </div>
 
@@ -206,9 +255,11 @@
 
     <script>
         setTimeout(() => {
-            const toast = document.querySelector('.custom-toast');
-            if (toast) toast.classList.remove('show');
+            document.querySelectorAll('.custom-toast').forEach(toast => {
+                toast.classList.add('hide');
+            });
         }, 5000);
     </script>
+
 
 </@layout.page>

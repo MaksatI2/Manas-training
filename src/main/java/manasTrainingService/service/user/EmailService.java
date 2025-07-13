@@ -1,5 +1,6 @@
 package manasTrainingService.service.user;
 
+import manasTrainingService.entity.CourseApplication;
 import manasTrainingService.entity.User;
 
 public interface EmailService {
@@ -9,4 +10,7 @@ public interface EmailService {
 
     void sendStudentWelcomeEmail(String email, String name, String rawPassword);
 
+    void sendNewCommentNotification(CourseApplication app, String comment, User author);
+
+    void sendApplicationStatusUpdateEmail(CourseApplication app);
 }
