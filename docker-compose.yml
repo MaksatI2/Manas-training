@@ -60,7 +60,7 @@ services:
     environment:
       - ENABLE_LETSENCRYPT=0
       - ENABLE_HTTP_REDIRECT=1
-      - DISABL  E_HTTPS=0
+      - DISABLE_HTTPS=0
       - JICOFO_AUTH_USER=focus
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
