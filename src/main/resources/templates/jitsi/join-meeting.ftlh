@@ -316,9 +316,6 @@
             }
 
             const domain = '157.245.67.28';
-            const protocol = 'https://';
-            const port = '';
-
             const options = {
                 roomName: 'ManasTraining_Meeting_${meeting.meetingId}',
                 width: '100%',
@@ -332,16 +329,11 @@
                     disableDeepLinking: true,
 
                     hosts: {
-                        domain: domain,
-                        muc: `conference.${domain}`,
-                        focus: `focus.${domain}`
+                        domain: '157.245.67.28',
+                        muc: 'muc.157.245.67.28'
                     },
-
-                    websocket: `wss://${domain}/xmpp-websocket`,
-
-                    bosh: `${protocol}${domain}/http-bind`,
-
-                    serviceUrl: `${protocol}${domain}/`,
+                    bosh: '//157.245.67.28/http-bind',
+                    websocket: 'wss://157.245.67.28/xmpp-websocket',
 
                     useStunTurn: true,
                     stunServers: [
@@ -421,7 +413,6 @@
                 jitsiAPI.addEventListener('videoConferenceJoined', function(event) {
                     console.log('Подключен к конференции:', event);
                     document.getElementById('loadingIndicator').style.display = 'none';
-                    startMeetingTimer();
                     joinMeetingOnServer();
                 });
 
@@ -439,12 +430,10 @@
 
                 jitsiAPI.addEventListener('participantJoined', function(event) {
                     console.log('Участник подключился:', event);
-                    updateParticipantCount();
                 });
 
                 jitsiAPI.addEventListener('participantLeft', function(event) {
                     console.log('Участник покинул встречу:', event);
-                    updateParticipantCount();
                 });
 
                 jitsiAPI.addEventListener('videoConferenceLeft', function(event) {
