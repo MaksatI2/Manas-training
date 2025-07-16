@@ -1,6 +1,6 @@
 stages:
-- build
-- deploy
+  - build
+  - deploy
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
@@ -29,12 +29,15 @@ deploy:
   before_script:
     - apt-get update -qq && apt-get install -y -qq openssh-client sshpass rsync
   script:
-    - echo "Деплой на сервер 157.245.67.28"
-    - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" rsync -avz -e "ssh -o StrictHostKeyChecking=no" --delete ./ root@157.245.67.28:/root/manas-training-service/
-    - sshpass -p "HMaggualm2SGj6pMjAFvSEYV" ssh -o StrictHostKeyChecking=no root@157.245.67.28 "cd /root/manas-training-service && chmod +x deploy.sh && ./deploy.sh"
+    - echo "Деплой на новый сервер 195.38.165.94"
+    - sshpass -p "manastraining14072025_kg" ssh -o StrictHostKeyChecking=no manastraining_kg@195.38.165.94 "mkdir -p /home/manastraining_kg/manas-training-service"
+    - sshpass -p "manastraining14072025_kg" rsync -avz -e "ssh -o StrictHostKeyChecking=no" --delete ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
+    - sshpass -p "manastraining14072025_kg" ssh -o StrictHostKeyChecking=no manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && chmod +x deploy.sh && chmod +x install-docker.sh && chmod +x setup-ssl.sh"
+    - sshpass -p "manastraining14072025_kg" ssh -o StrictHostKeyChecking=no manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./install-docker.sh"
+    - sshpass -p "manastraining14072025_kg" ssh -o StrictHostKeyChecking=no manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./deploy.sh"
   environment:
     name: production
-    url: http://157.245.67.28:8089
+    url: https://manastraining.kg
   only:
     - dev
   when: manual
