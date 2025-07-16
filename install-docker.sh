@@ -7,6 +7,8 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+SUDO_PASSWORD="manastraining14072025_kg"
+
 echo -e "${GREEN}🔧 Проверка и установка Docker...${NC}"
 
 if command -v docker &> /dev/null; then
@@ -15,18 +17,18 @@ if command -v docker &> /dev/null; then
 else
     echo -e "${YELLOW}📦 Установка Docker...${NC}"
 
-    sudo apt-get update
+    echo "$SUDO_PASSWORD" | sudo -S apt-get update
 
-    sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+    echo "$SUDO_PASSWORD" | sudo -S apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo -S gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg <<< "$SUDO_PASSWORD"
 
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo -S tee /etc/apt/sources.list.d/docker.list > /dev/null <<< "$SUDO_PASSWORD"
 
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    echo "$SUDO_PASSWORD" | sudo -S apt-get update
+    echo "$SUDO_PASSWORD" | sudo -S apt-get install -y docker-ce docker-ce-cli containerd.io
 
-    sudo usermod -aG docker $USER
+    echo "$SUDO_PASSWORD" | sudo -S usermod -aG docker $USER
 
     echo -e "${GREEN}✅ Docker установлен успешно${NC}"
 fi
@@ -36,15 +38,14 @@ if command -v docker-compose &> /dev/null; then
     docker-compose --version
 else
     echo -e "${YELLOW}📦 Установка Docker Compose...${NC}"
-
-    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
+    echo "$SUDO_PASSWORD" | sudo -S curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    echo "$SUDO_PASSWORD" | sudo -S chmod +x /usr/local/bin/docker-compose
 
     echo -e "${GREEN}✅ Docker Compose установлен успешно${NC}"
 fi
 
 echo -e "${YELLOW}🚀 Запуск Docker сервиса...${NC}"
-sudo systemctl start docker
-sudo systemctl enable docker
+echo "$SUDO_PASSWORD" | sudo -S systemctl start docker
+echo "$SUDO_PASSWORD" | sudo -S systemctl enable docker
 
 echo -e "${GREEN}✅ Docker готов к использованию${NC}"
