@@ -1,6 +1,24 @@
 version: '3.8'
 
 services:
+  nginx:
+    image: nginx:alpine
+    container_name: manas-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - app
+      - jitsi-web
+      - prosody
+    networks:
+      - manas-network
+    restart: unless-stopped
+
   postgres:
     image: postgres:15
     container_name: manas-postgres
@@ -32,7 +50,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=qwerty
-      - JITSI_DOMAIN=157.245.67.28
+      - JITSI_DOMAIN=manastraining.kg
     ports:
       - "8089:8089"
     depends_on:
@@ -75,7 +93,7 @@ services:
       - RESOLUTION=720
       - RESOLUTION_MIN=180
       - RESOLUTION_MAX=1080
-      - PUBLIC_URL=https://157.245.67.28:8443
+      - PUBLIC_URL=https://manastraining.kg
     networks:
       - manas-network
     volumes:
@@ -106,7 +124,7 @@ services:
       - LOG_LEVEL=warn
       - ENABLE_XMPP_WEBSOCKET=1
       - ENABLE_SUBDOMAINS=true
-      - PUBLIC_URL=https://157.245.67.28:8443
+      - PUBLIC_URL=https://manastraining.kg
     networks:
       - manas-network
     volumes:
@@ -145,7 +163,7 @@ services:
     image: jitsi/jvb:stable
     container_name: manas-jvb
     environment:
-      - DOCKER_HOST_ADDRESS=157.245.67.28
+      - DOCKER_HOST_ADDRESS=manastraining.kg
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
       - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
       - XMPP_SERVER=prosody
@@ -157,11 +175,11 @@ services:
       - JVB_STUN_SERVERS=stun.l.google.com:19302,stun1.l.google.com:19302,stun2.l.google.com:19302
       - TZ=Asia/Bishkek
       - JVB_ENABLE_APIS=rest,colibri
-      - JVB_WS_DOMAIN=157.245.67.28
+      - JVB_WS_DOMAIN=manastraining.kg
       - JVB_WS_SERVER_ID=jvb1
       - COLIBRI_REST_ENABLED=true
       - SHUTDOWN_REST_ENABLED=true
-      - PUBLIC_URL=https://157.245.67.28:8443
+      - PUBLIC_URL=https://manastraining.kg
     networks:
       - manas-network
     volumes:

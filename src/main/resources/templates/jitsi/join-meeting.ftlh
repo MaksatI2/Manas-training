@@ -197,7 +197,7 @@
         }
     </style>
 
-    <script src="https://157.245.67.28/js/external_api.js"></script>
+    <script src="https://manastraining.kg/js/external_api.js"></script>
     <script>
         let localStream = null;
         let cameraEnabled = true;
@@ -304,7 +304,7 @@
                 modalInstance.hide();
             }
 
-            const domain = '157.245.67.28';
+            const domain = 'https://manastraining.kg';
             const options = {
                 roomName: 'ManasTraining_Meeting_${meeting.meetingId}',
                 width: '100%',
@@ -318,11 +318,11 @@
                     disableDeepLinking: true,
 
                     hosts: {
-                        domain: '157.245.67.28',
-                        muc: 'muc.157.245.67.28'
+                        domain: 'https://manastraining.kg8',
+                        muc: 'muc.https://manastraining.kg'
                     },
-                    bosh: 'https://157.245.67.28/http-bind',
-                    websocket: 'wss://157.245.67.28/xmpp-websocket',
+                    bosh: 'https://manastraining.kg/http-bind',
+                    websocket: 'wss:https://manastraining.kg/xmpp-websocket',
 
                     useStunTurn: true,
                     stunServers: [
