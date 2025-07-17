@@ -1,0 +1,22 @@
+package manasTrainingService.dto.statistics;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import manasTrainingService.entity.CourseInstance;
+import manasTrainingService.entity.Status;
+
+@Getter
+@AllArgsConstructor
+@Setter
+public class AttendanceStatsDTO {
+    private final CourseInstance courseInstance;
+    private final int totalHours;
+    private final int absentHours;
+    private final Status enrollmentStatus;
+    private String localisedStatus;
+
+    public int getAttendancePercentage() {
+        return totalHours == 0 ? 0 : (absentHours * 100 / totalHours);
+    }
+}
