@@ -22,11 +22,6 @@ echo -e "${YELLOW}🔐 Настройка SSL сертификатов...${NC}"
 chmod +x setup-ssl.sh
 ./setup-ssl.sh
 
-echo -e "${YELLOW}🔧 Настройка прав доступа...${NC}"
-sudo usermod -aG docker $USER
-
-sudo chmod 666 /var/run/docker.sock
-
 echo -e "${YELLOW}🔨 Сборка и запуск контейнеров...${NC}"
 docker-compose up -d --build
 
