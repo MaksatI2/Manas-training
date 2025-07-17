@@ -14,25 +14,29 @@ echo -e "${GREEN}🔐 Настройка SSL для домена $DOMAIN...${NC}
 
 mkdir -p $SSL_DIR
 
-if ! command -v certbot &> /dev/null; then
-    echo -e "${YELLOW}📦 Установка certbot...${NC}"
-    sudo apt-get update
-    sudo apt-get install -y certbot python3-certbot-nginx
+if [ -f "$SSL_DIR/cert.pem" ] && [ -f "$SSL_DIR/key.pem" ]; then
+    echo -e "${GREEN}✅ SSL сертификаты уже существуют${NC}"
+    exit 0
+fi
+
+if ! command -v openssl &> /dev/null; then
+    echo -e "${RED}❌ OpenSSL не найден. Убедитесь, что он установлен на сервере${NC}"
+    exit 1
 fi
 
 echo -e "${YELLOW}🔧 Создание временного самоподписанного сертификата...${NC}"
-sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout $SSL_DIR/key.pem \
     -out $SSL_DIR/cert.pem \
     -subj "/C=KG/ST=Bishkek/L=Bishkek/O=Manas Training/CN=$DOMAIN"
 
-sudo chown -R $USER:$USER $SSL_DIR
 chmod 600 $SSL_DIR/key.pem
 chmod 644 $SSL_DIR/cert.pem
 
 echo -e "${GREEN}✅ Временный SSL сертификат создан${NC}"
 echo -e "${YELLOW}⚠️  Примечание: Это самоподписанный сертификат для разработки${NC}"
-echo -e "${YELLOW}   Для продакшена получите сертификат Let's Encrypt:${NC}"
+echo -e "${YELLOW}   Для продакшена получите сертификат Let's Encrypt вручную:${NC}"
 echo -e "${YELLOW}   sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN${NC}"
 
 echo -e "${GREEN}🚀 SSL настроен успешно!${NC}"
