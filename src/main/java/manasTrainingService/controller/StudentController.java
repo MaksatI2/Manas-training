@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.statistics.AttendanceStatsDTO;
+import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.user.StudentService;
+import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +32,7 @@ public class StudentController {
     private final UserService userService;
     private final EnrollmentService enrollmentService;
     private final CourseInstanceService courseInstanceService;
+    private final StudentStatisticsService studentStatisticsService;
 
     @GetMapping("/profile")
     public String profilePage(Model model){
@@ -79,5 +83,14 @@ public class StudentController {
         model.addAttribute("userRole", userService.getAuthorizedUser().getRole());
         return "student/course-detail";
     }
+
+    @GetMapping("/statistics")
+    public String viewStudentStatistics(Model model) {
+        User student = userService.getAuthorizedUser();
+        List<AttendanceStatsDTO> stats = studentStatisticsService.getAllAttendanceStats(student);
+        model.addAttribute("attendanceStatsList", stats);
+        return "student/statistics";
+    }
+
 
 }

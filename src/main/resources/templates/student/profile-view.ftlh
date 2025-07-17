@@ -237,6 +237,11 @@
                             <i class="fas fa-edit"></i>
                             Редактировать профиль
                         </a>
+                        <a href="/student/statistics" class="edit-button">
+                            <i class="fas fa-chart-bar"></i>
+                            Моя статистика
+                        </a>
+
                     </div>
 
                 </div>
