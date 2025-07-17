@@ -24,19 +24,20 @@ chmod +x setup-ssl.sh
 
 echo -e "${YELLOW}🔧 Настройка прав доступа...${NC}"
 sudo usermod -aG docker $USER
-newgrp docker
+
+sudo chmod 666 /var/run/docker.sock
 
 echo -e "${YELLOW}🔨 Сборка и запуск контейнеров...${NC}"
-sudo docker-compose up -d --build
+docker-compose up -d --build
 
 echo -e "${YELLOW}⏳ Ожидание готовности сервисов...${NC}"
 sleep 30
 
 echo -e "${YELLOW}🔍 Проверка статуса контейнеров...${NC}"
-sudo docker-compose ps
+docker-compose ps
 
 echo -e "${YELLOW}📝 Последние логи приложения:${NC}"
-sudo docker-compose logs --tail=50 app
+docker-compose logs --tail=50 app
 
 echo -e "${GREEN}✅ Деплой завершен успешно!${NC}"
 echo -e "${GREEN}🌐 Приложение доступно по адресу: https://manastraining.kg${NC}"
@@ -47,5 +48,5 @@ if curl -f http://localhost:8089/actuator/health > /dev/null 2>&1; then
     echo -e "${GREEN}✅ Приложение работает корректно${NC}"
 else
     echo -e "${RED}❌ Приложение не отвечает. Проверьте логи:${NC}"
-    sudo docker-compose logs app
+    docker-compose logs app
 fi
