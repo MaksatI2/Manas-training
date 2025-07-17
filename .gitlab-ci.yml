@@ -1,3 +1,28 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+
+build:
+  stage: build
+  image: maven:3.8.6-eclipse-temurin-17
+  script:
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 day
+  only:
+    - dev
+
 deploy:
   stage: deploy
   image: ubuntu:20.04
@@ -60,15 +85,15 @@ deploy:
     - ssh-add /tmp/deploy_key
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+    - ssh-keyscan -H 195.38.165.94 >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - echo "Деплой на сервер $SERVER_HOST"
-    - ssh $SSH_USER@$SERVER_HOST "mkdir -p /home/$SSH_USER/manas-training-service"
-    - rsync -avz --delete ./ $SSH_USER@$SERVER_HOST:/home/$SSH_USER/manas-training-service/
-    - ssh $SSH_USER@$SERVER_HOST "cd /home/$SSH_USER/manas-training-service && chmod +x deploy.sh && chmod +x install-docker.sh && chmod +x setup-ssl.sh"
-    - ssh $SSH_USER@$SERVER_HOST "cd /home/$SSH_USER/manas-training-service && ./install-docker.sh"
-    - ssh $SSH_USER@$SERVER_HOST "cd /home/$SSH_USER/manas-training-service && ./deploy.sh"
+    - echo "Деплой на сервер 195.38.165.94"
+    - ssh manastraining_kg@195.38.165.94 "mkdir -p /home/manastraining_kg/manas-training-service"
+    - rsync -avz --delete ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
+    - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && chmod +x deploy.sh && chmod +x install-docker.sh && chmod +x setup-ssl.sh"
+    - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./install-docker.sh"
+    - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./deploy.sh"
   environment:
     name: production
     url: https://manastraining.kg
