@@ -15,12 +15,12 @@ import manasTrainingService.validation.ValidPhoneNumber;
 public class CreateStudentByOrganizationDto {
 
     @NotBlank(message = "Имя обязательно для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Имя должно содержать только буквы")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
     @Size(max = 100, message = "Имя не должно превышать 100 символов")
     private String name;
 
     @NotBlank(message = "Фамилия обязательна для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Фамилия должна содержать только буквы")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
     @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
     private String lastName;
 
@@ -31,8 +31,7 @@ public class CreateStudentByOrganizationDto {
     @Size(max = 150, message = "Email не должен превышать 150 символов")
     private String email;
 
-    @NotBlank(message = "Номер телефона обязателен")
+    @NotBlank(message = "Номер телефона не может быть пустым")
     @ValidPhoneNumber
-    @Pattern(regexp = "^\\+996\\d{9}$", message = "Номер должен быть в формате +996XXXXXXXXX")
     private String phone;
 }

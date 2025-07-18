@@ -144,21 +144,10 @@
     </div>
 
     <script>
-        const input = document.querySelector("#phone");
-        const errorBlock = document.querySelector("#phone").nextElementSibling.nextElementSibling;
-
-        input.addEventListener("input", () => {
-            if (iti.isValidNumber()) {
-                input.style.borderColor = "green";
-                errorBlock.textContent = "";
-            } else {
-                input.style.borderColor = "red";
-                errorBlock.textContent = "Некорректный номер";
-            }
-        });
-
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.querySelector("#phone");
+            const errorBlock = input.nextElementSibling.nextElementSibling;
+
             const iti = window.intlTelInput(input, {
                 preferredCountries: ["kg", "ru", "kz", "uz"],
                 initialCountry: "kg",
@@ -172,12 +161,39 @@
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/utils.js"
             });
 
-            document.getElementById("studentForm").addEventListener("submit", function(e) {
+            input.addEventListener("input", function() {
+                if (iti.isValidNumber()) {
+                    input.style.borderColor = "green";
+                    errorBlock.textContent = "";
+                } else {
+                    input.style.borderColor = "red";
+                    errorBlock.textContent = "Некорректный номер";
+                }
+            });
+
+            document.getElementById("teacherForm").addEventListener("submit", function(e) {
                 const number = iti.getNumber();
                 input.value = number;
+
+                if (!iti.isValidNumber()) {
+                    e.preventDefault();
+                    errorBlock.textContent = "Пожалуйста, введите корректный номер телефона";
+                    input.style.borderColor = "red";
+                    return false;
+                }
+            });
+
+            input.addEventListener("blur", function() {
+                if (input.value.trim() !== "") {
+                    if (iti.isValidNumber()) {
+                        input.style.borderColor = "green";
+                        errorBlock.textContent = "";
+                    } else {
+                        input.style.borderColor = "red";
+                        errorBlock.textContent = "Некорректный номер телефона";
+                    }
+                }
             });
         });
-
-
     </script>
 </@page>

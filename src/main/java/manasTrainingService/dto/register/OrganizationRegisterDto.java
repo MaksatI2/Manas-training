@@ -26,6 +26,7 @@ public class OrganizationRegisterDto {
     private String password;
 
     @NotBlank(message = "Название организации не может быть пустым")
+    @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
     private String companyName;
 
     @NotBlank(message = "Номер телефона не может быть пустым")

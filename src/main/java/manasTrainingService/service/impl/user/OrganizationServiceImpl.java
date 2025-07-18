@@ -278,12 +278,10 @@ public class OrganizationServiceImpl implements OrganizationService {
         Organization organization = organizationRepository.findByUserId(organizationUser.getId())
                 .orElseThrow(() -> new OrganizationNotFoundException("Организация не найдена"));
 
-        String normalizedPhone = normalizePhoneNumber(dto.getPhone());
-
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistsException("Email уже используется");
         }
-        if (userRepository.existsByPhone(normalizedPhone)) {
+        if (userRepository.existsByPhone(dto.getPhone())) {
             throw new PhoneAlreadyExistsException("Телефон уже используется");
         }
 
@@ -294,7 +292,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .passwordHash(passwordEncoder.encode(rawPassword))
                 .name(dto.getName())
                 .lastName(dto.getLastName())
-                .phone(normalizedPhone)
+                .phone(dto.getPhone())
                 .isActive(true)
                 .role(studentRole)
                 .build();
@@ -313,23 +311,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                 student.getId()
         );
         emailService.sendStudentWelcomeEmail(student.getEmail(), student.getName(), rawPassword);
-    }
-
-    private String normalizePhoneNumber(String phone) {
-        if (phone == null || phone.isBlank()) {
-            throw new ValidationException("Номер телефона не может быть пустым");
-        }
-        String cleanedPhone = phone.replaceAll("[^0-9+]", "");
-        if (cleanedPhone.startsWith("+996") && cleanedPhone.length() == 13) {
-            return cleanedPhone;
-        }
-        if (cleanedPhone.startsWith("0")) {
-            cleanedPhone = cleanedPhone.substring(1);
-        }
-        if (cleanedPhone.length() == 9) {
-            return "+996" + cleanedPhone;
-        }
-        throw new ValidationException("Некорректный формат номера телефона. Ожидается 9 цифр или формат +996XXXXXXXXX");
     }
 
     @Override
