@@ -177,6 +177,31 @@
                     <option value="ky">🇰🇬 Кыргызча</option>
                     <option value="en">🇬🇧 English</option>
                 </select>
+
+                <#if known>
+                    <div class="dropdown mt-2">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
+                                style="border-color: rgba(255,255,255,0.2); color: white; text-align: left; padding: 0.5rem 1rem;">
+                            Дополнительно
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" href="/auth/manage-devices">Управление устройствами</a></li>
+                            <li>
+                                <form action="/auth/logout-all-devices" method="post" class="dropdown-item p-0">
+                                    <#if _csrf??>
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                    </#if>
+                                    <button type="submit" class="btn btn-link text-decoration-none w-100 text-start ps-3 py-2"
+                                            onclick="return confirm('Вы уверены, что хотите выйти из всех устройств?')"
+                                            style="color: inherit;">
+                                        <i class="fas fa-sign-out-alt me-1"></i>Выйти из всех устройств
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </#if>
+
                 <#if !known?? || !known>
                     <div class="profile-actions">
                         <a href="/auth/login" class="profile-btn">
@@ -410,6 +435,44 @@
         .sidebar.collapsed {
             width: var(--sidebar-collapsed-width);
             overflow-x: hidden;
+        }
+
+        .sidebar-profile .dropdown-menu {
+            background: var(--dark-blue);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0;
+        }
+
+        .sidebar-profile .dropdown-item {
+            color: rgba(255,255,255,0.9);
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-profile .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+        }
+
+        .sidebar-profile .dropdown-item form button {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar-profile .btn-outline-secondary {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-profile .btn-outline-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .sidebar.collapsed .dropdown {
+            display: none;
         }
 
         .sidebar-toggle {

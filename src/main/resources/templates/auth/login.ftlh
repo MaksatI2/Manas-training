@@ -12,15 +12,15 @@
     <div class="row justify-content-center">
         <div class="col-lg-5 col-md-7">
             <#if quickLoginAvailable?? && quickLoginAvailable>
-                <div class="feature-card mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="quick-login-card mb-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="flex-shrink-0">
                             <i class="fas fa-user-circle fa-3x"></i>
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h5 class="mb-1">Добро пожаловать обратно!</h5>
-                            <p class="mb-0">${quickLoginName}</p>
-                            <small class="text-light">${quickLoginEmail}</small>
+                            <p class="mb-0 user-name">${quickLoginName}</p>
+                            <small class="user-email">${quickLoginEmail}</small>
                         </div>
                     </div>
                     <p class="small mb-3">
@@ -32,7 +32,7 @@
                             <#if _csrf??>
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                             </#if>
-                            <button type="submit" class="btn btn-light btn-sm">
+                            <button type="submit" class="btn btn-quick-login">
                                 <i class="fas fa-sign-in-alt me-1"></i>Быстрый вход
                             </button>
                         </form>
@@ -40,7 +40,7 @@
                             <#if _csrf??>
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                             </#if>
-                            <button type="submit" class="btn btn-outline-light btn-sm">
+                            <button type="submit" class="btn btn-dismiss">
                                 <i class="fas fa-times me-1"></i>Не я
                             </button>
                         </form>
@@ -130,6 +130,104 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .quick-login-card {
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            color: var(--white);
+            border-radius: 10px;
+            border-left: 4px solid var(--light-blue);
+            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .quick-login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,102,204,0.3);
+        }
+
+        .quick-login-card h5 {
+            color: var(--white);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .quick-login-card .user-name {
+            color: var(--white);
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .quick-login-card .user-email {
+            color: var(--light-blue);
+            font-size: 0.9rem;
+        }
+
+        .quick-login-card p.small {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+
+        .quick-login-card .fas.fa-user-circle {
+            color: var(--light-blue);
+            font-size: 2.5rem;
+        }
+
+        .quick-login-card .fas.fa-clock {
+            color: var(--light-blue);
+        }
+
+        .btn-quick-login {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: none;
+            border-radius: 25px;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-quick-login:hover {
+            background: var(--light-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+        }
+
+        .btn-dismiss {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+            border-radius: 25px;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-dismiss:hover {
+            background: var(--white);
+            color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .quick-login-card {
+                padding: 1.5rem;
+            }
+
+            .quick-login-card h5 {
+                font-size: 1.1rem;
+            }
+
+            .quick-login-card .fas.fa-user-circle {
+                font-size: 2rem;
+            }
+        }
+    </style>
 
     <script>
         document.getElementById('togglePassword').addEventListener('click', function() {

@@ -105,7 +105,11 @@ public class AuthController {
     }
 
     @PostMapping("/dismiss-quick-login")
-    public String dismissQuickLogin(HttpServletResponse response) {
+    public String dismissQuickLogin(HttpServletRequest request, HttpServletResponse response) {
+        Optional<String> tokenOpt = rememberMeService.getRememberMeTokenFromCookie(request);
+        if (tokenOpt.isPresent()) {
+            rememberMeService.invalidateToken(tokenOpt.get());
+        }
         rememberMeService.removeRememberMeCookie(response);
         return "redirect:/auth/login";
     }
@@ -271,12 +275,32 @@ public class AuthController {
     @PostMapping("/revoke-token")
     public String revokeToken(@RequestParam("tokenId") Long tokenId,
                               Authentication authentication,
+                              HttpServletRequest request,
+                              HttpServletResponse response,
                               RedirectAttributes redirectAttributes) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/auth/login";
         }
 
-        redirectAttributes.addFlashAttribute("message", "Устройство успешно отключено.");
+        String currentEmail = authentication.getName();
+
+        Optional<String> currentTokenOpt = rememberMeService.getRememberMeTokenFromCookie(request);
+
+        try {
+            rememberMeService.invalidateTokenById(tokenId, currentEmail);
+
+            if (currentTokenOpt.isPresent()) {
+                Optional<RememberMeToken> tokenInfo = rememberMeService.getTokenInfo(currentTokenOpt.get());
+                if (tokenInfo.isPresent() && tokenInfo.get().getId().equals(tokenId)) {
+                    rememberMeService.removeRememberMeCookie(response);
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("message", "Устройство успешно отключено.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при отключении устройства.");
+        }
+
         return "redirect:/auth/manage-devices";
     }
 
@@ -287,9 +311,8 @@ public class AuthController {
                                    RedirectAttributes redirectAttributes) {
         if (authentication != null && authentication.isAuthenticated()) {
             String email = authentication.getName();
-
             rememberMeService.invalidateAllUserTokens(email);
-
+            rememberMeService.removeRememberMeCookie(response);
             new SecurityContextLogoutHandler().logout(request, response, authentication);
 
             redirectAttributes.addFlashAttribute("message", "Вы вышли из всех устройств.");
