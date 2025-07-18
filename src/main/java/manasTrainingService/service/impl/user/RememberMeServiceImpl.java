@@ -97,8 +97,11 @@ public class RememberMeServiceImpl implements RememberMeService {
         rememberMeToken.updateLastUsed();
         rememberMeTokenRepository.save(rememberMeToken);
 
+        User user = rememberMeToken.getUser();
+        user.getEmail();
+
         log.info("Validated remember-me token for user: {}", rememberMeToken.getEmail());
-        return Optional.of(rememberMeToken.getUser());
+        return Optional.of(user);
     }
 
     @Transactional
@@ -109,10 +112,25 @@ public class RememberMeServiceImpl implements RememberMeService {
 
     @Transactional
     @Override
+    public void invalidateTokenById(Long tokenId, String email) {
+        Optional<RememberMeToken> tokenOpt = rememberMeTokenRepository.findById(tokenId);
+        if (tokenOpt.isPresent()) {
+            RememberMeToken token = tokenOpt.get();
+            if (token.getEmail().equals(email)) {
+                token.setIsActive(false);
+                rememberMeTokenRepository.save(token);
+                log.info("Invalidated remember-me token {} for user: {}", tokenId, email);
+            }
+        }
+    }
+
+    @Transactional
+    @Override
     public void invalidateAllUserTokens(String email) {
         rememberMeTokenRepository.deactivateAllTokensForEmail(email);
         log.info("Invalidated all remember-me tokens for user: {}", email);
     }
+
 
     @Override
     public void addRememberMeCookie(HttpServletResponse response, String token) {
@@ -121,8 +139,9 @@ public class RememberMeServiceImpl implements RememberMeService {
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");
+        cookie.setAttribute("SameSite", "Lax");
         response.addCookie(cookie);
-        log.debug("Added remember-me cookie");
+        log.debug("Added remember-me cookie with token");
     }
 
     @Override
@@ -130,7 +149,9 @@ public class RememberMeServiceImpl implements RememberMeService {
         Cookie cookie = new Cookie(cookieName, "");
         cookie.setMaxAge(0);
         cookie.setHttpOnly(true);
+        cookie.setSecure(false);
         cookie.setPath("/");
+        cookie.setAttribute("SameSite", "Lax");
         response.addCookie(cookie);
         log.debug("Removed remember-me cookie");
     }
@@ -181,5 +202,10 @@ public class RememberMeServiceImpl implements RememberMeService {
         }
 
         return request.getRemoteAddr();
+    }
+
+    @Override
+    public Optional<RememberMeToken> getTokenInfo(String token) {
+        return rememberMeTokenRepository.findByTokenAndIsActiveTrue(token);
     }
 }
