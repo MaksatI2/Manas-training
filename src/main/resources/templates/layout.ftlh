@@ -218,10 +218,17 @@
                 </#if>
 
                 <div class="d-md-none mt-2 d-flex gap-2 justify-content-center">
-                    <a href="${profileUrl}" class="btn d-flex align-items-center justify-content-center"
-                       style="width: 44px; height: 44px; border-radius: 25px; background: white; color: var(--primary-blue); border: 2px solid var(--primary-blue);">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
+                    <#if isAdmin>
+                        <button class="btn d-flex align-items-center justify-content-center" disabled
+                                style="width: 44px; height: 44px; border-radius: 25px; background: white; color: var(--primary-blue); border: 2px solid var(--primary-blue); opacity: 0.6; cursor: not-allowed;">
+                            <i class="fas fa-user-circle"></i>
+                        </button>
+                    <#else>
+                        <a href="${profileUrl}" class="btn d-flex align-items-center justify-content-center"
+                           style="width: 44px; height: 44px; border-radius: 25px; background: white; color: var(--primary-blue); border: 2px solid var(--primary-blue);">
+                            <i class="fas fa-user-circle"></i>
+                        </a>
+                    </#if>
                     <form action="/logout" method="post">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                         <button type="submit" class="btn d-flex align-items-center justify-content-center text-white"
@@ -246,21 +253,35 @@
 
                 <div class="d-none d-md-flex align-items-center ms-auto rounded-pill overflow-hidden"
                      style="box-shadow: 0 0 5px rgba(0,0,0,0.1); background: var(--primary-blue); height: 48px;">
-                    <a href="${profileUrl}" class="d-flex align-items-center text-white px-3 text-decoration-none">
-                        <div class="rounded-circle d-flex justify-content-center align-items-center me-2"
-                             style="width: 36px; height: 36px; background: var(--light-blue); color: var(--dark-blue); font-weight: bold;">
-                            ${name?substring(0, 1)?upper_case}
+                    <#if isAdmin>
+                        <div class="d-flex align-items-center text-white px-3 text-decoration-none" style="cursor: not-allowed; opacity: 0.6;">
+                            <div class="rounded-circle d-flex justify-content-center align-items-center me-2"
+                                 style="width: 36px; height: 36px; background: var(--light-blue); color: var(--dark-blue); font-weight: bold;">
+                                ${name?substring(0, 1)?upper_case}
+                            </div>
+                            <div class="d-flex flex-column justify-content-center">
+                                <span class="fw-semibold" style="font-size: 0.85rem;">${name}</span>
+                                <small style="font-size: 0.7rem; color: var(--light-blue);">
+                                    <#if isAdmin>Администратор</#if>
+                                </small>
+                            </div>
                         </div>
-                        <div class="d-flex flex-column justify-content-center">
-                            <span class="fw-semibold" style="font-size: 0.85rem;">${name}</span>
-                            <small style="font-size: 0.7rem; color: var(--light-blue);">
-                                <#if isAdmin>Администратор</#if>
-                                <#if isTeacher>Преподаватель</#if>
-                                <#if isStudent>Студент</#if>
-                                <#if isOrganization>Организация</#if>
-                            </small>
-                        </div>
-                    </a>
+                    <#else>
+                        <a href="${profileUrl}" class="d-flex align-items-center text-white px-3 text-decoration-none">
+                            <div class="rounded-circle d-flex justify-content-center align-items-center me-2"
+                                 style="width: 36px; height: 36px; background: var(--light-blue); color: var(--dark-blue); font-weight: bold;">
+                                ${name?substring(0, 1)?upper_case}
+                            </div>
+                            <div class="d-flex flex-column justify-content-center">
+                                <span class="fw-semibold" style="font-size: 0.85rem;">${name}</span>
+                                <small style="font-size: 0.7rem; color: var(--light-blue);">
+                                    <#if isTeacher>Преподаватель</#if>
+                                    <#if isStudent>Студент</#if>
+                                    <#if isOrganization>Организация</#if>
+                                </small>
+                            </div>
+                        </a>
+                    </#if>
 
                     <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 0.5rem;"></div>
 
