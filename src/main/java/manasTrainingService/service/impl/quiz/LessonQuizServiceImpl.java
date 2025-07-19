@@ -5,9 +5,11 @@ import manasTrainingService.dto.quiz.LessonQuizDto;
 import manasTrainingService.dto.quiz.answers.QuizAnswerDto;
 import manasTrainingService.dto.quiz.answers.QuizResultDto;
 import manasTrainingService.entity.ActionType;
+import manasTrainingService.entity.Lesson;
 import manasTrainingService.entity.LessonQuiz;
 import manasTrainingService.entity.TargetType;
 import manasTrainingService.exceptions.nsee.LessonQuizNotFoundException;
+import manasTrainingService.repositories.quiz.LessonQuizOptionRepository;
 import manasTrainingService.repositories.quiz.LessonQuizRepository;
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.LessonService;
@@ -30,6 +32,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     private final LessonQuizOptionService lessonQuizOptionService;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final LessonQuizOptionRepository lessonQuizOptionRepository;
 
     @Transactional
     @Override
@@ -38,7 +41,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
         LessonQuiz lessonQuiz = new LessonQuiz();
         lessonQuiz.setTitle(lessonQuizDto.getTitle());
         lessonQuiz.setDescription(lessonQuizDto.getDescription());
-        lessonQuiz.setQuestionTimeLimit(lessonQuizDto.getQuestionTimeLimit());
+        lessonQuiz.setQuestionTimeLimit(lessonQuizDto.getQuestionTimeLimit() * lessonQuizDto.getQuestions().size());
         lessonQuiz.setLesson(lessonService.getLessonModelById(lessonQuizDto.getLessonId()));
         if(lessonQuizDto.getIsActive() == null){
             lessonQuiz.setIsActive(false);
@@ -65,7 +68,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
 
         lessonQuiz.setTitle(lessonQuizDto.getTitle());
         lessonQuiz.setDescription(lessonQuizDto.getDescription());
-        lessonQuiz.setQuestionTimeLimit(lessonQuizDto.getQuestionTimeLimit());
+        lessonQuiz.setQuestionTimeLimit(lessonQuizDto.getQuestionTimeLimit() * lessonQuizDto.getQuestions().size());
         if(lessonQuizDto.getIsActive() == null){
             lessonQuiz.setIsActive(false);
         }else{
@@ -156,5 +159,14 @@ public class LessonQuizServiceImpl implements LessonQuizService {
                 .questionsCount(quizAnswerDto.getQuestionAnswers().size())
                 .passingTime(endTime.minusMinutes(quizAnswerDto.getPassingStart().getMinute()).getMinute())
                 .build();
+    }
+
+    @Override
+    public void deleteQuiz(int id){
+        LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
+                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+        Lesson lesson = lessonQuiz.getLesson();
+        lesson.setLessonQuiz(null);
+        lessonQuizRepository.delete(lessonQuiz);
     }
 }

@@ -19,4 +19,6 @@ public interface LessonQuizService {
     LessonQuiz getQuizEntityById(int id);
 
     QuizResultDto checkQuizResults(QuizAnswerDto quizAnswerDto);
+
+    void deleteQuiz(int id);
 }

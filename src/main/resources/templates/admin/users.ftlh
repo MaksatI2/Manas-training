@@ -69,7 +69,7 @@
                 <table class="table table-bordered table-hover" id="usersTable" width="100%" cellspacing="0">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
                     <tr>
-                        <th>ID</th>
+                        <th>№</th>
                         <th>Имя</th>
                         <th>Фамилия</th>
                         <th>Email</th>
@@ -82,7 +82,7 @@
                     <tbody>
                     <#if users?has_content>
                         <#list users as user>
-                            <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}/edit'">
+                            <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}'">
                             <td>${user.id}</td>
                                 <td>${user.name}</td>
                                 <td>${user.lastName!"-"}</td>
@@ -99,6 +99,10 @@
                                     </#if>
                                 </td>
                                 <td class="text-center">
+                                    <a href="/admin/users/${user.id}/edit" class="btn btn-sm btn-primary"
+                                       title="Редактировать">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     <#if !user.isActive>
                                         <a href="/admin/users/${user.id}/activate"
                                            class="btn btn-sm btn-success"

@@ -158,10 +158,12 @@
 
         .user-role-and-edit {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: flex-start;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
+
 
 
         @media (max-width: 768px) {
@@ -190,6 +192,10 @@
 
             .profile-details {
                 grid-template-columns: 1fr;
+            }
+            .user-role-and-edit {
+                flex-direction: column;
+                align-items: stretch;
             }
         }
     </style>
@@ -237,6 +243,11 @@
                             <i class="fas fa-edit"></i>
                             Редактировать профиль
                         </a>
+                        <a href="/student/statistics" class="edit-button">
+                            <i class="fas fa-chart-bar"></i>
+                            Моя статистика
+                        </a>
+
                     </div>
 
                 </div>

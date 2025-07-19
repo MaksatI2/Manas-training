@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -219,5 +218,10 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .notes(schedule.getNotes())
                 .isActive(schedule.getIsActive())
                 .build();
+    }
+
+    @Override
+    public Integer sumActiveScheduleHoursByCourseInstanceId(Integer courseInstanceId) {
+        return scheduleRepository.sumActiveScheduleHoursByCourseInstanceId(courseInstanceId);
     }
 }

@@ -26,4 +26,6 @@ public interface CourseInstanceRepository extends JpaRepository<CourseInstance, 
             """)
     List<CourseInstance> findAllByOrganizationId(@Param("organizationId") Integer organizationId);
 
+    long countByIsActiveFalse();
+
 }

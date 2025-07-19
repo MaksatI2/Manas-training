@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import manasTrainingService.dto.quiz.LessonQuizDto;
 
 @Getter
 @Setter
@@ -24,5 +25,7 @@ public class LessonDTO {
     private String title;
 
     private String description;
+
+    private LessonQuizDto quiz;
 
 }

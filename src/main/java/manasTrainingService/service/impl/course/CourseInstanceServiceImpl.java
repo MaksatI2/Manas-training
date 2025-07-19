@@ -16,6 +16,7 @@ import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
+import manasTrainingService.service.quiz.LessonQuizService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.DateUtil;
 import org.springframework.stereotype.Service;
@@ -31,9 +32,9 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     private final CourseInstanceRepository courseInstanceRepository;
     private final CourseService courseService;
     private final LessonService lessonService;
-    private final ScheduleRepository scheduleRepository;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final LessonQuizService lessonQuizService;
 
     @Override
     public Integer createCourseInstance(CourseInstanceCreationDTO dto) {
@@ -106,6 +107,7 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                                         .id(lesson.getId())
                                         .title(lesson.getTitle())
                                         .description(lesson.getDescription())
+                                        .quiz(lessonQuizService.getQuizByLessonId(lesson.getId()))
                                         .build())
                                 .collect(Collectors.toList()))
                         .build())
@@ -208,5 +210,11 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                 .map(ci -> new ShortDto(ci.getId(), ci.getTitle()))
                 .toList();
     }
+
+    @Override
+    public long getCompletedCoursesCount() {
+        return courseInstanceRepository.countByIsActiveFalse();
+    }
+
 
 }

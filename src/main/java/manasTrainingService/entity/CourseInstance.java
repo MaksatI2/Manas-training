@@ -58,6 +58,9 @@ public class CourseInstance {
     @OneToMany(mappedBy = "courseInstance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Schedule> schedules;
 
+    @OneToMany(mappedBy = "instance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<TestInstance> testInstances;
+
     @PreUpdate
     void preUpdate() {
         updatedAt = LocalDateTime.now();

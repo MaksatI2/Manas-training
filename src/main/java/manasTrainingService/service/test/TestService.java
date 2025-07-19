@@ -5,6 +5,8 @@ import manasTrainingService.dto.answers.TestResultDto;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.entity.Test;
 
+import java.util.List;
+
 public interface TestService {
     void createTest(TestDto testDto);
 
@@ -20,7 +22,15 @@ public interface TestService {
 
     TestResultDto checkTestResult(TestAnswerDto result);
 
+    Integer deactivateTest(int id);
+
+    Integer activateTest(int id);
+
+    List<TestDto> getAllTestsByCourseId(int courseId);
+
     void clearNoData(TestDto testDto);
 
-    void deleteTest(int id);
+    Integer deleteTest(int id);
+
+    long getTotalTests();
 }

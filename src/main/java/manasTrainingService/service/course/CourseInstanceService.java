@@ -29,4 +29,6 @@ public interface CourseInstanceService {
     List<CourseInstanceCalendarDTO> getAllInstancesForCalendar();
 
     List<ShortDto> getByCourseId(Integer courseId);
+
+    long getCompletedCoursesCount();
 }
