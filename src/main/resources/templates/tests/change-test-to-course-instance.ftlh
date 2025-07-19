@@ -2,6 +2,11 @@
 <#import "/spring.ftl" as spring />
 <#import "../RoadMap.ftlh" as roadmap>
 <@page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Поток #${courseInstance.title}", "url": "/teacher/course/${courseInstance.id}"},
+    {"label": "Переназначить тест для потока: ${courseInstance.title}", "url": ""}
+    ] />
     <div class="hero-section">
         <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Итоговый тест для потока ${courseInstance.title}
         </h1>

@@ -18,6 +18,9 @@
                         <h5 class="card-title fs-3 mb-3">Тест по теме: ${quiz.title}</h5>
                         <p class="card-text fs-4">${quiz.description}</p>
                         <p class="card-text fs-5">Количество вопросов: ${quiz.questions?size}</p>
+                        <div class="alert alert-warning" role="alert">
+                            <p id="countdown" class="fs-4">У вас осталось: ${quiz.questionTimeLimit}:00</p>
+                        </div>
                     </div>
                 </div>
                 <form action="/quiz/checking" method="post" id="quizForm">
@@ -62,4 +65,22 @@
             </div>
         </div>
     </div>
+    <script>
+        let timer = ${quiz.questionTimeLimit};
+        let seconds = timer * 60;
+        const countDown = document.getElementById("countdown")
+
+        const interval = setInterval(() => {
+            seconds--
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            const formattedSecs = secs < 10 ? "0" + secs : secs;
+            countDown.textContent = "У вас осталось: " + mins + ":" + formattedSecs;
+
+            if(seconds <= 0){
+                clearInterval(interval)
+                window.location.href = "http://localhost:8089/";
+            }
+        }, 1000)
+    </script>
 </@page>

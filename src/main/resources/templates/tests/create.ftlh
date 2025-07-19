@@ -181,7 +181,7 @@
                 </button>
             </div>
             <div class="mb-3 form-check col-lg-10 col-md-10" id="active-test-block">
-                <@spring.formCheckbox "test.isActive" 'class="form-check-input fs-4"'/>
+                <@spring.formCheckbox "test.isActive" 'class="form-check-input fs-4" checked'/>
                 <label class="form-check-label fw-bold" for="test.isActive">Активный?</label>
             </div>
             <#if _csrf??>

@@ -59,6 +59,8 @@ public class LessonServiceImpl implements LessonService {
             quizDto = LessonQuizDto.builder()
                     .id(lesson.getLessonQuiz().getId())
                     .title(lesson.getLessonQuiz().getTitle())
+                    .description(lesson.getLessonQuiz().getDescription())
+                    .isActive(lesson.getLessonQuiz().getIsActive())
                     .build();
         }
         return LessonDTO.builder()

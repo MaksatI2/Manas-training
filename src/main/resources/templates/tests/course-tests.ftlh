@@ -1,6 +1,11 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
 <@layout.page>
+    <@roadmap.breadcrumbs items=[
+    {"label": "Главная", "url": "/"},
+    {"label": "Мои курсы", "url": "/teacher/my-courses"},
+    {"label": "Тесты для курса: ${course.title}", "url": ""}
+    ] />
     <div class="card shadow mb-4">
             <#if successMessage??>
                 <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -18,7 +23,7 @@
                     <div id="usersTable_buttons"></div>
 
 
-                    <a href="/test/create/${courseId}" class="btn btn-light btn-sm"
+                    <a href="/test/create/${course.id}" class="btn btn-light btn-sm"
                        style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
                         <i class="fas fa-plus me-1"></i> Создать новый тест
                     </a>
@@ -42,7 +47,7 @@
                     <tbody>
                     <#if tests?has_content>
                         <#list tests as test>
-                            <tr style="cursor: pointer;" onclick="window.location.href='/tests/${test.id}/edit'">
+                            <tr style="cursor: pointer;" onclick="window.location.href='/test/${test.id}/details'">
                                 <td>${test.title}</td>
                                 <td>${test.course.title}</td>
                                 <td>${test.passingScore}</td>

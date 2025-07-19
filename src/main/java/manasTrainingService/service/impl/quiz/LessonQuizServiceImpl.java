@@ -169,4 +169,20 @@ public class LessonQuizServiceImpl implements LessonQuizService {
         lesson.setLessonQuiz(null);
         lessonQuizRepository.delete(lessonQuiz);
     }
+
+    @Override
+    public void deactivateQuiz(int id){
+        LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
+                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+        lessonQuiz.setIsActive(false);
+        lessonQuizRepository.saveAndFlush(lessonQuiz);
+    }
+
+    @Override
+    public void activateQuiz(int id){
+        LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
+                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+        lessonQuiz.setIsActive(true);
+        lessonQuizRepository.saveAndFlush(lessonQuiz);
+    }
 }

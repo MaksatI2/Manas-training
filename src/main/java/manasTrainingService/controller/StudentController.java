@@ -5,13 +5,15 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
 import manasTrainingService.dto.statistics.AttendanceStatsDTO;
 import manasTrainingService.entity.User;
-import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.test.TestInstanceService;
+import manasTrainingService.service.test.TestResultService;
+import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserService;
@@ -35,6 +37,8 @@ public class StudentController {
     private final EnrollmentService enrollmentService;
     private final CourseInstanceService courseInstanceService;
     private final TestInstanceService testInstanceService;
+    private final TestResultService testResultService;
+    private final TestService testService;
     private final StudentStatisticsService studentStatisticsService;
 
     @GetMapping("/profile")
@@ -78,13 +82,15 @@ public class StudentController {
     }
 
     @GetMapping("/course/{id}")
-    public String viewStudentCourse(@PathVariable Integer id,
-                                    Model model) {
+    public String viewStudentCourse(@PathVariable Integer id, Model model) {
         enrollmentService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
         model.addAttribute("courseInstance", courseInstanceDto);
         try {
             model.addAttribute("testInstance",  testInstanceService.getTestInstanceByCourseInstance(id));
+            if(testResultService.userHasTestAttempt(testService.getTestByCourseId(id).getId())){
+                model.addAttribute("alreadyAttempted", "Вы уже прошли данный тест");
+            }
         } catch (TestInstanceNotFoundException e) {
             model.addAttribute("testInstanceNotFound", "Тестовое задание для курса " + courseInstanceDto.getCourseTitle() + " еще не было назначенно");
         }
