@@ -8,10 +8,16 @@ import manasTrainingService.dto.register.TeacherRegisterDto;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.user.EmailAlreadyExistsException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
+import manasTrainingService.service.AdminStatisticsService;
+import manasTrainingService.service.course.CourseTeacherInstanceService;
+import manasTrainingService.service.user.OrganizationService;
 import manasTrainingService.service.user.RoleService;
+import manasTrainingService.service.user.StudentStatisticsService;
+import manasTrainingService.service.user.UserProfileService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.RoleUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +32,12 @@ import java.util.List;
 public class AdminController {
     private final UserService userService;
     private final RoleService roleService;
+    private final AdminStatisticsService adminStatisticsService;
+    private final UserDetailsService userDetailsService;
+    private final UserProfileService userProfileService;
+    private final StudentStatisticsService studentStatisticsService;
+    private final OrganizationService organizationService;
+    private final CourseTeacherInstanceService courseTeacherInstanceService;
 
     @GetMapping("/teachers/add")
     public String showAddTeacherForm(Model model) {
@@ -64,6 +76,28 @@ public class AdminController {
         model.addAttribute("roleDisplayNames", RoleUtil.getAll());
         model.addAttribute("users", users);
         return "admin/users";
+    }
+
+    @GetMapping("/users/{userId}")
+    public String showUserDetails(@PathVariable Integer userId, Model model) {
+        var profile = userProfileService.getProfileDetails(userId);
+        model.addAttribute("profile", profile);
+
+        String roleName = profile.getUser().getRole().getName().toUpperCase();
+        switch (roleName) {
+            case "STUDENT":
+                model.addAttribute("attendanceStatsList", studentStatisticsService.getAllAttendanceStats(profile.getUser()));
+                model.addAttribute("testResults", studentStatisticsService.getTestResultsByStudent(profile.getUser()));
+                break;
+            case "TEACHER":
+                model.addAttribute("courses", courseTeacherInstanceService.getTeacherCourses(userId));
+                break;
+            case "ORGANIZATION":
+                model.addAttribute("students", organizationService.getStudentsCourseInfoForOrganization(profile.getUser()));
+                break;
+        }
+
+        return "admin/user-profile";
     }
 
     @GetMapping("/users/{userId}/activate")
@@ -170,6 +204,13 @@ public class AdminController {
             return "redirect:/admin/users";
         }
     }
+
+    @GetMapping("/statistics")
+    public String viewUserStatistics(Model model) {
+        model.addAttribute("userStats", adminStatisticsService.getSystemStatistics());
+        return "admin/statistics";
+    }
+
 
 
 

@@ -7,10 +7,16 @@ import manasTrainingService.dto.edit.TeacherProfileEditDto;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.profile.TeacherProfileDto;
 import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
+import manasTrainingService.dto.statistics.AttendanceStatsDTO;
+import manasTrainingService.entity.CourseInstance;
+import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
+import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.course.CourseInstanceService;
+import manasTrainingService.service.course.CourseInstanceStatisticsService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
-import manasTrainingService.service.test.TestService;
+import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.user.RoleService;
 import manasTrainingService.service.user.TeacherService;
 import manasTrainingService.service.user.UserService;
@@ -23,6 +29,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/teacher")
 @RequiredArgsConstructor
@@ -33,7 +41,9 @@ public class TeacherController {
     private final CourseTeacherInstanceService courseTeacherInstanceService;
     private final CourseInstanceService courseInstanceService;
     private final RoleService roleService;
-    private final TestService testService;
+    private final TestInstanceService testInstanceService;
+    private final CourseInstanceStatisticsService courseInstanceStatisticsService;
+    private final LessonAccessService lessonAccessService;
 
     @GetMapping("/profile")
     public String viewProfile(Model model) {
@@ -83,15 +93,37 @@ public class TeacherController {
                                     Model model) {
         courseTeacherInstanceService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
+        model.addAttribute("courseInstance", courseInstanceDto);
         if(userService.getAuthorizedUser().getRole() == roleService.getTeacherRoleId()){
             model.addAttribute("role", roleService.getTeacherRoleId().getName());
         }
-        if(testService.getTestByCourseId(id) != null){
-            model.addAttribute("test", testService.getTestByCourseId(id));
+        try {
+            model.addAttribute("testInstance", testInstanceService.getTestInstanceByCourseInstance(id));
+        } catch (TestInstanceNotFoundException e) {
+            model.addAttribute("testInstanceNotFound", e.getMessage());
         }
-        model.addAttribute("courseInstance", courseInstanceDto);
         return "teacher/course-detail";
     }
+    @GetMapping("/course/{id}/statistics")
+    public String viewCourseInstanceStatistics(@PathVariable("id") Integer id, Model model) {
+        CourseInstance courseInstance = courseInstanceService.getCourseInstanceModelById(id);
+        if (!lessonAccessService.canAccessInstanceStatistics(courseInstance)) {
+            throw new NoAccessException("У вас нет доступа к потоку курса");
+        }
+
+        List<AttendanceStatsDTO> attendanceStats = courseInstanceStatisticsService.getAttendanceStatsByCourseInstance(courseInstance);
+
+        //TODO нельзя сделать без новой реализации связи тестов и курсов
+//        List<TestResultDTO> testResults = courseInstanceStatisticsService.getTestResultsByCourseInstance(courseInstance);
+//        model.addAttribute("testResults", testResults);
+
+        model.addAttribute("courseInstance", courseInstance);
+        model.addAttribute("attendanceStatsList", attendanceStats);
+
+
+        return "teacher/course-statistics";
+    }
+
 
     @GetMapping
     public String listTeachers(

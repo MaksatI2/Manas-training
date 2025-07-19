@@ -36,22 +36,46 @@ public class RememberMeAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-
         String requestURI = request.getRequestURI();
-        if (requestURI.equals("/auth/login") || requestURI.equals("/login")) {
+
+        if (shouldSkipRememberMeProcessing(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            Optional<String> tokenOpt = rememberMeService.getRememberMeTokenFromCookie(request);
+            processRememberMeAuthentication(request, response);
+        } catch (Exception e) {
+            log.error("Error during remember-me authentication", e);
+            SecurityContextHolder.clearContext();
+            rememberMeService.removeRememberMeCookie(response);
+        }
 
-            if (tokenOpt.isPresent()) {
-                String token = tokenOpt.get();
-                Optional<User> userOpt = rememberMeService.validateAndRefreshToken(token, request);
+        filterChain.doFilter(request, response);
+    }
 
-                if (userOpt.isPresent()) {
-                    User user = userOpt.get();
+    private boolean shouldSkipRememberMeProcessing(String requestURI) {
+        return requestURI.startsWith("/api/auth/") ||
+               requestURI.startsWith("/static/") ||
+               requestURI.startsWith("/css/") ||
+               requestURI.startsWith("/js/") ||
+               requestURI.startsWith("/images/");
+    }
+
+    private void processRememberMeAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        Optional<String> tokenOpt = rememberMeService.getRememberMeTokenFromCookie(request);
+
+        if (tokenOpt.isPresent()) {
+            String token = tokenOpt.get();
+            log.debug("Found remember-me token in cookie");
+
+            Optional<User> userOpt = rememberMeService.validateAndRefreshToken(token, request);
+
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                log.debug("Remember-me token is valid for user: {}", user.getEmail());
+
+                try {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
 
                     if (userDetails != null && userDetails.isEnabled()) {
@@ -60,18 +84,19 @@ public class RememberMeAuthenticationFilter extends OncePerRequestFilter {
                         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                        log.debug("User authenticated via remember-me token: {}", user.getEmail());
+                        log.info("User authenticated via remember-me token: {}", user.getEmail());
+                    } else {
+                        log.warn("User details not found or disabled for email: {}", user.getEmail());
+                        rememberMeService.removeRememberMeCookie(response);
                     }
-                } else {
+                } catch (Exception e) {
+                    log.error("Error loading user details for remember-me authentication", e);
                     rememberMeService.removeRememberMeCookie(response);
                 }
+            } else {
+                log.debug("Remember-me token is invalid or expired, removing cookie");
+                rememberMeService.removeRememberMeCookie(response);
             }
-        } catch (Exception e) {
-            log.error("Error during remember-me authentication", e);
-            SecurityContextHolder.clearContext();
-            rememberMeService.removeRememberMeCookie(response);
         }
-
-        filterChain.doFilter(request, response);
     }
 }

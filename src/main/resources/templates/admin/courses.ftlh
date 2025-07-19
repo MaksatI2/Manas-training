@@ -81,7 +81,7 @@
                 <table class="table table-bordered table-hover" id="coursesTable" width="100%" cellspacing="0">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
                     <tr>
-                        <th>ID</th>
+                        <th>№</th>
                         <th>Название</th>
                         <th>Код курса</th>
                         <th>Категория</th>

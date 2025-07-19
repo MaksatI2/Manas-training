@@ -148,9 +148,5 @@
                 input.value = number;
             });
         });
-
-
     </script>
-
-
 </@page>

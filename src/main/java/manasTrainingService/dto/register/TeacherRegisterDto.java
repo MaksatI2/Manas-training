@@ -29,11 +29,11 @@ public class TeacherRegisterDto {
     private String password;
 
     @NotBlank(message = "Имя обязательно для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Имя должно содержать только буквы")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
     private String name;
 
     @NotBlank(message = "Фамилия обязательна для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Фамилия должна содержать только буквы")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
     private String surname;
 
     @NotBlank(message = "Номер телефона не может быть пустым")

@@ -12,11 +12,13 @@ import manasTrainingService.validation.ValidPhoneNumber;
 public class StudentRegisterDto {
 
     @NotBlank(message = "Имя обязательно для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Имя должно содержать только буквы")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
+    @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
     private String name;
 
     @NotBlank(message = "Фамилия обязательна для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Имя должно содержать только буквы")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
+    @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
     private String surname;
 
     @NotBlank(message = "Email обязателен")

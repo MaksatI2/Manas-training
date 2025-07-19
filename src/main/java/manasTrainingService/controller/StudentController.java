@@ -7,9 +7,11 @@ import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.statistics.AttendanceStatsDTO;
 import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.EnrollmentService;
+import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserService;
@@ -32,6 +34,7 @@ public class StudentController {
     private final UserService userService;
     private final EnrollmentService enrollmentService;
     private final CourseInstanceService courseInstanceService;
+    private final TestInstanceService testInstanceService;
     private final StudentStatisticsService studentStatisticsService;
 
     @GetMapping("/profile")
@@ -80,7 +83,11 @@ public class StudentController {
         enrollmentService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
         model.addAttribute("courseInstance", courseInstanceDto);
-        model.addAttribute("userRole", userService.getAuthorizedUser().getRole());
+        try {
+            model.addAttribute("testInstance",  testInstanceService.getTestInstanceByCourseInstance(id));
+        } catch (TestInstanceNotFoundException e) {
+            model.addAttribute("testInstanceNotFound", "Тестовое задание для курса " + courseInstanceDto.getCourseTitle() + " еще не было назначенно");
+        }
         return "student/course-detail";
     }
 
@@ -89,6 +96,7 @@ public class StudentController {
         User student = userService.getAuthorizedUser();
         List<AttendanceStatsDTO> stats = studentStatisticsService.getAllAttendanceStats(student);
         model.addAttribute("attendanceStatsList", stats);
+        model.addAttribute("testResults", studentStatisticsService.getTestResultsByStudent(student));
         return "student/statistics";
     }
 

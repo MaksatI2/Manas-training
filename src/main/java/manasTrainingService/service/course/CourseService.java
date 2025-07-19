@@ -21,4 +21,6 @@ public interface CourseService {
     List<CourseDto> getAvailableCoursesForOrganization(User organizationUser);
 
     List<TeacherCardDto> getTeachersByCourse(Integer courseId);
+
+    long getTotalCourses();
 }

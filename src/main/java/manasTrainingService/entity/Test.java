@@ -24,7 +24,7 @@ public class Test {
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_instance_id")
+    @JoinColumn(name = "course_id")
     Course course;
 
     @Column(name = "title", length = 200)
@@ -37,12 +37,6 @@ public class Test {
     @Builder.Default
     BigDecimal passingScore = new BigDecimal("70.00");
 
-    @Column(name = "scheduled_start")
-    LocalDateTime scheduledStart;
-
-    @Column(name = "scheduled_end")
-    LocalDateTime scheduledEnd;
-
     @Column(name = "is_active")
     @Builder.Default
     Boolean isActive = true;
@@ -52,4 +46,7 @@ public class Test {
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<TestResult> attempts;
+
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<TestInstance> testInstances;
 }

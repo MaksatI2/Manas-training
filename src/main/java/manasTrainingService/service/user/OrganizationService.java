@@ -11,6 +11,7 @@ import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrganizationService {
     void createOrganization(CreateOrganizationDto dto);
@@ -50,4 +51,5 @@ public interface OrganizationService {
     List<EmployeeShortDto> getAllTeachersShortDto();
 
 
+    Organization getByUserId(Integer userId);
 }

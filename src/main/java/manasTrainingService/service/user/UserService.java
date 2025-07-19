@@ -8,6 +8,7 @@ import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.register.OrganizationRegisterDto;
 import manasTrainingService.dto.register.StudentRegisterDto;
 import manasTrainingService.dto.register.TeacherRegisterDto;
+import manasTrainingService.dto.statistics.UserStatisticsDto;
 import manasTrainingService.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,4 +69,6 @@ public interface UserService {
 
     @Transactional
     void updateUser(UserEditDto userEditDto);
+
+    UserStatisticsDto getUserStatistics();
 }

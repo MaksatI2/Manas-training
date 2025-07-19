@@ -34,7 +34,7 @@
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary">Модули</a>
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary">Участники</a>
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary">Преподаватели</a>
-        <a href="<@spring.url '/admin/course-instances'/>" class="btn btn-secondary">Назад</a>
+        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">Статистика потока</a>
     </div>
     <div class="container">
         <h2>Модули курса</h2>

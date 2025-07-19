@@ -158,10 +158,12 @@
 
         .user-role-and-edit {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: flex-start;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
+
 
 
         @media (max-width: 768px) {
@@ -190,6 +192,10 @@
 
             .profile-details {
                 grid-template-columns: 1fr;
+            }
+            .user-role-and-edit {
+                flex-direction: column;
+                align-items: stretch;
             }
         }
     </style>

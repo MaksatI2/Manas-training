@@ -58,7 +58,7 @@
             <table class="table table-bordered table-hover" id="courseInstancesTable" width="100%" cellspacing="0">
                 <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
                 <tr>
-                    <th>ID</th>
+                    <th>№</th>
                     <th>Курс</th>
                     <th>Название потока</th>
                     <th>Категория</th>

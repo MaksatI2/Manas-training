@@ -26,7 +26,6 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     private final CourseInstanceTeacherRepository repository;
     private final CourseInstanceService courseInstanceService;
     private final UserService userService;
-    private final TestService testService;
     private final ActivityLogService activityLogService;
 
     @Override
@@ -96,7 +95,6 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
                             .startDate(DateUtil.formatDateOnly(ci.getStartDate()))
                             .endDate(DateUtil.formatDateOnly(ci.getEndDate()))
                             .isPrimary(relation.getIsPrimary())
-                            .courseTest(testService.getTestByCourseId(ci.getCourse().getId()))
                             .build();
                 })
                 .collect(Collectors.toList());

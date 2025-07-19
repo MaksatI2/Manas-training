@@ -170,3 +170,15 @@ databaseChangeLog:
   - include:
       file: db/changelog/features/058_lesson_content.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/fixes/059_fix_activity_logs.sql
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/features/060_indexing_tables.sql
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/fixes/061_update_tests_table.sql
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/initial/062_add_table_test_instances.sql
+      relativeToChangelogFile: false

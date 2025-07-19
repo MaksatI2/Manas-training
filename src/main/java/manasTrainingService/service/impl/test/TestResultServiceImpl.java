@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,4 +46,21 @@ public class TestResultServiceImpl implements TestResultService {
         testResult.setIsPassed(isPassed);
         return testResultRepository.saveAndFlush(testResult);
     }
+
+    @Override
+    public List<TestResult> getTestResultsByStudentId(Integer studentId) {
+        return testResultRepository.findAllByStudentId(studentId);
+    }
+
+    @Override
+    public BigDecimal getAverageScore() {
+        BigDecimal avg = testResultRepository.findAverageScore();
+        return avg != null ? avg : BigDecimal.ZERO;
+    }
+
+    @Override
+    public long getTotalPassedTestsInMonth(LocalDateTime start, LocalDateTime end) {
+        return testResultRepository.countByIsPassedTrueAndSubmittedAtBetween(start, end);
+    }
+
 }

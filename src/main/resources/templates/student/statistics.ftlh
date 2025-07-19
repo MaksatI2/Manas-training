@@ -82,10 +82,10 @@
     </style>
 
     <div class="statistics-container">
-        <h1 class="statistics-title">
+        <h2 class="statistics-title">
             <i class="fas fa-chart-bar" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
             Моя статистика посещаемости
-        </h1>
+        </h2>
 
         <table class="stats-table">
             <thead>
@@ -126,5 +126,50 @@
             </#if>
             </tbody>
         </table>
+
+        <#if testResults?? && (testResults?size > 0)>
+            <div class="test-results">
+                <h2 style="margin-bottom: 1rem;" class="statistics-title">Результаты тестов</h2>
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                    <tr style="background-color: #f0f8ff;">
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Курс</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Тест</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Оценка</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Статус</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Дата сдачи</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <#list testResults as result>
+                        <tr style="
+                                background-color: ${result.isPassed?string('#d4edda', '#f8d7da')};
+                                color: ${result.isPassed?string('#155724', '#721c24')};
+                                ">
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.courseTitle}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.testTitle}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.score}%</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+                                <#if result.isPassed>
+                                    Пройден
+                                <#else>
+                                    Не пройден
+                                </#if>
+                            </td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+                                <#if result.submittedAt??>
+                                    ${result.localisedTime}
+                                <#else>
+                                    —
+                                </#if>
+                            </td>
+                        </tr>
+                    </#list>
+                    </tbody>
+                </table>
+            </div>
+        </#if>
+
+
     </div>
 </@layout.page>

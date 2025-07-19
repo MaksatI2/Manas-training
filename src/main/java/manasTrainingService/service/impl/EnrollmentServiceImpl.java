@@ -134,4 +134,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         );
     }
 
+    @Override
+    public List<CourseEnrollment> findAllActiveEnrollmentsByStudentId(Integer studentId) {
+        return enrollmentRepository.findAllActiveEnrollmentsByStudentId(studentId);
+    }
+
 }
