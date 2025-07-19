@@ -2,7 +2,9 @@ package manasTrainingService.service.impl.test;
 
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.answers.TestAnswerDto;
+import manasTrainingService.dto.answers.TestResultDto;
 import manasTrainingService.entity.TestResult;
+import manasTrainingService.exceptions.nsee.TestResultNotFoundException;
 import manasTrainingService.repositories.test.TestResultRepository;
 import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
@@ -48,6 +50,21 @@ public class TestResultServiceImpl implements TestResultService {
     }
 
     @Override
+    public TestResultDto getTestResultsByUserId(){
+        TestResult testResult = testResultRepository.findByStudentId(userService.getAuthorizedUser().getId())
+                .orElseThrow(() -> new TestResultNotFoundException("Результатов по данному пользователю не найденно"));
+        return TestResultDto.builder()
+                .totalPoints(testResult.getScore().intValue())
+                .passingTime(testResult.getTimeSpentMinutes())
+                .isPassed(testResult.getIsPassed())
+                .build();
+    }
+
+    @Override
+    public Boolean userHasTestAttempt(int testId) {
+        return testResultRepository.existsByStudentIdAndTestId(userService.getAuthorizedUser().getId(), testId);
+    }
+
     public List<TestResult> getTestResultsByStudentId(Integer studentId) {
         return testResultRepository.findAllByStudentId(studentId);
     }

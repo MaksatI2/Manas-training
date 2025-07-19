@@ -101,6 +101,7 @@ public class TestInstanceServiceImpl implements TestInstanceService {
                 .test(TestDto.builder()
                         .id(testInstance.getTest().getId())
                         .title(testInstance.getTest().getTitle())
+                        .isActive(testInstance.getTest().getIsActive())
                         .build())
                 .courseInstanceId(testInstance.getInstance().getId())
                 .startDate(testInstance.getScheduledStart().toLocalDate())

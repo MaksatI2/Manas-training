@@ -32,12 +32,12 @@
     </div>
 
     <div class="container mt-4">
-        <a href="/courses/${courseInstance.courseId}/tests" class="btn btn-outline-primary w-100 mb-2">Список тестов по данному курсу</a>
+        <a href="/courses/${courseInstance.courseId}/tests" class="btn btn-outline-primary mb-2">Список тестов по данному курсу</a>
         <#if testInstance??>
-            <a href="/instance/${courseInstance.id}/change/test" class="btn btn-outline-warning w-100 mb-2">Переназначить тест для данного курса</a>
-            <a href="/instance/${courseInstance.id}/delete/test" class="btn btn-outline-danger w-100 mb-2">Отвязать данный тест от потока</a>
+            <a href="/instance/${courseInstance.id}/change/test" class="btn btn-outline-warning mb-2">Переназначить тест для данного курса</a>
+            <a href="/instance/${courseInstance.id}/delete/test" class="btn btn-outline-danger mb-2">Отвязать данный тест от потока</a>
         <#else>
-                <a href="/instance/${courseInstance.id}/test" class="btn btn-outline-primary w-100 mb-2">Назначить тест для данного потока</a>
+                <a href="/instance/${courseInstance.id}/test" class="btn btn-outline-primary mb-2">Назначить тест для данного потока</a>
         </#if>
         <h2>Модули курса</h2>
 
@@ -74,10 +74,27 @@
                                                                     ${lesson.description!''}
                                                                 </p>
                                                                 <#if lesson.quiz?has_content>
-                                                                    <a href="/quiz/${lesson.quiz.id}/edit" class="btn btn-outline-warning w-100 mb-2">Редактировать тест</a>
-                                                                    <a href="/quiz/${lesson.quiz.id}/delete" class="btn btn-outline-danger w-100 mb-2">Удалить тест</a>
+                                                                    <div class="row">
+                                                                        <div class="col=md-12 col-lg-6 mt-2">
+                                                                            <a href="/quiz/${lesson.quiz.id}/edit" class="btn btn-outline-warning w-100 mb-2">Редактировать тест</a>
+                                                                        </div>
+                                                                        <div class="col=md-12 col-lg-6 mt-2">
+                                                                            <a href="/quiz/${lesson.quiz.id}/delete" class="btn btn-outline-danger w-100 mb-2">Удалить тест</a>
+                                                                        </div>
+                                                                        <#if !lesson.quiz.isActive>
+                                                                            <div class="col=md-12 col-lg-12 mt-2">
+                                                                                <a href="/quiz/${lesson.quiz.id}/activate" class="btn btn-outline-success w-100 mb-2">Активировать тест</a>
+                                                                            </div>
+                                                                            <#else>
+                                                                                <div class="col=md-12 col-lg-12 mt-2">
+                                                                                    <a href="/quiz/${lesson.quiz.id}/deactivate" class="btn btn-outline-warning w-100 mb-2">Деактивировать тест</a>
+                                                                                </div>
+                                                                        </#if>
+                                                                    </div>
                                                                     <#else>
-                                                                        <a href="/quiz/create/${lesson.id}" class="btn btn-outline-primary w-100 mb-2">Создать тест</a>
+                                                                        <div class="mt-2 text-center">
+                                                                            <a href="/quiz/create/${lesson.id}" class="btn btn-outline-primary w-100 mb-2">Создать тест</a>
+                                                                        </div>
                                                                 </#if>
                                                             </div>
                                                         </div>

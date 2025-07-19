@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.service.course.CourseService;
+import manasTrainingService.service.test.TestInstanceService;
+import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.test.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,8 @@ public class CourseController {
     private CourseService courseService;
     @Autowired
     private TestService testService;
+    @Autowired
+    private TestInstanceService testInstanceService;
 
     @GetMapping
     public String getCourseList(Model model) {
@@ -58,7 +62,7 @@ public class CourseController {
     @GetMapping("/{id}/tests")
     public String getCourseTests(@PathVariable Integer id, Model model) {
         model.addAttribute("tests", testService.getAllTestsByCourseId(id));
-        model.addAttribute("courseId", id);
+        model.addAttribute("course", courseService.getCourseById(id));
         return "tests/course-tests";
     }
 }

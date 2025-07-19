@@ -69,14 +69,23 @@
                     </a>
                     <#if lesson.quiz??>
                         <a href="/quiz/${lesson.quiz.id}/edit" class="btn btn-warning btn-sm rounded-pill flex-shrink-0">
-                            <i class="fas fa-edit me-1"></i>Редатировать тест
+                            <i class="fas fa-edit me-1"></i> Редатировать тест
                         </a>
                         <a href="/quiz/${lesson.quiz.id}/delete" class="btn btn-danger btn-sm rounded-pill flex-shrink-0">
-                            <i class="fas fa-trash-alt me-1"></i>Удалить тест
+                            <i class="fas fa-trash-alt me-1"></i> Удалить тест
                         </a>
+                        <#if !lesson.quiz.isActive>
+                            <a href="/quiz/${lesson.quiz.id}/activate" class="btn btn-success btn-sm rounded-pill flex-shrink-0">
+                                <i class="fa-solid fa-check"></i> Активировать тест
+                            </a>
+                        <#else>
+                            <a href="/quiz/${lesson.quiz.id}/deactivate" class="btn btn-warning btn-sm rounded-pill flex-shrink-0">
+                                <i class="fas fa-ban"></i> Деактивировать тест
+                            </a>
+                        </#if>
                         <#else>
                             <a href="/quiz/create/${lesson.id}" class="btn btn-primary btn-sm rounded-pill flex-shrink-0">
-                                <i class="fas fa-plus me-1"></i>Создать тест
+                                <i class="fas fa-plus me-1"></i> Создать тест
                             </a>
                     </#if>
                 </#if>
@@ -195,7 +204,7 @@
         </div>
         <#if (isStudent || isTeacher)>
             <#if lesson.quiz?has_content>
-                <a href="/quiz/${lesson.quiz.id}/passing" class="btn btn-primary btn-sm rounded-pill flex-shrink-0 px-4 py-3">
+                <a href="/quiz/${lesson.quiz.id}/passing" class="btn btn-primary btn-sm rounded-pill flex-shrink-0 px-4 py-3 <#if !lesson.quiz.isActive>disabled</#if>">
                     <i class="fa-solid fa-list-check"></i> Пройти тест
                 </a>
                 <#else>

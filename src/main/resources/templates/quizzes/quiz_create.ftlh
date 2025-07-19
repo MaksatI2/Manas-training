@@ -171,7 +171,7 @@
                 <button type="button" class="btn btn-primary-custom" onclick="createQuestionBlock(${lessonQuiz.questions?size?c})">Добавить вопрос</button>
             </div>
             <div class="mb-3 form-check col-lg-10 col-md-10" id="active-test-block">
-                <@spring.formCheckbox "lessonQuiz.isActive" 'class="form-check-input fs-4"'/>
+                <@spring.formCheckbox "lessonQuiz.isActive" 'class="form-check-input fs-4" checked'/>
                 <label class="form-check-label fw-bold" for="lessonQuiz.isActive">Активный?</label>
             </div>
             <#if _csrf??>

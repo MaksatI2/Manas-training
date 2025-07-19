@@ -105,6 +105,10 @@ public class TestServiceImpl implements TestService {
                 .description(test.getDescription())
                 .isActive(test.getIsActive())
                 .courseInstanceId(test.getCourse().getId())
+                .course(CourseDto.builder()
+                        .id(test.getCourse().getId())
+                        .title(test.getCourse().getTitle())
+                        .build())
                 .passingScore(test.getPassingScore().intValue())
                 .questions(questionService.getQuestionsByTestId(test.getId()))
                 .build();
@@ -124,6 +128,10 @@ public class TestServiceImpl implements TestService {
                 .description(test.getDescription())
                 .isActive(test.getIsActive())
                 .courseInstanceId(test.getCourse().getId())
+                .course(CourseDto.builder()
+                        .id(test.getCourse().getId())
+                        .title(test.getCourse().getTitle())
+                        .build())
                 .passingScore(test.getPassingScore().intValue())
                 .questions(questionService.getQuestionsByTestId(test.getId()))
                 .build();
@@ -190,6 +198,12 @@ public class TestServiceImpl implements TestService {
             return testRepository.saveAndFlush(test).getCourse().getId();
         }else if(testInstances.stream().anyMatch(t -> t.getInstance().getEndDate().isBefore(LocalDateTime.now()))){
             test.setIsActive(false);
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.UPDATE,
+                    TargetType.TEST,
+                    id
+            );
             return testRepository.saveAndFlush(test).getCourse().getId();
         } else {
             throw new IncorrectDateException("Тест нельзя деактивироанть если он прикреплен к активному потоку");
@@ -201,6 +215,12 @@ public class TestServiceImpl implements TestService {
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
         test.setIsActive(true);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.TEST,
+                id
+        );
         return testRepository.saveAndFlush(test).getCourse().getId();
     }
 

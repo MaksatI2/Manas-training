@@ -96,8 +96,11 @@ public class LessonQuizController {
 
     @GetMapping("{id}/passing")
     public String getQuizPassingPage(@PathVariable int id, Model model) {
-        if(!lessonAccessService.canAccessLessonQuizPassing(lessonQuizService.getQuizEntityByLessonId(id))){
+        if(!lessonAccessService.canAccessLessonQuizPassing(lessonQuizService.getQuizEntityById(id))){
             throw new NoAccessException("У вас нет доступа к прохождению тестов");
+        }
+        if(!lessonQuizService.getQuizById(id).getIsActive()){
+            throw new NoAccessException("Тестирование сейчас не доступно");
         }
         QuizAnswerDto quizAnswerDto = new QuizAnswerDto();
         quizAnswerDto.setPassingStart(LocalTime.now());
@@ -126,4 +129,19 @@ public class LessonQuizController {
         }
         return "redirect:" + url;
     }
+
+    @GetMapping("{id}/activate")
+    public String activateQuiz(@PathVariable Integer id, RedirectAttributes redirectAttributes, HttpServletRequest httpServletRequest) {
+        lessonQuizService.activateQuiz(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно активирован");
+        return "redirect:" + httpServletRequest.getHeader("Referer");
+    }
+
+    @GetMapping("{id}/deactivate")
+    public String deactivateQuiz(@PathVariable Integer id, RedirectAttributes redirectAttributes, HttpServletRequest httpServletRequest) {
+        lessonQuizService.deactivateQuiz(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно деактивирован");
+        return "redirect:" + httpServletRequest.getHeader("Referer");
+    }
+
 }

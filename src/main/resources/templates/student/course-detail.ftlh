@@ -78,7 +78,11 @@
             <p>Модули отсутствуют</p>
         </#if>
         <#if testInstance?has_content>
-            <a href="/test/${testInstance.test.id}/passing?instance=${testInstance.courseInstanceId}" class="btn btn-outline-warning w-100 mb-2">Пройти итоговое тестирование</a>
+            <#if alreadyAttempted??>
+                <p>${alreadyAttempted}</p>
+                <#else>
+                    <a href="/test/${testInstance.test.id}/passing?instance=${testInstance.courseInstanceId}" class="btn btn-outline-warning w-100 mb-2 <#if !testInstance.test.isActive>disabled</#if>">Пройти итоговое тестирование</a>
+            </#if>
             <#else>
             <p>${testInstanceNotFound!}</p>
         </#if>

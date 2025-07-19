@@ -21,4 +21,8 @@ public interface LessonQuizService {
     QuizResultDto checkQuizResults(QuizAnswerDto quizAnswerDto);
 
     void deleteQuiz(int id);
+
+    void deactivateQuiz(int id);
+
+    void activateQuiz(int id);
 }

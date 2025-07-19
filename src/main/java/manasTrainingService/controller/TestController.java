@@ -1,12 +1,15 @@
 package manasTrainingService.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
+import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.test.TestInstanceService;
+import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +27,7 @@ public class TestController {
     private final TestService testService;
     private final CourseService courseService;
     private final TestInstanceService testInstanceService;
+    private final TestResultService testResultService;
 
     @GetMapping("create/{courseInstanceId}")
     public String createLessonTestPage(@PathVariable int courseInstanceId, Model model) {
@@ -49,13 +53,23 @@ public class TestController {
     }
 
     @GetMapping("{id}/edit")
-    public String getEditTestPage(@PathVariable int id, Model model) {
+    public String getEditTestPage(@PathVariable int id, Model model, HttpServletRequest request) {
         model.addAttribute("test", testService.getTestById(id));
+        String url = request.getHeader("Referer");
+        if(url != null){
+            request.getSession().setAttribute("redirectAfterEdit", url);
+        } else {
+            request.getSession().setAttribute("redirectAfterEdit", "/");
+        }
         return "tests/edit";
     }
 
     @PostMapping("edit")
-    public String editTest(@Valid @ModelAttribute("test") TestDto test, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String editTest(@Valid @ModelAttribute("test") TestDto test,
+                           BindingResult bindingResult,
+                           Model model,
+                           RedirectAttributes redirectAttributes,
+                           HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return "tests/edit";
         }
@@ -65,8 +79,10 @@ public class TestController {
             model.addAttribute("error", e.getMessage());
             return "tests/edit";
         }
+        String redirectUrl = request.getSession().getAttribute("redirectAfterEdit").toString();
+        request.getSession().removeAttribute("redirectAfterEdit");
         redirectAttributes.addFlashAttribute("successMessage", "Содержание теста успешно изменено");
-        return "redirect:/courses/"+test.getCourseInstanceId()+"/tests";
+        return "redirect:" + redirectUrl;
     }
 
     @GetMapping("{id}/delete")
@@ -84,6 +100,12 @@ public class TestController {
     @GetMapping("{id}/passing")
     public String getTestById(@PathVariable int id, @RequestParam("instance") int instanceId, Model model, RedirectAttributes redirectAttributes) {
         TestDto testDto = testService.getTestById(id);
+        if (!testDto.getIsActive()){
+            throw new NoAccessException("Тестирование сейчас не доступно");
+        }
+        if (testResultService.userHasTestAttempt(testService.getTestById(id).getId())) {
+            throw new NoAccessException("Вы уже прошли данный тест");
+        }
         if(testInstanceService.isValidAccessTime(instanceId)){
             model.addAttribute("result", new TestAnswerDto());
             model.addAttribute("test", testDto);
@@ -124,5 +146,11 @@ public class TestController {
         model.addAttribute("results", testService.checkTestResult(result));
         model.addAttribute("test", testService.getTestById(result.getTestId()));
         return "tests/test_passed_page";
+    }
+
+    @GetMapping("{id}/details")
+    public String testDetailsPage(@PathVariable int id, Model model) {
+        model.addAttribute("test", testService.getTestById(id));
+        return "tests/test-details";
     }
 }
