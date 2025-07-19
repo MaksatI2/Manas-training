@@ -6,6 +6,7 @@ import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
 import manasTrainingService.service.course.CourseService;
+import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +23,7 @@ public class TestController {
 
     private final TestService testService;
     private final CourseService courseService;
+    private final TestInstanceService testInstanceService;
 
     @GetMapping("create/{courseInstanceId}")
     public String createLessonTestPage(@PathVariable int courseInstanceId, Model model) {
@@ -43,7 +45,7 @@ public class TestController {
             return "tests/create";
         }
         redirectAttributes.addFlashAttribute("successMessage", "Тест успешно создан");
-        return "redirect:/teacher/my-courses";
+        return "redirect:/courses/"+test.getCourseInstanceId()+"/tests";
     }
 
     @GetMapping("{id}/edit")
@@ -64,24 +66,53 @@ public class TestController {
             return "tests/edit";
         }
         redirectAttributes.addFlashAttribute("successMessage", "Содержание теста успешно изменено");
-        return "redirect:/teacher/my-courses";
+        return "redirect:/courses/"+test.getCourseInstanceId()+"/tests";
     }
 
     @GetMapping("{id}/delete")
     public String deleteTest(@PathVariable int id, RedirectAttributes redirectAttributes) {
-        testService.deleteTest(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно удален");
-        return "redirect:/teacher/my-courses";
+        try {
+            int courseId = testService.deleteTest(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Тест успешно удален");
+            return "redirect:/courses/"+courseId+"/tests";
+        } catch (IncorrectDateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/courses/"+testService.getTestById(id).getCourseInstanceId()+"/tests";
+        }
     }
 
     @GetMapping("{id}/passing")
-    public String getTestById(@PathVariable int id, Model model) {
+    public String getTestById(@PathVariable int id, @RequestParam("instance") int instanceId, Model model, RedirectAttributes redirectAttributes) {
         TestDto testDto = testService.getTestById(id);
-        model.addAttribute("result", new TestAnswerDto());
-        model.addAttribute("test", testDto);
-        model.addAttribute("passing_start", LocalDateTime.now());
-        model.addAttribute("courseTitle", courseService.getCourseById(testDto.getId()).getTitle());
-        return "tests/test_passing";
+        if(testInstanceService.isValidAccessTime(instanceId)){
+            model.addAttribute("result", new TestAnswerDto());
+            model.addAttribute("test", testDto);
+            model.addAttribute("passing_start", LocalDateTime.now());
+            model.addAttribute("courseTitle", courseService.getCourseById(testDto.getId()).getTitle());
+            return "tests/test_passing";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Прохождение тестирования доступно только в специально отведенное время");
+            return "redirect:/student/course/" + instanceId;
+        }
+    }
+
+    @GetMapping("{id}/activate")
+    public String activateTest(@PathVariable int id, RedirectAttributes redirectAttributes){
+        int courseId = testService.activateTest(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно активирован!");
+        return "redirect:/courses/"+courseId+"/tests";
+    }
+
+    @GetMapping("{id}/deactivate")
+    public String deactivateTest(@PathVariable int id, RedirectAttributes redirectAttributes){
+        try {
+            int courseId = testService.deactivateTest(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Тест успешно деактивирован!");
+            return "redirect:/courses/"+courseId+"/tests";
+        } catch (IncorrectDateException e){
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/courses/"+testService.getTestById(id).getCourseInstanceId()+"/tests";
+        }
     }
 
     @PostMapping("checking")

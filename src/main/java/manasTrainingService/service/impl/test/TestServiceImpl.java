@@ -2,16 +2,15 @@ package manasTrainingService.service.impl.test;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import manasTrainingService.dto.answers.QuestionAnswerDto;
+import manasTrainingService.dto.CourseDto;
 import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.answers.TestResultDto;
-import manasTrainingService.dto.quiz.answers.QuizResultDto;
-import manasTrainingService.dto.tests.OptionDto;
 import manasTrainingService.dto.tests.QuestionDto;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.TargetType;
 import manasTrainingService.entity.Test;
+import manasTrainingService.entity.TestInstance;
 import manasTrainingService.entity.TestResult;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
 import manasTrainingService.exceptions.nsee.TestNotFoundException;
@@ -26,11 +25,8 @@ import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -53,29 +49,10 @@ public class TestServiceImpl implements TestService {
 
     @Override
     public void createTest(TestDto testDto) {
-
-        LocalDateTime scheduledStart = parseDateRange(testDto).get(0);
-        LocalDateTime scheduledEnd = parseDateRange(testDto).get(1);
-
-        if (LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата не может быть в прошлом");
-        }
-        if (scheduledStart.isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата открытия доступа не может быть после даты закрытия доступа");
-        }
-        if (scheduledStart.equals(scheduledEnd)) {
-            throw new IncorrectDateException("Дата и время не могут быть равны");
-        }
-        if (courseInstanceService.getCourseInstanceById(testDto.getCourseInstanceId()).getEndDate().isBefore(scheduledStart.toLocalDate())
-                || courseInstanceService.getCourseInstanceById(testDto.getCourseInstanceId()).getEndDate().isBefore(scheduledEnd.toLocalDate())) {
-            throw new IncorrectDateException("Дата начала тестирования не может быть позднее даты окончания курса");
-        }
         Test test = new Test();
         test.setTitle(testDto.getTitle());
         test.setDescription(testDto.getDescription());
         test.setPassingScore(BigDecimal.valueOf(testDto.getPassingScore()));
-        test.setScheduledStart(scheduledStart);
-        test.setScheduledEnd(scheduledEnd);
         if (testDto.getIsActive() == null) {
             test.setIsActive(false);
         } else {
@@ -98,28 +75,9 @@ public class TestServiceImpl implements TestService {
     public void editTest(TestDto testDto) {
         Test test = testRepository.findById(testDto.getId())
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
-
-        LocalDateTime scheduledStart = parseDateRange(testDto).get(0);
-        LocalDateTime scheduledEnd = parseDateRange(testDto).get(1);
-
-        if (LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата не может быть в прошлом");
-        }
-        if (scheduledStart.isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата открытия доступа не может быть после даты закрытия доступа");
-        }
-        if (scheduledStart.equals(scheduledEnd)) {
-            throw new IncorrectDateException("Дата и время не могут быть равны");
-        }
-        if (courseInstanceService.getCourseInstanceById(testDto.getCourseInstanceId()).getEndDate().isBefore(scheduledStart.toLocalDate())
-                || courseInstanceService.getCourseInstanceById(testDto.getCourseInstanceId()).getEndDate().isBefore(scheduledEnd.toLocalDate())) {
-            throw new IncorrectDateException("Дата начала тестирования не может быть позднее даты окончания курса");
-        }
         test.setTitle(testDto.getTitle());
         test.setDescription(testDto.getDescription());
         test.setPassingScore(BigDecimal.valueOf(testDto.getPassingScore()));
-        test.setScheduledStart(scheduledStart);
-        test.setScheduledEnd(scheduledEnd);
         if (testDto.getIsActive() == null) {
             test.setIsActive(false);
         } else {
@@ -146,10 +104,6 @@ public class TestServiceImpl implements TestService {
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .isActive(test.getIsActive())
-                .startDate(test.getScheduledStart().toLocalDate())
-                .endDate(test.getScheduledEnd().toLocalDate())
-                .startTime(test.getScheduledStart().toLocalTime())
-                .endTime(test.getScheduledEnd().toLocalTime())
                 .courseInstanceId(test.getCourse().getId())
                 .passingScore(test.getPassingScore().intValue())
                 .questions(questionService.getQuestionsByTestId(test.getId()))
@@ -169,10 +123,6 @@ public class TestServiceImpl implements TestService {
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .isActive(test.getIsActive())
-                .startDate(test.getScheduledStart().toLocalDate())
-                .endDate(test.getScheduledEnd().toLocalDate())
-                .startTime(test.getScheduledStart().toLocalTime())
-                .endTime(test.getScheduledEnd().toLocalTime())
                 .courseInstanceId(test.getCourse().getId())
                 .passingScore(test.getPassingScore().intValue())
                 .questions(questionService.getQuestionsByTestId(test.getId()))
@@ -230,6 +180,50 @@ public class TestServiceImpl implements TestService {
                 .build();
     }
 
+    @Override
+    public Integer deactivateTest(int id){
+        Test test = testRepository.findById(id)
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+        List<TestInstance> testInstances = test.getTestInstances();
+        if(testInstances.isEmpty()){
+            test.setIsActive(false);
+            return testRepository.saveAndFlush(test).getCourse().getId();
+        }else if(testInstances.stream().anyMatch(t -> t.getInstance().getEndDate().isBefore(LocalDateTime.now()))){
+            test.setIsActive(false);
+            return testRepository.saveAndFlush(test).getCourse().getId();
+        } else {
+            throw new IncorrectDateException("Тест нельзя деактивироанть если он прикреплен к активному потоку");
+        }
+    }
+
+    @Override
+    public Integer activateTest(int id){
+        Test test = testRepository.findById(id)
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+        test.setIsActive(true);
+        return testRepository.saveAndFlush(test).getCourse().getId();
+    }
+
+    @Override
+    public List<TestDto> getAllTestsByCourseId(int courseId){
+        List<Test> tests = testRepository.findAllByCourseId(courseId);
+        return tests.stream().map(t -> TestDto.builder()
+                .id(t.getId())
+                .title(t.getTitle())
+                .description(t.getDescription())
+                .isActive(t.getIsActive())
+                .course(CourseDto.builder()
+                        .id(t.getCourse().getId())
+                        .title(t.getCourse().getTitle())
+                        .build())
+                .passingScore(t.getPassingScore().intValue())
+                .questions(t.getQuestions().stream().map(q -> QuestionDto.builder()
+                        .question(q.getQuestion())
+                        .points(q.getPoints())
+                        .build()).toList())
+                .build()).toList();
+    }
+
     public void clearNoData(TestDto testDto) {
         if (testDto.getQuestions() == null) return;
         testDto.setQuestions(
@@ -249,22 +243,37 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public void deleteTest(int id) {
-        testRepository.deleteById(id);
-        activityLogService.log(
-                userService.getAuthorizedUser(),
-                ActionType.DELETE,
-                TargetType.TEST,
-                id
-        );
+    public Integer deleteTest(int id) {
+        Test test = testRepository.findById(id)
+                        .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+        int courseId = test.getCourse().getId();
+        List<TestInstance> testInstances = test.getTestInstances();
+        if(testInstances.isEmpty()){
+            testRepository.deleteById(id);
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.DELETE,
+                    TargetType.TEST,
+                    id
+            );
+            return courseId;
+        }else if(testInstances.stream().anyMatch(t -> t.getInstance().getEndDate().isBefore(LocalDateTime.now()))){
+            testRepository.deleteById(id);
+            activityLogService.log(
+                    userService.getAuthorizedUser(),
+                    ActionType.DELETE,
+                    TargetType.TEST,
+                    id
+            );
+            return courseId;
+        } else {
+            throw new IncorrectDateException("Тест нельзя удалить если он привязван к активному потоку");
+        }
     }
 
-    private List<LocalDateTime> parseDateRange(TestDto testDto) {
-        LocalDateTime start = testDto.getStartDate().atTime(testDto.getStartTime());
-        LocalDateTime end = testDto.getEndDate().atTime(testDto.getEndTime());
-        List<LocalDateTime> dates = new ArrayList<>();
-        dates.add(start);
-        dates.add(end);
-        return dates;
+    @Override
+    public long getTotalTests() {
+        return testRepository.count();
     }
+
 }

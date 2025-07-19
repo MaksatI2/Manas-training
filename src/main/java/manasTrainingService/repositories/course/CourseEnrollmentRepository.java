@@ -45,5 +45,13 @@ public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollme
             """)
     List<CourseEnrollment> findWithCourseByStudentIn(@Param("students") List<User> students);
 
+    @Query("""
+    SELECT e
+    FROM CourseEnrollment e
+    WHERE e.student.id = :studentId
+      AND e.courseInstance.isActive = true
+""")
+    List<CourseEnrollment> findAllActiveEnrollmentsByStudentId(@Param("studentId") Integer studentId);
+
 
 }

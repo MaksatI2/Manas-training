@@ -53,6 +53,8 @@ public class Course {
     @Builder.Default
     LocalDateTime updatedAt = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Test> tests;
 
     @PreUpdate
     void preUpdate() {

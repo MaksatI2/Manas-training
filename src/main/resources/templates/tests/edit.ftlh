@@ -36,42 +36,6 @@
                         <@spring.formInput "test.passingScore" 'class="form-control points" id="test.passingScore"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
-                    <div class="mb-3">
-                        <h3 class="mb-3">Доступен с:</h3>
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6">
-                                <label for="startDate" class="form-label fw-bold">Дата</label>
-                                <@spring.formInput "test.startDate" 'type="date" class="form-control input-date" id="startDate"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <label for="startTime" class="form-label fw-bold">Время</label>
-                                <@spring.formInput "test.startTime" 'type="time" class="form-control input-time" id="startTime"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
-                            </div>
-                        </div>
-                        <#if error??>
-                            <span class="error text-danger">${error}</span>
-                        </#if>
-                    </div>
-                    <div class="mb-3">
-                        <h3 class="mb-3">Доступен по:</h3>
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6">
-                                <label for="endDate" class="form-label fw-bold">Дата</label>
-                                <@spring.formInput "test.endDate" 'type="date" class="form-control input-date" id="endDate"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <label for="endTime" class="form-label fw-bold">Время</label>
-                                <@spring.formInput "test.endTime" 'type="time" class="form-control input-time" id="endTime"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
-                            </div>
-                        </div>
-                        <#if error??>
-                            <span class="error text-danger">${error}</span>
-                        </#if>
-                    </div>
                 </div>
             </div>
             <h3 class="text-center mb-4">Список вопросов</h3>
@@ -176,10 +140,6 @@
                 </button>
             </div>
             <input type="hidden" name="id" value="${test.id}">
-            <div class="mb-3 form-check col-lg-10 col-md-10" id="active-test-block">
-                <@spring.formCheckbox "test.isActive" 'class="form-check-input fs-4"'/>
-                <label class="form-check-label fw-bold" for="test.isActive">Активный?</label>
-            </div>
             <#if _csrf??>
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             </#if>
@@ -194,6 +154,85 @@
         let pointsInput = document.querySelectorAll(".points")
         let createQuestionButtonFromEdit = document.getElementById("createQuestion");
         let testId = ${test.id}
+
+        let createForm = document.getElementById("edit-test")
+        createForm.addEventListener("submit", event => {
+            let hasError = false;
+            if (document.querySelectorAll(".error-message")){
+                let errors = document.querySelectorAll(".error-message")
+                errors.forEach(er => {
+                    er.remove()
+                })
+            }
+            if (document.querySelectorAll(".is-invalid")){
+                let inputs = document.querySelectorAll(".is-invalid")
+                inputs.forEach(i => {
+                    i.classList.remove("is-invalid")
+                })
+            }
+            let form = event.target
+            let formData = new FormData(form);
+            let data = Object.fromEntries(formData.entries())
+            const testQuestions = new Map();
+            for (let [key, value] of formData.entries()) {
+                const qMatch = key.match(/^questions\[(\d+)]\.question$/);
+                const oMatch = key.match(/^questions\[(\d+)]\.options\[(\d+)]\.optionText$/);
+
+                if (qMatch) {
+                    const qIndex = parseInt(qMatch[1]);
+                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
+                    testQuestions.get(qIndex).question = value.trim();
+                }
+
+                if (oMatch) {
+                    const qIndex = parseInt(oMatch[1]);
+                    const oIndex = parseInt(oMatch[2]);
+                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
+                    testQuestions.get(qIndex).options[oIndex] = value.trim();
+                }
+            }
+
+            const questionsArray = Array.from(testQuestions.entries())
+                .map(([_, value]) => ({
+                    question: value.question,
+                    options: value.options
+                }));
+            console.log(questionsArray)
+            const questionsCount = questionsArray.length;
+            for(let i = 0; i < questionsCount; i++){
+                if(!questionsArray[i].question){
+                    hasError = true
+                    let input = document.getElementById("questions"+i+".question")
+                    if (input){
+                        input.classList.add("is-invalid")
+                        let error = document.createElement("label")
+                        error.setAttribute("for", "questions"+i+".question")
+                        error.setAttribute("class", "text-danger error-message")
+                        error.innerText = "Заполните текст вопроса"
+                        input.parentNode.insertBefore(error, input.nextSibling);
+                    }
+                }
+                const optionCount = questionsArray[i].options.length
+                for(let a = 0; a < optionCount; a++){
+                    if(!questionsArray[i].options[a]){
+                        hasError = true
+                        let input = document.getElementById("questions"+i+".options"+a+".optionText")
+                        if (input){
+                            input.classList.add("is-invalid")
+                            let error = document.createElement("label")
+                            error.setAttribute("for", "questions"+i+".options"+a+".optionText")
+                            error.setAttribute("class", "text-danger error-message")
+                            error.innerText = "Заполните вариант ответа"
+                            let div = document.getElementById("questionId-"+i+"-optionId-"+a)
+                            div.parentNode.insertBefore(error, div.nextSibling);
+                        }
+                    }
+                }
+            }
+            if(hasError){
+                event.preventDefault();
+            }
+        })
 
         pointsInput.forEach(input => {
             input.addEventListener('input', () => {
@@ -226,9 +265,10 @@
 
             div.append(createRemoveQuestionButton("questionId-" + questionIndex))
             div.append(createInputContainer(
-                "questions[" + questionIndex + "].question",
+                "questions[" + questionId + "].question",
                 "Введите текст вопроса",
-                "questions[" + questionIndex + "].question",
+                "questions[" + questionId + "].question",
+                "questions" + questionId +".question",
                 "text",
                 "form-control"
             ))
@@ -373,12 +413,10 @@
         }
 
         function createQuestionOptionFromEdit(questionIndex, optionIndex, questionId, isChecked) {
-            // let optionsCount = document.querySelectorAll(`[id^="questionId"][id*="optionId-"]`).length;
             let id = "questionId-" + questionIndex + "-optionId-" + optionIndex;
             let div = document.createElement("div");
             div.setAttribute("class", "mt-3 d-flex align-items-center");
             div.setAttribute("id", id);
-            div.setAttribute("data-new", "true");
 
             div.append(createEmptyContainer(
                 createRadio("questions[" + questionIndex + "].correctOptionIndex", questionIndex, optionIndex, isChecked),
@@ -387,12 +425,14 @@
             if (optionIndex > 1) {
                 optionContainer = createOptionInputContainer(
                     "questions[" + questionIndex + "].options[" + optionIndex + "].optionText",
+                    "questions" + questionIndex +".options" + optionIndex + ".optionText",
                     "text",
                     "d-flex flex-grow-1 align-items-center"
                 )
             } else {
                 optionContainer = createOptionInputContainer(
                     "questions[" + questionIndex + "].options[" + optionIndex + "].optionText",
+                    "questions" + questionIndex +".options" + optionIndex + ".optionText",
                     "text",
                     "flex-grow-1 me-5"
                 )

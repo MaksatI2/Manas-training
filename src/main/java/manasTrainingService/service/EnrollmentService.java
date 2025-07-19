@@ -21,4 +21,6 @@ public interface EnrollmentService {
     List<CourseEnrollment> findAllEnrollmentsForCourseInstance(Integer courseInstanceId);
 
     void changeEnrollmentStatus(Integer enrollmentId, Status newStatus);
+
+    List<CourseEnrollment> findAllActiveEnrollmentsByStudentId(Integer studentId);
 }

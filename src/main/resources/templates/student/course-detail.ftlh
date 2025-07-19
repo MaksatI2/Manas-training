@@ -8,6 +8,12 @@
     {"label": "Мои курсы", "url": "/student/my-courses"},
     {"label": "Курс #${courseInstance.id}", "url": ""}
     ] />
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <div class="hero-section">
         <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
         <p class="hero-subtitle">
@@ -22,16 +28,6 @@
     </div>
 
     <div class="container mt-4">
-        <#if role?? && role == "TEACHER">
-            <#if test??>
-                <a href="<@spring.url '/test/${test.id}/edit'/>" class="btn btn-primary">Редактировать итоговый тест</a>
-                <a href="<@spring.url '/test/${test.id}/delete'/>" class="btn btn-danger">Удалить итоговый тест</a>
-            <#else>
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-                <a href="<@spring.url '/test/create/${courseInstance.id}'/>" class="btn btn-primary">Создать итоговый тест</a>
-            </div>
-            </#if>
-        </#if>
         <h2>Модули курса</h2>
 
         <#if courseInstance.modules?has_content>
@@ -80,6 +76,11 @@
             </div>
         <#else>
             <p>Модули отсутствуют</p>
+        </#if>
+        <#if testInstance?has_content>
+            <a href="/test/${testInstance.test.id}/passing?instance=${testInstance.courseInstanceId}" class="btn btn-outline-warning w-100 mb-2">Пройти итоговое тестирование</a>
+            <#else>
+            <p>${testInstanceNotFound!}</p>
         </#if>
     </div>
 

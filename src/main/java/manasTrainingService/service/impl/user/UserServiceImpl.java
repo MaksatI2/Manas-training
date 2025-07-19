@@ -12,6 +12,7 @@ import manasTrainingService.dto.profile.StudentProfileDto;
 import manasTrainingService.dto.register.OrganizationRegisterDto;
 import manasTrainingService.dto.register.StudentRegisterDto;
 import manasTrainingService.dto.register.TeacherRegisterDto;
+import manasTrainingService.dto.statistics.UserStatisticsDto;
 import manasTrainingService.entity.Organization;
 import manasTrainingService.entity.Role;
 import manasTrainingService.entity.StudentProfile;
@@ -356,6 +357,16 @@ public class UserServiceImpl implements UserService {
         user.setPhone(userEditDto.getPhone());
 
         userRepository.save(user);
+    }
+
+    @Override
+    public UserStatisticsDto getUserStatistics() {
+        long students = userRepository.countByRole_NameAndIsActiveTrue("STUDENT");
+        long teachers = userRepository.countByRole_NameAndIsActiveTrue("TEACHER");
+        long organizations = userRepository.countByRole_NameAndIsActiveTrue("ORGANIZATION");
+        long inactiveUsers = userRepository.countByIsActiveFalse();
+
+        return new UserStatisticsDto(students, teachers, organizations, inactiveUsers);
     }
 
 

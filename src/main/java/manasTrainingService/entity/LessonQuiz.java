@@ -20,9 +20,9 @@ public class LessonQuiz {
     @Column(name = "id", nullable = false)
     Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id", nullable = false)
-    Lesson lesson;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "lesson_id", nullable = false)
+//    Lesson lesson;
 
     @Column(name = "question_time_limit")
     Integer questionTimeLimit;
@@ -39,4 +39,8 @@ public class LessonQuiz {
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<LessonQuizQuestion> questions;
+
+    @OneToOne
+    @JoinColumn(name = "lesson_id")
+    Lesson lesson;
 }

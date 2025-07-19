@@ -15,7 +15,7 @@
     <div class="hero-section">
         <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Редактирование теста по итогам урока</h1>
     </div>
-    <form method="post" action="/quiz/edit">
+    <form method="post" action="/quiz/edit" id="edit-quiz">
 
 
         <div class="row justify-content-center" id="test">
@@ -32,8 +32,8 @@
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="lessonQuiz.questionTimeLimit" class="form-label fw-bold">Время на прохождение</label>
-                        <@spring.formInput "lessonQuiz.questionTimeLimit" 'class="form-control points" id="lessonQuiz.questionTimeLimit"' />
+                        <label for="lessonQuiz.questionTimeLimit" class="form-label fw-bold">Время отведенное на один вопрос(В минутах)</label>
+                        <@spring.formInput "lessonQuiz.questionTimeLimit" 'class="form-control" id="lessonQuiz.questionTimeLimit"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                 </div>
@@ -149,8 +149,88 @@
     <script>
         let questionIndex = ${lessonQuiz.questions?size?c};
         let pointsInput = document.querySelectorAll(".points")
+        let timeInput = document.getElementById("questionTimeLimit")
         let createQuestionButtonFromEdit = document.getElementById("createQuestion");
         let quizId = ${lessonQuiz.id}
+
+        let createForm = document.getElementById("edit-quiz")
+        createForm.addEventListener("submit", event => {
+            let hasError = false;
+            if (document.querySelectorAll(".error-message")){
+                let errors = document.querySelectorAll(".error-message")
+                errors.forEach(er => {
+                    er.remove()
+                })
+            }
+            if (document.querySelectorAll(".is-invalid")){
+                let inputs = document.querySelectorAll(".is-invalid")
+                inputs.forEach(i => {
+                    i.classList.remove("is-invalid")
+                })
+            }
+            let form = event.target
+            let formData = new FormData(form);
+            let data = Object.fromEntries(formData.entries())
+            const testQuestions = new Map();
+            for (let [key, value] of formData.entries()) {
+                const qMatch = key.match(/^questions\[(\d+)]\.question$/);
+                const oMatch = key.match(/^questions\[(\d+)]\.options\[(\d+)]\.optionText$/);
+
+                if (qMatch) {
+                    const qIndex = parseInt(qMatch[1]);
+                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
+                    testQuestions.get(qIndex).question = value.trim();
+                }
+
+                if (oMatch) {
+                    const qIndex = parseInt(oMatch[1]);
+                    const oIndex = parseInt(oMatch[2]);
+                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
+                    testQuestions.get(qIndex).options[oIndex] = value.trim();
+                }
+            }
+
+            const questionsArray = Array.from(testQuestions.entries())
+                .map(([_, value]) => ({
+                    question: value.question,
+                    options: value.options
+                }));
+            console.log(questionsArray)
+            const questionsCount = questionsArray.length;
+            for(let i = 0; i < questionsCount; i++){
+                if(!questionsArray[i].question){
+                    hasError = true
+                    let input = document.getElementById("questions"+i+".question")
+                    if (input){
+                        input.classList.add("is-invalid")
+                        let error = document.createElement("label")
+                        error.setAttribute("for", "questions"+i+".question")
+                        error.setAttribute("class", "text-danger error-message")
+                        error.innerText = "Заполните текст вопроса"
+                        input.parentNode.insertBefore(error, input.nextSibling);
+                    }
+                }
+                const optionCount = questionsArray[i].options.length
+                for(let a = 0; a < optionCount; a++){
+                    if(!questionsArray[i].options[a]){
+                        hasError = true
+                        let input = document.getElementById("questions"+i+".options"+a+".optionText")
+                        if (input){
+                            input.classList.add("is-invalid")
+                            let error = document.createElement("label")
+                            error.setAttribute("for", "questions"+i+".options"+a+".optionText")
+                            error.setAttribute("class", "text-danger error-message")
+                            error.innerText = "Заполните вариант ответа"
+                            let div = document.getElementById("questionId-"+i+"-optionId-"+a)
+                            div.parentNode.insertBefore(error, div.nextSibling);
+                        }
+                    }
+                }
+            }
+            if(hasError){
+                event.preventDefault();
+            }
+        })
 
         pointsInput.forEach(input => {
             input.addEventListener('input', () => {
@@ -160,6 +240,13 @@
                 }
             });
         })
+
+        timeInput.addEventListener('input', () => {
+            timeInput.value = timeInput.value.replace(/[^0-9]/g, '');
+            if (parseInt(timeInput.value) > 60) {
+                timeInput.value = '60';
+            }
+        });
 
         function createQuestionBlockFromEdit(questionIndex, quizId) {
             const optionIdRef = {value: 0};
@@ -172,9 +259,10 @@
 
             div.append(createRemoveQuestionButton("questionId-" + questionIndex))
             div.append(createInputContainer(
-                "questions[" + questionIndex + "].question",
+                "questions[" + questionId + "].question",
                 "Введите текст вопроса",
-                "questions[" + questionIndex + "].question",
+                "questions[" + questionId + "].question",
+                "questions" + questionId +".question",
                 "text",
                 "form-control"
             ))
@@ -328,12 +416,14 @@
             if (optionIndex > 1) {
                 optionContainer = createOptionInputContainer(
                     "questions[" + questionIndex + "].options[" + optionIndex + "].optionText",
+                    "questions" + questionIndex +".options" + optionIndex + ".optionText",
                     "text",
                     "d-flex flex-grow-1 align-items-center"
                 )
             } else {
                 optionContainer = createOptionInputContainer(
                     "questions[" + questionIndex + "].options[" + optionIndex + "].optionText",
+                    "questions" + questionIndex +".options" + optionIndex + ".optionText",
                     "text",
                     "flex-grow-1 me-5"
                 )

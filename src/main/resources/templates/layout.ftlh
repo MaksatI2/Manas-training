@@ -84,6 +84,13 @@
                         </a>
                     </div>
                     <div class="nav-item">
+                        <a href="/admin/statistics" class="nav-link" data-tooltip="Статистика">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Статистика</span>
+                        </a>
+                    </div>
+
+                    <div class="nav-item">
                         <a href="/#" class="nav-link" data-tooltip="Отчеты">
                             <i class="fas fa-chart-bar"></i>
                             <span>Отчеты</span>

@@ -36,8 +36,8 @@ public class Lesson {
     @OneToMany(mappedBy = "lesson", orphanRemoval = true, cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
     List<LessonMaterial> materials;
 
-    @OneToMany(mappedBy = "lesson", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<LessonQuiz> quizzes;
+    @OneToOne(mappedBy = "lesson")
+    LessonQuiz lessonQuiz;
 
     @OneToOne(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     LessonContent content;

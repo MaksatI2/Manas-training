@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -375,5 +376,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         }).toList();
     }
 
-
+    @Override
+    public Organization getByUserId(Integer userId) {
+        return organizationRepository.findByUserId(userId).orElseThrow(() -> new UserNotFoundException("Организация не была найдена"));
+    }
 }

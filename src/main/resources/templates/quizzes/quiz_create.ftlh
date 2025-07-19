@@ -15,7 +15,7 @@
     <div class="hero-section">
         <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Тест по итогам урока</h1>
     </div>
-    <form method="post" action="/quiz/create">
+    <form method="post" action="/quiz/create" id="create-quiz">
 
 
         <div class="row justify-content-center" id="test">
@@ -32,8 +32,8 @@
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="lessonQuiz.questionTimeLimit" class="form-label fw-bold">Время на прохождение</label>
-                        <@spring.formInput "lessonQuiz.questionTimeLimit" 'class="form-control points" id="lessonQuiz.questionTimeLimit"' />
+                        <label for="lessonQuiz.questionTimeLimit" class="form-label fw-bold">Время отведенное на один вопрос(В минутах)</label>
+                        <@spring.formInput "lessonQuiz.questionTimeLimit" 'class="form-control" id="lessonQuiz.questionTimeLimit"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                 </div>
@@ -125,7 +125,7 @@
                             <@spring.showErrors "<br>" "error text-danger" />
                         </div>
                         <div class="mt-3 border rounded-4 px-4 py-3 mb-3" id="options-questionId-0">
-                            <div id="questionId-0-optionId-0" class="mb-3 d-flex align-items-center">
+                            <div id="questionId-0-optionId-0" class="d-flex align-items-center mt-3">
                                 <div class="form-check d-flex align-items-center mb-0">
                                     <input type="radio"
                                            name="questions[0].correctOptionIndex"
@@ -141,7 +141,7 @@
                                     <@spring.showErrors "<br>" "error text-danger" />
                                 </div>
                             </div>
-                            <div id="questionId-0-optionId-1" class="mb-3 d-flex align-items-center">
+                            <div id="questionId-0-optionId-1" class="d-flex align-items-center mt-3">
                                 <div class="form-check d-flex align-items-center mb-0">
                                     <input type="radio"
                                            name="questions[0].correctOptionIndex"
@@ -186,6 +186,86 @@
     <script>
         let questionIndex = ${lessonQuiz.questions?size?c};
         let pointsInput = document.querySelectorAll(".points")
+        let timeInput = document.getElementById("questionTimeLimit")
+
+        let createForm = document.getElementById("create-quiz")
+        createForm.addEventListener("submit", event => {
+            let hasError = false;
+            if (document.querySelectorAll(".error-message")){
+                let errors = document.querySelectorAll(".error-message")
+                errors.forEach(er => {
+                    er.remove()
+                })
+            }
+            if (document.querySelectorAll(".is-invalid")){
+                let inputs = document.querySelectorAll(".is-invalid")
+                inputs.forEach(i => {
+                    i.classList.remove("is-invalid")
+                })
+            }
+            let form = event.target
+            let formData = new FormData(form);
+            let data = Object.fromEntries(formData.entries())
+            const testQuestions = new Map();
+            for (let [key, value] of formData.entries()) {
+                const qMatch = key.match(/^questions\[(\d+)]\.question$/);
+                const oMatch = key.match(/^questions\[(\d+)]\.options\[(\d+)]\.optionText$/);
+
+                if (qMatch) {
+                    const qIndex = parseInt(qMatch[1]);
+                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
+                    testQuestions.get(qIndex).question = value.trim();
+                }
+
+                if (oMatch) {
+                    const qIndex = parseInt(oMatch[1]);
+                    const oIndex = parseInt(oMatch[2]);
+                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
+                    testQuestions.get(qIndex).options[oIndex] = value.trim();
+                }
+            }
+
+            const questionsArray = Array.from(testQuestions.entries())
+                .map(([_, value]) => ({
+                    question: value.question,
+                    options: value.options
+                }));
+            console.log(questionsArray)
+            const questionsCount = questionsArray.length;
+            for(let i = 0; i < questionsCount; i++){
+                if(!questionsArray[i].question){
+                    hasError = true
+                    let input = document.getElementById("questions"+i+".question")
+                    if (input){
+                        input.classList.add("is-invalid")
+                        let error = document.createElement("label")
+                        error.setAttribute("for", "questions"+i+".question")
+                        error.setAttribute("class", "text-danger error-message")
+                        error.innerText = "Заполните текст вопроса"
+                        input.parentNode.insertBefore(error, input.nextSibling);
+                    }
+                }
+                const optionCount = questionsArray[i].options.length
+                for(let a = 0; a < optionCount; a++){
+                    if(!questionsArray[i].options[a]){
+                        hasError = true
+                        let input = document.getElementById("questions"+i+".options"+a+".optionText")
+                        if (input){
+                            input.classList.add("is-invalid")
+                            let error = document.createElement("label")
+                            error.setAttribute("for", "questions"+i+".options"+a+".optionText")
+                            error.setAttribute("class", "text-danger error-message")
+                            error.innerText = "Заполните вариант ответа"
+                            let div = document.getElementById("questionId-"+i+"-optionId-"+a)
+                            div.parentNode.insertBefore(error, div.nextSibling);
+                        }
+                    }
+                }
+            }
+            if(hasError){
+                event.preventDefault();
+            }
+        })
 
         pointsInput.forEach(input => {
             input.addEventListener('input', () => {
@@ -195,6 +275,13 @@
                 }
             });
         })
+
+        timeInput.addEventListener('input', () => {
+            timeInput.value = timeInput.value.replace(/[^0-9]/g, '');
+            if (parseInt(timeInput.value) > 60) {
+                timeInput.value = '60';
+            }
+        });
 
         function createQuestionBlock(questionId) {
             const optionIdRef = {value: 0};
@@ -210,6 +297,7 @@
                 "questions[" + questionId + "].question",
                 "Введите текст вопроса",
                 "questions[" + questionId + "].question",
+                "questions" + questionId +".question",
                 "text",
                 "form-control"
             ))

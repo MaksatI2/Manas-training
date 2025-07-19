@@ -27,7 +27,18 @@
         </p>
     </div>
 
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">Статистика потока</a>
+    </div>
+
     <div class="container mt-4">
+        <a href="/courses/${courseInstance.courseId}/tests" class="btn btn-outline-primary w-100 mb-2">Список тестов по данному курсу</a>
+        <#if testInstance??>
+            <a href="/instance/${courseInstance.id}/change/test" class="btn btn-outline-warning w-100 mb-2">Переназначить тест для данного курса</a>
+            <a href="/instance/${courseInstance.id}/delete/test" class="btn btn-outline-danger w-100 mb-2">Отвязать данный тест от потока</a>
+        <#else>
+                <a href="/instance/${courseInstance.id}/test" class="btn btn-outline-primary w-100 mb-2">Назначить тест для данного потока</a>
+        </#if>
         <h2>Модули курса</h2>
 
         <#if courseInstance.modules?has_content>
@@ -62,7 +73,12 @@
                                                                 <p class="card-text text-muted small">
                                                                     ${lesson.description!''}
                                                                 </p>
-
+                                                                <#if lesson.quiz?has_content>
+                                                                    <a href="/quiz/${lesson.quiz.id}/edit" class="btn btn-outline-warning w-100 mb-2">Редактировать тест</a>
+                                                                    <a href="/quiz/${lesson.quiz.id}/delete" class="btn btn-outline-danger w-100 mb-2">Удалить тест</a>
+                                                                    <#else>
+                                                                        <a href="/quiz/create/${lesson.id}" class="btn btn-outline-primary w-100 mb-2">Создать тест</a>
+                                                                </#if>
                                                             </div>
                                                         </div>
                                                     </a>

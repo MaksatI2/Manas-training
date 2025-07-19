@@ -5,10 +5,16 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.EnrollmentService;
+import manasTrainingService.service.test.TestInstanceService;
+import manasTrainingService.dto.statistics.AttendanceStatsDTO;
+import manasTrainingService.entity.User;
+import manasTrainingService.service.impl.user.StudentStatisticsServiceImpl;
 import manasTrainingService.service.user.StudentService;
+import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +35,9 @@ public class StudentController {
     private final UserService userService;
     private final EnrollmentService enrollmentService;
     private final CourseInstanceService courseInstanceService;
+    private final TestInstanceService testInstanceService;
+    private final StudentStatisticsService studentStatisticsService;
+    private final StudentStatisticsServiceImpl studentStatisticsServiceImpl;
 
     @GetMapping("/profile")
     public String profilePage(Model model){
@@ -76,8 +85,22 @@ public class StudentController {
         enrollmentService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
         model.addAttribute("courseInstance", courseInstanceDto);
-        model.addAttribute("userRole", userService.getAuthorizedUser().getRole());
+        try {
+            model.addAttribute("testInstance",  testInstanceService.getTestInstanceByCourseInstance(id));
+        } catch (TestInstanceNotFoundException e) {
+            model.addAttribute("testInstanceNotFound", "Тестовое задание для курса " + courseInstanceDto.getCourseTitle() + " еще не было назначенно");
+        }
         return "student/course-detail";
     }
+
+    @GetMapping("/statistics")
+    public String viewStudentStatistics(Model model) {
+        User student = userService.getAuthorizedUser();
+        List<AttendanceStatsDTO> stats = studentStatisticsService.getAllAttendanceStats(student);
+        model.addAttribute("attendanceStatsList", stats);
+        model.addAttribute("testResults", studentStatisticsServiceImpl.getTestResultsByStudent(student));
+        return "student/statistics";
+    }
+
 
 }

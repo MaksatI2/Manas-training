@@ -21,46 +21,38 @@ function createLabel(name, text) {
     return label;
 }
 
-function createInput(name, type, className) {
+function createInput(name, id, type, className) {
     let input = document.createElement("input");
     input.setAttribute("type", type);
     input.setAttribute("class", className);
     input.setAttribute("name", name);
-    input.setAttribute("id", name);
-    if (className.includes('points')){
-        input.addEventListener("input", () => {
-            input.value = input.value.replace(/[^0-9]/g, '');
-            if (parseInt(input.value) > 100) {
-                input.value = '100';
-            }
-        })
-    }
+    input.setAttribute("id", id);
     return input;
 }
 
-function createOptionInput(name, type) {
+function createOptionInput(name, id, type) {
     let input = document.createElement("input");
     input.setAttribute("type", type);
     input.setAttribute("class", "form-control me-2");
     input.setAttribute("placeholder", "Вариант ответа")
     input.setAttribute("aria-describedby", "button-addon2")
     input.setAttribute("name", name);
-    input.setAttribute("id", name);
+    input.setAttribute("id", id);
     return input;
 }
 
-function createInputContainer(labelName, labelText, inputName, inputType, inputClassName){
+function createInputContainer(labelName, labelText, inputName, inputId, inputType, inputClassName){
     let div = document.createElement("div")
     div.setAttribute("class", "mb-3")
     div.append(createLabel(labelName, labelText));
-    div.append(createInput(inputName, inputType, inputClassName));
+    div.append(createInput(inputName, inputId, inputType, inputClassName));
     return div;
 }
 
-function createOptionInputContainer(inputName, inputType, className){
+function createOptionInputContainer(inputName, inputId, inputType, className){
     let div = document.createElement("div")
     div.setAttribute("class", className)
-    div.append(createOptionInput(inputName, inputType));
+    div.append(createOptionInput(inputName, inputId, inputType));
     return div;
 }
 
@@ -106,7 +98,10 @@ function createRemoveQuestionButton(id) {
     button.innerHTML = `<i class="fa-solid fa-trash"></i>`;
     button.addEventListener("click", () => {
         const element = document.getElementById(id);
-        if (element) element.remove();
+        if (element) {
+            element.remove();
+            questionId--;
+        }
     });
     div.append(button)
     return div;
@@ -116,7 +111,7 @@ function createOptionRemoveButton(id, questionId) {
     let button = document.createElement("button");
     button.setAttribute("type", "button");
     button.setAttribute("class", "btn btn-outline-danger");
-    button.setAttribute("id", "button-addon2");
+    button.setAttribute("id", "remove-" + id);
     button.innerHTML = `<i class="fa-solid fa-trash"></i>`;
     button.addEventListener("click", () => {
         const element = document.getElementById(id);
@@ -141,12 +136,14 @@ function createQuestionOption(questionId, optionId, isChecked) {
     if (optionId > 1){
         optionContainer = createOptionInputContainer(
             "questions[" + questionId + "].options[" + optionId + "].optionText",
+            "questions" + questionId +".options" + optionId + ".optionText",
             "text",
             "d-flex flex-grow-1 align-items-center"
             )
     }else {
         optionContainer = createOptionInputContainer(
             "questions[" + questionId + "].options[" + optionId + "].optionText",
+            "questions" + questionId +".options" + optionId + ".optionText",
             "text",
             "flex-grow-1 me-5"
         )

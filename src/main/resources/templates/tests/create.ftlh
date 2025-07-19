@@ -15,7 +15,7 @@
     <div class="hero-section">
         <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Итоговый тест</h1>
     </div>
-    <form method="post" action="/test/create">
+    <form method="post" action="/test/create" id="create-test">
 
 
         <div class="row justify-content-center" id="test">
@@ -35,42 +35,6 @@
                         <label for="test.passingScore" class="form-label fw-bold">Проходной балл</label>
                         <@spring.formInput "test.passingScore" 'class="form-control points" id="test.passingScore"' />
                         <@spring.showErrors "<br>" "error text-danger" />
-                    </div>
-                    <div class="mb-3">
-                        <h3 class="mb-3">Доступен с:</h3>
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6">
-                                <label for="startDate" class="form-label fw-bold">Дата</label>
-                                <@spring.formInput "test.startDate" 'type="date" class="form-control input-date" id="startDate"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <label for="startTime" class="form-label fw-bold">Время</label>
-                                <@spring.formInput "test.startTime" 'type="time" class="form-control input-time" id="startTime"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
-                            </div>
-                        </div>
-                        <#if error??>
-                            <span class="error text-danger">${error}</span>
-                        </#if>
-                    </div>
-                    <div class="mb-3">
-                        <h3 class="mb-3">Доступен по:</h3>
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6">
-                                <label for="endDate" class="form-label fw-bold">Дата</label>
-                                <@spring.formInput "test.endDate" 'type="date" class="form-control input-date" id="endDate"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <label for="endTime" class="form-label fw-bold">Время</label>
-                                <@spring.formInput "test.endTime" 'type="time" class="form-control input-time" id="endTime"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
-                            </div>
-                        </div>
-                        <#if error??>
-                            <span class="error text-danger">${error}</span>
-                        </#if>
                     </div>
                 </div>
             </div>
@@ -164,7 +128,7 @@
                             <@spring.showErrors "<br>" "error text-danger" />
                         </div>
                         <div class="mt-3 border rounded-4 px-4 py-3 mb-3" id="options-questionId-0">
-                            <div id="questionId-0-optionId-0" class="mb-3 d-flex align-items-center">
+                            <div id="questionId-0-optionId-0" class="d-flex align-items-center mt-3">
                                 <div class="form-check d-flex align-items-center mb-0">
                                     <input type="radio"
                                            name="questions[0].correctOptionIndex"
@@ -180,7 +144,7 @@
                                     <@spring.showErrors "<br>" "error text-danger" />
                                 </div>
                             </div>
-                            <div id="questionId-0-optionId-1" class="mb-3 d-flex align-items-center">
+                            <div id="questionId-0-optionId-1" class="d-flex align-items-center mt-3">
                                 <div class="form-check d-flex align-items-center mb-0">
                                     <input type="radio"
                                            name="questions[0].correctOptionIndex"
@@ -233,6 +197,85 @@
         let questionIndex = ${test.questions?size?c};
         let pointsInput = document.querySelectorAll(".points")
 
+        let createForm = document.getElementById("create-test")
+        createForm.addEventListener("submit", event => {
+            let hasError = false;
+            if (document.querySelectorAll(".error-message")){
+                let errors = document.querySelectorAll(".error-message")
+                errors.forEach(er => {
+                    er.remove()
+                })
+            }
+            if (document.querySelectorAll(".is-invalid")){
+                let inputs = document.querySelectorAll(".is-invalid")
+                inputs.forEach(i => {
+                    i.classList.remove("is-invalid")
+                })
+            }
+            let form = event.target
+            let formData = new FormData(form);
+            let data = Object.fromEntries(formData.entries())
+            const testQuestions = new Map();
+            for (let [key, value] of formData.entries()) {
+                const qMatch = key.match(/^questions\[(\d+)]\.question$/);
+                const oMatch = key.match(/^questions\[(\d+)]\.options\[(\d+)]\.optionText$/);
+
+                if (qMatch) {
+                    const qIndex = parseInt(qMatch[1]);
+                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
+                    testQuestions.get(qIndex).question = value.trim();
+                }
+
+                if (oMatch) {
+                    const qIndex = parseInt(oMatch[1]);
+                    const oIndex = parseInt(oMatch[2]);
+                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
+                    testQuestions.get(qIndex).options[oIndex] = value.trim();
+                }
+            }
+
+            const questionsArray = Array.from(testQuestions.entries())
+                .map(([_, value]) => ({
+                    question: value.question,
+                    options: value.options
+                }));
+            console.log(questionsArray)
+            const questionsCount = questionsArray.length;
+            for(let i = 0; i < questionsCount; i++){
+                if(!questionsArray[i].question){
+                    hasError = true
+                    let input = document.getElementById("questions"+i+".question")
+                    if (input){
+                        input.classList.add("is-invalid")
+                        let error = document.createElement("label")
+                        error.setAttribute("for", "questions"+i+".question")
+                        error.setAttribute("class", "text-danger error-message")
+                        error.innerText = "Заполните текст вопроса"
+                        input.parentNode.insertBefore(error, input.nextSibling);
+                    }
+                }
+                const optionCount = questionsArray[i].options.length
+                for(let a = 0; a < optionCount; a++){
+                    if(!questionsArray[i].options[a]){
+                        hasError = true
+                        let input = document.getElementById("questions"+i+".options"+a+".optionText")
+                        if (input){
+                            input.classList.add("is-invalid")
+                            let error = document.createElement("label")
+                            error.setAttribute("for", "questions"+i+".options"+a+".optionText")
+                            error.setAttribute("class", "text-danger error-message")
+                            error.innerText = "Заполните вариант ответа"
+                            let div = document.getElementById("questionId-"+i+"-optionId-"+a)
+                            div.parentNode.insertBefore(error, div.nextSibling);
+                        }
+                    }
+                }
+            }
+            if(hasError){
+                event.preventDefault();
+            }
+        })
+
         pointsInput.forEach(input => {
             input.addEventListener('input', () => {
                 input.value = input.value.replace(/[^0-9]/g, '');
@@ -241,17 +284,6 @@
                 }
             });
         })
-
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll(".input-date").forEach(input => {
-                input.setAttribute("type", "date");
-                const today = new Date().toISOString().split("T")[0];
-                input.setAttribute("min", today);
-            });
-            document.querySelectorAll(".input-time").forEach(input => {
-                input.setAttribute("type", "time");
-            });
-        });
 
         function createQuestionBlock(questionId) {
             const optionIdRef = {value: 0};
@@ -267,12 +299,13 @@
                 "questions[" + questionId + "].question",
                 "Введите текст вопроса",
                 "questions[" + questionId + "].question",
+                "questions" + questionId +".question",
                 "text",
                 "form-control"
             ))
 
             let optionsContainer = document.createElement("div");
-            optionsContainer.setAttribute("class", "mt-3 border rounded-4 px-4 py-3 mb-3");
+            optionsContainer.setAttribute("class", "mt-3 border rounded-4 px-4 py-3");
             optionsContainer.setAttribute("id", "options-questionId-" + questionId);
 
             optionsContainer.append(createQuestionOption(questionId, optionIdRef.value, true));

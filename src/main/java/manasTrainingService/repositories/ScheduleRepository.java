@@ -86,4 +86,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer>, Jp
                                     @Param("excludeId") Integer excludeId);
 
 
+    @Query("""
+    SELECT SUM(s.durationHours)
+    FROM Schedule s
+    WHERE s.courseInstance.id = :courseInstanceId AND s.isActive = true
+""")
+    Integer sumActiveScheduleHoursByCourseInstanceId(@Param("courseInstanceId") Integer courseInstanceId);
+
 }

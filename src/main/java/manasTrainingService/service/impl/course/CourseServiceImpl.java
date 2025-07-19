@@ -145,4 +145,10 @@ public class CourseServiceImpl implements CourseService {
         return t -> seen.add(keyExtractor.apply(t));
     }
 
+    @Override
+    public long getTotalCourses() {
+        return courseRepository.count();
+    }
+
+
 }

@@ -17,4 +17,6 @@ public interface ScheduleService {
     boolean hasSchedulesBeforeDateRange(Integer courseInstanceId, LocalDate newStart);
 
     boolean hasSchedulesAfterDateRange(Integer courseInstanceId, LocalDate newEnd);
+
+    Integer sumActiveScheduleHoursByCourseInstanceId(Integer courseInstanceId);
 }
