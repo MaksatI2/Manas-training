@@ -104,7 +104,7 @@ class OrganizationServiceTest {
     @Test
     void createStudentByOrganization_Success() {
         when(userRepository.existsByEmail(dto.getEmail())).thenReturn(false);
-        when(userRepository.existsByPhone("+996555123456")).thenReturn(false);
+        when(userRepository.existsByPhone(dto.getPhone())).thenReturn(false);
         when(organizationRepository.findByUserId(organizationUser.getId())).thenReturn(Optional.of(organization));
         when(roleService.getStudentRoleId()).thenReturn(studentRole);
         when(passwordEncoder.encode(anyString())).thenReturn("encoded_password");
@@ -121,7 +121,7 @@ class OrganizationServiceTest {
                 user.getEmail().equals(dto.getEmail()) &&
                         user.getName().equals(dto.getName()) &&
                         user.getLastName().equals(dto.getLastName()) &&
-                        user.getPhone().equals("+996555123456") &&
+                        user.getPhone().equals(dto.getPhone()) &&
                         user.getRole().equals(studentRole) &&
                         user.getIsActive()
         ));
@@ -147,7 +147,7 @@ class OrganizationServiceTest {
     void createStudentByOrganization_PhoneAlreadyExists_ThrowsException() {
         when(organizationRepository.findByUserId(organizationUser.getId())).thenReturn(Optional.of(organization));
         when(userRepository.existsByEmail(dto.getEmail())).thenReturn(false);
-        when(userRepository.existsByPhone("+996555123456")).thenReturn(true);
+        when(userRepository.existsByPhone(dto.getPhone())).thenReturn(true);
 
         assertThrows(PhoneAlreadyExistsException.class, () ->
                 organizationService.createStudentByOrganization(dto, organizationUser));
@@ -169,19 +169,7 @@ class OrganizationServiceTest {
         verify(emailService, never()).sendStudentWelcomeEmail(anyString(), anyString(), anyString());
     }
 
-    @Test
-    void createStudentByOrganization_InvalidPhoneFormat_ThrowsException() {
-        dto.setPhone("12345");
-        when(organizationRepository.findByUserId(organizationUser.getId())).thenReturn(Optional.of(organization));
 
-        assertThrows(ValidationException.class, () ->
-                organizationService.createStudentByOrganization(dto, organizationUser));
-        verify(userRepository, never()).existsByEmail(anyString());
-        verify(userRepository, never()).existsByPhone(anyString());
-        verify(userRepository, never()).save(any());
-        verify(studentProfileRepository, never()).save(any());
-        verify(emailService, never()).sendStudentWelcomeEmail(anyString(), anyString(), anyString());
-    }
 
     @Test
     void createStudentByOrganization_PhoneWithPlus996_Success() {

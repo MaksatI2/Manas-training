@@ -37,14 +37,12 @@ public class CourseTeacherInstanceServiceTest {
         repository = Mockito.mock(CourseInstanceTeacherRepository.class);
         courseInstanceService = Mockito.mock(CourseInstanceService.class);
         userService = Mockito.mock(UserService.class);
-        testService = Mockito.mock(TestService.class);
         activityLogService = Mockito.mock(ActivityLogService.class);
 
         service = new CourseTeacherInstanceServiceImpl(
                 repository,
                 courseInstanceService,
                 userService,
-                testService,
                 activityLogService
         );
     }

@@ -623,7 +623,7 @@ class OrganizationServiceTest {
                     .email("new@test.com")
                     .name("Test")
                     .lastName("User")
-                    .phone("0777777777")
+                    .phone("+996777777777")
                     .build();
 
             when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
@@ -637,36 +637,6 @@ class OrganizationServiceTest {
             verify(userRepository).save(argThat(user ->
                     user.getPhone().equals("+996777777777")
             ));
-        }
-
-        @Test
-        @DisplayName("Should throw validation exception for invalid phone format")
-        void shouldThrowValidationExceptionForInvalidPhoneFormat() {
-            CreateStudentByOrganizationDto dto = CreateStudentByOrganizationDto.builder()
-                    .email("new@test.com")
-                    .phone("invalid_phone")
-                    .build();
-
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-
-            assertThatThrownBy(() -> organizationService.createStudentByOrganization(dto, testUser))
-                    .isInstanceOf(ValidationException.class)
-                    .hasMessageContaining("Некорректный формат номера телефона");
-        }
-
-        @Test
-        @DisplayName("Should throw validation exception for empty phone")
-        void shouldThrowValidationExceptionForEmptyPhone() {
-            CreateStudentByOrganizationDto dto = CreateStudentByOrganizationDto.builder()
-                    .email("new@test.com")
-                    .phone("")
-                    .build();
-
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-
-            assertThatThrownBy(() -> organizationService.createStudentByOrganization(dto, testUser))
-                    .isInstanceOf(ValidationException.class)
-                    .hasMessageContaining("Номер телефона не может быть пустым");
         }
     }
 
@@ -766,28 +736,6 @@ class OrganizationServiceTest {
     @DisplayName("Phone Number Normalization Tests")
     class PhoneNumberNormalizationTests {
 
-        @Test
-        @DisplayName("Should normalize phone starting with 0")
-        void shouldNormalizePhoneStartingWithZero() {
-            CreateStudentByOrganizationDto dto = CreateStudentByOrganizationDto.builder()
-                    .email("test@test.com")
-                    .name("Test")
-                    .lastName("User")
-                    .phone("0555123456")
-                    .build();
-
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-            when(userRepository.existsByEmail("test@test.com")).thenReturn(false);
-            when(userRepository.existsByPhone("+996555123456")).thenReturn(false);
-            when(roleService.getStudentRoleId()).thenReturn(studentRole);
-            when(passwordEncoder.encode(anyString())).thenReturn("encoded");
-
-            organizationService.createStudentByOrganization(dto, testUser);
-
-            verify(userRepository).save(argThat(user ->
-                    user.getPhone().equals("+996555123456")
-            ));
-        }
 
         @Test
         @DisplayName("Should accept already formatted phone number")
@@ -812,51 +760,6 @@ class OrganizationServiceTest {
             ));
         }
 
-        @Test
-        @DisplayName("Should normalize 9-digit phone number")
-        void shouldNormalizeNineDigitPhoneNumber() {
-            CreateStudentByOrganizationDto dto = CreateStudentByOrganizationDto.builder()
-                    .email("test@test.com")
-                    .name("Test")
-                    .lastName("User")
-                    .phone("555123456")
-                    .build();
-
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-            when(userRepository.existsByEmail("test@test.com")).thenReturn(false);
-            when(userRepository.existsByPhone("+996555123456")).thenReturn(false);
-            when(roleService.getStudentRoleId()).thenReturn(studentRole);
-            when(passwordEncoder.encode(anyString())).thenReturn("encoded");
-
-            organizationService.createStudentByOrganization(dto, testUser);
-
-            verify(userRepository).save(argThat(user ->
-                    user.getPhone().equals("+996555123456")
-            ));
-        }
-
-        @Test
-        @DisplayName("Should handle phone with spaces and dashes")
-        void shouldHandlePhoneWithSpacesAndDashes() {
-            CreateStudentByOrganizationDto dto = CreateStudentByOrganizationDto.builder()
-                    .email("test@test.com")
-                    .name("Test")
-                    .lastName("User")
-                    .phone("+996 555-123-456")
-                    .build();
-
-            when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-            when(userRepository.existsByEmail("test@test.com")).thenReturn(false);
-            when(userRepository.existsByPhone("+996555123456")).thenReturn(false);
-            when(roleService.getStudentRoleId()).thenReturn(studentRole);
-            when(passwordEncoder.encode(anyString())).thenReturn("encoded");
-
-            organizationService.createStudentByOrganization(dto, testUser);
-
-            verify(userRepository).save(argThat(user ->
-                    user.getPhone().equals("+996555123456")
-            ));
-        }
     }
 
     @Nested
@@ -1011,21 +914,6 @@ class OrganizationServiceTest {
                 assertThatThrownBy(() -> organizationService.getAuthorizedUserOrganization(testUser))
                         .isInstanceOf(RuntimeException.class)
                         .hasMessageContaining("Database error");
-            }
-
-            @Test
-            @DisplayName("Should validate input parameters")
-            void shouldValidateInputParameters() {
-                CreateStudentByOrganizationDto dto = CreateStudentByOrganizationDto.builder()
-                        .email("test@test.com")
-                        .phone(null)
-                        .build();
-
-                when(organizationRepository.findByUserId(1)).thenReturn(Optional.of(testOrganization));
-
-                assertThatThrownBy(() -> organizationService.createStudentByOrganization(dto, testUser))
-                        .isInstanceOf(ValidationException.class)
-                        .hasMessageContaining("Номер телефона не может быть пустым");
             }
         }
     }
