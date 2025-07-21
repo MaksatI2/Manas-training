@@ -28,8 +28,6 @@ services:
       POSTGRES_PASSWORD: qwerty
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     networks:
       - manas-network
     restart: unless-stopped
@@ -51,8 +49,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=qwerty
       - JITSI_DOMAIN=manastraining.kg
-    ports:
-      - "8089:8089"
+    expose:
+      - "8089"
     depends_on:
       postgres:
         condition: service_healthy
@@ -70,13 +68,13 @@ services:
   jitsi-web:
     image: jitsi/web:stable
     container_name: manas-jitsi-web
-    ports:
-      - "8080:80"
-      - "8443:443"
+    expose:
+      - "80"
+      - "443"
     environment:
       - ENABLE_LETSENCRYPT=0
-      - ENABLE_HTTP_REDIRECT=1
-      - DISABLE_HTTPS=0
+      - ENABLE_HTTP_REDIRECT=0
+      - DISABLE_HTTPS=1
       - JICOFO_AUTH_USER=focus
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
@@ -130,9 +128,9 @@ services:
     volumes:
       - prosody-config:/config
       - prosody-plugins:/prosody-plugins-custom
-    ports:
-      - "5222:5222"
-      - "5280:5280"
+    expose:
+      - "5222"
+      - "5280"
     restart: unless-stopped
 
   jicofo:
