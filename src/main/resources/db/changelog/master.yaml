@@ -182,3 +182,7 @@ databaseChangeLog:
   - include:
       file: db/changelog/initial/062_add_table_test_instances.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/notifications/063_notifications_table.sql
+      relativeToChangelogFile: false
+

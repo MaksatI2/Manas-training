@@ -151,9 +151,12 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/applications/organization" class="nav-link" data-tooltip="Заявки на курсы">
-                            <i class="fas fa-file-alt"></i>
-                            <span>Заявки на курсы</span>
+                        <a href="/applications/organization" class="nav-link d-flex justify-content-between align-items-center" data-tooltip="Заявки на курсы">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Заявки на курсы</span>
+                            </div>
+                            <span id="notificationCount" class="badge bg-danger ms-2" style="display: none;">0</span>
                         </a>
                     </div>
                 </#if>
@@ -171,9 +174,12 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/applications/student/applications" class="nav-link" data-tooltip="Мои заявки">
-                            <i class="fas fa-file-alt"></i>
-                            <span>Мои заявки</span>
+                        <a href="/applications/student/applications" class="nav-link d-flex justify-content-between align-items-center" data-tooltip="Мои заявки">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Мои заявки</span>
+                            </div>
+                            <span id="notificationCountStudent" class="badge bg-danger ms-2" style="display: none;">0</span>
                         </a>
                     </div>
                 </#if>
@@ -315,6 +321,16 @@
                         </a>
                     </#if>
 
+                    <a href="/notifications" class="d-flex align-items-center justify-content-center text-white position-relative"
+                       style="width: 44px; height: 48px; background: transparent; border: none;">
+                        <i class="fas fa-bell"></i>
+                        <span id="notificationCountHeader"
+                              class="position-absolute"
+                              style="top: 2px; right: 2px; font-size: 0.6rem; display: none;"
+                              class="badge rounded-pill bg-danger">
+                              0
+                        </span>
+                    </a>
                     <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 0.5rem;"></div>
 
                     <form action="/logout" method="post" class="d-flex">
@@ -861,6 +877,21 @@
             padding-top: 4rem;
         }
 
+        .sidebar.collapsed #notificationCount,
+        .sidebar.collapsed #notificationCountStudent {
+            display: none !important;
+        }
+        .sidebar.collapsed .nav-link.d-flex {
+            justify-content: center !important;
+        }
+        .sidebar.collapsed .nav-link .badge {
+            display: none !important;
+        }
+        .sidebar.collapsed .nav-link div {
+            justify-content: center;
+        }
+
+
         .hero-section {
             background: linear-gradient(135deg, rgba(0, 102, 204, 0.1), rgba(135, 206, 235, 0.1));
             border-radius: 15px;
@@ -1020,7 +1051,13 @@
             visibility: visible;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="/static/js/websocket-notifications.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            updateNotificationCount();
+        });
         window.addEventListener('load', function () {
             document.body.style.visibility = 'visible';
             document.body.style.display = 'block';

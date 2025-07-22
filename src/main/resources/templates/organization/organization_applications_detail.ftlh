@@ -181,4 +181,17 @@
             </#if>
         </div>
     </div>
+    <script>
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        fetch('/api/notifications/mark-all-as-read?targetType=COURSE_APPLICATION', {
+            method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        }).then(() => {
+            updateNotificationCount();
+        });
+    </script>
 </@layout.page>

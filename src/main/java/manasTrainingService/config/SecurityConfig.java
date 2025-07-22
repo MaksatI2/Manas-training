@@ -31,7 +31,8 @@ public class SecurityConfig {
                                 "/error",
                                 "/courses/**",
                                 "/teachers/**",
-                                "/data/images/**"
+                                "/data/images/**",
+                                "/ws/**"
                         ).permitAll()
                         .requestMatchers("/applications/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/applications/organization/**").hasAuthority("ORGANIZATION")
@@ -43,6 +44,9 @@ public class SecurityConfig {
                         .requestMatchers("/test/{id}/delete").hasAuthority("TEACHER")
                         .requestMatchers("/test/{id}/passing").hasAuthority("STUDENT")
                         .anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/ws/**")
                 )
                 .addFilterBefore(rememberMeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
