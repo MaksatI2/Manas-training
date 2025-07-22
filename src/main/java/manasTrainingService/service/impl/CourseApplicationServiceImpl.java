@@ -7,18 +7,14 @@ import manasTrainingService.dto.application.*;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.BadRequestException;
 import manasTrainingService.exceptions.nsee.NotFoundException;
-import manasTrainingService.repositories.course.ApplicationCommentRepository;
-import manasTrainingService.repositories.course.CourseApplicationEmployeeRepository;
-import manasTrainingService.repositories.course.CourseApplicationRepository;
-import manasTrainingService.repositories.course.CourseEnrollmentRepository;
-import manasTrainingService.repositories.course.CourseInstanceRepository;
-import manasTrainingService.repositories.course.CourseRepository;
+import manasTrainingService.repositories.course.*;
 import manasTrainingService.repositories.user.OrganizationRepository;
 import manasTrainingService.repositories.user.UserRepository;
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.CourseApplicationService;
-import manasTrainingService.service.user.UserService;
+import manasTrainingService.service.NotificationService;
 import manasTrainingService.service.user.EmailService;
+import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.StatusUtil;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -44,6 +40,7 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
     private final ActivityLogService activityLogService;
     private final UserService userService;
     private final EmailService emailService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -106,6 +103,8 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                     savedCae.getId()
             );
         }
+        notificationService.notifyAdminsAboutNewApplication(savedApp);
+
     }
 
     @Override
@@ -204,6 +203,12 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                 TargetType.COURSE_APPLICATION,
                 app.getId()
         );
+        if (app.getOrganization() != null) {
+            notificationService.notifyOrganizationAboutStatusChange(app);
+        }
+        if (app.getSubmittedBy() != null) {
+            notificationService.notifyStudentAboutStatusChange(app);
+        }
 
     }
 
@@ -229,6 +234,9 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                 TargetType.APPLICATION_COMMENT,
                 saved.getId()
         );
+        notificationService.notifyOrganizationAboutComment(app, comment);
+        notificationService.notifyStudentAboutComment(app, comment);
+
     }
 
     @Override
@@ -237,15 +245,15 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
 
         return applicationCommentRepository.findAllByApplicationIdOrderByCreatedAtAsc(appId)
                 .stream().map(c -> {
-            ApplicationCommentDto dto = new ApplicationCommentDto();
-            dto.setId(c.getId());
-            dto.setApplicationId(appId);
-            dto.setComment(c.getComment());
-            dto.setAuthorName(c.getAdmin().getName() + " " + c.getAdmin().getLastName());
-            dto.setCreatedAt(c.getCreatedAt());
-            dto.setFormattedCreatedAt(c.getCreatedAt() != null ? c.getCreatedAt().format(formatter) : null);
-            return dto;
-        }).toList();
+                    ApplicationCommentDto dto = new ApplicationCommentDto();
+                    dto.setId(c.getId());
+                    dto.setApplicationId(appId);
+                    dto.setComment(c.getComment());
+                    dto.setAuthorName(c.getAdmin().getName() + " " + c.getAdmin().getLastName());
+                    dto.setCreatedAt(c.getCreatedAt());
+                    dto.setFormattedCreatedAt(c.getCreatedAt() != null ? c.getCreatedAt().format(formatter) : null);
+                    return dto;
+                }).toList();
     }
 
     @Transactional
@@ -365,6 +373,8 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         cae.setApplicationStatus(Status.PENDING);
 
         courseApplicationEmployeeRepository.save(cae);
+        notificationService.notifyAdminsAboutNewApplication(ca);
+
     }
 
     @Transactional

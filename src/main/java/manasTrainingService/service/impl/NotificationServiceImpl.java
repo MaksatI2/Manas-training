@@ -1,0 +1,202 @@
+package manasTrainingService.service.impl;
+
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.notifications.NotificationResponseDTO;
+import manasTrainingService.dto.notifications.NotificationWithUnreadCountDTO;
+import manasTrainingService.entity.*;
+import manasTrainingService.repositories.NotificationRepository;
+import manasTrainingService.repositories.user.UserRepository;
+import manasTrainingService.service.NotificationService;
+import manasTrainingService.util.NotificationWebSocketSender;
+import manasTrainingService.util.StatusUtil;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
+@Service
+@RequiredArgsConstructor
+public class NotificationServiceImpl implements NotificationService {
+
+    private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
+    private final NotificationWebSocketSender notificationWebSocketSender;
+
+    @Override
+    @Transactional
+    public void create(Notification notification) {
+        notificationRepository.save(notification);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<NotificationResponseDTO> getUserNotifications(User user) {
+        return notificationRepository.findAllByUserOrderByCreatedAtDesc(user)
+                .stream()
+                .map(this::toDTO)
+                .collect(toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countUnreadNotifications(User user) {
+        return notificationRepository.countByUserAndIsReadFalse(user);
+    }
+
+    @Override
+    @Transactional
+    public void markAsRead(Integer notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("Notification not found: " + notificationId));
+        if (!notification.getIsRead()) {
+            notification.setIsRead(true);
+            notificationRepository.save(notification);
+        }
+    }
+
+    private NotificationResponseDTO toDTO(Notification notification) {
+        return NotificationResponseDTO.builder()
+                .id(notification.getId())
+                .title(notification.getTitle())
+                .body(notification.getBody())
+                .targetType(notification.getTargetType().name())
+                .targetId(notification.getTargetId())
+                .notificationType(notification.getNotificationType().name())
+                .isRead(notification.getIsRead())
+                .createdAt(notification.getCreatedAt())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public void markAllAsRead(User user, TargetType targetType) {
+        List<Notification> notifications = notificationRepository.findAllByUserOrderByCreatedAtDesc(user);
+        notifications.stream()
+                .filter(n -> !n.getIsRead() && n.getTargetType() == targetType)
+                .forEach(n -> n.setIsRead(true));
+        notificationRepository.saveAll(notifications);
+    }
+
+    @Override
+    public void notifyAdminsAboutNewApplication(CourseApplication application) {
+        String submittedBy = application.getOrganization() != null
+                ? application.getOrganization().getUser().getName() + " (Организация)"
+                : application.getSubmittedBy().getName() + " (Студент)";
+
+        List<User> admins = userRepository.findAllByRole_Name("ADMIN");
+        for (User admin : admins) {
+            Notification notification = Notification.builder()
+                    .user(admin)
+                    .title("Новая заявка на курс")
+                    .body("Создана новая заявка от " + submittedBy)
+                    .targetType(TargetType.COURSE_APPLICATION)
+                    .targetId(application.getId())
+                    .notificationType(NotificationType.GENERAL)
+                    .build();
+            create(notification);
+            sendToWebSocket(admin, notification);
+        }
+    }
+
+    @Override
+    public void notifyOrganizationAboutComment(CourseApplication application, String comment) {
+        if (application.getOrganization() != null) {
+            User orgUser = application.getOrganization().getUser();
+            sendCommentNotification(orgUser, application, comment, "Новый комментарий к заявке");
+        }
+    }
+
+    @Override
+    public void notifyStudentAboutComment(CourseApplication application, String comment) {
+        if (application.getSubmittedBy() != null) {
+            User student = application.getSubmittedBy();
+            sendCommentNotification(student, application, comment, "Новый комментарий к вашей заявке");
+        }
+    }
+
+    @Override
+    public void notifyStudentAboutStatusChange(CourseApplication application) {
+        if (application.getSubmittedBy() != null) {
+            User student = application.getSubmittedBy();
+            Notification notification = Notification.builder()
+                    .user(student)
+                    .title("Статус вашей заявки обновлен")
+                    .body("Ваша заявка теперь в статусе: " + StatusUtil.localize(application.getStatus()))
+                    .targetType(TargetType.COURSE_APPLICATION)
+                    .targetId(application.getId())
+                    .notificationType(NotificationType.GENERAL)
+                    .build();
+            create(notification);
+            sendToWebSocket(student, notification);
+        }
+    }
+
+    @Override
+    public void notifyOrganizationAboutStatusChange(CourseApplication application) {
+        if (application.getOrganization() != null) {
+            User orgUser = application.getOrganization().getUser();
+            Notification notification = Notification.builder()
+                    .user(orgUser)
+                    .title("Статус заявки вашей организации обновлен")
+                    .body("Заявка теперь в статусе: " + StatusUtil.localize(application.getStatus()))
+                    .targetType(TargetType.COURSE_APPLICATION)
+                    .targetId(application.getId())
+                    .notificationType(NotificationType.GENERAL)
+                    .build();
+            create(notification);
+            sendToWebSocket(orgUser, notification);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void createAndSend(Notification notification) {
+        create(notification);
+        long unreadCount = countUnreadNotifications(notification.getUser());
+        NotificationWithUnreadCountDTO dto = NotificationWithUnreadCountDTO.builder()
+                .notification(toDTO(notification))
+                .unreadCount(unreadCount)
+                .build();
+        notificationWebSocketSender.sendNotification(notification.getUser().getId(), dto);
+    }
+
+
+    private void sendCommentNotification(User user, CourseApplication app, String comment, String title) {
+        Notification notification = Notification.builder()
+                .user(user)
+                .title(title)
+                .body(comment)
+                .targetType(TargetType.COURSE_APPLICATION)
+                .targetId(app.getId())
+                .notificationType(NotificationType.GENERAL)
+                .build();
+        create(notification);
+        sendToWebSocket(user, notification);
+    }
+
+    private void sendToWebSocket(User user, Notification notification) {
+        NotificationResponseDTO dto = NotificationResponseDTO.builder()
+                .id(notification.getId())
+                .title(notification.getTitle())
+                .body(notification.getBody())
+                .targetType(notification.getTargetType().name())
+                .targetId(notification.getTargetId())
+                .notificationType(notification.getNotificationType().name())
+                .isRead(notification.getIsRead())
+                .createdAt(notification.getCreatedAt())
+                .build();
+
+        long unreadCount = this.countUnreadNotifications(user);
+
+        NotificationWithUnreadCountDTO dtoWithCount = NotificationWithUnreadCountDTO.builder()
+                .notification(dto)
+                .unreadCount(unreadCount)
+                .build();
+
+        notificationWebSocketSender.sendNotification(user.getId(), dtoWithCount);
+    }
+
+}

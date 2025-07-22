@@ -9,6 +9,7 @@ import manasTrainingService.repositories.course.*;
 import manasTrainingService.repositories.user.OrganizationRepository;
 import manasTrainingService.repositories.user.UserRepository;
 import manasTrainingService.service.ActivityLogService;
+import manasTrainingService.service.NotificationService;
 import manasTrainingService.service.impl.CourseApplicationServiceImpl;
 import manasTrainingService.service.user.EmailService;
 import manasTrainingService.service.user.UserService;
@@ -49,7 +50,8 @@ class CourseApplicationServiceImplTest {
     private CourseInstanceRepository instanceRepository;
     @Mock
     private EmailService emailService;
-
+    @Mock
+    private NotificationService notificationService;
     @Mock
     private UserService userService;
     @Mock
