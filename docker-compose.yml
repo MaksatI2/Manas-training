@@ -19,38 +19,47 @@ services:
     networks:
       - manas-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   postgres:
-    image: postgres:15
+    image: postgres:15-alpine
     container_name: manas-postgres
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: qwerty
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qwerty}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
     networks:
       - manas-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 10
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: manas-app
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - POSTGRES_PASSWORD=qwerty
-      - MAIL_USERNAME=zer0icemax@gmail.com
-      - MAIL_PASSWORD=chfe zivr epbv zbc
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=qwerty
-      - JITSI_DOMAIN=manastraining.kg
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-docker}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-qwerty}
+      - MAIL_USERNAME=${MAIL_USERNAME:-zer0icemax@gmail.com}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-postgres}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-qwerty}
+      - JITSI_DOMAIN=${DOMAIN:-manastraining.kg}
       - SERVER_PORT=8089
+      - JAVA_OPTS=-Xmx512m -Xms256m
     expose:
       - "8089"
     depends_on:
@@ -94,8 +103,10 @@ services:
       - RESOLUTION=720
       - RESOLUTION_MIN=180
       - RESOLUTION_MAX=1080
-      - PUBLIC_URL=https://manastraining.kg
+      - PUBLIC_URL=https://${DOMAIN:-manastraining.kg}
       - ENABLE_GUESTS=1
+      - ENABLE_LOBBY=1
+      - TOOLBAR_BUTTONS=microphone,camera,closedcaptions,desktop,fullscreen,fodeviceselection,hangup,profile,info,chat,recording,livestreaming,etherpad,sharedvideo,settings,raisehand,videoquality,filmstrip,invite,feedback,stats,shortcuts,tileview,videobackgroundblur,download,help,mute-everyone,security
     networks:
       - manas-network
     volumes:
@@ -117,17 +128,17 @@ services:
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
       - XMPP_MUC_DOMAIN=muc.meet.jitsi
       - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
-      - JICOFO_COMPONENT_SECRET=jicofo-secret
+      - JICOFO_COMPONENT_SECRET=${JICOFO_COMPONENT_SECRET:-jicofo-secret}
       - JVB_AUTH_USER=jvb
-      - JVB_AUTH_PASSWORD=jvb-password
+      - JVB_AUTH_PASSWORD=${JVB_AUTH_PASSWORD:-jvb-password}
       - JICOFO_AUTH_USER=focus
-      - JICOFO_AUTH_PASSWORD=focus-password
+      - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD:-focus-password}
       - TZ=Asia/Bishkek
       - ENABLE_LOBBY=1
       - LOG_LEVEL=warn
       - ENABLE_XMPP_WEBSOCKET=1
       - ENABLE_SUBDOMAINS=true
-      - PUBLIC_URL=https://manastraining.kg
+      - PUBLIC_URL=https://${DOMAIN:-manastraining.kg}
     networks:
       - manas-network
     volumes:
@@ -145,9 +156,9 @@ services:
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
       - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
-      - JICOFO_COMPONENT_SECRET=jicofo-secret
+      - JICOFO_COMPONENT_SECRET=${JICOFO_COMPONENT_SECRET:-jicofo-secret}
       - JICOFO_AUTH_USER=focus
-      - JICOFO_AUTH_PASSWORD=focus-password
+      - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD:-focus-password}
       - JVB_BREWERY_MUC=jvbbrewery
       - JIGASI_BREWERY_MUC=jigasibrewery
       - TZ=Asia/Bishkek
@@ -166,23 +177,23 @@ services:
     image: jitsi/jvb:stable
     container_name: manas-jvb
     environment:
-      - DOCKER_HOST_ADDRESS=manastraining.kg
+      - DOCKER_HOST_ADDRESS=${DOMAIN:-manastraining.kg}
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
       - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
       - XMPP_SERVER=prosody
       - JVB_AUTH_USER=jvb
-      - JVB_AUTH_PASSWORD=jvb-password
+      - JVB_AUTH_PASSWORD=${JVB_AUTH_PASSWORD:-jvb-password}
       - JVB_BREWERY_MUC=jvbbrewery
       - JVB_PORT=10000
       - JVB_TCP_HARVESTER_DISABLED=true
       - JVB_STUN_SERVERS=stun.l.google.com:19302,stun1.l.google.com:19302,stun2.l.google.com:19302
       - TZ=Asia/Bishkek
       - JVB_ENABLE_APIS=rest,colibri
-      - JVB_WS_DOMAIN=manastraining.kg
+      - JVB_WS_DOMAIN=${DOMAIN:-manastraining.kg}
       - JVB_WS_SERVER_ID=jvb1
       - COLIBRI_REST_ENABLED=true
       - SHUTDOWN_REST_ENABLED=true
-      - PUBLIC_URL=https://manastraining.kg
+      - PUBLIC_URL=https://${DOMAIN:-manastraining.kg}
     networks:
       - manas-network
     volumes:

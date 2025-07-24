@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 RED='\033[0;31m'
@@ -17,11 +16,35 @@ mkdir -p $SSL_DIR
 mkdir -p ./nginx/logs
 mkdir -p ./nginx/html/.well-known/acme-challenge
 
-if ! command -v certbot &> /dev/null; then
-    echo -e "${YELLOW}📦 Установка Certbot...${NC}"
-    sudo apt update
-    sudo apt install -y certbot
+if [ "$CI" = "true" ] || [ "$GITLAB_CI" = "true" ]; then
+    echo -e "${YELLOW}🔧 Обнаружена CI среда, используем Docker для Certbot${NC}"
+    USE_DOCKER_CERTBOT=true
+else
+    USE_DOCKER_CERTBOT=false
 fi
+
+install_certbot_local() {
+    if ! command -v certbot &> /dev/null; then
+        echo -e "${YELLOW}📦 Установка Certbot...${NC}"
+        apt update && apt install -y certbot
+    fi
+}
+
+run_certbot_docker() {
+    echo -e "${YELLOW}🐳 Использование Certbot через Docker...${NC}"
+    docker run --rm \
+        -v "$(pwd)/nginx/html:/var/www/html" \
+        -v "$(pwd)/letsencrypt:/etc/letsencrypt" \
+        certbot/certbot certonly \
+        --webroot \
+        --webroot-path=/var/www/html \
+        --email $EMAIL \
+        --agree-tos \
+        --no-eff-email \
+        --domains $DOMAIN,www.$DOMAIN \
+        --keep-until-expiring \
+        --non-interactive
+}
 
 if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
     echo -e "${GREEN}✅ SSL сертификат уже существует${NC}"
@@ -43,44 +66,64 @@ openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
 echo -e "${YELLOW}🚀 Запуск nginx для валидации домена...${NC}"
 docker-compose up -d nginx
 
-sleep 10
+sleep 15
 
 echo -e "${YELLOW}🌐 Получение SSL сертификата от Let's Encrypt...${NC}"
-sudo certbot certonly \
-    --webroot \
-    --webroot-path=./nginx/html \
-    --email $EMAIL \
-    --agree-tos \
-    --no-eff-email \
-    --domains $DOMAIN,www.$DOMAIN \
-    --keep-until-expiring \
-    --non-interactive
 
-if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
-    echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
-    sudo cp "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
-    sudo cp "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
-    sudo chown $(whoami):$(whoami) "$SSL_DIR/fullchain.pem" "$SSL_DIR/privkey.pem"
-    sudo chmod 644 "$SSL_DIR/fullchain.pem"
-    sudo chmod 600 "$SSL_DIR/privkey.pem"
+if [ "$USE_DOCKER_CERTBOT" = "true" ]; then
+    mkdir -p ./letsencrypt
+    run_certbot_docker
 
-    echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+    if [ -f "./letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+        echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
+        cp "./letsencrypt/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
+        cp "./letsencrypt/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
+        chmod 644 "$SSL_DIR/fullchain.pem"
+        chmod 600 "$SSL_DIR/privkey.pem"
+        echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+    else
+        echo -e "${RED}❌ Ошибка получения сертификата от Let's Encrypt${NC}"
+        echo -e "${YELLOW}🔒 Используем самоподписанный сертификат${NC}"
+    fi
 else
-    echo -e "${RED}❌ Ошибка получения сертификата от Let's Encrypt${NC}"
-    echo -e "${YELLOW}🔒 Используем самоподписанный сертификат${NC}"
+    install_certbot_local
+
+    certbot certonly \
+        --webroot \
+        --webroot-path=./nginx/html \
+        --email $EMAIL \
+        --agree-tos \
+        --no-eff-email \
+        --domains $DOMAIN,www.$DOMAIN \
+        --keep-until-expiring \
+        --non-interactive
+
+    if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+        echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
+        cp "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
+        cp "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
+        chmod 644 "$SSL_DIR/fullchain.pem"
+        chmod 600 "$SSL_DIR/privkey.pem"
+        echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+    else
+        echo -e "${RED}❌ Ошибка получения сертификата от Let's Encrypt${NC}"
+        echo -e "${YELLOW}🔒 Используем самоподписанный сертификат${NC}"
+    fi
 fi
 
 echo -e "${YELLOW}🔄 Перезапуск nginx с новыми сертификатами...${NC}"
 docker-compose restart nginx
 
-echo -e "${YELLOW}⏰ Настройка автоматического обновления сертификата...${NC}"
-CRON_JOB="0 3 * * 1 /usr/bin/certbot renew --quiet --post-hook 'cd $(pwd) && docker-compose restart nginx'"
+if [ "$USE_DOCKER_CERTBOT" = "false" ]; then
+    echo -e "${YELLOW}⏰ Настройка автоматического обновления сертификата...${NC}"
+    CRON_JOB="0 3 */1 * * /usr/bin/certbot renew --quiet --post-hook 'cd $(pwd) && docker-compose restart nginx'"
 
-if ! crontab -l 2>/dev/null | grep -q "certbot renew"; then
-    (crontab -l 2>/dev/null; echo "$CRON_JOB") | sudo crontab -
-    echo -e "${GREEN}✅ Автоматическое обновление сертификата настроено${NC}"
-else
-    echo -e "${GREEN}✅ Автоматическое обновление сертификата уже настроено${NC}"
+    if ! crontab -l 2>/dev/null | grep -q "certbot renew"; then
+        (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+        echo -e "${GREEN}✅ Автоматическое обновление сертификата настроено${NC}"
+    else
+        echo -e "${GREEN}✅ Автоматическое обновление сертификата уже настроено${NC}"
+    fi
 fi
 
 echo -e "${GREEN}🎉 SSL настройка завершена!${NC}"
