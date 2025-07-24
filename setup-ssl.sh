@@ -78,6 +78,7 @@ if check_certificate; then
     exit 0
 fi
 
+
 create_temp_certificate
 
 echo -e "${YELLOW}🚀 Запуск nginx для валидации домена...${NC}"
