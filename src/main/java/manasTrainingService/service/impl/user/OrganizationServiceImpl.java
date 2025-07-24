@@ -65,7 +65,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .build();
         organizationRepository.save(organization);
         activityLogService.log(
-                userService.getAuthorizedUser(),
+                dto.getUser(),
                 ActionType.CREATE,
                 TargetType.ORGANIZATION,
                 organization.getId()

@@ -37,7 +37,7 @@ public class StudentServiceImpl implements StudentService {
                 .build();
         studentProfileRepository.save(studentProfile);
         activityLogService.log(
-                userService.getAuthorizedUser(),
+                studentProfileDto.getStudent(),
                 ActionType.CREATE,
                 TargetType.STUDENT_PROFILE,
                 studentProfile.getId()
