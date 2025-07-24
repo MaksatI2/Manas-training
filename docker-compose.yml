@@ -50,6 +50,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=qwerty
       - JITSI_DOMAIN=manastraining.kg
+      - SERVER_PORT=8089
     expose:
       - "8089"
     depends_on:
@@ -60,6 +61,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./logs:/app/logs
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8089/actuator/health || exit 1"]
       interval: 30s
@@ -93,6 +95,7 @@ services:
       - RESOLUTION_MIN=180
       - RESOLUTION_MAX=1080
       - PUBLIC_URL=https://manastraining.kg
+      - ENABLE_GUESTS=1
     networks:
       - manas-network
     volumes:
@@ -102,6 +105,7 @@ services:
       - prosody
       - jicofo
       - jvb
+    restart: unless-stopped
 
   prosody:
     image: jitsi/prosody:stable
