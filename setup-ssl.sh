@@ -9,14 +9,15 @@ NC='\033[0m'
 DOMAIN="manastraining.kg"
 EMAIL="zer0icemax@gmail.com"
 SSL_DIR="./nginx/ssl"
+CERTBOT_DIR="./letsencrypt"
 
 echo -e "${GREEN}🔐 Настройка SSL сертификата для $DOMAIN${NC}"
 
-mkdir -p $SSL_DIR
-mkdir -p ./nginx/logs
-mkdir -p ./nginx/html/.well-known/acme-challenge
+mkdir -p "$SSL_DIR"
+mkdir -p "./nginx/logs"
+mkdir -p "./nginx/html/.well-known/acme-challenge"
 
-if [ "$CI" = "true" ] || [ "$GITLAB_CI" = "true" ]; then
+if [ -n "$CI" ] || [ -n "$GITLAB_CI" ]; then
     echo -e "${YELLOW}🔧 Обнаружена CI среда, используем Docker для Certbot${NC}"
     USE_DOCKER_CERTBOT=true
 else
@@ -26,42 +27,58 @@ fi
 install_certbot_local() {
     if ! command -v certbot &> /dev/null; then
         echo -e "${YELLOW}📦 Установка Certbot...${NC}"
-        apt update && apt install -y certbot
+        apt-get update && apt-get install -y certbot
     fi
 }
 
 run_certbot_docker() {
     echo -e "${YELLOW}🐳 Использование Certbot через Docker...${NC}"
+    mkdir -p "$CERTBOT_DIR"
+
     docker run --rm \
         -v "$(pwd)/nginx/html:/var/www/html" \
-        -v "$(pwd)/letsencrypt:/etc/letsencrypt" \
+        -v "$(pwd)/$CERTBOT_DIR:/etc/letsencrypt" \
+        -v "$(pwd)/$CERTBOT_DIR/log:/var/log/letsencrypt" \
         certbot/certbot certonly \
         --webroot \
         --webroot-path=/var/www/html \
-        --email $EMAIL \
+        --email "$EMAIL" \
         --agree-tos \
         --no-eff-email \
-        --domains $DOMAIN,www.$DOMAIN \
-        --keep-until-expiring \
-        --non-interactive
+        --domains "$DOMAIN,www.$DOMAIN" \
+        --non-interactive \
+        --keep-until-expiring
 }
 
-if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
-    echo -e "${GREEN}✅ SSL сертификат уже существует${NC}"
+check_certificate() {
+    if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
+        echo -e "${GREEN}✅ SSL сертификат уже существует${NC}"
 
-    if openssl x509 -checkend 2592000 -noout -in "$SSL_DIR/fullchain.pem" > /dev/null 2>&1; then
-        echo -e "${GREEN}✅ Сертификат действителен еще минимум 30 дней${NC}"
-        exit 0
+        if openssl x509 -checkend 2592000 -noout -in "$SSL_DIR/fullchain.pem" > /dev/null 2>&1; then
+            echo -e "${GREEN}✅ Сертификат действителен еще минимум 30 дней${NC}"
+            return 0
+        else
+            echo -e "${YELLOW}⚠️ Сертификат истекает в ближайшие 30 дней, обновляем...${NC}"
+            return 1
+        fi
     else
-        echo -e "${YELLOW}⚠️ Сертификат истекает в ближайшие 30 дней, обновляем...${NC}"
+        return 1
     fi
+}
+
+create_temp_certificate() {
+    echo -e "${YELLOW}🔒 Создание временного самоподписанного сертификата...${NC}"
+    openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+        -keyout "$SSL_DIR/privkey.pem" \
+        -out "$SSL_DIR/fullchain.pem" \
+        -subj "/C=KG/ST=Bishkek/L=Bishkek/O=ManasTraining/CN=$DOMAIN"
+}
+
+if check_certificate; then
+    exit 0
 fi
 
-echo -e "${YELLOW}🔒 Создание временного самоподписанного сертификата...${NC}"
-openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
-    -keyout "$SSL_DIR/privkey.pem" \
-    -out "$SSL_DIR/fullchain.pem" \
-    -subj "/C=KG/ST=Bishkek/L=Bishkek/O=ManasTraining/CN=$DOMAIN"
+create_temp_certificate
 
 echo -e "${YELLOW}🚀 Запуск nginx для валидации домена...${NC}"
 docker-compose up -d nginx
@@ -71,43 +88,49 @@ sleep 15
 echo -e "${YELLOW}🌐 Получение SSL сертификата от Let's Encrypt...${NC}"
 
 if [ "$USE_DOCKER_CERTBOT" = "true" ]; then
-    mkdir -p ./letsencrypt
-    run_certbot_docker
-
-    if [ -f "./letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
-        echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
-        cp "./letsencrypt/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
-        cp "./letsencrypt/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
-        chmod 644 "$SSL_DIR/fullchain.pem"
-        chmod 600 "$SSL_DIR/privkey.pem"
-        echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+    if run_certbot_docker; then
+        if [ -f "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" ]; then
+            echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
+            cp "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
+            cp "$CERTBOT_DIR/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
+            chmod 644 "$SSL_DIR/fullchain.pem"
+            chmod 600 "$SSL_DIR/privkey.pem"
+            echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+        else
+            echo -e "${RED}❌ Ошибка получения сертификата от Let's Encrypt${NC}"
+            echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
+        fi
     else
-        echo -e "${RED}❌ Ошибка получения сертификата от Let's Encrypt${NC}"
-        echo -e "${YELLOW}🔒 Используем самоподписанный сертификат${NC}"
+        echo -e "${RED}❌ Ошибка выполнения Certbot в Docker${NC}"
+        echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
     fi
 else
     install_certbot_local
 
-    certbot certonly \
+    if certbot certonly \
         --webroot \
         --webroot-path=./nginx/html \
-        --email $EMAIL \
+        --email "$EMAIL" \
         --agree-tos \
         --no-eff-email \
-        --domains $DOMAIN,www.$DOMAIN \
-        --keep-until-expiring \
-        --non-interactive
+        --domains "$DOMAIN,www.$DOMAIN" \
+        --non-interactive \
+        --keep-until-expiring; then
 
-    if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
-        echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
-        cp "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
-        cp "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
-        chmod 644 "$SSL_DIR/fullchain.pem"
-        chmod 600 "$SSL_DIR/privkey.pem"
-        echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+        if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+            echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
+            cp "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
+            cp "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
+            chmod 644 "$SSL_DIR/fullchain.pem"
+            chmod 600 "$SSL_DIR/privkey.pem"
+            echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+        else
+            echo -e "${RED}❌ Ошибка: сертификаты не найдены после успешного выполнения Certbot${NC}"
+            echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
+        fi
     else
-        echo -e "${RED}❌ Ошибка получения сертификата от Let's Encrypt${NC}"
-        echo -e "${YELLOW}🔒 Используем самоподписанный сертификат${NC}"
+        echo -e "${RED}❌ Ошибка выполнения Certbot${NC}"
+        echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
     fi
 fi
 
