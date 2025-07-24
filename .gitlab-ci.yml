@@ -90,7 +90,20 @@ deploy:
   script:
     - echo "Деплой на сервер 195.38.165.94"
     - ssh manastraining_kg@195.38.165.94 "mkdir -p /home/manastraining_kg/manas-training-service"
-    - rsync -avz --delete ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
+    - |
+      cat << 'EOF' > .rsyncignore
+      target/test-classes/
+      target/maven-archiver/
+      target/maven-status/
+      target/generated-test-sources/
+      target/surefire-reports/
+      .git/
+      .gitlab-ci.yml
+      README.md
+      .gitignore
+      *.log
+      EOF
+    - rsync -avz --delete --exclude-from=.rsyncignore --ignore-errors ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && chmod +x deploy.sh && chmod +x setup-ssl.sh"
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./deploy.sh"
   environment:
