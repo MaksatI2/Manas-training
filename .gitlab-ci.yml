@@ -90,20 +90,33 @@ deploy:
   script:
     - echo "Деплой на сервер 195.38.165.94"
     - ssh manastraining_kg@195.38.165.94 "mkdir -p /home/manastraining_kg/manas-training-service"
+
+    - rm -rf target/test-classes/ || true
+    - rm -rf target/maven-archiver/ || true
+    - rm -rf target/maven-status/ || true
+    - rm -rf target/generated-test-sources/ || true
+    - rm -rf target/generated-sources/ || true
+    - rm -rf target/surefire-reports/ || true
+    - find target/ -name "*.class" -not -path "*/classes/*" -delete || true
+
     - |
       cat << 'EOF' > .rsyncignore
-      target/test-classes/
-      target/maven-archiver/
-      target/maven-status/
-      target/generated-test-sources/
-      target/surefire-reports/
       .git/
       .gitlab-ci.yml
       README.md
       .gitignore
       *.log
+      .m2/
       EOF
-    - rsync -avz --delete --exclude-from=.rsyncignore --ignore-errors ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
+
+    - rsync -avz --exclude-from=.rsyncignore --partial --progress ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/ || true
+
+    - |
+      if [ $? -ne 0 ]; then
+        echo "Первая попытка rsync не удалась, пробуем альтернативный подход..."
+        rsync -avz --exclude-from=.rsyncignore --ignore-errors --force ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
+      fi
+
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && chmod +x deploy.sh && chmod +x setup-ssl.sh"
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./deploy.sh"
   environment:
