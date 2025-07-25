@@ -199,6 +199,7 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                         .endDate(instance.getEndDate().toLocalDate())
                         .status(instance.getIsActive() ? "Активен" : "Неактивен")
                         .color("#3f51b5")
+                        .courseId(instance.getCourse().getId())
                         .build())
                 .toList();
     }

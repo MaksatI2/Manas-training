@@ -3,6 +3,7 @@ package manasTrainingService.service.impl.course;
 import jakarta.persistence.EntityNotFoundException;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.dto.CourseOption;
 import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.course.CourseNotFoundException;
@@ -148,6 +149,16 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public long getTotalCourses() {
         return courseRepository.count();
+    }
+
+    @Override
+    public List<CourseOption> getAvailableCourseOptionsForCalendar() {
+        return courseInstanceRepository.findAllByIsActiveTrue().stream()
+                .map(CourseInstance::getCourse)
+                .filter(course -> course != null)
+                .filter(distinctByKey(Course::getId))
+                .map(course -> new CourseOption(course.getId(), course.getTitle()))
+                .toList();
     }
 
 
