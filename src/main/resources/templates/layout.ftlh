@@ -91,12 +91,6 @@
                     </div>
 
                     <div class="nav-item">
-                        <a href="/#" class="nav-link" data-tooltip="Отчеты">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Отчеты</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
                         <a href="/admin/courses
 
 " class="nav-link" data-tooltip="Управление курсами">
