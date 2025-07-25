@@ -25,11 +25,23 @@
             </div>
         </div>
         <div class="card shadow-sm border-0 rounded-3">
+            <div class="my-3 mx-4" >
+                <label for="courseFilter" class="form-label fw-semibold text-dark">Фильтр по курсу:</label>
+                <select id="courseFilter" class="form-select" style="max-width: 400px;">
+                    <option value="all">Все курсы</option>
+                    <#list courseOptions as option>
+                        <option value="${option.id()}">${option.title()}</option>
+                    </#list>
+                </select>
+            </div>
+
             <div class="card-body p-4">
                 <div id="calendar"></div>
             </div>
         </div>
     </div>
+
+
 
     <div class="modal fade" id="courseModal" tabindex="-1" aria-labelledby="courseModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-lg">
@@ -67,6 +79,36 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
+            <#assign colors = [
+  "#0066cc", "#2ca4ab", "#8e44ad", "#27ae60", "#e67e22", "#34495e",
+  "#1abc9c", "#9b59b6", "#2980b9", "#f39c12", "#d35400", "#7f8c8d",
+  "#16a085", "#bdc3c7", "#f1c40f", "#3498db", "#95a5a6", "#3f51b5",
+  "#5d6d7e", "#45b39d", "#af7ac5", "#f8c471", "#52be80", "#dc7633",
+  "#2874a6", "#85929e", "#1f618d",
+  "#3cb371", "#5dade2", "#6c3483", "#48c9b0"]>
+
+            <#assign index = 0>
+
+            const allEvents = [
+                <#list calendarItems as item>
+                {
+                    title: "${item.courseInstanceTitle?js_string}",
+                    start: "${item.startDate}",
+                    end: "${item.endDate}",
+                    color: "${colors[index % colors?size]}",
+                    extendedProps: {
+                        courseId: "${item.courseId?js_string}",
+                        courseTitle: "${item.courseTitle?js_string}",
+                        category: "${item.category?js_string}",
+                        status: "${item.status?js_string}",
+                        startDate: "${item.startDate}",
+                        endDate: "${item.endDate}"
+                    }
+                }<#if item_has_next>,</#if>
+                <#assign index = index + 1>
+                </#list>
+            ];
+
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'ru',
@@ -88,32 +130,7 @@
                     month: 'Месяц',
                     week: 'Неделя'
                 },
-                <#assign colors = [
-   "#0066cc", "#2ca4ab", "#8e44ad", "#27ae60", "#e67e22", "#c0392b", "#34495e",
-   "#1abc9c", "#9b59b6", "#2980b9", "#f39c12", "#d35400", "#7f8c8d", "#16a085",
-   "#bdc3c7", "#f1c40f", "#e74c3c", "#3498db", "#95a5a6", "#3f51b5",
-   "#5d6d7e", "#ff6f61", "#45b39d", "#af7ac5", "#f8c471", "#52be80", "#dc7633",
-   "#2874a6", "#85929e", "#d98880", "#1f618d"
- ]>
-                <#assign index = 0>
-                events: [
-                    <#list calendarItems as item>
-                    {
-                        title: "${item.courseInstanceTitle?js_string}",
-                        start: "${item.startDate}",
-                        end: "${item.endDate}",
-                        color: "${colors[index % colors?size]}",
-                        extendedProps: {
-                            courseTitle: "${item.courseTitle?js_string}",
-                            category: "${item.category?js_string}",
-                            status: "${item.status?js_string}",
-                            startDate: "${item.startDate}",
-                            endDate: "${item.endDate}"
-                        }
-                    }<#if item_has_next>,</#if>
-                    <#assign index = index + 1>
-                    </#list>
-                ],
+                events: allEvents,
 
                 eventClick: function(info) {
                     const props = info.event.extendedProps;
@@ -140,6 +157,17 @@
             });
 
             calendar.render();
+            document.getElementById('courseFilter').addEventListener('change', function () {
+                const selectedCourseId = this.value;
+
+                const filteredEvents = selectedCourseId === 'all'
+                    ? allEvents
+                    : allEvents.filter(event => event.extendedProps.courseId === selectedCourseId);
+
+                calendar.removeAllEvents();
+                calendar.addEventSource(filteredEvents);
+            });
+
             setTimeout(() => {
                 calendar.updateSize();
             }, 5);
