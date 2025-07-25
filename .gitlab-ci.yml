@@ -4,33 +4,21 @@ stages:
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DskipTests"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
 
 cache:
   paths:
     - .m2/repository/
+    - target/
 
 build:
   stage: build
   image: maven:3.8.6-eclipse-temurin-17
-  before_script:
-    - rm -rf target/
   script:
-    - mvn $MAVEN_CLI_OPTS clean package
-    - ls -la target/
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
   artifacts:
     paths:
       - target/*.jar
-      - docker-compose.yml
-      - deploy.sh
-      - setup-ssl.sh
-      - nginx/
-      - .env
-    exclude:
-      - target/test-classes/**
-      - target/surefire-reports/**
-      - target/maven-archiver/**
-      - target/maven-status/**
     expire_in: 1 day
   only:
     - dev
@@ -102,33 +90,12 @@ deploy:
   script:
     - echo "Деплой на сервер 195.38.165.94"
     - ssh manastraining_kg@195.38.165.94 "mkdir -p /home/manastraining_kg/manas-training-service"
-    - |
-      rsync -avz --delete \
-        --exclude='.git/' \
-        --exclude='.gitlab-ci.yml' \
-        --exclude='src/' \
-        --exclude='pom.xml' \
-        --exclude='.m2/' \
-        --exclude='target/test-classes/' \
-        --exclude='target/surefire-reports/' \
-        --exclude='target/maven-archiver/' \
-        --exclude='target/maven-status/' \
-        --exclude='*.log' \
-        ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/ || {
-          echo "rsync завершился с кодом $?"
-          if [ $? -eq 23 ]; then
-            echo "Некоторые файлы не были переданы, но продолжаем..."
-          else
-            exit $?
-          fi
-        }
+    - rsync -avz --delete ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && chmod +x deploy.sh && chmod +x setup-ssl.sh"
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./deploy.sh"
   environment:
     name: production
     url: https://manastraining.kg
-  dependencies:
-    - build
   only:
     - dev
   when: manual
