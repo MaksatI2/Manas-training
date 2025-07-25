@@ -1,3 +1,28 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+
+build:
+  stage: build
+  image: maven:3.8.6-eclipse-temurin-17
+  script:
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 day
+  only:
+    - dev
+
 deploy:
   stage: deploy
   image: ubuntu:20.04
@@ -65,33 +90,7 @@ deploy:
   script:
     - echo "Деплой на сервер 195.38.165.94"
     - ssh manastraining_kg@195.38.165.94 "mkdir -p /home/manastraining_kg/manas-training-service"
-
-    - |
-      cat > /tmp/rsync_exclude << 'EOF'
-      .git/
-      target/test-classes/
-      target/maven-archiver/
-      target/maven-status/
-      target/surefire-reports/
-      .m2/
-      *.log
-      .DS_Store
-      node_modules/
-      .idea/
-      *.iml
-      EOF
-
-    - |
-      if ! rsync -avz --delete --exclude-from=/tmp/rsync_exclude --partial --force ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/; then
-        echo "Первая попытка rsync не удалась, пробуем без --delete"
-        if ! rsync -avz --exclude-from=/tmp/rsync_exclude --partial --force ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/; then
-          echo "Вторая попытка не удалась, используем tar+scp"
-          tar --exclude-from=/tmp/rsync_exclude -czf /tmp/deploy.tar.gz ./
-          scp /tmp/deploy.tar.gz manastraining_kg@195.38.165.94:/tmp/
-          ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && rm -rf * .* 2>/dev/null || true && tar -xzf /tmp/deploy.tar.gz && rm /tmp/deploy.tar.gz"
-        fi
-      fi
-
+    - rsync -avz --delete ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && chmod +x deploy.sh && chmod +x setup-ssl.sh"
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./deploy.sh"
   environment:
@@ -100,9 +99,3 @@ deploy:
   only:
     - dev
   when: manual
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
-  allow_failure: false
