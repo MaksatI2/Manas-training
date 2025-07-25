@@ -90,7 +90,18 @@ deploy:
   script:
     - echo "Деплой на сервер 195.38.165.94"
     - ssh manastraining_kg@195.38.165.94 "mkdir -p /home/manastraining_kg/manas-training-service"
-    - rsync -avz --delete ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
+    - |
+      rsync -avz --delete \
+        --exclude='.git/' \
+        --exclude='target/test-classes/' \
+        --exclude='target/maven-archiver/' \
+        --exclude='target/maven-status/' \
+        --exclude='*.log' \
+        --exclude='.m2/' \
+        --exclude='node_modules/' \
+        --exclude='.DS_Store' \
+        --force \
+        ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && chmod +x deploy.sh && chmod +x setup-ssl.sh"
     - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./deploy.sh"
   environment:
@@ -99,3 +110,8 @@ deploy:
   only:
     - dev
   when: manual
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
