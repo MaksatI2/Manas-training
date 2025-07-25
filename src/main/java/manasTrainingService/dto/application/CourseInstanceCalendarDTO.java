@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CourseInstanceCalendarDTO {
     private Integer id;
+    private Integer courseId;
     private String courseInstanceTitle;
     private String courseTitle;
     private String category;
