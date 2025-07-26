@@ -297,6 +297,8 @@ public class CourseApplicationController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("courses", courseService.getAllCourses());
             model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            model.addAttribute("errors", bindingResult);
+
             return "student/student_applications_edit";
         }
 
