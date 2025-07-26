@@ -23,4 +23,6 @@ public class NotificationCreateDTO {
 
     @NotBlank
     String notificationType;
+
+    String link;
 }

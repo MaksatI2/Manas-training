@@ -202,13 +202,15 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                 TargetType.COURSE_APPLICATION,
                 app.getId()
         );
-        if (app.getOrganization() != null) {
-            notificationService.notifyOrganizationAboutStatusChange(app);
+        User applicant = app.getSubmittedBy();
+        if (applicant != null) {
+            String roleName = applicant.getRole().getName();
+            if ("ORGANIZATION".equalsIgnoreCase(roleName)) {
+                notificationService.notifyOrganizationAboutStatusChange(app);
+            } else if ("STUDENT".equalsIgnoreCase(roleName)) {
+                notificationService.notifyStudentAboutStatusChange(app);
+            }
         }
-        if (app.getSubmittedBy() != null) {
-            notificationService.notifyStudentAboutStatusChange(app);
-        }
-
     }
 
 
@@ -233,8 +235,13 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                 TargetType.APPLICATION_COMMENT,
                 saved.getId()
         );
-        notificationService.notifyOrganizationAboutComment(app, comment);
-        notificationService.notifyStudentAboutComment(app, comment);
+        User applicant = app.getSubmittedBy();
+        String roleName = applicant.getRole().getName();
+        if ("ORGANIZATION".equalsIgnoreCase(roleName)) {
+            notificationService.notifyOrganizationAboutComment(app, comment);
+        } else if ("STUDENT".equalsIgnoreCase(roleName)) {
+            notificationService.notifyStudentAboutComment(app, comment);
+        }
 
     }
 
@@ -349,10 +356,6 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         application.setPreferredStartDate(dto.getPreferredStartDate());
         application.setPreferredEndDate(dto.getPreferredEndDate());
 
-        if (student.getStudentProfile() != null &&
-                student.getStudentProfile().getOrganization() != null) {
-            application.setOrganization(student.getStudentProfile().getOrganization());
-        }
 
         if (dto.getPreferredTeacherId() != null) {
             userRepository.findById(dto.getPreferredTeacherId()).ifPresent(application::setPreferredTeacher);

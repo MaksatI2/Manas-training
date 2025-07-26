@@ -14,6 +14,18 @@ stompClient.connect({}, function () {
 
                     console.log('WebSocket data:', data);
                     showFlash("info", `${notification.title}: ${notification.body}`);
+                    if (notification.link && notification.link.trim() !== '') {
+                        setTimeout(() => {
+                            const toast = document.querySelector('.toast:last-of-type');
+                            if (toast) {
+                                toast.style.cursor = 'pointer';
+                                toast.addEventListener('click', () => {
+                                    window.location.href = notification.link;
+                                });
+                            }
+                        }, 100);
+                    }
+
                     updateNotificationCounter(unreadCount);
                 });
             }

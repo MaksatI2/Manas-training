@@ -50,4 +50,7 @@ public class Notification {
     @Builder.Default
     LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "link")
+    String link;
+
 }

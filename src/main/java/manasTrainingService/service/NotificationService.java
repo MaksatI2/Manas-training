@@ -31,4 +31,10 @@ public interface NotificationService {
     void notifyOrganizationAboutStatusChange(CourseApplication application);
 
     void createAndSend(Notification notification);
+
+    void markAllAsReadForUser(User user);
+
+    void deleteAllNotificationsForUser(User user);
+
+    int deleteOldNotifications(int daysThreshold);
 }

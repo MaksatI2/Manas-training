@@ -6,6 +6,15 @@
             <i class="fas fa-bell me-2"></i>Мои уведомления
         </h2>
 
+        <div class="mb-4 d-flex gap-3">
+            <button id="markAllBtn" class="btn btn-outline-success btn-sm">
+                <i class="fas fa-check-double me-1"></i> Прочитать все
+            </button>
+            <button id="clearAllBtn" class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-trash me-1"></i> Очистить все
+            </button>
+        </div>
+
         <#if notifications?size == 0>
             <div class="text-center my-5">
                 <i class="fas fa-inbox fa-3x mb-3" style="color: var(--light-blue);"></i>
@@ -34,27 +43,29 @@
                         </div>
 
                         <p class="mb-3" style="color: var(--text-dark);">${n.body}</p>
-
-                        <#assign url = "">
-                        <#if isAdmin?? && isAdmin>
-                            <#if n.targetType == "COURSE_APPLICATION">
-                                <#assign url = "/applications/admin/" + n.targetId>
-                            </#if>
-                        <#elseif isOrganization?? && isOrganization>
-                            <#if n.targetType == "COURSE_APPLICATION">
-                                <#assign url = "/applications/organization/" + n.targetId>
-                            </#if>
-                        <#elseif isStudent?? && isStudent>
-                            <#if n.targetType == "COURSE_APPLICATION">
-                                <#assign url = "/applications/student/applications">
-                            </#if>
-                        <#elseif isTeacher?? && isTeacher>
-                            <#if n.targetType == "NEW_SCHEDULE">
-                                <#assign url = "/schedules">
+                        <#assign url = n.link>
+                        <#if !url?has_content>
+                            <#assign url = "">
+                            <#if isAdmin?? && isAdmin>
+                                <#if n.targetType == "COURSE_APPLICATION">
+                                    <#assign url = "/applications/admin/" + n.targetId>
+                                </#if>
+                            <#elseif isOrganization?? && isOrganization>
+                                <#if n.targetType == "COURSE_APPLICATION">
+                                    <#assign url = "/applications/organization/" + n.targetId>
+                                </#if>
+                            <#elseif isStudent?? && isStudent>
+                                <#if n.targetType == "COURSE_APPLICATION">
+                                    <#assign url = "/applications/student/applications">
+                                </#if>
+                            <#elseif isTeacher?? && isTeacher>
+                                <#if n.targetType == "NEW_SCHEDULE">
+                                    <#assign url = "/schedules">
+                                </#if>
                             </#if>
                         </#if>
 
-                        <#if url?length != 0>
+                        <#if url?has_content>
                             <a href="${url}" class="btn btn-sm"
                                style="
                                    border-radius: 25px;
@@ -74,4 +85,35 @@
             </div>
         </#if>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const markBtn = document.getElementById('markAllBtn');
+            const clearBtn = document.getElementById('clearAllBtn');
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+            if (markBtn) {
+                markBtn.addEventListener('click', () => {
+                    fetch('/api/notifications/mark-all', {
+                        method: 'POST',
+                        headers: {
+                            [csrfHeader]: csrfToken
+                        }
+                    }).then(() => location.reload());
+                });
+            }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    if (confirm('Вы уверены, что хотите удалить все уведомления?')) {
+                        fetch('/api/notifications/clear', {
+                            method: 'DELETE',
+                            headers: {
+                                [csrfHeader]: csrfToken
+                            }
+                        }).then(() => location.reload());
+                    }
+                });
+            }
+        });
+    </script>
 </@layout.page>

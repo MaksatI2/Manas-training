@@ -315,16 +315,18 @@
                         </a>
                     </#if>
 
-                    <a href="/notifications" class="d-flex align-items-center justify-content-center text-white position-relative"
+                    <a href="/notifications"
+                       class="d-flex align-items-center justify-content-center text-white position-relative"
                        style="width: 44px; height: 48px; background: transparent; border: none;">
                         <i class="fas fa-bell"></i>
                         <span id="notificationCountHeader"
-                              class="position-absolute"
-                              style="top: 2px; right: 2px; font-size: 0.6rem; display: none;"
-                              class="badge rounded-pill bg-danger">
-                              0
+                              class="position-absolute badge rounded-pill"
+                              style="top: 2px; right: 2px; font-size: 0.6rem; display: none;
+                 background-color: #dc3545; color: white; border: 1px solid white; padding: 2px 5px;">
+                           0
                         </span>
                     </a>
+
                     <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 0.5rem;"></div>
 
                     <form action="/logout" method="post" class="d-flex">

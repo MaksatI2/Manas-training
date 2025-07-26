@@ -17,6 +17,7 @@ public class NotificationResponseDTO {
     Integer targetId;
     String notificationType;
     Boolean isRead;
+    String link;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime createdAt;
