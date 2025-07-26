@@ -190,8 +190,15 @@ class CourseApplicationServiceImplTest {
         admin.setName("A");
         admin.setLastName("B");
 
+        Role studentRole = new Role();
+        studentRole.setName("STUDENT");
+
+        User applicant = new User();
+        applicant.setRole(studentRole);
+
         CourseApplication app = new CourseApplication();
         app.setId(1);
+        app.setSubmittedBy(applicant);
 
         when(userRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(admin));
         when(applicationRepository.findById(1)).thenReturn(Optional.of(app));

@@ -2,6 +2,7 @@ package manasTrainingService.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import manasTrainingService.dto.notifications.NotificationResponseDTO;
 import manasTrainingService.dto.notifications.NotificationWithUnreadCountDTO;
 import manasTrainingService.entity.*;
@@ -10,13 +11,16 @@ import manasTrainingService.repositories.user.UserRepository;
 import manasTrainingService.service.NotificationService;
 import manasTrainingService.util.NotificationWebSocketSender;
 import manasTrainingService.util.StatusUtil;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
@@ -67,6 +71,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .notificationType(notification.getNotificationType().name())
                 .isRead(notification.getIsRead())
                 .createdAt(notification.getCreatedAt())
+                .link(notification.getLink())
                 .build();
     }
 
@@ -86,6 +91,8 @@ public class NotificationServiceImpl implements NotificationService {
                 ? application.getOrganization().getUser().getName() + " (Организация)"
                 : application.getSubmittedBy().getName() + " (Студент)";
 
+        String link = "/applications/admin/" + application.getId();
+
         List<User> admins = userRepository.findAllByRole_Name("ADMIN");
         for (User admin : admins) {
             Notification notification = Notification.builder()
@@ -95,6 +102,7 @@ public class NotificationServiceImpl implements NotificationService {
                     .targetType(TargetType.COURSE_APPLICATION)
                     .targetId(application.getId())
                     .notificationType(NotificationType.GENERAL)
+                    .link(link)
                     .build();
             create(notification);
             sendToWebSocket(admin, notification);
@@ -105,7 +113,8 @@ public class NotificationServiceImpl implements NotificationService {
     public void notifyOrganizationAboutComment(CourseApplication application, String comment) {
         if (application.getOrganization() != null) {
             User orgUser = application.getOrganization().getUser();
-            sendCommentNotification(orgUser, application, comment, "Новый комментарий к заявке");
+            String link = "/applications/organization/" + application.getId();
+            sendCommentNotification(orgUser, application, comment, "Новый комментарий к заявке", link);
         }
     }
 
@@ -113,7 +122,8 @@ public class NotificationServiceImpl implements NotificationService {
     public void notifyStudentAboutComment(CourseApplication application, String comment) {
         if (application.getSubmittedBy() != null) {
             User student = application.getSubmittedBy();
-            sendCommentNotification(student, application, comment, "Новый комментарий к вашей заявке");
+            String link = "/applications/student/applications/" + application.getId();
+            sendCommentNotification(student, application, comment, "Новый комментарий к вашей заявке", link);
         }
     }
 
@@ -121,6 +131,7 @@ public class NotificationServiceImpl implements NotificationService {
     public void notifyStudentAboutStatusChange(CourseApplication application) {
         if (application.getSubmittedBy() != null) {
             User student = application.getSubmittedBy();
+            String link = "/applications/student/applications/" + application.getId();
             Notification notification = Notification.builder()
                     .user(student)
                     .title("Статус вашей заявки обновлен")
@@ -128,6 +139,7 @@ public class NotificationServiceImpl implements NotificationService {
                     .targetType(TargetType.COURSE_APPLICATION)
                     .targetId(application.getId())
                     .notificationType(NotificationType.GENERAL)
+                    .link(link)
                     .build();
             create(notification);
             sendToWebSocket(student, notification);
@@ -138,6 +150,7 @@ public class NotificationServiceImpl implements NotificationService {
     public void notifyOrganizationAboutStatusChange(CourseApplication application) {
         if (application.getOrganization() != null) {
             User orgUser = application.getOrganization().getUser();
+            String link = "/applications/organization/" + application.getId();
             Notification notification = Notification.builder()
                     .user(orgUser)
                     .title("Статус заявки вашей организации обновлен")
@@ -145,6 +158,7 @@ public class NotificationServiceImpl implements NotificationService {
                     .targetType(TargetType.COURSE_APPLICATION)
                     .targetId(application.getId())
                     .notificationType(NotificationType.GENERAL)
+                    .link(link)
                     .build();
             create(notification);
             sendToWebSocket(orgUser, notification);
@@ -164,7 +178,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
 
-    private void sendCommentNotification(User user, CourseApplication app, String comment, String title) {
+    private void sendCommentNotification(User user, CourseApplication app, String comment, String title, String link) {
         Notification notification = Notification.builder()
                 .user(user)
                 .title(title)
@@ -172,6 +186,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .targetType(TargetType.COURSE_APPLICATION)
                 .targetId(app.getId())
                 .notificationType(NotificationType.GENERAL)
+                .link(link)
                 .build();
         create(notification);
         sendToWebSocket(user, notification);
@@ -187,6 +202,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .notificationType(notification.getNotificationType().name())
                 .isRead(notification.getIsRead())
                 .createdAt(notification.getCreatedAt())
+                .link(notification.getLink())
                 .build();
 
         long unreadCount = this.countUnreadNotifications(user);
@@ -197,6 +213,31 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
 
         notificationWebSocketSender.sendNotification(user.getId(), dtoWithCount);
+    }
+    @Transactional
+    @Override
+    public void markAllAsReadForUser(User user) {
+        List<Notification> unread = notificationRepository.findAllByUserAndIsReadFalse(user);
+        unread.forEach(n -> n.setIsRead(true));
+        notificationRepository.saveAll(unread);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllNotificationsForUser(User user) {
+        notificationRepository.deleteByUser(user);
+    }
+
+    @Override
+    public int deleteOldNotifications(int daysThreshold) {
+        LocalDateTime threshold = LocalDateTime.now().minusDays(daysThreshold);
+        return notificationRepository.deleteByCreatedAtBefore(threshold);
+    }
+
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void autoDeleteOldNotifications() {
+        int deleted = deleteOldNotifications(60);
+        log.info("Автоудалено {} устаревших уведомлений", deleted);
     }
 
 }

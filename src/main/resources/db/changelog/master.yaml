@@ -185,4 +185,8 @@ databaseChangeLog:
   - include:
       file: db/changelog/notifications/063_notifications_table.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/fixes/064_add_link_column_to_notifications.sql
+      relativeToChangelogFile: false
+
 

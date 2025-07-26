@@ -1,22 +1,11 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
 <@layout.page title="Просмотр заявки">
-    <#if errorMessage??>
-        <div class="custom-toast show bg-danger text-white">
-            <div class="d-flex align-items-center p-2">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <span>${errorMessage}</span>
-            </div>
-        </div>
-    </#if>
-
     <#if successMessage??>
-        <div class="custom-toast show bg-success text-white">
-            <div class="d-flex align-items-center p-2">
-                <i class="fas fa-check-circle me-2"></i>
-                <span>${successMessage}</span>
-            </div>
-        </div>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
 
 

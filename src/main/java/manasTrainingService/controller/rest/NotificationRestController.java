@@ -39,6 +39,7 @@ public class NotificationRestController {
                 .targetType(TargetType.valueOf(dto.getTargetType()))
                 .targetId(dto.getTargetId())
                 .notificationType(NotificationType.valueOf(dto.getNotificationType()))
+                .link(dto.getLink())
                 .build();
 
         notificationService.create(notification);
@@ -105,6 +106,25 @@ public class NotificationRestController {
         notificationService.markAllAsRead(userDetails.getUser(), TargetType.valueOf(targetType));
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/mark-all")
+    public ResponseEntity<Void> markAllAsReadForUser(Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+            return ResponseEntity.status(401).build();
+        }
+        notificationService.markAllAsReadForUser(userDetails.getUser());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> deleteAllNotifications(Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+            return ResponseEntity.status(401).build();
+        }
+        notificationService.deleteAllNotificationsForUser(userDetails.getUser());
+        return ResponseEntity.ok().build();
+    }
+
 
 }
 
