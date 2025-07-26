@@ -23,6 +23,13 @@
         <div class="card-body">
             <form method="post">
                 <input type="hidden" name="_csrf" value="${_csrf.token}"/>
+                <#if errors?? && errors.hasGlobalErrors()>
+                    <div class="alert alert-danger small">
+                        <#list errors.globalErrors as err>
+                            ${err.defaultMessage}<br/>
+                        </#list>
+                    </div>
+                </#if>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -35,6 +42,9 @@
                                 </option>
                             </#list>
                         </select>
+                        <#if errors?? && errors.hasFieldErrors("courseId")>
+                            <div class="text-danger small mt-1">${errors.getFieldError("courseId").defaultMessage}</div>
+                        </#if>
                     </div>
 
                     <div class="col-md-6">
@@ -58,12 +68,18 @@
                         <input type="date" class="form-control" id="preferredStartDate"
                                name="preferredStartDate"
                                value="${application.preferredStartDate}">
+                        <#if errors?? && errors.hasFieldErrors("preferredStartDate")>
+                            <div class="text-danger small mt-1">${errors.getFieldError("preferredStartDate").defaultMessage}</div>
+                        </#if>
                     </div>
                     <div class="col-md-6">
                         <label for="preferredEndDate" class="form-label">Желаемая дата окончания</label>
                         <input type="date" class="form-control" id="preferredEndDate"
                                name="preferredEndDate"
                                value="${application.preferredEndDate}">
+                        <#if errors?? && errors.hasFieldErrors("preferredEndDate")>
+                            <div class="text-danger small mt-1">${errors.getFieldError("preferredEndDate").defaultMessage}</div>
+                        </#if>
                     </div>
                 </div>
 

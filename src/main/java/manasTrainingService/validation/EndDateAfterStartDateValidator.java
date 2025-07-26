@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import manasTrainingService.dto.CourseInstanceCreationDTO;
 import manasTrainingService.dto.application.CourseApplicationCreateDto;
+import manasTrainingService.dto.application.StudentCourseApplicationCreateDto;
 import manasTrainingService.dto.instance.CourseInstanceUpdateDTO;
 
 import java.time.LocalDate;
@@ -24,6 +25,10 @@ public class EndDateAfterStartDateValidator implements ConstraintValidator<EndDa
             startDate = dto.getStartDate();
             endDate = dto.getEndDate();
         } else if (obj instanceof CourseApplicationCreateDto dto) {
+            startDate = dto.getPreferredStartDate();
+            endDate = dto.getPreferredEndDate();
+        }
+        else if (obj instanceof StudentCourseApplicationCreateDto dto) {
             startDate = dto.getPreferredStartDate();
             endDate = dto.getPreferredEndDate();
         } else {

@@ -94,6 +94,13 @@
         </div>
 
         <div class="card-body-custom">
+            <#if errors?? && errors.hasGlobalErrors()>
+                <div class="alert alert-danger small">
+                    <#list errors.globalErrors as err>
+                        ${err.defaultMessage}<br/>
+                    </#list>
+                </div>
+            </#if>
             <form method="post" action="/applications/organization/${id}/edit">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
@@ -109,6 +116,9 @@
                                     </option>
                                 </#list>
                             </select>
+                            <#if errors?? && errors.hasFieldErrors("courseId")>
+                                <div class="text-danger small mt-1">${errors.getFieldError("courseId").defaultMessage}</div>
+                            </#if>
                         </div>
 
                         <div class="mb-3">
@@ -130,12 +140,18 @@
                             <label for="preferredStartDate" class="form-label fw-bold">Желаемая дата начала</label>
                             <input type="date" class="form-control" name="preferredStartDate" id="preferredStartDate"
                                    value="${(application.preferredStartDate)?if_exists}">
+                            <#if errors?? && errors.hasFieldErrors("preferredStartDate")>
+                                <div class="text-danger small mt-1">${errors.getFieldError("preferredStartDate").defaultMessage}</div>
+                            </#if>
                         </div>
 
                         <div class="mb-3">
                             <label for="preferredEndDate" class="form-label fw-bold">Желаемая дата окончания</label>
                             <input type="date" class="form-control" name="preferredEndDate" id="preferredEndDate"
                                    value="${(application.preferredEndDate)?if_exists}">
+                            <#if errors?? && errors.hasFieldErrors("preferredEndDate")>
+                                <div class="text-danger small mt-1">${errors.getFieldError("preferredEndDate").defaultMessage}</div>
+                            </#if>
                         </div>
                     </div>
 
@@ -150,12 +166,18 @@
                                     </option>
                                 </#list>
                             </select>
+                            <#if errors?? && errors.hasFieldErrors("employeeIds")>
+                                <div class="text-danger small mt-1">${errors.getFieldError("employeeIds").defaultMessage}</div>
+                            </#if>
                         </div>
 
                         <div class="mb-3">
                             <label for="outgoingCode" class="form-label fw-bold">Исходящий код</label>
                             <input type="text" class="form-control" name="outgoingCode" id="outgoingCode"
                                    value="${application.outgoingCode!}" required>
+                            <#if errors?? && errors.hasFieldErrors("outgoingCode")>
+                                <div class="text-danger small mt-1">${errors.getFieldError("outgoingCode").defaultMessage}</div>
+                            </#if>
                         </div>
                     </div>
                 </div>

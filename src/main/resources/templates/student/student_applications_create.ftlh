@@ -77,13 +77,11 @@
             <form method="post" action="/applications/student/applications">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
-                <#if errors??>
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            <#list errors.fieldErrors as err>
-                                <li>${err.field}: ${err.defaultMessage}</li>
-                            </#list>
-                        </ul>
+                <#if errors?? && errors.hasGlobalErrors()>
+                    <div class="alert alert-danger small">
+                        <#list errors.globalErrors as err>
+                            ${err.defaultMessage}<br/>
+                        </#list>
                     </div>
                 </#if>
 
@@ -99,6 +97,9 @@
                                 </option>
                             </#list>
                         </select>
+                        <#if errors?? && errors.hasFieldErrors("courseId")>
+                            <div class="text-danger small mt-1">${errors.getFieldError("courseId").defaultMessage}</div>
+                        </#if>
                     </div>
                     <div class="col-md-6">
                         <label for="preferredTeacherId" class="form-label fw-bold">Предпочтительный преподаватель</label>
@@ -120,11 +121,17 @@
                         <label for="preferredStartDate" class="form-label fw-bold">Желаемая дата начала</label>
                         <input type="date" id="preferredStartDate" name="preferredStartDate" class="form-control"
                                value="${(application.preferredStartDate)!}">
+                        <#if errors?? && errors.hasFieldErrors("preferredStartDate")>
+                            <div class="text-danger small mt-1">${errors.getFieldError("preferredStartDate").defaultMessage}</div>
+                        </#if>
                     </div>
                     <div class="col-md-6">
                         <label for="preferredEndDate" class="form-label fw-bold">Желаемая дата окончания</label>
                         <input type="date" id="preferredEndDate" name="preferredEndDate" class="form-control"
                                value="${(application.preferredEndDate)!}">
+                        <#if errors?? && errors.hasFieldErrors("preferredEndDate")>
+                            <div class="text-danger small mt-1">${errors.getFieldError("preferredEndDate").defaultMessage}</div>
+                        </#if>
                     </div>
                 </div>
 

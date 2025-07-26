@@ -1,9 +1,9 @@
 package manasTrainingService.dto.application;
 
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import manasTrainingService.validation.EndDateAfterStartDate;
 
 import java.time.LocalDate;
 
@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EndDateAfterStartDate
 public class StudentCourseApplicationCreateDto {
 
     @NotNull(message = "Курс обязателен")
@@ -25,10 +26,4 @@ public class StudentCourseApplicationCreateDto {
     @FutureOrPresent(message = "Дата окончания должна быть сегодня или позже")
     private LocalDate preferredEndDate;
 
-
-    @AssertTrue(message = "Дата окончания не может быть раньше даты начала")
-    public boolean isEndAfterStart() {
-        return preferredStartDate == null || preferredEndDate == null
-                || !preferredEndDate.isBefore(preferredStartDate);
-    }
 }

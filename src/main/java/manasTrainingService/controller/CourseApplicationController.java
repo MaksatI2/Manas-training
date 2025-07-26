@@ -3,6 +3,7 @@ package manasTrainingService.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.dto.CourseOption;
 import manasTrainingService.dto.application.*;
 import manasTrainingService.exceptions.nsee.BadRequestException;
 import manasTrainingService.service.CourseApplicationService;
@@ -146,6 +147,9 @@ public class CourseApplicationController {
 
         model.addAttribute("calendarItems", calendarItems);
         model.addAttribute("userRole", "organization");
+        List<CourseOption> courseOptions = courseService.getAvailableCourseOptionsForCalendar();
+        model.addAttribute("courseOptions", courseOptions);
+
         return "organization/organization_course_instances_calendar";
     }
 
@@ -207,6 +211,7 @@ public class CourseApplicationController {
                             organizationService.getAuthorizedUserOrganizationByEmail(principal.getName()).getUser()));
             model.addAttribute("employees", organizationService.getMyEmployees(principal.getName()));
             model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            model.addAttribute("errors", bindingResult);
             return "organization/organization_applications_edit";
         }
 
@@ -292,6 +297,8 @@ public class CourseApplicationController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("courses", courseService.getAllCourses());
             model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            model.addAttribute("errors", bindingResult);
+
             return "student/student_applications_edit";
         }
 

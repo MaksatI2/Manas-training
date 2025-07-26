@@ -8,7 +8,7 @@
                     <i class="fas fa-lock-fill text-danger fs-1 me-3"></i>
                     <div>
                         <h2 class="h5 fw-bold mb-1" style="color: var(--text-dark);">Доступ запрещён</h2>
-                        <p style="color: var(--text-dark); font-size: 1rem;">Обратитесь к администратору для получения доступа.</p>
+                        <p style="color: var(--text-dark); font-size: 1rem;">У вас нет доступа к этой странице.</p>
                     </div>
                 </div>
                 <div class="text-center">

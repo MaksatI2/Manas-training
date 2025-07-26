@@ -6,6 +6,7 @@ import manasTrainingService.dto.ShortDto;
 import manasTrainingService.dto.application.*;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.BadRequestException;
+import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.NotFoundException;
 import manasTrainingService.repositories.course.*;
 import manasTrainingService.repositories.user.OrganizationRepository;
@@ -111,10 +112,8 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
     public List<CourseApplicationViewDto> getApplicationsForOrganization(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
-        Integer orgId = organizationRepository.findByUserId(user.getId()).map(Organization::getId)
-                .orElseThrow(() -> new NotFoundException("Организация не найдена"));
 
-        return courseApplicationRepository.findByOrganizationId(orgId).stream().map(this::mapToViewDto).toList();
+        return courseApplicationRepository.findBySubmittedById(user.getId()).stream().map(this::mapToViewDto).toList();
     }
 
     @Override
@@ -123,7 +122,7 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                 .orElseThrow(() -> new NotFoundException("Заявка не найдена"));
 
         if (!app.getSubmittedBy().getEmail().equals(email)) {
-            throw new BadRequestException("Нет доступа к заявке");
+            throw new NoAccessException("Нет доступа к заявке");
         }
 
         return mapToViewDto(app);

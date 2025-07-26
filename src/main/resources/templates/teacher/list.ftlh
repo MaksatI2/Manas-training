@@ -90,6 +90,8 @@
             font-size: 0.9rem;
             color: var(--text-dark);
             flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .teacher-name {
@@ -161,7 +163,7 @@
                             <div class="teacher-department">
                                 Перечень преподаваемых дисциплин: ${teacher.department}
                             </div>
-                            <div class="teacher-contact">
+                            <div class="teacher-contact mt-auto flex gap-4">
                                 <div><i class="fas fa-envelope"></i>${teacher.email}</div>
                                 <#if teacher.phone??>
                                     <div><i class="fas fa-phone"></i>${teacher.phone}</div>
