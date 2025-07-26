@@ -211,6 +211,7 @@ public class CourseApplicationController {
                             organizationService.getAuthorizedUserOrganizationByEmail(principal.getName()).getUser()));
             model.addAttribute("employees", organizationService.getMyEmployees(principal.getName()));
             model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            model.addAttribute("errors", bindingResult);
             return "organization/organization_applications_edit";
         }
 
