@@ -19,6 +19,8 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
         <meta name="_csrf" content="${_csrf.token}">
         <meta name="_csrf_header" content="${_csrf.headerName}">
     </head>
@@ -91,9 +93,7 @@
                     </div>
 
                     <div class="nav-item">
-                        <a href="/admin/courses
-
-" class="nav-link" data-tooltip="Управление курсами">
+                        <a href="/admin/courses" class="nav-link" data-tooltip="Управление курсами">
                             <i class="fas fa-book-open"></i>
                             <span>Управление курсами</span>
                         </a>
@@ -179,11 +179,26 @@
                 </#if>
             </div>
             <div class="sidebar-profile">
-                <select class="language-selector" id="languageSelector">
-                    <option value="ru">🇷🇺 Русский</option>
-                    <option value="ky">🇰🇬 Кыргызча</option>
-                    <option value="en">🇬🇧 English</option>
-                </select>
+                <div class="custom-language-selector" id="languageSelector">
+                    <button class="selected-language">
+                        <span class="fi fi-ru"></span>
+                        <span class="language-text">Русский</span>
+                    </button>
+                    <div class="language-options">
+                        <div class="language-option" data-value="ru">
+                            <span class="fi fi-ru"></span>
+                            <span>Русский</span>
+                        </div>
+                        <div class="language-option" data-value="ky">
+                            <span class="fi fi-kg"></span>
+                            <span>Кыргызча</span>
+                        </div>
+                        <div class="language-option" data-value="en">
+                            <span class="fi fi-gb"></span>
+                            <span>English</span>
+                        </div>
+                    </div>
+                </div>
 
                 <#if known>
                     <div class="dropdown mt-2">
@@ -393,9 +408,30 @@
             });
         });
 
-        document.getElementById('languageSelector').addEventListener('change', function(e) {
-            const selectedLang = e.target.value;
-            console.log('Selected language:', selectedLang);
+        document.addEventListener('DOMContentLoaded', function() {
+            const languageSelector = document.querySelector('.custom-language-selector');
+            const selectedBtn = languageSelector.querySelector('.selected-language');
+            const optionsContainer = languageSelector.querySelector('.language-options');
+
+            selectedBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = optionsContainer.style.display === 'block';
+                optionsContainer.style.display = isOpen ? 'none' : 'block';
+            });
+
+            optionsContainer.querySelectorAll('.language-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-value');
+                    console.log('Selected language:', lang);
+
+                    selectedBtn.innerHTML = this.innerHTML;
+                    optionsContainer.style.display = 'none';
+                });
+            });
+
+            document.addEventListener('click', function() {
+                optionsContainer.style.display = 'none';
+            });
         });
 
         const currentPath = window.location.pathname;
@@ -452,7 +488,12 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Helvetica, Arial, sans-serif;
+            font-weight: 400;
+            line-height: 1.5;
+            letter-spacing: 0.01em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             background-color: #f8f9fa;
             overflow-x: hidden;
         }
@@ -600,14 +641,6 @@
             min-height: 0;
         }
 
-        .sidebar-nav {
-            flex: 1;
-            padding: 1rem 0;
-            overflow-y: auto;
-            overflow-x: hidden;
-            min-height: 0;
-        }
-
         .nav-item {
             margin-bottom: 0.5rem;
         }
@@ -618,10 +651,6 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-        }
-
-        .nav-item {
-            margin-bottom: 0.5rem;
         }
 
         .nav-link {
@@ -829,26 +858,66 @@
             transform: scale(1.1);
         }
 
-        .language-selector {
+        .custom-language-selector {
+            position: relative;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .selected-language {
+            width: 100%;
+            padding: 0.67rem 1rem;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
-            padding: 0.5rem 1rem;
             color: var(--white);
-            width: 100%;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
         }
 
-        .sidebar.collapsed .language-selector {
+        .language-options {
             display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: var(--dark-blue);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin-top: 5px;
+            z-index: 100;
+            overflow: hidden;
         }
 
-        .language-selector:focus {
-            background: rgba(255, 255, 255, 0.2);
+        .language-option {
+            padding: 0.4rem 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
             color: var(--white);
-            border-color: var(--light-blue);
-            outline: none;
+            font-size: 0.85rem;
+        }
+
+        .language-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .fi {
+            width: 20px;
+            height: 15px;
+            border-radius: 2px;
+            display: inline-block;
+            background-size: cover;
+        }
+
+        .sidebar.collapsed .custom-language-selector {
+            display: none;
         }
 
         .main-wrapper {
@@ -886,7 +955,6 @@
         .sidebar.collapsed .nav-link div {
             justify-content: center;
         }
-
 
         .hero-section {
             background: linear-gradient(135deg, rgba(0, 102, 204, 0.1), rgba(135, 206, 235, 0.1));
