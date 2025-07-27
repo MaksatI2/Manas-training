@@ -46,19 +46,25 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
     @Transactional
     @Override
     public void saveQuizQuestions(List<LessonQuizQuestionDto> questions, LessonQuiz lessonQuiz){
-        for(LessonQuizQuestionDto lessonQuizQuestionDto : questions){
+
+        int requiredCount = questions.size();
+        int basePoints = 100 / requiredCount;
+        int remainder = 100 % requiredCount;
+
+
+        for(int i = 0; i < questions.size(); i++){
             LessonQuizQuestion lessonQuizQuestion = new LessonQuizQuestion();
-            lessonQuizQuestion.setQuestion(lessonQuizQuestionDto.getQuestion());
-            lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/questions.size()));
+            lessonQuizQuestion.setQuestion(questions.get(i).getQuestion());
+            lessonQuizQuestion.setPoints(BigDecimal.valueOf(basePoints + (i < remainder ? 1 : 0)));
             lessonQuizQuestion.setQuiz(lessonQuiz);
             LessonQuizQuestion savedQuizQuestion = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
-            lessonQuizOptionService.saveQuizOptions(lessonQuizQuestionDto.getOptions(), savedQuizQuestion, lessonQuizQuestionDto.getCorrectOptionIndex());
+            lessonQuizOptionService.saveQuizOptions(questions.get(i).getOptions(), savedQuizQuestion, questions.get(i).getCorrectOptionIndex());
         }
     }
 
     @Transactional
     @Override
-    public void editQuizQuestion(List<LessonQuizQuestionDto> questions){
+    public void editQuizQuestion(List<LessonQuizQuestionDto> questions, LessonQuiz quiz){
         List<LessonQuizQuestionDto> deletedQuizQuestions = questions.stream()
                 .filter(q -> q.getIsRemoved() != null && q.getIsRemoved())
                 .toList();
@@ -70,7 +76,7 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
             deleteQuestionsFromEdit(deletedQuizQuestions);
         }
 
-        editQuestionsFromEdit(changedQuizQuestions);
+        editQuestionsFromEdit(changedQuizQuestions, quiz);
     }
 
     @Override
@@ -122,16 +128,19 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
         }
     }
 
-    private void editQuestionsFromEdit(List<LessonQuizQuestionDto> questions){
+    private void editQuestionsFromEdit(List<LessonQuizQuestionDto> questions, LessonQuiz quiz){
         User user = userService.getAuthorizedUser();
-        for(LessonQuizQuestionDto question : questions){
-            if (question.getId() != null){
-                LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(question.getId())
+        int requiredCount = questions.size();
+        int basePoints = 100 / requiredCount;
+        int remainder = 100 % requiredCount;
+        for(int i = 0; i < questions.size(); i++){
+            if (questions.get(i).getId() != null){
+                LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(questions.get(i).getId())
                         .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
-                lessonQuizQuestion.setQuestion(question.getQuestion());
-                lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/questions.size()));
+                lessonQuizQuestion.setQuestion(questions.get(i).getQuestion());
+                lessonQuizQuestion.setPoints(BigDecimal.valueOf(basePoints + (i < remainder ? 1 : 0)));
                 LessonQuizQuestion updated = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
-                lessonQuizOptionService.editQuizOptions(question.getOptions(), question.getCorrectOptionIndex());
+                lessonQuizOptionService.editQuizOptions(questions.get(i).getOptions(), questions.get(i).getCorrectOptionIndex());
                 activityLogService.log(
                         user,
                         ActionType.UPDATE,
@@ -140,11 +149,11 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
                 );
             }else {
                 LessonQuizQuestion lessonQuizQuestion = new LessonQuizQuestion();
-                lessonQuizQuestion.setQuestion(question.getQuestion());
-                lessonQuizQuestion.setPoints(BigDecimal.valueOf(100/questions.size()));
-                lessonQuizQuestion.setQuiz(lessonQuizService.getQuizEntityById(question.getQuizId()));
+                lessonQuizQuestion.setQuestion(questions.get(i).getQuestion());
+                lessonQuizQuestion.setPoints(BigDecimal.valueOf(basePoints + (i < remainder ? 1 : 0)));
+                lessonQuizQuestion.setQuiz(quiz);
                 LessonQuizQuestion savedQuizQuestion = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);
-                lessonQuizOptionService.saveQuizOptions(question.getOptions(), savedQuizQuestion, question.getCorrectOptionIndex());
+                lessonQuizOptionService.saveQuizOptions(questions.get(i).getOptions(), savedQuizQuestion, questions.get(i).getCorrectOptionIndex());
                 activityLogService.log(
                         user,
                         ActionType.CREATE,

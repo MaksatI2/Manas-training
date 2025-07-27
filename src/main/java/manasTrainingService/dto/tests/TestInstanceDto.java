@@ -7,6 +7,7 @@ import manasTrainingService.dto.instance.CourseInstanceDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -31,4 +32,5 @@ public class TestInstanceDto {
     private LocalDate endDate;
     @NotNull(message = "Время обязательно для заполнения")
     private LocalTime endTime;
+    private Boolean isEnded;
 }

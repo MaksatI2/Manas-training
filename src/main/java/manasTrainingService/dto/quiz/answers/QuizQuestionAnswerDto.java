@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 public class QuizQuestionAnswerDto {
     Integer id;
     Integer questionId;
+    @NotNull(message = "Ответ обязателен")
     Integer answerId;
     private BigDecimal points;
 }

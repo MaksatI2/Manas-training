@@ -20,6 +20,7 @@ public class LessonDTO {
 
     @NotNull
     private Integer moduleId;
+    private CourseModuleDTO courseModule;
 
     @NotBlank(message = "Название урока необходимо")
     private String title;

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface TestQuestionRepository extends JpaRepository<TestQuestion, Integer> {
     List<TestQuestion> findAllByTestId(Integer testId);
+    List<TestQuestion> findAllByTestIdAndIsRequiredTrue(Integer testId);
+
 }

@@ -1,12 +1,16 @@
 package manasTrainingService.controller;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.exceptions.nsee.NoAccessException;
+import manasTrainingService.service.LessonAccessService;
+import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
+import manasTrainingService.service.impl.LessonAccessServiceImpl;
 import manasTrainingService.service.test.TestInstanceService;
-import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.test.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -15,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -29,6 +34,10 @@ public class CourseController {
     private TestService testService;
     @Autowired
     private TestInstanceService testInstanceService;
+    @Autowired
+    private CourseInstanceService courseInstanceService;
+    @Autowired
+    private LessonAccessService lessonAccessService;
 
     @GetMapping
     public String getCourseList(Model model) {
@@ -60,9 +69,13 @@ public class CourseController {
     }
 
     @GetMapping("/{id}/tests")
-    public String getCourseTests(@PathVariable Integer id, Model model) {
+    public String getCourseTests(@PathVariable Integer id, @RequestParam("instance") int instanceId, Model model) {
+        if (!lessonAccessService.canAccessCourseTests()){
+            throw new NoAccessException("У вас нет досупа к этой странице");
+        }
         model.addAttribute("tests", testService.getAllTestsByCourseId(id));
         model.addAttribute("course", courseService.getCourseById(id));
+        model.addAttribute("instance", courseInstanceService.getCourseInstanceById(instanceId));
         return "tests/course-tests";
     }
 }

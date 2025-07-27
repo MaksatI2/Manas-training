@@ -188,5 +188,13 @@ databaseChangeLog:
   - include:
       file: db/changelog/fixes/064_add_link_column_to_notifications.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/fixes/065_add_unique_course_instance_to_test_instance.sql
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/fixes/066_change_foreign_key_test_id_table_test_results.sql
+      relativeToChangelogFile: false
+
+
 
 

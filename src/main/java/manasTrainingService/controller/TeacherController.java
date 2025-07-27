@@ -6,6 +6,8 @@ import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.profile.TeacherProfileDto;
+import manasTrainingService.dto.tests.TestInstanceDto;
+import manasTrainingService.entity.TestInstance;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
 import manasTrainingService.dto.statistics.AttendanceStatsDTO;
@@ -17,6 +19,7 @@ import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseInstanceStatisticsService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.test.TestInstanceService;
+import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.user.RoleService;
 import manasTrainingService.service.user.TeacherService;
 import manasTrainingService.service.user.UserService;
@@ -29,6 +32,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -44,6 +49,7 @@ public class TeacherController {
     private final TestInstanceService testInstanceService;
     private final CourseInstanceStatisticsService courseInstanceStatisticsService;
     private final LessonAccessService lessonAccessService;
+    private final TestResultService testResultService;
 
     @GetMapping("/profile")
     public String viewProfile(Model model) {
@@ -93,12 +99,17 @@ public class TeacherController {
                                     Model model) {
         courseTeacherInstanceService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         model.addAttribute("courseInstance", courseInstanceDto);
         if(userService.getAuthorizedUser().getRole() == roleService.getTeacherRoleId()){
             model.addAttribute("role", roleService.getTeacherRoleId().getName());
         }
         try {
-            model.addAttribute("testInstance", testInstanceService.getTestInstanceByCourseInstance(id));
+            TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceByCourseInstanceId(id);
+            model.addAttribute("testInstance", testInstanceDto);
+            model.addAttribute("startDate", testInstanceDto.getStartDate().format(formatter));
+            model.addAttribute("endDate", testInstanceDto.getEndDate().format(formatter));
+            model.addAttribute("hasResults", testResultService.hasResultsByTestInstanceId(testInstanceDto.getId()));
         } catch (TestInstanceNotFoundException e) {
             model.addAttribute("testInstanceNotFound", e.getMessage());
         }

@@ -14,6 +14,8 @@ public interface TestService {
 
     TestDto getTestById(int id);
 
+    TestDto getTestForPassingById(int id);
+
     TestDto getTestByCourseId(int id);
 
     Test getTestEntityByCourseId(int id);
@@ -22,15 +24,17 @@ public interface TestService {
 
     TestResultDto checkTestResult(TestAnswerDto result);
 
-    Integer deactivateTest(int id);
+    void deactivateTest(int id);
 
-    Integer activateTest(int id);
+    void activateTest(int id);
 
     List<TestDto> getAllTestsByCourseId(int courseId);
 
     void clearNoData(TestDto testDto);
 
-    Integer deleteTest(int id);
+    void deleteTest(int id);
 
     long getTotalTests();
+
+    Boolean testExistById(int id);
 }

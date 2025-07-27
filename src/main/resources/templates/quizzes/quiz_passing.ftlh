@@ -4,36 +4,43 @@
 <@page>
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
-    {"label": "Тест #${quiz.id}", "url": ""},
-    {"label": "Прохождение", "url": ""}
+    {"label": "Мои курсы", "url": "/student/my-courses"},
+    {"label": "${lesson.courseModule.courseInstance.title}", "url": "/student/course/${lesson.courseModule.courseInstance.id}"},
+    {"label": "Урок #${lesson.title}", "url": "/lessons/${lesson.id}"},
+    {"label": "Тест: ${quiz.title}", "url": ""}
     ] />
     <div class="hero-section">
-        <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Тест по результатам урока</h1>
+        <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Тест по результатам урока "${quiz.lesson.title}"</h1>
+        <p class="hero-subtitle fs-4">У вас осталось: <span class="fw-bold" id="countdown">${quiz.questionTimeLimit}:00</span></p>
     </div>
     <div class="row justify-content-center">
         <div class="col-lg-10 col-md-10">
-            <div class="feature-card">
                 <div class="feature-card">
                     <div class="card-body">
-                        <h5 class="card-title fs-3 mb-3">Тест по теме: ${quiz.title}</h5>
-                        <p class="card-text fs-4">${quiz.description}</p>
-                        <p class="card-text fs-5">Количество вопросов: ${quiz.questions?size}</p>
-                        <div class="alert alert-warning" role="alert">
-                            <p id="countdown" class="fs-4">У вас осталось: ${quiz.questionTimeLimit}:00</p>
-                        </div>
+                        <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3">${quiz.title}</h5>
+                        <p class="card-text fs-4 border-bottom border-primary-subtle pb-3">${quiz.description}</p>
+                        <p class="card-text fs-5"><span class="fw-bold">Количество вопросов:</span> ${quiz.questions?size}</p>
                     </div>
                 </div>
                 <form action="/quiz/checking" method="post" id="quizForm">
                     <#if quiz.questions??>
+                        <#assign bindingResult = .globals["org.springframework.validation.BindingResult.result"]>
                         <#list quiz.questions as question>
                             <div class="feature-card">
                                 <div class="card-body px-4">
-                                    <h4 class="card-title mb-3">Вопрос №${question?index+1}</h4>
-                                    <h5 class="card-title mb-3">${question.question}</h5>
+                                    <h4 class="card-title mb-3 border-bottom border-primary-subtle pb-3">Вопрос №${question?index+1}
+                                        <#if bindingResult?? && bindingResult.hasFieldErrors("questionAnswers[" + question?index + "].answerId")>
+                                            <#list bindingResult.getFieldErrors("questionAnswers[" + question?index + "].answerId") as error>
+                                                <span class="text-danger">${error.defaultMessage}</span>
+                                            </#list>
+                                        </#if>
+                                    </h4>
+                                    <h5 class="card-title mb-3 fs-4">${question.question}</h5>
                                     <#if question.options??>
+                                        <ul class="list-group">
                                         <#list question.options as option>
-                                            <div class="form-check">
-                                                <input class="form-check-input fs-4" type="radio"
+                                            <li class="list-group-item border-primary-subtle fs-5">
+                                                <input class="form-check-input me-1 fs-4" type="radio"
                                                        name="questionAnswers[${question?index}].answerId"
                                                        id="question-${question?index}-option-${option?index}"
                                                        value="${option.id}">
@@ -41,16 +48,15 @@
                                                        for="question-${question?index}-option-${option?index}">
                                                     ${option.optionText}
                                                 </label>
-                                                <input type="hidden"
-                                                       name="questionAnswers[${question?index}].questionId"
-                                                       value="${question.id}">
-                                                <input type="hidden" name="questionAnswers[${question?index}].points"
-                                                       value="${question.points}">
-                                            </div>
+                                            </li>
                                         </#list>
+                                        </ul>
                                     </#if>
                                 </div>
                             </div>
+                            <input type="hidden"
+                                   name="questionAnswers[${question?index}].questionId"
+                                   value="${question.id}">
                         </#list>
                     </#if>
                     <#if _csrf??>
@@ -59,28 +65,29 @@
                     <input type="hidden" name="quizId" value="${result.quizId}">
                     <input type="hidden" name="passingStart" value="${result.passingStart}">
                     <div class="text-center">
-                        <input type="submit" class="btn btn-primary-custom w-75" value="Отправить">
+                        <input type="submit" class="btn btn-primary-custom w-75" value="Отправить ответы">
                     </div>
                 </form>
-            </div>
         </div>
     </div>
     <script>
-        let timer = ${quiz.questionTimeLimit};
-        let seconds = timer * 60;
+        let startTime = new Date("${startTime}")
+        let duration = ${timer} * 60 * 1000;
+        let endTime = new Date(startTime.getTime() + duration);
         const countDown = document.getElementById("countdown")
+        function updateTimer(){
+            let now = new Date();
+            let timer = endTime - now;
 
-        const interval = setInterval(() => {
-            seconds--
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            const formattedSecs = secs < 10 ? "0" + secs : secs;
-            countDown.textContent = "У вас осталось: " + mins + ":" + formattedSecs;
-
-            if(seconds <= 0){
-                clearInterval(interval)
-                window.location.href = "http://localhost:8089/";
+            const min = Math.floor(timer / 1000 / 60);
+            const sec = Math.floor((timer / 1000) % 60);
+            countDown.textContent =  min.toString().padStart(2, "0") + ":" + sec.toString().padStart(2, "0");
+            if(timer <= 0){
+                countDown.textContent = "00:00"
+                window.location.href = "http://localhost:8089/quiz/${quiz.id}/time-is-over";
             }
-        }, 1000)
+        }
+        setInterval(updateTimer, 100);
+        updateTimer();
     </script>
 </@page>

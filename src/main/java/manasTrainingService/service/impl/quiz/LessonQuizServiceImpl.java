@@ -1,6 +1,9 @@
 package manasTrainingService.service.impl.quiz;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.instance.CourseModuleDTO;
+import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.dto.quiz.LessonQuizDto;
 import manasTrainingService.dto.quiz.answers.QuizAnswerDto;
 import manasTrainingService.dto.quiz.answers.QuizResultDto;
@@ -41,7 +44,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
         LessonQuiz lessonQuiz = new LessonQuiz();
         lessonQuiz.setTitle(lessonQuizDto.getTitle());
         lessonQuiz.setDescription(lessonQuizDto.getDescription());
-        lessonQuiz.setQuestionTimeLimit(lessonQuizDto.getQuestionTimeLimit() * lessonQuizDto.getQuestions().size());
+        lessonQuiz.setQuestionTimeLimit(lessonQuizDto.getQuestionTimeLimit());
         lessonQuiz.setLesson(lessonService.getLessonModelById(lessonQuizDto.getLessonId()));
         if(lessonQuizDto.getIsActive() == null){
             lessonQuiz.setIsActive(false);
@@ -68,7 +71,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
 
         lessonQuiz.setTitle(lessonQuizDto.getTitle());
         lessonQuiz.setDescription(lessonQuizDto.getDescription());
-        lessonQuiz.setQuestionTimeLimit(lessonQuizDto.getQuestionTimeLimit() * lessonQuizDto.getQuestions().size());
+        lessonQuiz.setQuestionTimeLimit(lessonQuizDto.getQuestionTimeLimit());
         if(lessonQuizDto.getIsActive() == null){
             lessonQuiz.setIsActive(false);
         }else{
@@ -76,7 +79,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
         }
         LessonQuiz updated = lessonQuizRepository.saveAndFlush(lessonQuiz);
 
-        lessonQuizQuestionService.editQuizQuestion(lessonQuizDto.getQuestions());
+        lessonQuizQuestionService.editQuizQuestion(lessonQuizDto.getQuestions(), updated);
 
         activityLogService.log(
                 userService.getAuthorizedUser(),
@@ -97,6 +100,19 @@ public class LessonQuizServiceImpl implements LessonQuizService {
                 .description(lessonQuiz.getDescription())
                 .isActive(lessonQuiz.getIsActive())
                 .lessonId(lessonQuiz.getLesson().getId())
+                .lesson(LessonDTO.builder()
+                        .id(lessonQuiz.getLesson().getId())
+                        .title(lessonQuiz.getLesson().getTitle())
+                        .description(lessonQuiz.getLesson().getDescription())
+                        .courseModule(CourseModuleDTO.builder()
+                                .id(lessonQuiz.getLesson().getModule().getId())
+                                .title(lessonQuiz.getLesson().getModule().getTitle())
+                                .courseInstance(CourseInstanceDTO.builder()
+                                        .id(lessonQuiz.getLesson().getModule().getCourseInstance().getId())
+                                        .title(lessonQuiz.getLesson().getModule().getCourseInstance().getTitle())
+                                        .build())
+                                .build())
+                        .build())
                 .questionTimeLimit(lessonQuiz.getQuestionTimeLimit())
                 .questions(lessonQuizQuestionService.getQuizQuestionsByQuizId(lessonQuiz.getId()))
                 .build();
@@ -135,6 +151,8 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     @Override
     public QuizResultDto checkQuizResults(QuizAnswerDto quizAnswerDto){
         LocalTime endTime = LocalTime.now();
+        LessonQuiz lessonQuiz = lessonQuizRepository.findById(quizAnswerDto.getQuizId())
+                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
         return QuizResultDto.builder()
                 .correctAnswersCount((int) quizAnswerDto.getQuestionAnswers()
                         .stream()
@@ -150,7 +168,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
                         .stream()
                         .filter(a -> a.getAnswerId() != null)
                         .filter(a -> lessonQuizOptionService.getQuizOptionEntityById(a.getAnswerId()).getIsCorrect())
-                        .mapToInt(a -> a.getPoints().intValue())
+                        .mapToInt(a -> lessonQuizQuestionService.getQuizQuestinEntityById(a.getQuestionId()).getPoints().intValue())
                         .sum())
                 .withoutAnswersCount((int) quizAnswerDto.getQuestionAnswers()
                         .stream()
@@ -158,6 +176,22 @@ public class LessonQuizServiceImpl implements LessonQuizService {
                         .count())
                 .questionsCount(quizAnswerDto.getQuestionAnswers().size())
                 .passingTime(endTime.minusMinutes(quizAnswerDto.getPassingStart().getMinute()).getMinute())
+                .quiz(LessonQuizDto.builder()
+                        .id(lessonQuiz.getId())
+                        .title(lessonQuiz.getTitle())
+                        .lesson(LessonDTO.builder()
+                                .id(lessonQuiz.getLesson().getId())
+                                .title(lessonQuiz.getLesson().getTitle())
+                                .courseModule(CourseModuleDTO.builder()
+                                        .id(lessonQuiz.getLesson().getModule().getId())
+                                        .title(lessonQuiz.getLesson().getModule().getTitle())
+                                        .courseInstance(CourseInstanceDTO.builder()
+                                                .id(lessonQuiz.getLesson().getModule().getCourseInstance().getId())
+                                                .title(lessonQuiz.getLesson().getModule().getCourseInstance().getTitle())
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
                 .build();
     }
 

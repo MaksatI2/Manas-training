@@ -14,6 +14,7 @@ import java.util.List;
 public class QuizAnswerDto {
     private Integer id;
     private Integer quizId;
+    @Valid
     private List<QuizQuestionAnswerDto> questionAnswers;
     private LocalTime passingStart;
 }

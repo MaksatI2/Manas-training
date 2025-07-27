@@ -16,17 +16,18 @@ import manasTrainingService.exceptions.nsee.IncorrectDateException;
 import manasTrainingService.exceptions.nsee.TestNotFoundException;
 import manasTrainingService.repositories.test.TestRepository;
 import manasTrainingService.service.*;
-import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.test.TestAnswerService;
+import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -36,11 +37,22 @@ public class TestServiceImpl implements TestService {
     private final QuestionService questionService;
     private final CourseService courseService;
     private final OptionService optionService;
-    private final TestResultService testResultService;
+    private TestResultService testResultService;
     private final TestAnswerService testAnswerService;
-    private final CourseInstanceService courseInstanceService;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private TestInstanceService testInstanceService;
+    private final EnrollmentService enrollmentService;
+
+    @Autowired
+    public void testInstanceService(@Lazy TestInstanceService testInstanceService) {
+        this.testInstanceService = testInstanceService;
+    }
+
+    @Autowired
+    public void TestResultService(@Lazy TestResultService testResultService) {
+        this.testResultService = testResultService;
+    }
 
     @PostConstruct
     public void checkInjection() {
@@ -78,11 +90,6 @@ public class TestServiceImpl implements TestService {
         test.setTitle(testDto.getTitle());
         test.setDescription(testDto.getDescription());
         test.setPassingScore(BigDecimal.valueOf(testDto.getPassingScore()));
-        if (testDto.getIsActive() == null) {
-            test.setIsActive(false);
-        } else {
-            test.setIsActive(testDto.getIsActive());
-        }
         Test updated = testRepository.saveAndFlush(test);
         questionService.editQuestions(testDto.getQuestions());
 
@@ -115,8 +122,27 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    public TestDto getTestForPassingById(int id) {
+        Test test = testRepository.findById(id)
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+
+        return TestDto.builder()
+                .id(test.getId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .isActive(test.getIsActive())
+                .courseInstanceId(test.getCourse().getId())
+                .course(CourseDto.builder()
+                        .id(test.getCourse().getId())
+                        .title(test.getCourse().getTitle())
+                        .build())
+                .passingScore(test.getPassingScore().intValue())
+                .questions(questionService.getQuestionsForPassingByTestId(test.getId()))
+                .build();
+    }
+
+    @Override
     public TestDto getTestByCourseId(int id) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         Test test = testRepository.findByCourseId(id)
                 .orElse(null);
         if (test == null) {
@@ -152,19 +178,23 @@ public class TestServiceImpl implements TestService {
     @Override
     public TestResultDto checkTestResult(TestAnswerDto result) {
         LocalDateTime endTime = LocalDateTime.now();
-
-        int resultScore = result.getQuestionAnswers()
+        Test test = testRepository.findById(result.getTestId())
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+        int resultScore = (int) Math.ceil(result.getQuestionAnswers()
                 .stream()
                 .filter(a -> optionService.getOptionById(a.getAnswerId()).getIsCorrect())
-                .mapToInt(a -> a.getPoints().intValue())
-                .sum();
-
+                .mapToDouble(a -> questionService.getQuestionById(a.getQuestionId()).getPoints().doubleValue())
+                .sum());
         boolean isPassed = true;
+        int passingScore = test.getPassingScore().intValue();
+        int percentage = passingScore > 0 ? (int) ((double) resultScore / passingScore * 100) : 0;
         if (getTestById(result.getTestId()).getPassingScore() > resultScore) {
             isPassed = false;
         }
-        TestResult savedTestResult = testResultService.saveTestResult(result, resultScore, isPassed, endTime);
+        TestResult savedTestResult = testResultService.saveTestResult(result, resultScore, isPassed, endTime, percentage);
         testAnswerService.saveTestAnswers(result, savedTestResult);
+
+        enrollmentService.courseComplete(savedTestResult);
 
         return TestResultDto.builder()
                 .correctAnswersCount((int) result.getQuestionAnswers()
@@ -185,17 +215,18 @@ public class TestServiceImpl implements TestService {
                 .questionsCount(result.getQuestionAnswers().size())
                 .passingTime(endTime.minusMinutes(result.getPassingStart().getMinute()).getMinute())
                 .isPassed(isPassed)
+                .testInstance(testInstanceService.getTestInstanceById(result.getTestInstanceId()))
                 .build();
     }
 
     @Override
-    public Integer deactivateTest(int id){
+    public void deactivateTest(int id){
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
         List<TestInstance> testInstances = test.getTestInstances();
         if(testInstances.isEmpty()){
             test.setIsActive(false);
-            return testRepository.saveAndFlush(test).getCourse().getId();
+            testRepository.saveAndFlush(test);
         }else if(testInstances.stream().anyMatch(t -> t.getInstance().getEndDate().isBefore(LocalDateTime.now()))){
             test.setIsActive(false);
             activityLogService.log(
@@ -204,14 +235,14 @@ public class TestServiceImpl implements TestService {
                     TargetType.TEST,
                     id
             );
-            return testRepository.saveAndFlush(test).getCourse().getId();
+            testRepository.saveAndFlush(test);
         } else {
             throw new IncorrectDateException("Тест нельзя деактивироанть если он прикреплен к активному потоку");
         }
     }
 
     @Override
-    public Integer activateTest(int id){
+    public void activateTest(int id){
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
         test.setIsActive(true);
@@ -221,7 +252,7 @@ public class TestServiceImpl implements TestService {
                 TargetType.TEST,
                 id
         );
-        return testRepository.saveAndFlush(test).getCourse().getId();
+        testRepository.saveAndFlush(test);
     }
 
     @Override
@@ -263,10 +294,9 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public Integer deleteTest(int id) {
+    public void deleteTest(int id) {
         Test test = testRepository.findById(id)
                         .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
-        int courseId = test.getCourse().getId();
         List<TestInstance> testInstances = test.getTestInstances();
         if(testInstances.isEmpty()){
             testRepository.deleteById(id);
@@ -276,7 +306,6 @@ public class TestServiceImpl implements TestService {
                     TargetType.TEST,
                     id
             );
-            return courseId;
         }else if(testInstances.stream().anyMatch(t -> t.getInstance().getEndDate().isBefore(LocalDateTime.now()))){
             testRepository.deleteById(id);
             activityLogService.log(
@@ -285,7 +314,6 @@ public class TestServiceImpl implements TestService {
                     TargetType.TEST,
                     id
             );
-            return courseId;
         } else {
             throw new IncorrectDateException("Тест нельзя удалить если он привязван к активному потоку");
         }
@@ -296,4 +324,8 @@ public class TestServiceImpl implements TestService {
         return testRepository.count();
     }
 
+    @Override
+    public Boolean testExistById(int id){
+        return testRepository.existsById(id);
+    }
 }

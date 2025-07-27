@@ -65,8 +65,8 @@ public class StudentStatisticsServiceImpl implements StudentStatisticsService {
         List<TestResult> results = testResultService.getTestResultsByStudentId(student.getId());
 
         return results.stream().map(result -> new TestResultDTO(
-                result.getTest().getCourse().getTitle(),
-                result.getTest().getTitle(),
+                result.getTestInstance().getInstance().getTitle(),
+                result.getTestInstance().getInstance().getTitle(),
                 result.getScore(),
                 result.getIsPassed(),
                 result.getSubmittedAt(),

@@ -1,6 +1,7 @@
 package manasTrainingService.dto.quiz.answers;
 
 import lombok.*;
+import manasTrainingService.dto.quiz.LessonQuizDto;
 
 @Getter
 @Setter
@@ -14,4 +15,5 @@ public class QuizResultDto {
     private Integer withoutAnswersCount;
     private Integer passingTime;
     private Integer questionsCount;
+    private LessonQuizDto quiz;
 }

@@ -2,22 +2,11 @@ let createQuestionButton = document.getElementById("createQuestion");
 let testFormDiv = document.getElementById("test");
 let questionId = questionIndex;
 
-const optionCounters = {};
-
-function getNextOptionId(questionId) {
-    if (!(questionId in optionCounters)) {
-        optionCounters[questionId] = 2;
-    } else {
-        optionCounters[questionId]++;
-    }
-    return optionCounters[questionId];
-}
-
 function createLabel(name, text) {
     let label = document.createElement("label");
     label.setAttribute("for", name);
     label.setAttribute("class", "form-label fw-bold");
-    label.innerText = text;
+    label.innerHTML = text;
     return label;
 }
 
@@ -34,7 +23,7 @@ function createOptionInput(name, id, type) {
     let input = document.createElement("input");
     input.setAttribute("type", type);
     input.setAttribute("class", "form-control me-2");
-    input.setAttribute("placeholder", "Вариант ответа")
+    input.setAttribute("placeholder", "Вариант ответа *")
     input.setAttribute("aria-describedby", "button-addon2")
     input.setAttribute("name", name);
     input.setAttribute("id", id);
@@ -115,6 +104,8 @@ function createOptionRemoveButton(id, questionId) {
     button.innerHTML = `<i class="fa-solid fa-trash"></i>`;
     button.addEventListener("click", () => {
         const element = document.getElementById(id);
+        let errorMessage = document.getElementById("invalid-"+id);
+        if(errorMessage) errorMessage.remove();
         if (element) element.remove();
         if(getOptionsCount(questionId) < 4){
             document.getElementById("add-options-button-question-"+questionId).disabled = false;
