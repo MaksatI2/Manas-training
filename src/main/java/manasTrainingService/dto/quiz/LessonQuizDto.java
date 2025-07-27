@@ -4,6 +4,7 @@ package manasTrainingService.dto.quiz;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import manasTrainingService.dto.instance.LessonDTO;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
 public class LessonQuizDto {
     private Integer id;
     private Integer lessonId;
+    private LessonDTO lesson;
     private Integer questionTimeLimit;
     @NotBlank(message = "Название теста обязательно для заполнения")
     private String title;

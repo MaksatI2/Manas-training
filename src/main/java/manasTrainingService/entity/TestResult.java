@@ -23,8 +23,8 @@ public class TestResult {
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "test_id", nullable = false)
-    Test test;
+    @JoinColumn(name = "test_instance_id", nullable = false)
+    TestInstance testInstance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)

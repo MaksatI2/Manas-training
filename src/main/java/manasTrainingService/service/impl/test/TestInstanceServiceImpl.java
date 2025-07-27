@@ -1,8 +1,10 @@
 package manasTrainingService.service.impl.test;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.dto.tests.TestInstanceDto;
+import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.TestInstance;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
 import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
@@ -31,7 +33,6 @@ public class TestInstanceServiceImpl implements TestInstanceService {
         TestInstance testInstance = new TestInstance();
         LocalDateTime scheduledStart = parseDateRange(testInstanceDto).get(0);
         LocalDateTime scheduledEnd = parseDateRange(testInstanceDto).get(1);
-
         if (LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)) {
             throw new IncorrectDateException("Дата не может быть в прошлом");
         }
@@ -57,7 +58,7 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Transactional
     @Override
     public void changeTestToCourseInstance(TestInstanceDto testInstanceDto){
-        TestInstance testInstance = testInstanceRepository.findByCourseInstanceId(testInstanceDto.getCourseInstanceId())
+        TestInstance testInstance = testInstanceRepository.findByInstanceId(testInstanceDto.getCourseInstanceId())
                 .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
         LocalDateTime scheduledStart = parseDateRange(testInstanceDto).get(0);
         LocalDateTime scheduledEnd = parseDateRange(testInstanceDto).get(1);
@@ -93,34 +94,87 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     }
 
     @Override
-    public TestInstanceDto getTestInstanceByCourseInstance(int courseInstanceId){
-        TestInstance testInstance = testInstanceRepository.findByCourseInstanceId(courseInstanceId)
+    public TestInstanceDto getTestInstanceByCourseInstanceId(int courseInstanceId){
+        TestInstance testInstance = testInstanceRepository.findByInstanceId(courseInstanceId)
                 .orElseThrow(() -> new TestInstanceNotFoundException("Для этого потока еще не был назначен тест"));
         return TestInstanceDto.builder()
                 .id(testInstance.getId())
                 .test(TestDto.builder()
                         .id(testInstance.getTest().getId())
                         .title(testInstance.getTest().getTitle())
+                        .passingScore(testInstance.getTest().getPassingScore().intValue())
                         .isActive(testInstance.getTest().getIsActive())
                         .build())
                 .courseInstanceId(testInstance.getInstance().getId())
+                .courseInstance(CourseInstanceDTO.builder()
+                        .id(testInstance.getInstance().getId())
+                        .title(testInstance.getInstance().getTitle())
+                        .build())
                 .startDate(testInstance.getScheduledStart().toLocalDate())
                 .endDate(testInstance.getScheduledEnd().toLocalDate())
                 .startTime(testInstance.getScheduledStart().toLocalTime())
                 .endTime(testInstance.getScheduledEnd().toLocalTime())
+                .isEnded(testInstance.getScheduledEnd().isBefore(LocalDateTime.now()))
                 .build();
     }
 
     @Override
+    public TestInstanceDto getTestInstanceById(int id){
+        TestInstance testInstance = testInstanceRepository.findById(id)
+                .orElseThrow(() -> new TestInstanceNotFoundException("Для этого потока еще не был назначен тест"));
+        return TestInstanceDto.builder()
+                .id(testInstance.getId())
+                .test(TestDto.builder()
+                        .id(testInstance.getTest().getId())
+                        .title(testInstance.getTest().getTitle())
+                        .passingScore(testInstance.getTest().getPassingScore().intValue())
+                        .isActive(testInstance.getTest().getIsActive())
+                        .build())
+                .courseInstanceId(testInstance.getInstance().getId())
+                .courseInstance(CourseInstanceDTO.builder()
+                        .id(testInstance.getInstance().getId())
+                        .title(testInstance.getInstance().getTitle())
+                        .build())
+                .startDate(testInstance.getScheduledStart().toLocalDate())
+                .endDate(testInstance.getScheduledEnd().toLocalDate())
+                .startTime(testInstance.getScheduledStart().toLocalTime())
+                .endTime(testInstance.getScheduledEnd().toLocalTime())
+                .isEnded(testInstance.getScheduledEnd().isBefore(LocalDateTime.now()))
+                .build();
+    }
+
+    @Override
+    public TestInstance getTestInstanceEntityById(int id){
+        return testInstanceRepository.findById(id)
+                .orElseThrow(() -> new TestInstanceNotFoundException("Для этого потока еще не был назначен тест"));
+    }
+
+
+    @Transactional
+    @Override
     public void deleteTestFromTestInstance(int courseInstanceId){
-        TestInstance testInstance = testInstanceRepository.findByCourseInstanceId(courseInstanceId)
+        TestInstance testInstance = testInstanceRepository.findByInstanceId(courseInstanceId)
                 .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+        CourseInstance courseInstance = testInstance.getInstance();
+        courseInstance.setTestInstance(null);
         testInstanceRepository.delete(testInstance);
     }
 
     @Override
     public Boolean isValidAccessTime(int courseInstanceId){
-        TestInstance testInstance = testInstanceRepository.findByCourseInstanceId(courseInstanceId)
+        TestInstance testInstance = testInstanceRepository.findByInstanceId(courseInstanceId)
+                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+        return testInstance.getScheduledStart().isBefore(LocalDateTime.now()) && testInstance.getScheduledEnd().isAfter(LocalDateTime.now());
+    }
+
+    @Override
+    public Boolean isTestInstanceExist(int courseInstanceId){
+        return testInstanceRepository.existsByInstanceId(courseInstanceId);
+    }
+
+    @Override
+    public Boolean isAvailableTime(int courseInstanceId){
+        TestInstance testInstance = testInstanceRepository.findByInstanceId(courseInstanceId)
                 .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
         return testInstance.getScheduledStart().isBefore(LocalDateTime.now()) && testInstance.getScheduledEnd().isAfter(LocalDateTime.now());
     }

@@ -9,7 +9,7 @@ import java.util.List;
 public interface LessonQuizQuestionService {
     void saveQuizQuestions(List<LessonQuizQuestionDto> questions, LessonQuiz lessonQuiz);
 
-    void editQuizQuestion(List<LessonQuizQuestionDto> questions);
+    void editQuizQuestion(List<LessonQuizQuestionDto> questions, LessonQuiz quiz);
 
     List<LessonQuizQuestionDto> getQuizQuestionsByQuizId(int quizId);
 

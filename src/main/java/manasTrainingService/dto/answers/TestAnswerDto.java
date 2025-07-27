@@ -1,5 +1,6 @@
 package manasTrainingService.dto.answers;
 
+import jakarta.validation.Valid;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,5 +16,7 @@ public class TestAnswerDto {
     private Integer id;
     private Integer testId;
     private LocalDateTime passingStart;
+    private Integer testInstanceId;
+    @Valid
     private List<QuestionAnswerDto> questionAnswers = new ArrayList<>();
 }

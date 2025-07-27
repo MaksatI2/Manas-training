@@ -21,6 +21,7 @@ public class CourseModuleDTO {
 
     @NotNull
     private Integer courseInstanceId;
+    private CourseInstanceDTO courseInstance;
 
     @NotBlank(message = "Название модуля необходимо")
     private String title;

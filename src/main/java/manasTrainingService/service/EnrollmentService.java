@@ -4,6 +4,7 @@ import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseEnrollmentDTO;
 import manasTrainingService.entity.CourseEnrollment;
 import manasTrainingService.entity.Status;
+import manasTrainingService.entity.TestResult;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ public interface EnrollmentService {
 
     List<CourseEnrollmentCardDTO> getStudentCourses();
 
+    List<CourseEnrollmentCardDTO> getStudentFinishedCourses();
+
     void hasAccess(Integer courseInstanceId);
 
     List<CourseEnrollment> findAllEnrollmentsForCourseInstance(Integer courseInstanceId);
@@ -23,4 +26,6 @@ public interface EnrollmentService {
     void changeEnrollmentStatus(Integer enrollmentId, Status newStatus);
 
     List<CourseEnrollment> findAllActiveEnrollmentsByStudentId(Integer studentId);
+
+    void courseComplete(TestResult testResult);
 }

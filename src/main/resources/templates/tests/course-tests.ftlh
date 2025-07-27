@@ -4,6 +4,7 @@
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
     {"label": "Мои курсы", "url": "/teacher/my-courses"},
+    {"label": "${instance.title}", "url": "/teacher/course/${instance.id}"},
     {"label": "Тесты для курса: ${course.title}", "url": ""}
     ] />
     <div class="card shadow mb-4">
@@ -47,7 +48,7 @@
                     <tbody>
                     <#if tests?has_content>
                         <#list tests as test>
-                            <tr style="cursor: pointer;" onclick="window.location.href='/test/${test.id}/details'">
+                            <tr style="cursor: pointer;" onclick="window.location.href='/test/${test.id}/details?instance=${instance.id}'">
                                 <td>${test.title}</td>
                                 <td>${test.course.title}</td>
                                 <td>${test.passingScore}</td>

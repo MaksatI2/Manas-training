@@ -1,6 +1,8 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.dto.lesson.LessonEditDto;
@@ -61,6 +63,7 @@ public class LessonServiceImpl implements LessonService {
                     .title(lesson.getLessonQuiz().getTitle())
                     .description(lesson.getLessonQuiz().getDescription())
                     .isActive(lesson.getLessonQuiz().getIsActive())
+                    .questionTimeLimit(lesson.getLessonQuiz().getQuestionTimeLimit())
                     .build();
         }
         return LessonDTO.builder()
@@ -68,6 +71,14 @@ public class LessonServiceImpl implements LessonService {
                 .description(lesson.getDescription())
                 .id(lesson.getId())
                 .quiz(quizDto)
+                .courseModule(CourseModuleDTO.builder()
+                        .id(lesson.getModule().getId())
+                        .title(lesson.getModule().getTitle())
+                        .courseInstance(CourseInstanceDTO.builder()
+                                .id(lesson.getModule().getCourseInstance().getId())
+                                .title(lesson.getModule().getCourseInstance().getTitle())
+                                .build())
+                        .build())
                 .moduleId(lesson.getModule().getId())
                 .build();
     }

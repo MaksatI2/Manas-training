@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,12 +21,12 @@ public class TestInstance {
     @Column(name = "id")
     Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "course_instance_id")
+    @OneToOne
+    @JoinColumn(name = "course_instance_id", nullable = false, unique = true)
     CourseInstance instance;
 
     @ManyToOne
-    @JoinColumn(name = "test_id")
+    @JoinColumn(name = "test_id", nullable = false)
     Test test;
 
     @Column(name = "scheduled_start")
@@ -33,4 +34,7 @@ public class TestInstance {
 
     @Column(name ="scheduled_end")
     LocalDateTime scheduledEnd;
+
+    @OneToMany(mappedBy = "testInstance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<TestResult> attempts;
 }

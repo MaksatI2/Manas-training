@@ -32,5 +32,30 @@
                 </#list>
             </div>
         </#if>
+
+        <#if finishedCourses?size == 0>
+        <#else>
+            <div class="hero-section mt-5">
+                <h2 class="hero-title"><i class="fas fa-book me-2"></i>Завершенные курсы</h2>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <#list finishedCourses as course>
+                    <div class="col">
+                        <a href="/student/course/${course.courseInstanceId}" class="text-decoration-none text-dark">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">${course.courseTitle}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">${course.instanceTitle}</h6>
+                                    <p class="card-text">
+                                        Статус: <strong>${course.localizedStatus}</strong><br>
+                                        Срок: ${course.startDate} – ${course.endDate}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </#list>
+            </div>
+        </#if>
     </div>
 </@layout.page>

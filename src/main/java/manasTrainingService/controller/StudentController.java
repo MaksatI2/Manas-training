@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.tests.TestInstanceDto;
 import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
 import manasTrainingService.dto.statistics.AttendanceStatsDTO;
 import manasTrainingService.entity.User;
@@ -14,6 +15,7 @@ import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
+import manasTrainingService.service.impl.user.StudentStatisticsServiceImpl;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserService;
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -40,6 +44,7 @@ public class StudentController {
     private final TestResultService testResultService;
     private final TestService testService;
     private final StudentStatisticsService studentStatisticsService;
+    private final StudentStatisticsServiceImpl studentStatisticsServiceImpl;
 
     @GetMapping("/profile")
     public String profilePage(Model model){
@@ -78,6 +83,7 @@ public class StudentController {
     public String getCourses(Model model) {
         List<CourseEnrollmentCardDTO> studentCourses = enrollmentService.getStudentCourses();
         model.addAttribute("courses", studentCourses);
+        model.addAttribute("finishedCourses", enrollmentService.getStudentFinishedCourses());
         return "student/my-courses";
     }
 
@@ -85,12 +91,19 @@ public class StudentController {
     public String viewStudentCourse(@PathVariable Integer id, Model model) {
         enrollmentService.hasAccess(id);
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         model.addAttribute("courseInstance", courseInstanceDto);
+        model.addAttribute("now", LocalDateTime.now());
         try {
-            model.addAttribute("testInstance",  testInstanceService.getTestInstanceByCourseInstance(id));
-            if(testResultService.userHasTestAttempt(testService.getTestByCourseId(id).getId())){
-                model.addAttribute("alreadyAttempted", "Вы уже прошли данный тест");
+            TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceByCourseInstanceId(id);
+            model.addAttribute("testInstance",  testInstanceDto);
+            if(testResultService.userHasTestAttempt(testInstanceDto.getId())){
+                model.addAttribute("testResult", testResultService.getTestResultsByUserId());
             }
+            model.addAttribute("isAvailableTime", testInstanceService.isAvailableTime(id));
+            model.addAttribute("testExits", testService.testExistById(testInstanceDto.getTest().getId()));
+            model.addAttribute("startDate", testInstanceDto.getStartDate().format(formatter));
+            model.addAttribute("endDate", testInstanceDto.getEndDate().format(formatter));
         } catch (TestInstanceNotFoundException e) {
             model.addAttribute("testInstanceNotFound", "Тестовое задание для курса " + courseInstanceDto.getCourseTitle() + " еще не было назначенно");
         }
@@ -102,6 +115,7 @@ public class StudentController {
         User student = userService.getAuthorizedUser();
         List<AttendanceStatsDTO> stats = studentStatisticsService.getAllAttendanceStats(student);
         model.addAttribute("attendanceStatsList", stats);
+        model.addAttribute("testResults", studentStatisticsServiceImpl.getTestResultsByStudent(student));
         model.addAttribute("testResults", studentStatisticsService.getTestResultsByStudent(student));
         return "student/statistics";
     }

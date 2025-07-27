@@ -6,7 +6,7 @@
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
     {"label": "Мои курсы", "url": "/teacher/my-courses"},
-    {"label": "Курс #${courseInstance.id}", "url": ""}
+    {"label": "Курс #${courseInstance.title}", "url": ""}
     ] />
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -28,17 +28,13 @@
     </div>
 
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">Статистика потока</a>
+        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">Статистика
+            потока</a>
+        <a href="/courses/${courseInstance.courseId}/tests?instance=${courseInstance.id}" class="btn btn-primary">Список
+            тестов по данному курсу</a>
     </div>
 
     <div class="container mt-4">
-        <a href="/courses/${courseInstance.courseId}/tests" class="btn btn-outline-primary mb-2">Список тестов по данному курсу</a>
-        <#if testInstance??>
-            <a href="/instance/${courseInstance.id}/change/test" class="btn btn-outline-warning mb-2">Переназначить тест для данного курса</a>
-            <a href="/instance/${courseInstance.id}/delete/test" class="btn btn-outline-danger mb-2">Отвязать данный тест от потока</a>
-        <#else>
-                <a href="/instance/${courseInstance.id}/test" class="btn btn-outline-primary mb-2">Назначить тест для данного потока</a>
-        </#if>
         <h2>Модули курса</h2>
 
         <#if courseInstance.modules?has_content>
@@ -53,7 +49,8 @@
                                         aria-controls="collapse${module.id}">
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
-                                <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-primary btn-sm ms-3">
+                                <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
+                                   class="btn btn-primary btn-sm ms-3">
                                     + Урок
                                 </a>
                             </div>
@@ -66,36 +63,14 @@
                                         <div class="row row-cols-1 row-cols-md-2 g-3">
                                             <#list module.lessons as lesson>
                                                 <div class="col">
-                                                    <a href="<@spring.url '/lessons/${lesson.id}'/>" class="text-decoration-none">
+                                                    <a href="<@spring.url '/lessons/${lesson.id}'/>"
+                                                       class="text-decoration-none">
                                                         <div class="card h-100 shadow-sm">
                                                             <div class="card-body">
                                                                 <h6 class="card-title">${lesson.title}</h6>
                                                                 <p class="card-text text-muted small">
                                                                     ${lesson.description!''}
                                                                 </p>
-                                                                <#if lesson.quiz?has_content>
-                                                                    <div class="row">
-                                                                        <div class="col=md-12 col-lg-6 mt-2">
-                                                                            <a href="/quiz/${lesson.quiz.id}/edit" class="btn btn-outline-warning w-100 mb-2">Редактировать тест</a>
-                                                                        </div>
-                                                                        <div class="col=md-12 col-lg-6 mt-2">
-                                                                            <a href="/quiz/${lesson.quiz.id}/delete" class="btn btn-outline-danger w-100 mb-2">Удалить тест</a>
-                                                                        </div>
-                                                                        <#if !lesson.quiz.isActive>
-                                                                            <div class="col=md-12 col-lg-12 mt-2">
-                                                                                <a href="/quiz/${lesson.quiz.id}/activate" class="btn btn-outline-success w-100 mb-2">Активировать тест</a>
-                                                                            </div>
-                                                                            <#else>
-                                                                                <div class="col=md-12 col-lg-12 mt-2">
-                                                                                    <a href="/quiz/${lesson.quiz.id}/deactivate" class="btn btn-outline-warning w-100 mb-2">Деактивировать тест</a>
-                                                                                </div>
-                                                                        </#if>
-                                                                    </div>
-                                                                    <#else>
-                                                                        <div class="mt-2 text-center">
-                                                                            <a href="/quiz/create/${lesson.id}" class="btn btn-outline-primary w-100 mb-2">Создать тест</a>
-                                                                        </div>
-                                                                </#if>
                                                             </div>
                                                         </div>
                                                     </a>
@@ -114,6 +89,28 @@
         <#else>
             <p>Модули отсутствуют</p>
         </#if>
+
+
+        <h2>Тестирование</h2>
+        <div class="feature-card mb-3">
+            <#if testInstance?has_content>
+                <p>Тест назначенный на данный поток: <span class="fw-bold">${testInstance.test.title}</span></p>
+                <p>Начало: <span class="fw-bold">${startDate} ${testInstance.startTime}</span> | Окончание: <span
+                            class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
+                <#if hasResults>
+                    <p class="text-danger">Вы не можете переназначить или отвязать тест от данного потока, так как по нему уже есть результаты.</p>
+                <#else>
+                    <a href="/instance/${courseInstance.id}/change/test" class="btn btn-warning mb-2">Переназначить тест
+                        для данного курса</a>
+                    <a href="/instance/${courseInstance.id}/delete/test" class="btn btn-danger mb-2">Отвязать данный
+                        тест от потока</a>
+                </#if>
+            <#else>
+                <p>На данный поток пока не был назначен тест.</p>
+                <a href="/instance/${courseInstance.id}/test" class="btn btn-primary mb-2">Назначить тест для данного
+                    потока</a>
+            </#if>
+        </div>
     </div>
 
     <style>
@@ -146,6 +143,7 @@
         .card-text {
             font-size: 0.875rem;
         }
+
         .hero-subtitle {
             color: var(--text-dark);
             font-size: 1.4rem;

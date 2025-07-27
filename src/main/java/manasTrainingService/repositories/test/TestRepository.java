@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface TestRepository extends JpaRepository<Test, Integer> {
     List<Test> findAllByCourseId(Integer courseId);
     Optional<Test> findByCourseId(Integer courseId);
+    Boolean existsById(int id);
 }

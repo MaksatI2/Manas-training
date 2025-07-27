@@ -10,9 +10,11 @@ import java.time.LocalTime;
 import java.util.List;
 
 public interface TestResultService {
-    TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultPoints, boolean isPassed, LocalDateTime endTime);
+    TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultPoints, boolean isPassed, LocalDateTime endTime, int percentage);
 
     TestResultDto getTestResultsByUserId();
+
+    TestResultDto getResultsByTestInstanceIdAndStudentId(int testInstanceId);
 
     Boolean userHasTestAttempt(int testId);
 
@@ -21,4 +23,6 @@ public interface TestResultService {
     BigDecimal getAverageScore();
 
     long getTotalPassedTestsInMonth(LocalDateTime start, LocalDateTime end);
+
+    Boolean hasResultsByTestInstanceId(int testInstanceId);
 }

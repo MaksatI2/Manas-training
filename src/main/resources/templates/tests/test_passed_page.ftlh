@@ -4,8 +4,9 @@
 <@page>
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
-    {"label": "Тест #${test.id}", "url": "/test/${test.id}/passing"},
-    {"label": "Результаты", "url": ""}
+    {"label": "Мои курсы", "url": "/student/my-courses"},
+    {"label": "${results.testInstance.courseInstance.title}", "url": "/student/course/${results.testInstance.courseInstance.id}"},
+    {"label": "Результаты теста по итогам курса ${results.testInstance.courseInstance.title}", "url": ""}
     ] />
     <div class="hero-section">
         <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Результаты прохождения теста</h1>

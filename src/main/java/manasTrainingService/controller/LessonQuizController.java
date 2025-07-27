@@ -1,23 +1,25 @@
 package manasTrainingService.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.quiz.LessonQuizDto;
 import manasTrainingService.dto.quiz.answers.QuizAnswerDto;
-import manasTrainingService.entity.LessonQuiz;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.user.LessonQuizAlreadyCreatedException;
 import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.quiz.LessonQuizService;
-import org.springframework.expression.AccessException;
+import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Controller
@@ -28,6 +30,11 @@ public class LessonQuizController {
     private final LessonQuizService lessonQuizService;
     private final LessonService lessonService;
     private final LessonAccessService lessonAccessService;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Integer.class, new CustomNumberEditor(Integer.class, true));
+    }
 
     @GetMapping("create/{lessonId}")
     public String createQuizPage(@PathVariable Integer lessonId, Model model, HttpServletRequest request) {
@@ -44,8 +51,8 @@ public class LessonQuizController {
         }else {
             request.getSession().setAttribute("redirectAfterCreate", "/");
         }
-        lessonQuizDto.setLessonId(lessonId);
         model.addAttribute("lessonQuiz", lessonQuizDto);
+        model.addAttribute("lesson", lessonService.getLessonById(lessonId));
         return "quizzes/quiz_create";
     }
 
@@ -75,27 +82,39 @@ public class LessonQuizController {
         } else {
             request.getSession().setAttribute("redirectAfterEdit", "/");
         }
-        model.addAttribute("lessonQuiz", lessonQuizService.getQuizById(id));
+        LessonQuizDto lessonQuizDto = lessonQuizService.getQuizById(id);
+        model.addAttribute("lessonQuiz", lessonQuizDto);
+        model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
         return "quizzes/quiz_edit";
     }
 
     @PostMapping("edit")
-    public String editQuiz(@Valid @ModelAttribute("lessonQuiz") LessonQuizDto lessonQuizDto,
+    public String editQuiz(@Valid LessonQuizDto lessonQuizDto,
                            BindingResult bindingResult,
                            RedirectAttributes redirectAttributes,
-                           HttpServletRequest request){
+                           Model model,
+                           HttpServletRequest request,
+                           HttpSession session){
         if (bindingResult.hasErrors()) {
+            model.addAttribute("lessonQuiz", lessonQuizDto);
+            model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
             return "quizzes/quiz_edit";
         }
         String redirectUrl = request.getSession().getAttribute("redirectAfterEdit").toString();
         request.getSession().removeAttribute("redirectAfterEdit");
         lessonQuizService.editQuiz(lessonQuizDto);
+        if(session.getAttribute("timer") != null && session.getAttribute("startTime") != null){
+            session.removeAttribute("timer");
+            session.removeAttribute("startTime");
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Тест успешно изменен");
         return "redirect:" + redirectUrl;
     }
 
     @GetMapping("{id}/passing")
-    public String getQuizPassingPage(@PathVariable int id, Model model) {
+    public String getQuizPassingPage(@PathVariable int id,
+                                     Model model,
+                                     HttpSession session) {
         if(!lessonAccessService.canAccessLessonQuizPassing(lessonQuizService.getQuizEntityById(id))){
             throw new NoAccessException("У вас нет доступа к прохождению тестов");
         }
@@ -105,24 +124,46 @@ public class LessonQuizController {
         QuizAnswerDto quizAnswerDto = new QuizAnswerDto();
         quizAnswerDto.setPassingStart(LocalTime.now());
         quizAnswerDto.setQuizId(id);
+        LessonQuizDto lessonQuizDto = lessonQuizService.getQuizById(id);
+        if(session.getAttribute("timer") == null && session.getAttribute("startTime") == null){
+            session.setAttribute("timer", lessonQuizDto.getQuestionTimeLimit());
+            session.setAttribute("startTime", LocalDateTime.now());
+        }
         model.addAttribute("result", quizAnswerDto);
-        model.addAttribute("quiz", lessonQuizService.getQuizById(id));
+        model.addAttribute("quiz", lessonQuizDto);
+        model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
         return "quizzes/quiz_passing";
     }
 
     @PostMapping("checking")
-    public String checkResults(@Valid QuizAnswerDto quizAnswerDto, Model model){
-        model.addAttribute("results", lessonQuizService.checkQuizResults(quizAnswerDto));
+    public String checkResults(@Valid @ModelAttribute("result") QuizAnswerDto result,
+                               BindingResult bindingResult,
+                               Model model,
+                               HttpSession session) {
+        LessonQuizDto lessonQuizDto = lessonQuizService.getQuizById(result.getQuizId());
+        if(bindingResult.hasErrors()){
+            model.addAttribute("result", result);
+            model.addAttribute("quiz", lessonQuizDto);
+            model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
+            return "quizzes/quiz_passing";
+        }
+        model.addAttribute("results", lessonQuizService.checkQuizResults(result));
+        session.removeAttribute("timer");
+        session.removeAttribute("startTime");
         return "quizzes/quiz_passed_result_page";
     }
 
     @GetMapping("{id}/delete")
-    public String deleteQuiz(@PathVariable Integer id, RedirectAttributes redirectAttributes, HttpServletRequest httpServletRequest) {
+    public String deleteQuiz(@PathVariable Integer id, RedirectAttributes redirectAttributes, HttpServletRequest httpServletRequest, HttpSession session) {
         if(!lessonAccessService.canAccessLessonQuizDelete(lessonQuizService.getQuizEntityById(id))){
             throw new NoAccessException("У вас нет доступа к удалению теста");
         }
         String url = httpServletRequest.getHeader("Referer");
         lessonQuizService.deleteQuiz(id);
+        if(session.getAttribute("timer") != null && session.getAttribute("startTime") != null){
+            session.removeAttribute("timer");
+            session.removeAttribute("startTime");
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Тест успешно удален");
         if(url == null){
             return "redirect:/";
@@ -138,10 +179,31 @@ public class LessonQuizController {
     }
 
     @GetMapping("{id}/deactivate")
-    public String deactivateQuiz(@PathVariable Integer id, RedirectAttributes redirectAttributes, HttpServletRequest httpServletRequest) {
+    public String deactivateQuiz(@PathVariable Integer id,
+                                 RedirectAttributes redirectAttributes,
+                                 HttpServletRequest httpServletRequest,
+                                 HttpSession session) {
         lessonQuizService.deactivateQuiz(id);
         redirectAttributes.addFlashAttribute("successMessage", "Тест успешно деактивирован");
+        if(session.getAttribute("timer") != null && session.getAttribute("startTime") != null){
+            session.removeAttribute("timer");
+            session.removeAttribute("startTime");
+        }
         return "redirect:" + httpServletRequest.getHeader("Referer");
     }
 
+    @GetMapping("{id}/time-is-over")
+    public String timeOut(@PathVariable int id, Model model, HttpSession session){
+        LessonQuizDto lessonQuizDto = lessonQuizService.getQuizById(id);
+        if(!lessonQuizDto.getIsActive()){
+            throw new NoAccessException("У вас нет доступа к этой странице");
+        }
+        if(session.getAttribute("timer") != null && session.getAttribute("startTime") != null){
+            session.removeAttribute("timer");
+            session.removeAttribute("startTime");
+        }
+        model.addAttribute("quiz", lessonQuizDto);
+        model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
+        return "quizzes/quiz_time_is_over";
+    }
 }

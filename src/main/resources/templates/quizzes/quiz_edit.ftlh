@@ -4,8 +4,10 @@
 <@page>
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
-    {"label": "Тест #${lessonQuiz.id}", "url": "/quiz/${lessonQuiz.id}/passing"},
-    {"label": "Редактирование", "url": ""}
+    {"label": "Мои курсы", "url": "/teacher/my-courses"},
+    {"label": "${lesson.courseModule.courseInstance.title}", "url": "/teacher/course/${lesson.courseModule.courseInstance.id}"},
+    {"label": "Урок #${lesson.title}", "url": "/lessons/${lesson.id}"},
+    {"label": "Редактирование теста: ${lessonQuiz.title}", "url": ""}
     ] />
     <#if lessonQuiz.questions?? && 0 < lessonQuiz.questions?size>
         <#assign questionlastIndex = lessonQuiz.questions?size - 1>
@@ -22,17 +24,17 @@
             <div class="col-lg-10 col-md-10">
                 <div class="feature-card">
                     <div class="mb-3">
-                        <label for="lessonQuiz.title" class="form-label fw-bold">Название теста</label>
+                        <label for="lessonQuiz.title" class="form-label fw-bold">Название теста <span class="text-danger">*</span></label>
                         <@spring.formInput "lessonQuiz.title" 'class="form-control" id="lessonQuiz.title"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="lessonQuiz.description" class="form-label fw-bold">Описание теста</label>
+                        <label for="lessonQuiz.description" class="form-label fw-bold">Описание теста <span class="text-danger">*</span></label>
                         <@spring.formTextarea "lessonQuiz.description" 'class="form-control" rows="3" id="lessonQuiz.description"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="lessonQuiz.questionTimeLimit" class="form-label fw-bold">Время отведенное на один вопрос(В минутах)</label>
+                        <label for="lessonQuiz.questionTimeLimit" class="form-label fw-bold">Время на прохождение теста (В минутах) <span class="text-danger">*</span></label>
                         <@spring.formInput "lessonQuiz.questionTimeLimit" 'class="form-control" id="lessonQuiz.questionTimeLimit"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
@@ -53,13 +55,18 @@
                             </#if>
                             <div class="mb-3">
                                 <label for="questions[${question?index}].question" class="form-label fw-bold">Введите
-                                    текст вопроса</label>
+                                    текст вопроса <span class="text-danger">*</span></label>
                                 <@spring.formInput "lessonQuiz.questions[${question?index}].question" 'class="form-control" id="questions[${question?index}].question"' />
                                 <@spring.showErrors "<br>" "error text-danger" />
                             </div>
                             <#if question.options??>
-                                <div class="mt-3 border rounded-4 px-4 py-3 mb-3"
+                                <div class="mt-3 border <#if .globals['org.springframework.validation.BindingResult.test']?? && .globals['org.springframework.validation.BindingResult.test'].hasFieldErrors('questions[${question?index}].correctOptionIndex')>border-danger</#if> rounded-4 px-4 py-3 mb-3"
                                      id="options-questionId-${question?index}">
+                                    <#if .globals['org.springframework.validation.BindingResult.test']?? && .globals['org.springframework.validation.BindingResult.test'].hasFieldErrors('questions[${question?index}].correctOptionIndex')>
+                                        <#list .globals['org.springframework.validation.BindingResult.test'].getFieldErrors('questions[${question?index}].correctOptionIndex') as validationError>
+                                            <span class="text-danger">${validationError.defaultMessage}</span>
+                                        </#list>
+                                    </#if>
                                     <#list (question.options)![] as option>
                                         <div class="d-flex align-items-center mt-3"
                                              id="questionId-${question?index}-optionId-${option?index}"
@@ -84,7 +91,7 @@
                                                 <div class="d-flex flex-grow-1 align-items-center"
                                                      id="question-${question?index}-option-${option?index}-inputBlock">
                                                     <@spring.formInput "lessonQuiz.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3"
-                                                placeholder="Вариант ответа"
+                                                placeholder="Вариант ответа *"
                                                 aria-describedby="delete-question-${question?index}-option-${option?index}"
                                                 id="questions[${question?index}].options[${option?index}].optionText"' />
                                                     <button class="btn btn-outline-danger"
@@ -98,7 +105,7 @@
                                                 <div class="flex-grow-1 me-5"
                                                      id="question-${question?index}-option-${option?index}-inputBlock">
                                                     <@spring.formInput "lessonQuiz.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3"
-                                                placeholder="Вариант ответа"
+                                                placeholder="Вариант ответа *"
                                                 aria-describedby="delete-question-${question?index}-option-${option?index}"
                                                 id="questions[${question?index}].options[${option?index}].optionText"' />
                                                 </div>
@@ -141,6 +148,7 @@
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             </#if>
             <input type="hidden" name="lessonId" value="${lessonQuiz.lessonId}">
+            <input type="hidden" name="lessonQuiz.id" value="${lessonQuiz.id}">
             <div class="text-center">
                 <button type="submit" class="btn btn-primary-custom w-75">Сохранить изменения</button>
             </div>
@@ -153,100 +161,7 @@
         let createQuestionButtonFromEdit = document.getElementById("createQuestion");
         let quizId = ${lessonQuiz.id}
 
-        let createForm = document.getElementById("edit-quiz")
-        createForm.addEventListener("submit", event => {
-            let hasError = false;
-            if (document.querySelectorAll(".error-message")){
-                let errors = document.querySelectorAll(".error-message")
-                errors.forEach(er => {
-                    er.remove()
-                })
-            }
-            if (document.querySelectorAll(".is-invalid")){
-                let inputs = document.querySelectorAll(".is-invalid")
-                inputs.forEach(i => {
-                    i.classList.remove("is-invalid")
-                })
-            }
-            let form = event.target
-            let formData = new FormData(form);
-            let data = Object.fromEntries(formData.entries())
-            const testQuestions = new Map();
-            for (let [key, value] of formData.entries()) {
-                const qMatch = key.match(/^questions\[(\d+)]\.question$/);
-                const oMatch = key.match(/^questions\[(\d+)]\.options\[(\d+)]\.optionText$/);
-
-                if (qMatch) {
-                    const qIndex = parseInt(qMatch[1]);
-                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
-                    testQuestions.get(qIndex).question = value.trim();
-                }
-
-                if (oMatch) {
-                    const qIndex = parseInt(oMatch[1]);
-                    const oIndex = parseInt(oMatch[2]);
-                    if (!testQuestions.has(qIndex)) testQuestions.set(qIndex, { question: "", options: [] });
-                    testQuestions.get(qIndex).options[oIndex] = value.trim();
-                }
-            }
-
-            const questionsArray = Array.from(testQuestions.entries())
-                .map(([_, value]) => ({
-                    question: value.question,
-                    options: value.options
-                }));
-            console.log(questionsArray)
-            const questionsCount = questionsArray.length;
-            for(let i = 0; i < questionsCount; i++){
-                if(!questionsArray[i].question){
-                    hasError = true
-                    let input = document.getElementById("questions"+i+".question")
-                    if (input){
-                        input.classList.add("is-invalid")
-                        let error = document.createElement("label")
-                        error.setAttribute("for", "questions"+i+".question")
-                        error.setAttribute("class", "text-danger error-message")
-                        error.innerText = "Заполните текст вопроса"
-                        input.parentNode.insertBefore(error, input.nextSibling);
-                    }
-                }
-                const optionCount = questionsArray[i].options.length
-                for(let a = 0; a < optionCount; a++){
-                    if(!questionsArray[i].options[a]){
-                        hasError = true
-                        let input = document.getElementById("questions"+i+".options"+a+".optionText")
-                        if (input){
-                            input.classList.add("is-invalid")
-                            let error = document.createElement("label")
-                            error.setAttribute("for", "questions"+i+".options"+a+".optionText")
-                            error.setAttribute("class", "text-danger error-message")
-                            error.innerText = "Заполните вариант ответа"
-                            let div = document.getElementById("questionId-"+i+"-optionId-"+a)
-                            div.parentNode.insertBefore(error, div.nextSibling);
-                        }
-                    }
-                }
-            }
-            if(hasError){
-                event.preventDefault();
-            }
-        })
-
-        pointsInput.forEach(input => {
-            input.addEventListener('input', () => {
-                input.value = input.value.replace(/[^0-9]/g, '');
-                if (parseInt(input.value) > 100) {
-                    input.value = '100';
-                }
-            });
-        })
-
-        timeInput.addEventListener('input', () => {
-            timeInput.value = timeInput.value.replace(/[^0-9]/g, '');
-            if (parseInt(timeInput.value) > 60) {
-                timeInput.value = '60';
-            }
-        });
+        let form = document.getElementById("edit-quiz")
 
         function createQuestionBlockFromEdit(questionIndex, quizId) {
             const optionIdRef = {value: 0};
@@ -260,7 +175,7 @@
             div.append(createRemoveQuestionButton("questionId-" + questionIndex))
             div.append(createInputContainer(
                 "questions[" + questionId + "].question",
-                "Введите текст вопроса",
+                `Введите текст вопроса  <span class="text-danger">*</span>`,
                 "questions[" + questionId + "].question",
                 "questions" + questionId +".question",
                 "text",
@@ -473,7 +388,7 @@
         }
 
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+    <script src="/static/js/test_form_validation_error.js"></script>
+    <script src="/static/js/quiz_form.js"></script>
     <script src="/static/js/test_create.js"></script>
 </@page>

@@ -12,6 +12,7 @@ import manasTrainingService.service.test.TestAnswerService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +36,16 @@ public class TestAnswerServiceImpl implements TestAnswerService {
             testAnswer.setAttempt(savedTestResult);
             testAnswerRepository.saveAndFlush(testAnswer);
         }
+    }
+
+    @Override
+    public List<QuestionAnswerDto> getAnswersByAttemtId(int attemptId){
+        List<TestAnswer> testAnswers = testAnswerRepository.findAllByAttempt_Id(attemptId);
+        return testAnswers.stream().map(t ->
+            QuestionAnswerDto.builder()
+                    .questionId(t.getQuestion().getId())
+                    .answerId(t.getSelectedOption().getId())
+                    .points(t.getPointsEarned())
+                    .build()).toList();
     }
 }

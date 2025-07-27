@@ -16,6 +16,7 @@ import manasTrainingService.util.DateUtil;
 import manasTrainingService.util.StatusUtil;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final CourseApplicationEmployeeService courseApplicationEmployeeService;
     private final UserService userService;
     private final ActivityLogService activityLogService;
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
 
     @Override
     public void enrollEmployees(Integer courseInstanceId, List<Integer> employeeIds) {
@@ -93,6 +95,19 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         User user = userService.getAuthorizedUser();
         List<CourseEnrollment> enrollments = getStudentEnrollments(user.getId());
 
+        return getCourseEnrollmentCardDTOS(enrollments);
+    }
+
+    @Override
+    public List<CourseEnrollmentCardDTO> getStudentFinishedCourses() {
+        User user = userService.getAuthorizedUser();
+        List<CourseEnrollment> enrollments = enrollmentRepository.findAllByStudentIdAndStatus(user.getId(), Status.COMPLETED);
+
+
+        return getCourseEnrollmentCardDTOS(enrollments);
+    }
+
+    private List<CourseEnrollmentCardDTO> getCourseEnrollmentCardDTOS(List<CourseEnrollment> enrollments) {
         return enrollments.stream()
                 .map(enrollment -> CourseEnrollmentCardDTO.builder()
                         .courseInstanceId(enrollment.getCourseInstance().getId())
@@ -109,9 +124,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public void hasAccess(Integer courseInstanceId) {
         User user = userService.getAuthorizedUser();
-        if (!enrollmentRepository.existsByCourseInstanceIdAndStudentIdAndStatus(courseInstanceId, user.getId(), Status.ENROLLED)) {
+        if (!enrollmentRepository.existsByCourseInstanceIdAndStudentIdAndStatus(courseInstanceId, user.getId(), Status.ENROLLED)
+                && !enrollmentRepository.existsByCourseInstanceIdAndStudentIdAndStatus(courseInstanceId, user.getId(), Status.COMPLETED)) {
             throw new NoAccessException("У вас нет доступа к курсу");
-        };
+        }
+
     }
 
     @Override
@@ -137,6 +154,18 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public List<CourseEnrollment> findAllActiveEnrollmentsByStudentId(Integer studentId) {
         return enrollmentRepository.findAllActiveEnrollmentsByStudentId(studentId);
+    }
+
+    @Override
+    public void courseComplete(TestResult testResult){
+        User user = userService.getAuthorizedUser();
+        CourseEnrollment courseEnrollment = courseEnrollmentRepository.findByCourseInstanceIdAndStudentId(testResult.getTestInstance().getInstance().getId(), user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Заись на курс не была найдена"));
+        courseEnrollment.setStatus(Status.COMPLETED);
+        courseEnrollment.setCompletionDate(LocalDateTime.now());
+        courseEnrollment.setFinalGrade(testResult.getScore());
+        courseEnrollmentRepository.saveAndFlush(courseEnrollment);
+
     }
 
 }

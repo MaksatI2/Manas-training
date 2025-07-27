@@ -1,6 +1,7 @@
 package manasTrainingService.service.test;
 
 import manasTrainingService.dto.tests.TestInstanceDto;
+import manasTrainingService.entity.TestInstance;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface TestInstanceService {
@@ -10,9 +11,17 @@ public interface TestInstanceService {
     @Transactional
     void changeTestToCourseInstance(TestInstanceDto testInstanceDto);
 
-    TestInstanceDto getTestInstanceByCourseInstance(int courseInstanceId);
+    TestInstanceDto getTestInstanceByCourseInstanceId(int courseInstanceId);
+
+    TestInstanceDto getTestInstanceById(int id);
+
+    TestInstance getTestInstanceEntityById(int id);
 
     void deleteTestFromTestInstance(int courseInstanceId);
 
     Boolean isValidAccessTime(int courseInstanceId);
+
+    Boolean isTestInstanceExist(int courseInstanceId);
+
+    Boolean isAvailableTime(int courseInstanceId);
 }

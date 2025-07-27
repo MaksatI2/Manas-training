@@ -1,5 +1,6 @@
 package manasTrainingService.dto.quiz;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -11,8 +12,14 @@ import lombok.*;
 public class LessonQuizOptionDto {
     private Integer id;
     private Integer questionId;
-    @NotBlank(message = "Ответ обязательно должен быть заполнен")
     private String optionText;
     private Boolean isCorrect;
     private Boolean isRemoved;
+
+
+    @AssertTrue(message = "Ответ обязательно должен быть заполнен")
+    public boolean isValidTextIfNotRemoved() {
+        return Boolean.TRUE.equals(isRemoved) || (optionText != null && !optionText.trim().isEmpty());
+    }
+
 }

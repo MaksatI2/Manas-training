@@ -14,11 +14,15 @@ import java.util.Optional;
 public interface TestResultRepository extends JpaRepository<TestResult, Integer> {
     List<TestResult> findAllByStudentId(int studentId);
 
-    List<TestResult> findAllByTestId(int testId);
+    List<TestResult> findAllByTestInstanceId(int testId);
+
+    Optional<TestResult> findOneByStudentIdAndTestInstanceId(int studentId, int testId);
 
     Optional<TestResult> findByStudentId(int studentId);
 
-    Boolean existsByStudentIdAndTestId(int studentId, int testId);
+    Boolean existsByStudentIdAndTestInstanceId(int studentId, int testInstanceId);
+
+    Boolean existsByTestInstance_Id(int testInstanceId);
 
     @Query("SELECT ROUND(AVG(tr.score), 2) FROM TestResult tr")
 

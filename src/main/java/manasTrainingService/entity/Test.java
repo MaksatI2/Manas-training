@@ -45,8 +45,5 @@ public class Test {
     List<TestQuestion> questions;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<TestResult> attempts;
-
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<TestInstance> testInstances;
 }

@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface TestInstanceRepository extends JpaRepository<TestInstance, Integer> {
 
-    @Query(value = "Select ti from TestInstance ti where ti.instance.id = :courseInstanceId")
-    Optional<TestInstance> findByCourseInstanceId(@Param("courseInstanceId") Integer courseInstanceId);
+    Optional<TestInstance> findByInstanceId(Integer instanceId);
+    Boolean existsByInstanceId(Integer instanceId);
 }

@@ -7,6 +7,8 @@ import manasTrainingService.entity.TestQuestion;
 import java.util.List;
 
 public interface QuestionService {
+    List<QuestionDto> getQuestionsForPassingByTestId(Integer testId);
+
     void saveQuestions(List<QuestionDto> questions, Test test);
 
     void editQuestions(List<QuestionDto> questions);

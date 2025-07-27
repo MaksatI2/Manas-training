@@ -22,4 +22,6 @@ public interface LessonAccessService {
     boolean canAccessLessonQuizDelete(LessonQuiz lessonQuiz);
 
     boolean canAccessInstanceStatistics(CourseInstance instance);
+
+    boolean canAccessCourseTests();
 }
