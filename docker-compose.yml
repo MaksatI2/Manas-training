@@ -106,6 +106,9 @@ services:
       - PUBLIC_URL=https://${DOMAIN:-manastraining.kg}
       - ENABLE_GUESTS=1
       - ENABLE_LOBBY=1
+      - XMPP_WEBSOCKET_URL=wss://${DOMAIN:-manastraining.kg}/meet/xmpp-websocket
+      - DEFAULT_LANGUAGE=ru
+      - LANG_DETECTION=false
       - TOOLBAR_BUTTONS=microphone,camera,closedcaptions,desktop,fullscreen,fodeviceselection,hangup,profile,info,chat,recording,livestreaming,etherpad,sharedvideo,settings,raisehand,videoquality,filmstrip,invite,feedback,stats,shortcuts,tileview,videobackgroundblur,download,help,mute-everyone,security
     networks:
       - manas-network
@@ -139,6 +142,8 @@ services:
       - ENABLE_XMPP_WEBSOCKET=1
       - ENABLE_SUBDOMAINS=true
       - PUBLIC_URL=https://${DOMAIN:-manastraining.kg}
+      - ENABLE_XMPP_WEBSOCKET_CORS=1
+      - WEBSOCKET_DOMAIN=${DOMAIN:-manastraining.kg}
     networks:
       - manas-network
     volumes:

@@ -60,11 +60,13 @@ spring:
       enabled: true
 
 jitsi:
-  domain: manastraining.kg
+  domain: meet.jitsi
   port: 443
   protocol: https
   room:
     prefix: ManasTraining
+  web:
+    url: https://manastraining.kg
 
 logging:
   level:
