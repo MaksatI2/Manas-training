@@ -213,11 +213,11 @@ public class MeetingServiceImpl implements MeetingService {
 
     private String buildMeetingUrl(String roomName) {
         if ("80".equals(jitsiPort) && "http".equals(jitsiProtocol)) {
-            return String.format("%s://%s/%s", jitsiProtocol, jitsiDomain, roomName);
+            return String.format("%s://%s/meet/%s", jitsiProtocol, jitsiDomain, roomName);
         } else if ("443".equals(jitsiPort) && "https".equals(jitsiProtocol)) {
-            return String.format("%s://%s/%s", jitsiProtocol, jitsiDomain, roomName);
+            return String.format("%s://%s/meet/%s", jitsiProtocol, jitsiDomain, roomName);
         } else {
-            return String.format("%s://%s:%s/%s", jitsiProtocol, jitsiDomain, jitsiPort, roomName);
+            return String.format("%s://%s:%s/meet/%s", jitsiProtocol, jitsiDomain, jitsiPort, roomName);
         }
     }
 
