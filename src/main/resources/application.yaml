@@ -1,14 +1,5 @@
 server:
   port: 8089
-  forward-headers-strategy: framework
-  tomcat:
-    remoteip:
-      remote-ip-header: x-forwarded-for
-      protocol-header: x-forwarded-proto
-      host-header: x-forwarded-host
-      port-header: x-forwarded-port
-      protocol-header-https-value: https
-      internal-proxies: 10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3}|169\\.254\\.\\d{1,3}\\.\\d{1,3}|127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}
 
 spring:
   application:
@@ -67,6 +58,13 @@ spring:
   task:
     scheduling:
       enabled: true
+
+jitsi:
+  domain: manastraining.kg
+  port: 443
+  protocol: https
+  room:
+    prefix: ManasTraining
 
 logging:
   level:
