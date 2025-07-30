@@ -178,8 +178,8 @@
                     </div>
                 </#if>
             </div>
-            <div class="sidebar-profile">
-                <div class="custom-language-selector" id="languageSelector">
+            <div class="sidebar-profile <#if known>authorized</#if>">
+                <div class="custom-language-selector mt-4" id="languageSelector">
                     <button class="selected-language">
                         <span class="fi fi-ru"></span>
                         <span class="language-text">Русский</span>
@@ -858,6 +858,11 @@
             transform: scale(1.1);
         }
 
+        .sidebar-profile .dropdown-menu {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         .custom-language-selector {
             position: relative;
             width: 100%;
@@ -890,7 +895,10 @@
             border-radius: 8px;
             margin-top: 5px;
             z-index: 100;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
+            max-height: 200px;
+            white-space: nowrap;
         }
 
         .language-option {
@@ -1113,6 +1121,10 @@
         .sidebar-overlay.active {
             opacity: 1;
             visibility: visible;
+        }
+
+        .sidebar-profile.authorized {
+            height: 13rem;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
