@@ -148,7 +148,7 @@
                                 ">
                             <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.courseTitle}</td>
                             <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.testTitle}</td>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.score}%</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.score}</td>
                             <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
                                 <#if result.isPassed>
                                     Пройден

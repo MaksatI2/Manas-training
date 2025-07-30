@@ -25,4 +25,6 @@ public interface TestResultService {
     long getTotalPassedTestsInMonth(LocalDateTime start, LocalDateTime end);
 
     Boolean hasResultsByTestInstanceId(int testInstanceId);
+
+    List<TestResult> getTestResultsByCourseInstanceId(Integer id);
 }

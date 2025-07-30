@@ -178,4 +178,10 @@ public class TestInstanceServiceImpl implements TestInstanceService {
                 .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
         return testInstance.getScheduledStart().isBefore(LocalDateTime.now()) && testInstance.getScheduledEnd().isAfter(LocalDateTime.now());
     }
+
+    @Override
+    public TestInstance getTestInstanceModelByCourseInstanceId(Integer id) {
+        return testInstanceRepository.findByInstanceId(id)
+                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+    }
 }

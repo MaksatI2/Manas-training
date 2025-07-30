@@ -24,4 +24,6 @@ public interface TestInstanceService {
     Boolean isTestInstanceExist(int courseInstanceId);
 
     Boolean isAvailableTime(int courseInstanceId);
+    
+    TestInstance getTestInstanceModelByCourseInstanceId(Integer id);
 }

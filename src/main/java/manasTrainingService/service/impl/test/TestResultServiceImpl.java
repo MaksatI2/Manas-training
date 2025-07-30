@@ -5,6 +5,7 @@ import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.answers.TestResultDto;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.tests.TestInstanceDto;
+import manasTrainingService.entity.TestInstance;
 import manasTrainingService.entity.TestResult;
 import manasTrainingService.exceptions.nsee.TestResultNotFoundException;
 import manasTrainingService.repositories.test.TestResultRepository;
@@ -103,5 +104,13 @@ public class TestResultServiceImpl implements TestResultService {
     @Override
     public Boolean hasResultsByTestInstanceId(int testInstanceId){
         return testResultRepository.existsByTestInstance_Id(testInstanceId);
+    }
+
+    @Override
+    public List<TestResult> getTestResultsByCourseInstanceId(Integer id) {
+        TestInstance testInstance = testInstanceService.getTestInstanceModelByCourseInstanceId(id);
+
+        return testResultRepository.findAllByTestInstanceId(testInstance.getId());
+
     }
 }
