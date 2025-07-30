@@ -3,6 +3,7 @@ package manasTrainingService.service.impl;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.ScheduleViewDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
+import manasTrainingService.dto.statistics.TeacherMonthlyHoursDTO;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.ScheduleNotFouneException;
 import manasTrainingService.repositories.ScheduleRepository;
@@ -223,5 +224,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public Integer sumActiveScheduleHoursByCourseInstanceId(Integer courseInstanceId) {
         return scheduleRepository.sumActiveScheduleHoursByCourseInstanceId(courseInstanceId);
+    }
+
+    @Override
+    public List<TeacherMonthlyHoursDTO> getMonthlyTeacherHourStats() {
+        return scheduleRepository.getMonthlyTeachingHoursPerTeacher();
     }
 }

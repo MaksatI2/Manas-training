@@ -2,6 +2,7 @@ package manasTrainingService.service;
 
 import manasTrainingService.dto.ScheduleViewDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
+import manasTrainingService.dto.statistics.TeacherMonthlyHoursDTO;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface ScheduleService {
     boolean hasSchedulesAfterDateRange(Integer courseInstanceId, LocalDate newEnd);
 
     Integer sumActiveScheduleHoursByCourseInstanceId(Integer courseInstanceId);
+
+    List<TeacherMonthlyHoursDTO> getMonthlyTeacherHourStats();
 }

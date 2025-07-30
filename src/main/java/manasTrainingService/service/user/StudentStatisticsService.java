@@ -10,4 +10,6 @@ public interface StudentStatisticsService {
     List<AttendanceStatsDTO> getAllAttendanceStats(User student);
 
     List<TestResultDTO> getTestResultsByStudent(User student);
+
+    List<TestResultDTO> getTestResultsByCourseInstanceId(Integer courseInstanceId);
 }

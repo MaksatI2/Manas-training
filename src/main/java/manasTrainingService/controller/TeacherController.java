@@ -6,6 +6,7 @@ import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.dto.edit.TeacherProfileEditDto;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.profile.TeacherProfileDto;
+import manasTrainingService.dto.statistics.TestResultDTO;
 import manasTrainingService.dto.tests.TestInstanceDto;
 import manasTrainingService.entity.TestInstance;
 import manasTrainingService.entity.User;
@@ -14,6 +15,7 @@ import manasTrainingService.dto.statistics.AttendanceStatsDTO;
 import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
+import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseInstanceStatisticsService;
@@ -21,6 +23,7 @@ import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.user.RoleService;
+import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.TeacherService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.data.domain.Page;
@@ -50,6 +53,7 @@ public class TeacherController {
     private final CourseInstanceStatisticsService courseInstanceStatisticsService;
     private final LessonAccessService lessonAccessService;
     private final TestResultService testResultService;
+    private final StudentStatisticsService studentStatisticsService;
 
     @GetMapping("/profile")
     public String viewProfile(Model model) {
@@ -124,10 +128,9 @@ public class TeacherController {
 
         List<AttendanceStatsDTO> attendanceStats = courseInstanceStatisticsService.getAttendanceStatsByCourseInstance(courseInstance);
 
-        //TODO нельзя сделать без новой реализации связи тестов и курсов
-//        List<TestResultDTO> testResults = courseInstanceStatisticsService.getTestResultsByCourseInstance(courseInstance);
-//        model.addAttribute("testResults", testResults);
+        List<TestResultDTO> results = studentStatisticsService.getTestResultsByCourseInstanceId(id);
 
+        model.addAttribute("results", results);
         model.addAttribute("courseInstance", courseInstance);
         model.addAttribute("attendanceStatsList", attendanceStats);
 

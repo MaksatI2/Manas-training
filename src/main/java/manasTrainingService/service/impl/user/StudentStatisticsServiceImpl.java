@@ -64,13 +64,43 @@ public class StudentStatisticsServiceImpl implements StudentStatisticsService {
     public List<TestResultDTO> getTestResultsByStudent(User student) {
         List<TestResult> results = testResultService.getTestResultsByStudentId(student.getId());
 
-        return results.stream().map(result -> new TestResultDTO(
-                result.getTestInstance().getInstance().getTitle(),
-                result.getTestInstance().getInstance().getTitle(),
-                result.getScore(),
-                result.getIsPassed(),
-                result.getSubmittedAt(),
-                DateUtil.formatWithTime(result.getSubmittedAt())
-        )).collect(Collectors.toList());
+        return results.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
+
+    @Override
+    public List<TestResultDTO> getTestResultsByCourseInstanceId(Integer courseInstanceId) {
+        List<TestResult> results = testResultService.getTestResultsByCourseInstanceId(courseInstanceId);
+
+        return results.stream()
+                .map(this::toDtoWithStudentName)
+                .collect(Collectors.toList());
+    }
+
+    private TestResultDTO toDto(TestResult result) {
+        return TestResultDTO.builder()
+                .courseTitle(result.getTestInstance().getInstance().getTitle())
+                .testTitle(result.getTestInstance().getInstance().getTitle())
+                .score(result.getScore())
+                .isPassed(result.getIsPassed())
+                .submittedAt(result.getSubmittedAt())
+                .localisedTime(DateUtil.formatWithTime(result.getSubmittedAt()))
+                .build();
+    }
+
+    private TestResultDTO toDtoWithStudentName(TestResult result) {
+        return TestResultDTO.builder()
+                .courseTitle(result.getTestInstance().getInstance().getTitle())
+                .testTitle(result.getTestInstance().getInstance().getTitle())
+                .score(result.getScore())
+                .isPassed(result.getIsPassed())
+                .submittedAt(result.getSubmittedAt())
+                .localisedTime(DateUtil.formatWithTime(result.getSubmittedAt()))
+                .studentName(result.getStudent().getName() + " " + result.getStudent().getLastName())
+                .build();
+    }
+
+
+
 }

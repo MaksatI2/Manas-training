@@ -43,35 +43,48 @@
             </tbody>
         </table>
 
-        <#--    <h2>Результаты тестов студентов</h2>-->
-        <#--    <table>-->
-        <#--        <thead>-->
-        <#--        <tr>-->
-        <#--            <th>Студент</th>-->
-        <#--            <th>Название теста</th>-->
-        <#--            <th>Оценка (%)</th>-->
-        <#--            <th>Статус</th>-->
-        <#--            <th>Дата сдачи</th>-->
-        <#--        </tr>-->
-        <#--        </thead>-->
-        <#--        <tbody>-->
-        <#--        <#list testResultsList as result>-->
-        <#--            <tr class="${result.isPassed?then('passed','failed')}">-->
-        <#--                <td>${result.studentName}</td>-->
-        <#--                <td>${result.testTitle}</td>-->
-        <#--                <td>${result.score?string("0.0")}</td>-->
-        <#--                <td>-->
-        <#--                    <#if result.isPassed>-->
-        <#--                        <span style="color: green;">Пройден</span>-->
-        <#--                    <#else>-->
-        <#--                        <span style="color: red;">Не пройден</span>-->
-        <#--                    </#if>-->
-        <#--                </td>-->
-        <#--                <td>${result.submittedAt?string("dd.MM.yyyy HH:mm")!}</td>-->
-        <#--            </tr>-->
-        <#--        </#list>-->
-        <#--        </tbody>-->
-        <#--    </table>-->
+        <#if results?? && (results?size > 0)>
+            <div class="test-results">
+                <h2 style="margin-bottom: 1rem;" class="statistics-title">Результаты тестов</h2>
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                    <tr style="background-color: #f0f8ff;">
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Имя</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Тест</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Оценка</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Статус</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Дата сдачи</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <#list results as result>
+                        <tr style="
+                                background-color: ${result.isPassed?string('#d4edda', '#f8d7da')};
+                                color: ${result.isPassed?string('#155724', '#721c24')};
+                                ">
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.studentName}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.testTitle}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.score}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+                                <#if result.isPassed>
+                                    Пройден
+                                <#else>
+                                    Не пройден
+                                </#if>
+                            </td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+                                <#if result.submittedAt??>
+                                    ${result.localisedTime}
+                                <#else>
+                                    —
+                                </#if>
+                            </td>
+                        </tr>
+                    </#list>
+                    </tbody>
+                </table>
+            </div>
+        </#if>
     </div>
 
     <style>
