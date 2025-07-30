@@ -15,7 +15,6 @@ import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
-import manasTrainingService.service.impl.user.StudentStatisticsServiceImpl;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserService;
@@ -44,7 +43,6 @@ public class StudentController {
     private final TestResultService testResultService;
     private final TestService testService;
     private final StudentStatisticsService studentStatisticsService;
-    private final StudentStatisticsServiceImpl studentStatisticsServiceImpl;
 
     @GetMapping("/profile")
     public String profilePage(Model model){
@@ -115,7 +113,6 @@ public class StudentController {
         User student = userService.getAuthorizedUser();
         List<AttendanceStatsDTO> stats = studentStatisticsService.getAllAttendanceStats(student);
         model.addAttribute("attendanceStatsList", stats);
-        model.addAttribute("testResults", studentStatisticsServiceImpl.getTestResultsByStudent(student));
         model.addAttribute("testResults", studentStatisticsService.getTestResultsByStudent(student));
         return "student/statistics";
     }

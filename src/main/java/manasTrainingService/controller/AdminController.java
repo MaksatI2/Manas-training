@@ -5,25 +5,26 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.config.CustomUserDetails;
 import manasTrainingService.dto.UserEditDto;
 import manasTrainingService.dto.register.TeacherRegisterDto;
+import manasTrainingService.entity.MonthYear;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.user.EmailAlreadyExistsException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.service.AdminStatisticsService;
+import manasTrainingService.service.ScheduleService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.user.OrganizationService;
-import manasTrainingService.service.user.RoleService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserProfileService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.RoleUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -31,13 +32,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
     private final UserService userService;
-    private final RoleService roleService;
     private final AdminStatisticsService adminStatisticsService;
-    private final UserDetailsService userDetailsService;
     private final UserProfileService userProfileService;
     private final StudentStatisticsService studentStatisticsService;
     private final OrganizationService organizationService;
     private final CourseTeacherInstanceService courseTeacherInstanceService;
+    private final ScheduleService scheduleService;
 
     @GetMapping("/teachers/add")
     public String showAddTeacherForm(Model model) {
@@ -208,6 +208,8 @@ public class AdminController {
     @GetMapping("/statistics")
     public String viewUserStatistics(Model model) {
         model.addAttribute("userStats", adminStatisticsService.getSystemStatistics());
+        model.addAttribute("teacherHourStats", scheduleService.getMonthlyTeacherHourStats());
+        model.addAttribute("monthYear", MonthYear.currentMonthYear());
         return "admin/statistics";
     }
 
