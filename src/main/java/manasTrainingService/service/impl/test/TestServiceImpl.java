@@ -1,17 +1,16 @@
 package manasTrainingService.service.impl.test;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.dto.answers.QuestionAnswerDto;
 import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.answers.TestResultDto;
+import manasTrainingService.dto.tests.OptionDto;
 import manasTrainingService.dto.tests.QuestionDto;
 import manasTrainingService.dto.tests.TestDto;
-import manasTrainingService.entity.ActionType;
-import manasTrainingService.entity.TargetType;
-import manasTrainingService.entity.Test;
-import manasTrainingService.entity.TestInstance;
-import manasTrainingService.entity.TestResult;
+import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
 import manasTrainingService.exceptions.nsee.TestNotFoundException;
 import manasTrainingService.repositories.test.TestRepository;
@@ -28,6 +27,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -43,6 +44,7 @@ public class TestServiceImpl implements TestService {
     private final UserService userService;
     private TestInstanceService testInstanceService;
     private final EnrollmentService enrollmentService;
+    private final HttpSession session;
 
     @Autowired
     public void testInstanceService(@Lazy TestInstanceService testInstanceService) {
@@ -125,7 +127,8 @@ public class TestServiceImpl implements TestService {
     public TestDto getTestForPassingById(int id) {
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
-
+        List<QuestionDto> questions = questionService.getQuestionsForPassingByTestId(test.getId());
+        session.setAttribute("questionsCount", questions.size());
         return TestDto.builder()
                 .id(test.getId())
                 .title(test.getTitle())
@@ -137,7 +140,7 @@ public class TestServiceImpl implements TestService {
                         .title(test.getCourse().getTitle())
                         .build())
                 .passingScore(test.getPassingScore().intValue())
-                .questions(questionService.getQuestionsForPassingByTestId(test.getId()))
+                .questions(questions)
                 .build();
     }
 
@@ -177,21 +180,29 @@ public class TestServiceImpl implements TestService {
 
     @Override
     public TestResultDto checkTestResult(TestAnswerDto result) {
-        LocalDateTime endTime = LocalDateTime.now();
         Test test = testRepository.findById(result.getTestId())
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+        int questionsCount = (Integer) session.getAttribute("questionsCount");
+        session.removeAttribute("questionsCount");
+        int basePoints = 100 / questionsCount;
+        int remainder = 100 % questionsCount;
+        for (int i = 0; i < result.getQuestionAnswers().size(); i++) {
+            result.getQuestionAnswers().get(i).setPoints(BigDecimal.valueOf(basePoints + (i < remainder ? 1 : 0)));
+            System.out.println(result.getQuestionAnswers().get(i).getPoints() + "\n");
+            }
         int resultScore = (int) Math.ceil(result.getQuestionAnswers()
                 .stream()
                 .filter(a -> optionService.getOptionById(a.getAnswerId()).getIsCorrect())
                 .mapToDouble(a -> questionService.getQuestionById(a.getQuestionId()).getPoints().doubleValue())
                 .sum());
-        boolean isPassed = true;
-        int passingScore = test.getPassingScore().intValue();
-        int percentage = passingScore > 0 ? (int) ((double) resultScore / passingScore * 100) : 0;
-        if (getTestById(result.getTestId()).getPassingScore() > resultScore) {
-            isPassed = false;
+        boolean isPassed = false;
+        System.out.println(resultScore + "\n");
+        int percentage = (int) Math.round((resultScore * 100.0) / 100);
+        System.out.println(percentage + "\n");
+        if (resultScore >= test.getPassingScore().intValue()) {
+            isPassed = true;
         }
-        TestResult savedTestResult = testResultService.saveTestResult(result, resultScore, isPassed, endTime, percentage);
+        TestResult savedTestResult = testResultService.saveTestResult(result, resultScore, percentage, isPassed);
         testAnswerService.saveTestAnswers(result, savedTestResult);
 
         enrollmentService.courseComplete(savedTestResult);
@@ -213,7 +224,7 @@ public class TestServiceImpl implements TestService {
                         .filter(a -> a.getAnswerId() == null)
                         .count())
                 .questionsCount(result.getQuestionAnswers().size())
-                .passingTime(endTime.minusMinutes(result.getPassingStart().getMinute()).getMinute())
+                .passingTime(LocalDateTime.now().minusMinutes(result.getPassingStart().getMinute()).getMinute())
                 .isPassed(isPassed)
                 .testInstance(testInstanceService.getTestInstanceById(result.getTestInstanceId()))
                 .build();
@@ -327,5 +338,44 @@ public class TestServiceImpl implements TestService {
     @Override
     public Boolean testExistById(int id){
         return testRepository.existsById(id);
+    }
+
+    @Override
+    public TestDto getTestByIdForTestResult(int testInstanceId) {
+        TestInstance testInstance = testInstanceService.getTestInstanceEntityById(testInstanceId);
+        Test test = testRepository.findById(testInstance.getTest().getId())
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+        List<QuestionAnswerDto> answers = testAnswerService.getAnswersByAttemtId(testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceId).getId());
+        List<QuestionDto> questions = test.getQuestions()
+                .stream()
+                .filter(q -> answers.stream().map(qa -> qa.getQuestionId()).toList().contains(q.getId()))
+                .map(q -> QuestionDto.builder()
+                        .id(q.getId())
+                        .testId(q.getTest().getId())
+                        .question(q.getQuestion())
+                        .options(q.getOptions().stream().map(o -> OptionDto.builder()
+                                .optionText(o.getOptionText())
+                                .isCorrect(o.getIsCorrect())
+                                .questionId(o.getQuestion().getId())
+                                .id(o.getId())
+                                .build()).toList())
+                        .isRequired(q.getIsRequired())
+                        .points(q.getPoints())
+                        .build())
+                .toList();
+
+        return TestDto.builder()
+                .id(test.getId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .isActive(test.getIsActive())
+                .courseInstanceId(test.getCourse().getId())
+                .course(CourseDto.builder()
+                        .id(test.getCourse().getId())
+                        .title(test.getCourse().getTitle())
+                        .build())
+                .passingScore(test.getPassingScore().intValue())
+                .questions(questions)
+                .build();
     }
 }

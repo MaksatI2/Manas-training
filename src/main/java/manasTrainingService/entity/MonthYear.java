@@ -1,6 +1,8 @@
 package manasTrainingService.entity;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 public enum MonthYear {
     JANUARY(1, "Январь"),
@@ -48,4 +50,9 @@ public enum MonthYear {
         MonthYear currentMonth = fromMonthNumber(now.getMonthValue());
         return currentMonth.format(now.getYear());
     }
+
+    public List<MonthYear> getAllMonths() {
+        return Arrays.asList(MonthYear.values());
+    }
+
 }

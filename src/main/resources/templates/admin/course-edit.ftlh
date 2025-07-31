@@ -113,11 +113,15 @@
                                    min="1"
                                    required>
                             <#if .globals['org.springframework.validation.BindingResult.course']?? && .globals['org.springframework.validation.BindingResult.course'].hasFieldErrors('duration')>
-                                <div class="invalid-feedback">
-                                    <#list .globals['org.springframework.validation.BindingResult.course'].getFieldErrors('duration') as error>
-                                        ${error.defaultMessage}
-                                    </#list>
-                                </div>
+                                <#assign durationErrors = .globals['org.springframework.validation.BindingResult.course'].getFieldErrors('duration') />
+                                <#assign visibleErrors = durationErrors?filter(error -> error.code != "typeMismatch") />
+                                <#if (visibleErrors?size > 0)>
+                                    <div class="invalid-feedback">
+                                        <#list visibleErrors as error>
+                                            ${error.defaultMessage}
+                                        </#list>
+                                    </div>
+                                </#if>
                             </#if>
                         </div>
                     </div>

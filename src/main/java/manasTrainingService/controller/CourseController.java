@@ -5,6 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
+import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.tests.TestInstanceDto;
+import manasTrainingService.entity.Course;
 import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.course.CourseInstanceService;
@@ -69,13 +72,15 @@ public class CourseController {
     }
 
     @GetMapping("/{id}/tests")
-    public String getCourseTests(@PathVariable Integer id, @RequestParam("instance") int instanceId, Model model) {
+    public String getCourseTests(@PathVariable Integer id, Model model) {
+        CourseInstanceDTO courseInstanceDTO = courseInstanceService.getCourseInstanceById(id);
+        CourseDto courseDto = courseService.getById(courseInstanceDTO.getCourseId());
         if (!lessonAccessService.canAccessCourseTests()){
             throw new NoAccessException("У вас нет досупа к этой странице");
         }
-        model.addAttribute("tests", testService.getAllTestsByCourseId(id));
-        model.addAttribute("course", courseService.getCourseById(id));
-        model.addAttribute("instance", courseInstanceService.getCourseInstanceById(instanceId));
+        model.addAttribute("tests", testService.getAllTestsByCourseId(courseDto.getId()));
+        model.addAttribute("course", courseDto);
+        model.addAttribute("instance", courseInstanceDTO);
         return "tests/course-tests";
     }
 }
