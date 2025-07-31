@@ -38,12 +38,13 @@ public class TestResultServiceImpl implements TestResultService {
     }
 
     @Override
-    public TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultPoints, boolean isPassed, LocalDateTime endTime, int percentage) {
+    public TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultScore, int percentage,  Boolean isPassed) {
+        LocalDateTime endTime = LocalDateTime.now();
         int duration = (int) Duration.between(testAnswerDto.getPassingStart(), endTime).toMinutes();
         TestResult testResult = new TestResult();
         testResult.setTestInstance(testInstanceService.getTestInstanceEntityById(testAnswerDto.getTestInstanceId()));
         testResult.setStudent(userService.getAuthorizedUser());
-        testResult.setScore(BigDecimal.valueOf(resultPoints));
+        testResult.setScore(BigDecimal.valueOf(resultScore));
         testResult.setPercentage(BigDecimal.valueOf(percentage));
         testResult.setStartedAt(testAnswerDto.getPassingStart());
         testResult.setSubmittedAt(endTime);

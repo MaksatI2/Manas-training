@@ -37,4 +37,6 @@ public interface TestService {
     long getTotalTests();
 
     Boolean testExistById(int id);
+
+    TestDto getTestByIdForTestResult(int testInstanceId);
 }

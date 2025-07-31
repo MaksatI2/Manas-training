@@ -30,7 +30,7 @@
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
         <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">Статистика
             потока</a>
-        <a href="/courses/${courseInstance.courseId}/tests?instance=${courseInstance.id}" class="btn btn-primary">Список
+        <a href="/courses/${courseInstance.id}/tests" class="btn btn-primary">Список
             тестов по данному курсу</a>
     </div>
 

@@ -98,7 +98,7 @@ public class StudentController {
             if(testResultService.userHasTestAttempt(testInstanceDto.getId())){
                 model.addAttribute("testResult", testResultService.getTestResultsByUserId());
             }
-            model.addAttribute("isAvailableTime", testInstanceService.isAvailableTime(id));
+            model.addAttribute("isAvailableTime", testInstanceService.isValidAccessTime(testInstanceDto.getId()));
             model.addAttribute("testExits", testService.testExistById(testInstanceDto.getTest().getId()));
             model.addAttribute("startDate", testInstanceDto.getStartDate().format(formatter));
             model.addAttribute("endDate", testInstanceDto.getEndDate().format(formatter));

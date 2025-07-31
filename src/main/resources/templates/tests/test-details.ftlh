@@ -5,7 +5,6 @@
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
     {"label": "Мои курсы", "url": "/teacher/my-courses"},
-    {"label": "${instance.title}", "url": "/teacher/courses/${instance.id}"},
     {"label": "Тесты по курсу: ${test.course.title}", "url": "/courses/${test.course.id}/tests"},
     {"label": "Детали теста: ${test.title}", "url": ""}
     ] />

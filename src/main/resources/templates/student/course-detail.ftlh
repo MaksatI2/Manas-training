@@ -91,7 +91,7 @@
                     <p>Количество набранных балов: ${testResult.totalPoints} из ${testInstance.test.passingScore}</p>
                     <p>Время затраченное на прохождение: ${testResult.passingTime} минут.</p>
                     <#if testInstance.isEnded && testExits>
-                        <a href="/test/${testInstance.test.id}/result/details?instance=${testInstance.id}" class="btn btn-primary mb-2">Посмотреть подробности</a>
+                        <a href="/test/${testInstance.id}/result/details" class="btn btn-primary mb-2">Посмотреть подробности</a>
                     </#if>
                 <#else>
                         <h5>
@@ -101,7 +101,7 @@
                         <#if isAvailableTime>
                             <p>Тестирование доступно с <span class="fw-bold">${startDate} ${testInstance.startTime}</span> по <span class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
                             <p class="text-danger">По истечению данного срока доступ к тестированию будет закрыт.</p>
-                            <a href="/test/${testInstance.test.id}/passing?instance=${testInstance.courseInstanceId}"
+                            <a href="/test/${testInstance.id}/passing"
                                class="btn btn-primary mb-2 <#if !testInstance.test.isActive>disabled</#if>">Пройти
                                 итоговое тестирование</a>
                             <#else>
