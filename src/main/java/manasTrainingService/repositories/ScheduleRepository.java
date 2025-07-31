@@ -95,20 +95,23 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer>, Jp
     Integer sumActiveScheduleHoursByCourseInstanceId(@Param("courseInstanceId") Integer courseInstanceId);
 
     @Query("""
-    SELECT new manasTrainingService.dto.statistics.TeacherMonthlyHoursDTO(
-        s.teacher.name,
-        s.teacher.lastName,
-        SUM(s.durationHours)
-    )
-    FROM Schedule s
-    WHERE MONTH(s.lessonDate) = MONTH(CURRENT_DATE)
-      AND YEAR(s.lessonDate) = YEAR(CURRENT_DATE)
-      AND s.isActive = true
-    GROUP BY s.teacher.id, s.teacher.name, s.teacher.lastName
-    HAVING SUM(s.durationHours) > 0
-    ORDER BY s.teacher.lastName
-""")
-    List<TeacherMonthlyHoursDTO> getMonthlyTeachingHoursPerTeacher();
+        SELECT new manasTrainingService.dto.statistics.TeacherMonthlyHoursDTO(
+            s.teacher.name,
+            s.teacher.lastName,
+            SUM(s.durationHours)
+        )
+        FROM Schedule s
+        WHERE MONTH(s.lessonDate) = :month
+          AND YEAR(s.lessonDate) = :year
+          AND s.isActive = true
+        GROUP BY s.teacher.id, s.teacher.name, s.teacher.lastName
+        HAVING SUM(s.durationHours) > 0
+        ORDER BY s.teacher.lastName
+    """)
+    List<TeacherMonthlyHoursDTO> getMonthlyTeachingHoursPerTeacher(Integer month, Integer year);
+
+    @Query("SELECT DISTINCT YEAR(s.lessonDate) FROM Schedule s ORDER BY YEAR(s.lessonDate)")
+    List<Integer> findDistinctYears();
 
 
 

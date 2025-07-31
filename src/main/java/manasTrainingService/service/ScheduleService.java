@@ -21,5 +21,9 @@ public interface ScheduleService {
 
     Integer sumActiveScheduleHoursByCourseInstanceId(Integer courseInstanceId);
 
-    List<TeacherMonthlyHoursDTO> getMonthlyTeacherHourStats();
+
+
+    List<TeacherMonthlyHoursDTO> getMonthlyTeacherHourStats(String monthStr, String yearStr);
+
+    List<Integer> getAvailableYears();
 }

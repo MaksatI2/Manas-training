@@ -226,8 +226,41 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.sumActiveScheduleHoursByCourseInstanceId(courseInstanceId);
     }
 
+
     @Override
-    public List<TeacherMonthlyHoursDTO> getMonthlyTeacherHourStats() {
-        return scheduleRepository.getMonthlyTeachingHoursPerTeacher();
+    public List<TeacherMonthlyHoursDTO> getMonthlyTeacherHourStats(String monthStr, String yearStr) {
+        LocalDate now = LocalDate.now();
+
+        int month = parseMonthOrDefault(monthStr, now.getMonthValue());
+        int year = parseYearOrDefault(yearStr, now.getYear());
+
+        return fetchTeacherHours(month, year);
+    }
+
+    private int parseMonthOrDefault(String monthStr, int defaultMonth) {
+        try {
+            int parsed = Integer.parseInt(monthStr);
+            if (parsed >= 1 && parsed <= 12) {
+                return parsed;
+            }
+        } catch (Exception ignored) {}
+        return defaultMonth;
+    }
+
+    private int parseYearOrDefault(String yearStr, int defaultYear) {
+        try {
+            return Integer.parseInt(yearStr);
+        } catch (Exception ignored) {}
+        return defaultYear;
+    }
+
+    private List<TeacherMonthlyHoursDTO> fetchTeacherHours(int month, int year) {
+        return scheduleRepository.getMonthlyTeachingHoursPerTeacher(month, year);
+    }
+
+
+    @Override
+    public List<Integer> getAvailableYears() {
+        return scheduleRepository.findDistinctYears();
     }
 }
