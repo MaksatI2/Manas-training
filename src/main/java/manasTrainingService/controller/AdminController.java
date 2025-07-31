@@ -24,7 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -208,8 +208,7 @@ public class AdminController {
     @GetMapping("/statistics")
     public String viewUserStatistics(Model model) {
         model.addAttribute("userStats", adminStatisticsService.getSystemStatistics());
-        model.addAttribute("teacherHourStats", scheduleService.getMonthlyTeacherHourStats());
-        model.addAttribute("monthYear", MonthYear.currentMonthYear());
+        model.addAttribute("months", Arrays.asList(MonthYear.values()));
         return "admin/statistics";
     }
 
