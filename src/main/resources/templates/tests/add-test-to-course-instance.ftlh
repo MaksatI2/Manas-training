@@ -21,9 +21,9 @@
                         <label for="testId" class="form-label fw-bold">Тест <#if !tests?has_content><span class="text-danger">(Нет активных тестов)</span></#if> <span class="text-danger">*</span></label>
                         <select class="form-select" id="testId" name="testId"<#if !tests?has_content> disabled </#if>>
                             <#if tests?has_content>
-                                <option value="" disabled selected>Выберите тест для данного потока</option>
+                                <option value="" disabled <#if !testInstanceDto.testId??>selected</#if>>Выберите тест для данного потока</option>
                                 <#list tests as test>
-                                    <option value="${test.id}">
+                                    <option value="${test.id}" <#if testInstanceDto.testId?? && testInstanceDto.testId == test.id>selected</#if>>
                                         ${test.title}
                                     </option>
                                 </#list>

@@ -1,6 +1,6 @@
 let createQuestionButtonContainer = document.getElementById("createQuestionContainer")
 
-function createQuestionBlock(count, testId) {
+function createQuestionBlock(count, lessonQuizId) {
     let all = document.querySelectorAll('[id^="questionId-"]')
     let questions = Array.from(all)
         .filter(el => /^questionId-\d+$/.test(el.id))
@@ -117,17 +117,12 @@ function createQuestionBlock(count, testId) {
                                 Добавить вариант ответа
                             </button>
                         </div>
-                        <div class="mb-3">
-                            <input type="checkbox" name="questions[${questionIndex}].isRequired" class="form-check-input fs-4" value="true" checked>
-                            <label for="questions[${questionIndex}].isRequired"
-                                   class="form-label fw-bold mx-2">Активный?</label>
-                        </div>
                     </div>
                 </div>
     `;
         createQuestionButtonContainer.insertAdjacentHTML("beforebegin", question)
-        if (testId) {
-            let hiddenInput = `<input type="hidden" name="questions[${questionIndex}].testId" value="${testId}">`
+        if (lessonQuizId) {
+            let hiddenInput = `<input type="hidden" name="questions[${questionIndex}].lessonQuizId" value="${lessonQuizId}">`
             document.getElementById(`questionId-${questionIndex}`).insertAdjacentHTML("beforeend", hiddenInput)
         }
     }
@@ -200,9 +195,8 @@ function deleteQuestion(id) {
 
 function deleteOption(id, errorId, questionId) {
     let button = document.getElementById(id);
-    let optionId = id.split('-').at(-1)
-    console.log(optionId)
     let div = document.getElementById(id);
+    let optionId = id.split('-').at(-1)
     let err;
     if (errorId) {
         err = document.querySelectorAll("." + errorId)
@@ -237,7 +231,7 @@ function deleteQuestionFromEdit(id, index) {
     let deleteButton = document.getElementById("delete-question-" + index)
     deleteButton.remove()
 
-    div.querySelectorAll('input').forEach(input => input.readOnly = true)
+    div.querySelectorAll("input").forEach(input => input.readOnly = true)
     div.querySelectorAll("button").forEach(button => button.disabled = true)
 
     let btn = document.createElement("button")
@@ -247,11 +241,9 @@ function deleteQuestionFromEdit(id, index) {
 
     btn.addEventListener("click", () => {
         input.remove()
-        div.querySelectorAll('input').forEach(input => input.readOnly = false)
+        div.querySelectorAll("input").forEach(input => input.readOnly = false)
         div.querySelectorAll("button").forEach(button => button.disabled = false)
         div.setAttribute("class", "col-lg-10 col-md-10")
-        div.removeAttribute("deleted");
-
         btn.remove()
         btnDiv.append(deleteButton)
     })
@@ -260,7 +252,6 @@ function deleteQuestionFromEdit(id, index) {
 
     div.append(input);
     div.setAttribute("class", "col-lg-10 col-md-10 opacity-50")
-    div.setAttribute("deleted", 'true');
     div.append(btn)
     btnDiv.append(btn)
 }
@@ -281,11 +272,6 @@ function deleteOptionFromEdit(id, questionIndex, optionIndex, errorId) {
         err = document.querySelectorAll("."+errorId)
         err.forEach(e => e.remove())
     }
-    let errorMessage = document.getElementById("invalid-"+id)
-    if(errorMessage){
-        errorMessage.remove();
-        div.querySelector(".is-invalid").classList.remove("is-invalid")
-    }
 
     let btn = document.createElement("button")
     btn.setAttribute("type", "button")
@@ -293,11 +279,9 @@ function deleteOptionFromEdit(id, questionIndex, optionIndex, errorId) {
     btn.innerHTML = `<i class="fa-solid fa-rotate-left"></i>`
     btn.addEventListener("click", () => {
         input.remove()
-        div.querySelectorAll('input[type="text"]').forEach(input => input.readOnly = false)
-        div.querySelectorAll('input[type="radio"]').forEach(input => input.disabled = false)
+        div.querySelectorAll("input").forEach(input => input.readOnly = false)
         div.querySelectorAll("button").forEach(button => button.disabled = false)
         div.classList.remove("opacity-50")
-        div.removeAttribute("deleted");
         div.setAttribute("class", "d-flex flex-grow-1 align-items-center mt-3")
         if (getOptionsCountForEdit(questionIndex) > 4){
             let optionBlock = document.getElementById("options-questionId-"+questionIndex)
@@ -316,12 +300,9 @@ function deleteOptionFromEdit(id, questionIndex, optionIndex, errorId) {
     let btnDiv = document.getElementById("question-" + questionIndex + "-option-" + optionIndex + "-inputBlock")
     let deletedInput = document.getElementById("questions"+questionIndex+".options"+optionIndex+".optionText")
     if(!isNew || deletedInput.value.trim() !== ""){
-        div.querySelectorAll('input[type="text"]').forEach(input => input.readOnly = true)
-        div.querySelectorAll('input[type="radio"]').forEach(input => input.disabled = true)
+        div.querySelectorAll("input").forEach(input => input.readOnly = true)
         div.querySelectorAll("button").forEach(button => button.disabled = true)
         div.append(input);
-        div.setAttribute("class", "d-flex flex-grow-1 align-items-center mt-3 opacity-50")
-        div.setAttribute("deleted", 'true');
         const deletedRadio = document.getElementById("questions["+questionIndex+"].options["+optionIndex+"]")
         if(deletedRadio && deletedRadio.checked){
             let radio = document.getElementById("questions["+questionIndex+"].options["+0+"]")
@@ -329,6 +310,7 @@ function deleteOptionFromEdit(id, questionIndex, optionIndex, errorId) {
                 radio.checked = true;
             }
         }
+        div.setAttribute("class", "d-flex flex-grow-1 align-items-center mt-3 opacity-50")
         btnDiv.append(btn)
         if(getOptionsCountForEdit(questionIndex) < 4){
             document.getElementById("add-options-button-question-"+questionIndex).disabled = false;
@@ -361,7 +343,6 @@ function getOptionsCountForEdit(questionId){
     const pattern = /^questionId-\d+-optionId-\d+$/;
     let questionOptionCount = questionBlock.querySelectorAll('[id]');
     const filtredElements = Array.from(questionOptionCount).filter(e => pattern.test(e.id) && !e.classList.contains("opacity-50"));
-    console.log(filtredElements.length)
     return (filtredElements.length);
 }
 

@@ -101,7 +101,7 @@
                                                     </button>
                                                 </div>
                                             <#else>
-                                                <div class="flex-grow-1 me-5">
+                                                <div class="flex-grow-1 me-0">
                                                     <@spring.formInput "test.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3"
                                                             placeholder="Вариант ответа *"
                                                             aria-describedby="button-addon2"
@@ -127,7 +127,7 @@
                     </div>
                 </#list>
             <#else>
-                <div class="col-lg-10 col-md-10">
+                <div class="col-lg-10 col-md-10" id="questionId-0">
                     <div class="feature-card">
                         <div class="mb-3">
                             <label for="questions[0].question" class="form-label fw-bold">Введите текст
@@ -145,7 +145,7 @@
                                            class="form-check-input fs-4"
                                            checked/>
                                 </div>
-                                <div class="flex-grow-1 me-5">
+                                <div class="flex-grow-1 me-0">
                                     <@spring.formInput "test.questions[0].options[0].optionText" 'class="form-control me-2"
                                     placeholder="Вариант ответа *"
                                     id="questions[0].options[0].optionText"' />
@@ -161,16 +161,60 @@
                                            class="form-check-input fs-4"
                                     />
                                 </div>
-                                <div class="flex-grow-1 me-5">
+                                <div class="flex-grow-1 me-0">
                                     <@spring.formInput "test.questions[0].options[1].optionText" 'class="form-control me-2"
                                     placeholder="Вариант ответа *"
                                     id="questions[0].options[1].optionText"' />
                                     <@spring.showErrors "<br>" "error text-danger" />
                                 </div>
                             </div>
+                            <div id="questionId-0-optionId-2" class="d-flex align-items-center mt-3">
+                                <div class="form-check d-flex align-items-center mb-0">
+                                    <input type="radio"
+                                           name="questions[0].correctOptionIndex"
+                                           value="1"
+                                           id="questions[0].options[2]"
+                                           class="form-check-input fs-4"
+                                    />
+                                </div>
+                                <div class="d-flex flex-grow-1 align-items-center">
+                                    <@spring.formInput "test.questions[0].options[2].optionText" 'class="form-control me-3"
+                                                            placeholder="Вариант ответа *"
+                                                            aria-describedby="button-addon2"
+                                                            id="questions[0].options[2].optionText"' />
+                                    <button class="btn btn-outline-danger"
+                                            type="button"
+                                            id="button-addon2"
+                                            onclick="deleteOption('questionId-0-optionId-2', 'option-2-error', 0)">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="questionId-0-optionId-3" class="d-flex align-items-center mt-3">
+                                <div class="form-check d-flex align-items-center mb-0">
+                                    <input type="radio"
+                                           name="questions[0].correctOptionIndex"
+                                           value="1"
+                                           id="questions[0].options[3]"
+                                           class="form-check-input fs-4"
+                                    />
+                                </div>
+                                <div class="d-flex flex-grow-1 align-items-center">
+                                    <@spring.formInput "test.questions[0].options[3].optionText" 'class="form-control me-3"
+                                                            placeholder="Вариант ответа *"
+                                                            aria-describedby="button-addon2"
+                                                            id="questions[0].options[3].optionText"' />
+                                    <button class="btn btn-outline-danger"
+                                            type="button"
+                                            id="button-addon2"
+                                            onclick="deleteOption('questionId-0-optionId-3', 'option-3-error', 0)">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3" id="createOption">
-                            <button type="button" class="btn btn-primary-custom" onclick="addOption(0)" id="add-options-button-question-0">
+                            <button type="button" class="btn btn-primary-custom" onclick="createOption(0)" id="add-options-button-question-0">
                                 Добавить вариант ответа
                             </button>
                         </div>
@@ -183,10 +227,18 @@
                 </div>
             </#if>
 
-            <div class=" mb-3 col-lg-10 col-md-10" id="createQuestion">
-                <button type="button" class="btn btn-primary-custom"
-                        onclick="createQuestionBlock(${test.questions?size?c})">Добавить вопрос
+            <div class=" mb-3 col-lg-10 col-md-10 dropdown" id="createQuestionContainer">
+                <button type="button" class="btn btn-primary-custom dropdown-toggle" id="createQuestion" data-bs-toggle="dropdown">
+                    Добавить вопросы
                 </button>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-item" onclick="createQuestionBlock(1)">1</li>
+                    <li class="dropdown-item" onclick="createQuestionBlock(3)">3</li>
+                    <li class="dropdown-item" onclick="createQuestionBlock(5)">5</li>
+                    <li class="dropdown-item" onclick="createQuestionBlock(10)">10</li>
+                    <li class="dropdown-item" onclick="createQuestionBlock(15)">15</li>
+                    <li class="dropdown-item" onclick="createQuestionBlock(20)">20</li>
+                </ul>
             </div>
             <div class="mb-3 form-check col-lg-10 col-md-10" id="active-test-block">
                 <@spring.formCheckbox "test.isActive" 'class="form-check-input fs-4" checked'/>
@@ -203,53 +255,10 @@
     </form>
     <script>
         let questionIndex = ${test.questions?size?c};
-        let pointsInput = document.querySelectorAll(".points")
+        let pointsInput = document.querySelectorAll(".points");
         let form = document.getElementById("create-test");
-        function createQuestionBlock(questionId) {
-            const optionIdRef = {value: 0};
-            let colDiv = document.createElement("div")
-            colDiv.setAttribute("class", "col-lg-10 col-md-10")
-            colDiv.setAttribute("id", "questionId-" + questionId);
-
-            let div = document.createElement("div");
-            div.setAttribute("class", "feature-card");
-
-            div.append(createRemoveQuestionButton("questionId-" + questionId))
-            div.append(createInputContainer(
-                "questions[" + questionId + "].question",
-                `Введите текст вопроса <span class="text-danger">*</span>`,
-                "questions[" + questionId + "].question",
-                "questions" + questionId +".question",
-                "text",
-                "form-control"
-            ))
-
-            let optionsContainer = document.createElement("div");
-            optionsContainer.setAttribute("class", "mt-3 border rounded-4 px-4 py-3");
-            optionsContainer.setAttribute("id", "options-questionId-" + questionId);
-
-            optionsContainer.append(createQuestionOption(questionId, optionIdRef.value, true));
-            optionIdRef.value++;
-            optionsContainer.append(createQuestionOption(questionId, optionIdRef.value, false));
-            optionIdRef.value++;
-
-            const addButton = createAddButton(questionId, optionsContainer, optionIdRef);
-            optionsContainer.append(addButton);
-
-            div.append(optionsContainer);
-
-            div.append(createEmptyContainer(
-                createCheckBox("questions[" + questionId + "].isRequired"),
-                createLabel("questions[" + questionId + "].isRequired", "Активный?")
-            ))
-
-            colDiv.append(div)
-
-            return colDiv;
-        }
-
     </script>
     <script src="/static/js/test_form_validation_error.js"></script>
+    <script src="/static/js/test_form_validation.js"></script>
     <script src="/static/js/test_form.js"></script>
-    <script src="/static/js/test_create.js"></script>
 </@page>

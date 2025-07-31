@@ -1,6 +1,7 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.tests.OptionDto;
 import manasTrainingService.dto.tests.QuestionDto;
 import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.TargetType;
@@ -37,6 +38,41 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    public void editQuestions(List<QuestionDto> questions) {
+        List<QuestionDto> deletedTestQuestions = questions.stream()
+                .filter(q -> q.getIsRemoved() != null && q.getIsRemoved())
+                .toList();
+        List<QuestionDto> changedQuestions = questions.stream()
+                .filter(q -> q.getIsRemoved() == null)
+                .toList();
+
+        if (!deletedTestQuestions.isEmpty()){
+            deleteQuestionsFromTest(deletedTestQuestions);
+        }
+
+        editQuestionFromTest(changedQuestions);
+    }
+
+    @Override
+    public List<QuestionDto> getQuestionsByTestId(int testId) {
+        List<TestQuestion> questions = testQuestionRepository.findAllByTestId(testId);
+        return questions.stream()
+                .map(q -> QuestionDto.builder()
+                        .id(q.getId())
+                        .testId(q.getTest().getId())
+                        .question(q.getQuestion())
+                        .points(q.getPoints())
+                        .isRequired(q.getIsRequired())
+                        .options(q.getOptions().stream()
+                                .map(o -> OptionDto.builder()
+                                        .id(o.getId())
+                                        .questionId(o.getQuestion().getId())
+                                        .isCorrect(o.getIsCorrect())
+                                        .optionText(o.getOptionText())
+                                .build()).toList())
+                        .build()).toList();
+    }
+
     public List<QuestionDto> getQuestionsForPassingByTestId(Integer testId) {
         List<TestQuestion> questions = testQuestionRepository.findAllByTestIdAndIsRequiredTrue(testId);
         if (questions.size() <= 20) {
@@ -48,7 +84,13 @@ public class QuestionServiceImpl implements QuestionService {
                             .testId(q.getTest().getId())
                             .points(q.getPoints())
                             .question(q.getQuestion())
-                            .options(optionService.getOptionsByQuestionId(q.getId()))
+                            .options(q.getOptions().stream()
+                                    .map(o -> OptionDto.builder()
+                                            .id(o.getId())
+                                            .questionId(o.getQuestion().getId())
+                                            .isCorrect(o.getIsCorrect())
+                                            .optionText(o.getOptionText())
+                                            .build()).toList())
                             .build()).toList();
         } else {
             Collections.shuffle(questions);
@@ -63,35 +105,30 @@ public class QuestionServiceImpl implements QuestionService {
                             .testId(q.getTest().getId())
                             .points(q.getPoints())
                             .question(q.getQuestion())
-                            .options(optionService.getOptionsByQuestionId(q.getId()))
+                            .options(q.getOptions().stream()
+                                    .map(o -> OptionDto.builder()
+                                            .id(o.getId())
+                                            .questionId(o.getQuestion().getId())
+                                            .isCorrect(o.getIsCorrect())
+                                            .optionText(o.getOptionText())
+                                            .build()).toList())
                             .build()).toList();
         }
     }
-
 
     @Override
     public void saveQuestions(List<QuestionDto> questions, Test test) {
         createQuestionsForTest(questions, test);
     }
 
-    @Override
-    public void editQuestions(List<QuestionDto> questions) {
-        List<QuestionDto> deletedTestQuestions = questions.stream()
-                .filter(q -> q.getIsRemoved() != null && q.getIsRemoved())
-                .toList();
-        List<QuestionDto> changedQuestions = questions.stream()
-                .filter(q -> q.getIsRemoved() == null)
-                .toList();
-
-        if (!deletedTestQuestions.isEmpty()) {
-            deleteQuestionsFromTest(deletedTestQuestions);
-        }
-
-        editQuestionFromTest(changedQuestions);
-    }
-
     private void createQuestionsForTest(List<QuestionDto> questions, Test test) {
         User user = userService.getAuthorizedUser();
+        questions = questions.stream()
+                .peek(q -> {
+                    if (q.getIsRequired() == null) {
+                        q.setIsRequired(false);
+                    }
+                }).toList();
         int basePoints = 100 / questions.stream().filter(q -> q.getIsRequired()).toList().size();
         int remainder = 100 % questions.stream().filter(q -> q.getIsRequired()).toList().size();
         for (int i = 0; i < questions.size(); i++) {
@@ -113,22 +150,6 @@ public class QuestionServiceImpl implements QuestionService {
             );
             optionService.saveQuestionOptions(questions.get(i).getOptions(), savedTestQuestion, questions.get(i).getCorrectOptionIndex());
         }
-    }
-
-    @Override
-    public List<QuestionDto> getQuestionsByTestId(int testId) {
-        List<TestQuestion> questions = testQuestionRepository.findAllByTestId(testId);
-        return questions.stream().map(q ->
-                QuestionDto.builder()
-                        .id(q.getId())
-                        .question(q.getQuestion())
-                        .isRequired(q.getIsRequired())
-                        .testId(q.getTest().getId())
-                        .points(q.getPoints())
-                        .question(q.getQuestion())
-                        .options(optionService.getOptionsByQuestionId(q.getId()))
-                        .build()).toList();
-
     }
 
     @Override
@@ -154,8 +175,12 @@ public class QuestionServiceImpl implements QuestionService {
 
     private void editQuestionFromTest(List<QuestionDto> questions) {
         User user = userService.getAuthorizedUser();
-
         List<QuestionDto> requiredQuestions = questions.stream()
+                .peek(q -> {
+                    if (q.getIsRequired() == null) {
+                        q.setIsRequired(false);
+                    }
+                })
                 .filter(QuestionDto::getIsRequired)
                 .toList();
 

@@ -48,7 +48,7 @@
                     <tbody>
                     <#if tests?has_content>
                         <#list tests as test>
-                            <tr style="cursor: pointer;" onclick="window.location.href='/test/${test.id}/details?instance=${instance.id}'">
+                            <tr style="cursor: pointer;" onclick="window.location.href='/test/${test.id}/details'">
                                 <td>${test.title}</td>
                                 <td>${test.course.title}</td>
                                 <td>${test.passingScore}</td>

@@ -10,7 +10,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 public interface TestResultService {
-    TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultPoints, boolean isPassed, LocalDateTime endTime, int percentage);
+    TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultScore, int percentage, Boolean isPassed);
 
     TestResultDto getTestResultsByUserId();
 

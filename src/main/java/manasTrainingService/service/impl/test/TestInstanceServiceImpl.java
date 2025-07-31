@@ -161,8 +161,8 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     }
 
     @Override
-    public Boolean isValidAccessTime(int courseInstanceId){
-        TestInstance testInstance = testInstanceRepository.findByInstanceId(courseInstanceId)
+    public Boolean isValidAccessTime(int id){
+        TestInstance testInstance = testInstanceRepository.findById(id)
                 .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
         return testInstance.getScheduledStart().isBefore(LocalDateTime.now()) && testInstance.getScheduledEnd().isAfter(LocalDateTime.now());
     }

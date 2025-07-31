@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.answers.TestResultDto;
+import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.dto.tests.TestInstanceDto;
 import manasTrainingService.entity.TestResult;
@@ -128,26 +129,28 @@ public class TestController {
         }
     }
 
-    @GetMapping("{id}/passing")
-    public String getTestById(@PathVariable int id, @RequestParam("instance") int instanceId, Model model, RedirectAttributes redirectAttributes) {
-        TestDto testDto = testService.getTestForPassingById(id);
+    @GetMapping("{testInstanceId}/passing")
+    public String getTestById(@PathVariable int testInstanceId, Model model, RedirectAttributes redirectAttributes) {
+        TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(testInstanceId);
+        TestDto testDto = testService.getTestForPassingById(testInstanceDto.getTest().getId());
         if (!testDto.getIsActive()){
             throw new NoAccessException("Тестирование сейчас не доступно");
         }
         if (testResultService.userHasTestAttempt(testDto.getId())) {
             throw new NoAccessException("Вы уже прошли данный тест");
         }
-        if(testInstanceService.isValidAccessTime(instanceId)){
+        if(testInstanceService.isValidAccessTime(testInstanceId)){
+            CourseInstanceDTO courseInstanceDTO = courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstance().getId());
             model.addAttribute("result", new TestAnswerDto());
-            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
+            model.addAttribute("courseInstance", courseInstanceDTO);
             model.addAttribute("test", testDto);
             model.addAttribute("passing_start", LocalDateTime.now());
-            model.addAttribute("testInstanceId", testInstanceService.getTestInstanceByCourseInstanceId(instanceId).getId());
+            model.addAttribute("testInstanceId", testInstanceDto.getId());
             model.addAttribute("courseTitle", courseService.getCourseById(testDto.getId()).getTitle());
             return "tests/test_passing";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Прохождение тестирования доступно только в специально отведенное время");
-            return "redirect:/student/course/" + instanceId;
+            return "redirect:/student/course/" + courseInstanceService.getCourseInstanceById(testInstanceService.getTestInstanceById(testInstanceId).getCourseInstance().getId());
         }
     }
 
@@ -197,19 +200,19 @@ public class TestController {
     }
 
     @GetMapping("{id}/details")
-    public String testDetailsPage(@PathVariable int id, @RequestParam("instance") int instanceId, Model model) {
+    public String testDetailsPage(@PathVariable int id, Model model) {
         model.addAttribute("test", testService.getTestById(id));
-        model.addAttribute("instance", courseInstanceService.getCourseInstanceById(instanceId));
         return "tests/test-details";
     }
 
-    @GetMapping("{testId}/result/details")
-    public String viewTestResults(@PathVariable int testId, @RequestParam("instance") int testInstanceId, Model model){
-        if(!testService.testExistById(testId)){
+    @GetMapping("{testInstanceId}/result/details")
+    public String viewTestResults(@PathVariable int testInstanceId, Model model){
+        TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(testInstanceId);
+        if(!testService.testExistById(testInstanceDto.getTest().getId())){
             throw new NoAccessException("Такого теста уже не существует");
         }
         TestResultDto testResultDto = testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceId);
-        model.addAttribute("test", testService.getTestById(testId));
+        model.addAttribute("test", testService.getTestByIdForTestResult(testInstanceDto.getId()));
         model.addAttribute("result", testResultDto);
         model.addAttribute("answers", testAnswerService.getAnswersByAttemtId(testResultDto.getId()));
         return "tests/test_result_view";

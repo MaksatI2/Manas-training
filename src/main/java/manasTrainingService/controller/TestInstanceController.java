@@ -46,9 +46,11 @@ public class TestInstanceController {
     @PostMapping("add/test")
     public String addTestToInstance(@Valid @ModelAttribute TestInstanceDto testInstanceDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         Integer courseInstanceId = testInstanceDto.getCourseInstanceId();
+        CourseInstance ci = courseInstanceService.getCourseInstanceModelById(courseInstanceId);
+        List<TestDto> activeTests = testService.getAllTestsByCourseId(ci.getCourse().getId()).stream().filter( t -> t.getIsActive()).toList();
         if(bindingResult.hasErrors()) {
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));
-            model.addAttribute("tests", testService.getAllTestsByCourseId(courseInstanceId).stream().filter(TestDto::getIsActive).toList());
+            model.addAttribute("tests", activeTests);
             model.addAttribute("courseInstanceId", courseInstanceId);
             return "tests/add-test-to-course-instance";
         }
@@ -58,7 +60,7 @@ public class TestInstanceController {
             return "redirect:/teacher/course/"+testInstanceDto.getCourseInstanceId();
         }catch (IncorrectDateException e){
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));
-            model.addAttribute("tests", testService.getAllTestsByCourseId(courseInstanceId).stream().filter(TestDto::getIsActive).toList());
+            model.addAttribute("tests", activeTests);
             model.addAttribute("courseInstanceId", courseInstanceId);
             model.addAttribute("error", e.getMessage());
             return "tests/add-test-to-course-instance";
