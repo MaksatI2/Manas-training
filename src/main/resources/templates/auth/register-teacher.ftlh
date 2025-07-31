@@ -9,6 +9,10 @@
         color: red;
         font-size: 13px;
     }
+
+    #phone::placeholder {
+        opacity: 0.7;
+    }
 </style>
 <@page>
     <div class="hero-section">
@@ -67,7 +71,7 @@
                                 <label for="phone" class="form-label">
                                     <i class="fas fa-phone me-1"></i>Номер телефона *
                                 </label>
-                                <@spring.formInput "teacherRegisterDto.phone" ' type="tel" class="form-control" id="phone" autocomplete="off"'/>
+                                <@spring.formInput "teacherRegisterDto.phone" ' type="tel" class="form-control" id="phone" autocomplete="off" placeholder="0700 123 456" '/>
                                 <div class="error-block">
                                     <@spring.showErrors  "<br>" "error-message" />
                                 </div>

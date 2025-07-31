@@ -40,7 +40,7 @@
                     <#list categories as category>
                         <tr style="cursor: pointer;" onclick="window.location.href='/admin/categories/edit/${category.id}'">
                             <td>
-                                <span class="badge" style="background: #003d7a; color: white;">${category.name}</span>
+                                <span class="badge" style="background: #003d7a; color: white; font-size: 1.15rem">${category.name}</span>
                             </td>
                             <td style="color: #2c3e50;">${category.description!''}</td>
                             <td onclick="event.stopPropagation();" class="actions-col">
