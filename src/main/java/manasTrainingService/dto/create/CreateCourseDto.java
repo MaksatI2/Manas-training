@@ -1,5 +1,6 @@
 package manasTrainingService.dto.create;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +27,7 @@ public class CreateCourseDto {
 
     @NotNull(message = "Продолжительность обязательна")
     @Min(value = 1, message = "Должно быть положительным числом")
+    @Max(value = 10000, message = "Слишком большая продолжительность, максимальное значение 10000")
     private Integer duration;
 
     @Builder.Default

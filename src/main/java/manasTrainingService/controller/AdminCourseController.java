@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
-import manasTrainingService.dto.CourseDeletionDependenciesDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.dto.create.CreateCourseDto;
 import manasTrainingService.dto.edit.CourseEditDto;
@@ -15,9 +14,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.beans.PropertyEditorSupport;
 import java.util.List;
 
 @Controller
@@ -27,6 +28,7 @@ public class AdminCourseController {
 
     private final CourseAdminService courseAdminService;
     private final CourseCategoryService categoryAdminService;
+
 
     @GetMapping
     public String listCourses(Model model) {
@@ -56,6 +58,15 @@ public class AdminCourseController {
                             BindingResult bindingResult,
                             Model model,
                             RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasFieldErrors("duration")) {
+            for (FieldError error : bindingResult.getFieldErrors("duration")) {
+                if ("typeMismatch".equals(error.getCode())) {
+                    bindingResult.rejectValue("duration", "duration.invalid", "Некорректная продолжительность — введите число от 1 до 10 000");
+                    break;
+                }
+            }
+        }
 
         if (bindingResult.hasErrors()) {
             List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
@@ -100,6 +111,14 @@ public class AdminCourseController {
                              Model model,
                              RedirectAttributes redirectAttributes) {
 
+        if (bindingResult.hasFieldErrors("duration")) {
+            for (FieldError error : bindingResult.getFieldErrors("duration")) {
+                if ("typeMismatch".equals(error.getCode())) {
+                    bindingResult.rejectValue("duration", "duration.invalid", "Некорректная продолжительность — введите число от 1 до 10 000");
+                    break;
+                }
+            }
+        }
         updateCourseDto.setId(id);
 
         String[] activeValues = request.getParameterValues("active");
