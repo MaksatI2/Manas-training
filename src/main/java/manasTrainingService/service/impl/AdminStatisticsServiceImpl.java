@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.statistics.AdminStatisticsDto;
 import manasTrainingService.dto.statistics.UserStatisticsDto;
 import manasTrainingService.service.AdminStatisticsService;
-import manasTrainingService.service.CertificateService;
+import manasTrainingService.service.certificate.CertificateService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.test.TestResultService;
@@ -24,9 +24,9 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 
     private final CourseService courseService;
     private final TestService testService;
-    private final CertificateService certificateService;
     private final CourseInstanceService courseInstanceService;
     private final TestResultService testResultService;
+    private final CertificateService certificateService;
 
     private final UserService userService;
 
