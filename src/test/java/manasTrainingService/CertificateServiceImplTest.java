@@ -9,7 +9,6 @@ import manasTrainingService.entity.User;
 import manasTrainingService.repositories.CertificateRepository;
 import manasTrainingService.repositories.course.CourseEnrollmentRepository;
 import manasTrainingService.repositories.course.CourseInstanceRepository;
-import manasTrainingService.service.certificate.CertificatePdfService;
 import manasTrainingService.service.impl.certificate.CertificateServiceImpl;
 import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -50,11 +49,9 @@ class CertificateServiceImplTest {
     @Test
     void getStatuses_whenNoCerts() {
         int studentId = 42;
-        // репозиторий возвратил одно завершённое обучение
         when(enrollRepo.findByStudentIdAndCompletionDateIsNotNull(studentId))
                 .thenReturn(List.of(fakeEnrollment(7, "Kotlin")));
 
-        // а сертификатов по этому курсу нет
         when(certRepo.findByStudentIdAndCourseInstanceId(studentId, 7))
                 .thenReturn(List.of());
 
