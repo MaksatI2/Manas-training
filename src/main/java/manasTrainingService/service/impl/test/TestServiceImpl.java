@@ -27,8 +27,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -184,21 +182,18 @@ public class TestServiceImpl implements TestService {
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
         int questionsCount = (Integer) session.getAttribute("questionsCount");
         session.removeAttribute("questionsCount");
-        int basePoints = 100 / questionsCount;
+        double basePoints = 100 / questionsCount;
         int remainder = 100 % questionsCount;
         for (int i = 0; i < result.getQuestionAnswers().size(); i++) {
             result.getQuestionAnswers().get(i).setPoints(BigDecimal.valueOf(basePoints + (i < remainder ? 1 : 0)));
-            System.out.println(result.getQuestionAnswers().get(i).getPoints() + "\n");
             }
         int resultScore = (int) Math.ceil(result.getQuestionAnswers()
                 .stream()
                 .filter(a -> optionService.getOptionById(a.getAnswerId()).getIsCorrect())
-                .mapToDouble(a -> questionService.getQuestionById(a.getQuestionId()).getPoints().doubleValue())
+                .mapToDouble(a -> a.getPoints().doubleValue())
                 .sum());
         boolean isPassed = false;
-        System.out.println(resultScore + "\n");
         int percentage = (int) Math.round((resultScore * 100.0) / 100);
-        System.out.println(percentage + "\n");
         if (resultScore >= test.getPassingScore().intValue()) {
             isPassed = true;
         }
@@ -281,7 +276,6 @@ public class TestServiceImpl implements TestService {
                 .passingScore(t.getPassingScore().intValue())
                 .questions(t.getQuestions().stream().map(q -> QuestionDto.builder()
                         .question(q.getQuestion())
-                        .points(q.getPoints())
                         .build()).toList())
                 .build()).toList();
     }
@@ -360,7 +354,6 @@ public class TestServiceImpl implements TestService {
                                 .id(o.getId())
                                 .build()).toList())
                         .isRequired(q.getIsRequired())
-                        .points(q.getPoints())
                         .build())
                 .toList();
 

@@ -66,6 +66,7 @@
                     </div>
                 </#if>
             </#list>
+            Lorem ipsum dolor sit amet, consectetur adipisicing.
         </div>
     </div>
 </@page>
