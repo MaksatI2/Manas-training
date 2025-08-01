@@ -29,7 +29,7 @@ public class TestAnswerServiceImpl implements TestAnswerService {
             testAnswer.setSelectedOption(optionService.getOptionById(questionAnswer.getAnswerId()));
             testAnswer.setIsCorrect(optionService.getOptionById(questionAnswer.getAnswerId()).getIsCorrect());
             if (optionService.getOptionById(questionAnswer.getAnswerId()).getIsCorrect()){
-                testAnswer.setPointsEarned(questionService.getQuestionById(questionAnswer.getQuestionId()).getPoints());
+                testAnswer.setPointsEarned(questionAnswer.getPoints());
             }else{
                 testAnswer.setPointsEarned(BigDecimal.ZERO);
             }

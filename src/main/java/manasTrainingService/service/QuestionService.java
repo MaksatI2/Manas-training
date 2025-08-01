@@ -1,5 +1,6 @@
 package manasTrainingService.service;
 
+import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.tests.QuestionDto;
 import manasTrainingService.entity.Test;
 import manasTrainingService.entity.TestQuestion;
@@ -16,4 +17,6 @@ public interface QuestionService {
     List<QuestionDto> getQuestionsByTestId(int testId);
 
     TestQuestion getQuestionById(int id);
+
+    List<QuestionDto> getQuestionsByAnswerQuestionId(TestAnswerDto testAnswerDto);
 }

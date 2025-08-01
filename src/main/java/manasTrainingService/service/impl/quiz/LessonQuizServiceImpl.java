@@ -119,6 +119,35 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     }
 
     @Override
+    public LessonQuizDto getQuizByIdForPassing(int id){
+        LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
+                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+
+        return LessonQuizDto.builder()
+                .id(lessonQuiz.getId())
+                .title(lessonQuiz.getTitle())
+                .description(lessonQuiz.getDescription())
+                .isActive(lessonQuiz.getIsActive())
+                .lessonId(lessonQuiz.getLesson().getId())
+                .lesson(LessonDTO.builder()
+                        .id(lessonQuiz.getLesson().getId())
+                        .title(lessonQuiz.getLesson().getTitle())
+                        .description(lessonQuiz.getLesson().getDescription())
+                        .courseModule(CourseModuleDTO.builder()
+                                .id(lessonQuiz.getLesson().getModule().getId())
+                                .title(lessonQuiz.getLesson().getModule().getTitle())
+                                .courseInstance(CourseInstanceDTO.builder()
+                                        .id(lessonQuiz.getLesson().getModule().getCourseInstance().getId())
+                                        .title(lessonQuiz.getLesson().getModule().getCourseInstance().getTitle())
+                                        .build())
+                                .build())
+                        .build())
+                .questionTimeLimit(lessonQuiz.getQuestionTimeLimit())
+                .questions(lessonQuizQuestionService.getQuizQuestionsByQuizIdForPassing(lessonQuiz.getId()))
+                .build();
+    }
+
+    @Override
     public LessonQuizDto getQuizByLessonId(int lessonId){
         LessonQuiz lessonQuiz = lessonQuizRepository.findByLessonId(lessonId)
                 .orElse(null);
