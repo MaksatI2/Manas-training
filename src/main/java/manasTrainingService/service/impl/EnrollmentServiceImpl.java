@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,6 +67,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         return enrollmentRepository.findByCourseInstanceId(courseInstanceId).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<CourseEnrollment> findByStudentAndInstance(Integer studentId, Integer courseInstanceId) {
+        return enrollmentRepository
+                .findByStudentIdAndCourseInstanceId(studentId, courseInstanceId)
+                .stream()
+                .findFirst();
     }
 
     private CourseEnrollmentDTO toDto(CourseEnrollment enrollment) {
@@ -149,6 +158,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 TargetType.COURSE_ENROLLMENT,
                 saved.getId()
         );
+    }
+
+    @Override
+    public List<CourseInstance> getCompletedCourseInstances(Integer studentId) {
+        return enrollmentRepository.findCompletedCourseInstancesByStudentId(studentId);
     }
 
     @Override

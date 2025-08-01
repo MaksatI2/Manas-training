@@ -171,6 +171,9 @@ databaseChangeLog:
       file: db/changelog/features/058_lesson_content.sql
       relativeToChangelogFile: false
   - include:
+      file: db/changelog/fixes/059_fix_certificates.sql
+      relativeToChangelogFile: false
+  - include:
       file: db/changelog/fixes/059_fix_activity_logs.sql
       relativeToChangelogFile: false
   - include:

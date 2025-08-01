@@ -116,6 +116,12 @@
                             <span>Заявки на курсы</span>
                         </a>
                     </div>
+                    <div class="nav-item">
+                        <a href="/admin/certificate" class="nav-link" data-tooltip="Сертификаты">
+                            <i class="fas fa-award"></i>
+                            <span>Сертификаты</span>
+                        </a>
+                    </div>
                 </#if>
                 <#if isTeacher?? && isTeacher>
                     <div class="nav-item">
@@ -174,6 +180,12 @@
                                 <span>Мои заявки</span>
                             </div>
                             <span id="notificationCountStudent" class="badge bg-danger ms-2" style="display: none;">0</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/student/certificates" class="nav-link" data-tooltip="Сертификаты">
+                            <i class="fas fa-award"></i>
+                            <span>Сертификаты</span>
                         </a>
                     </div>
                 </#if>
