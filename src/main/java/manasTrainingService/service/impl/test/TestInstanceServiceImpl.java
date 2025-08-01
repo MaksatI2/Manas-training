@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -180,8 +181,7 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     }
 
     @Override
-    public TestInstance getTestInstanceModelByCourseInstanceId(Integer id) {
-        return testInstanceRepository.findByInstanceId(id)
-                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+    public Optional<TestInstance> getTestInstanceModelByCourseInstanceId(Integer id) {
+        return testInstanceRepository.findByInstanceId(id);
     }
 }

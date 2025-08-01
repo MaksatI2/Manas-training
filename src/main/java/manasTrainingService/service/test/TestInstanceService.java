@@ -4,6 +4,8 @@ import manasTrainingService.dto.tests.TestInstanceDto;
 import manasTrainingService.entity.TestInstance;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 public interface TestInstanceService {
     @Transactional
     void addTestToCourseInstance(TestInstanceDto testInstanceDto);
@@ -25,5 +27,5 @@ public interface TestInstanceService {
 
     Boolean isAvailableTime(int courseInstanceId);
 
-    TestInstance getTestInstanceModelByCourseInstanceId(Integer id);
+    Optional<TestInstance> getTestInstanceModelByCourseInstanceId(Integer id);
 }

@@ -17,10 +17,8 @@ import manasTrainingService.validation.ValidPhoneNumber;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeacherRegisterDto {
-    @NotBlank(message = "Email обязателен")
-    @Email(message = "Некорректный формат email")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            message = "Email должен содержать только английские символы")
+    @NotBlank(message = "Email не может быть пустым")
+    @Email(message = "Неверный формат email", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
     private String email;
 
     @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).+$",
