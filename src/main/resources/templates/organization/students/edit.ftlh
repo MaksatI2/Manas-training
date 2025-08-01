@@ -1,5 +1,7 @@
 <#import "../../layout.ftlh" as layout>
 <#import "../../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
@@ -50,31 +52,61 @@
 
     <h1 class="page-title">Редактирование студента</h1>
 
+    <#if errorMessage??>
+        <div class="alert alert-danger" role="alert">
+            ${errorMessage}
+        </div>
+    </#if>
+
     <form method="post" action="/organization/students/${student.studentId}/edit" class="form-wrapper mt-4">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
+        <@spring.bind "student.name"/>
         <div class="mb-3">
             <label for="name" class="form-label">Имя</label>
-            <input type="text" class="form-control" id="name" name="name"
-                   value="${student.name!}" placeholder="Введите имя">
+            <input type="text" class="form-control <#if spring.status.error>is-invalid</#if>"
+                   id="name" name="name" value="${student.name!}" placeholder="Введите имя">
+            <#if spring.status.error>
+                <div class="invalid-feedback">
+                    <@spring.showErrors "<br>"/>
+                </div>
+            </#if>
         </div>
 
+        <@spring.bind "student.lastName"/>
         <div class="mb-3">
             <label for="lastName" class="form-label">Фамилия</label>
-            <input type="text" class="form-control" id="lastName" name="lastName"
-                   value="${student.lastName!}" placeholder="Введите фамилию">
+            <input type="text" class="form-control <#if spring.status.error>is-invalid</#if>"
+                   id="lastName" name="lastName" value="${student.lastName!}" placeholder="Введите фамилию">
+            <#if spring.status.error>
+                <div class="invalid-feedback">
+                    <@spring.showErrors "<br>"/>
+                </div>
+            </#if>
         </div>
 
+        <@spring.bind "student.email"/>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email"
-                   value="${student.email!}" placeholder="example@email.com">
+            <input type="email" class="form-control <#if spring.status.error>is-invalid</#if>"
+                   id="email" name="email" value="${student.email!}" placeholder="example@email.com">
+            <#if spring.status.error>
+                <div class="invalid-feedback">
+                    <@spring.showErrors "<br>"/>
+                </div>
+            </#if>
         </div>
 
+        <@spring.bind "student.phone"/>
         <div class="mb-4">
             <label for="phone" class="form-label">Телефон</label>
-            <input type="text" class="form-control" id="phone" name="phone"
-                   value="${student.phone!}" placeholder="+996xxxxxxxxx">
+            <input type="text" class="form-control <#if spring.status.error>is-invalid</#if>"
+                   id="phone" name="phone" value="${student.phone!}" placeholder="+996xxxxxxxxx">
+            <#if spring.status.error>
+                <div class="invalid-feedback">
+                    <@spring.showErrors "<br>"/>
+                </div>
+            </#if>
         </div>
 
         <div class="d-flex justify-content-between">

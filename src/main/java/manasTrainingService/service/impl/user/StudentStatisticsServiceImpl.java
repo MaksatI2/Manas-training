@@ -43,8 +43,7 @@ public class StudentStatisticsServiceImpl implements StudentStatisticsService {
             CourseInstance course = enrollment.getCourseInstance();
             Status status = enrollment.getStatus();
 
-            Integer totalHours = scheduleService
-                    .sumActiveScheduleHoursByCourseInstanceId(course.getId());
+            Integer totalHours = course.getCourse().getDurationHours();
 
             Integer absentHours = attendanceService
                     .sumAbsentHoursByStudentAndCourseInstance(student.getId(), course.getId());

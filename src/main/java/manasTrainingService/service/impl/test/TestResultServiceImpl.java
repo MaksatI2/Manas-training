@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -109,9 +111,13 @@ public class TestResultServiceImpl implements TestResultService {
 
     @Override
     public List<TestResult> getTestResultsByCourseInstanceId(Integer id) {
-        TestInstance testInstance = testInstanceService.getTestInstanceModelByCourseInstanceId(id);
+        Optional<TestInstance> testInstanceOpt = testInstanceService.getTestInstanceModelByCourseInstanceId(id);
 
-        return testResultRepository.findAllByTestInstanceId(testInstance.getId());
+        if (testInstanceOpt.isEmpty()) {
+            return Collections.emptyList();
+        }
 
+        return testResultRepository.findAllByTestInstanceId(testInstanceOpt.get().getId());
     }
+
 }
