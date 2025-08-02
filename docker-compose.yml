@@ -161,6 +161,7 @@ services:
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
       - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_SERVER=manas-prosody
       - JICOFO_COMPONENT_SECRET=${JICOFO_COMPONENT_SECRET:-jicofo-secret}
       - JICOFO_AUTH_USER=focus
       - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD:-focus-password}
@@ -170,13 +171,6 @@ services:
       - JICOFO_ENABLE_BRIDGE_HEALTH_CHECKS=true
       - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=15000
       - JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT=20000
-    networks:
-      - manas-network
-    volumes:
-      - jicofo-config:/config
-    depends_on:
-      - prosody
-    restart: unless-stopped
 
   jvb:
     image: jitsi/jvb:stable
