@@ -1,6 +1,7 @@
 package manasTrainingService.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.tests.OptionDto;
 import manasTrainingService.dto.tests.QuestionDto;
 import manasTrainingService.entity.ActionType;
@@ -61,7 +62,6 @@ public class QuestionServiceImpl implements QuestionService {
                         .id(q.getId())
                         .testId(q.getTest().getId())
                         .question(q.getQuestion())
-                        .points(q.getPoints())
                         .isRequired(q.getIsRequired())
                         .options(q.getOptions().stream()
                                 .map(o -> OptionDto.builder()
@@ -82,7 +82,6 @@ public class QuestionServiceImpl implements QuestionService {
                             .question(q.getQuestion())
                             .isRequired(q.getIsRequired())
                             .testId(q.getTest().getId())
-                            .points(q.getPoints())
                             .question(q.getQuestion())
                             .options(q.getOptions().stream()
                                     .map(o -> OptionDto.builder()
@@ -103,7 +102,6 @@ public class QuestionServiceImpl implements QuestionService {
                             .question(q.getQuestion())
                             .isRequired(q.getIsRequired())
                             .testId(q.getTest().getId())
-                            .points(q.getPoints())
                             .question(q.getQuestion())
                             .options(q.getOptions().stream()
                                     .map(o -> OptionDto.builder()
@@ -134,11 +132,6 @@ public class QuestionServiceImpl implements QuestionService {
         for (int i = 0; i < questions.size(); i++) {
             TestQuestion testQuestion = new TestQuestion();
             testQuestion.setQuestion(questions.get(i).getQuestion());
-            if (questions.get(i).getIsRequired()) {
-                testQuestion.setPoints(BigDecimal.valueOf(basePoints + (i < remainder ? 1 : 0)));
-            } else {
-                testQuestion.setPoints(BigDecimal.valueOf(0));
-            }
             testQuestion.setIsRequired(questions.get(i).getIsRequired());
             testQuestion.setTest(test);
             TestQuestion savedTestQuestion = testQuestionRepository.saveAndFlush(testQuestion);
@@ -203,14 +196,6 @@ public class QuestionServiceImpl implements QuestionService {
             testQuestion.setQuestion(q.getQuestion());
             testQuestion.setIsRequired(q.getIsRequired());
 
-            if (q.getIsRequired()) {
-                int points = basePoints + (requiredIndex < remainder ? 1 : 0);
-                testQuestion.setPoints(BigDecimal.valueOf(points));
-                requiredIndex++;
-            } else {
-                testQuestion.setPoints(BigDecimal.ZERO);
-            }
-
             TestQuestion savedQuestion = testQuestionRepository.saveAndFlush(testQuestion);
 
             if (q.getId() != null) {
@@ -226,5 +211,26 @@ public class QuestionServiceImpl implements QuestionService {
                     testQuestion.getId()
             );
         }
+    }
+
+    @Override
+    public List<QuestionDto> getQuestionsByAnswerQuestionId(TestAnswerDto testAnswerDto){
+        List<TestQuestion> questions = testQuestionRepository.findAllByTestId(testAnswerDto.getTestId());
+        return questions.stream()
+                .filter(q -> testAnswerDto.getQuestionAnswers().stream().map(qa -> qa.getQuestionId()).toList().contains(q.getId()))
+                .map(q -> QuestionDto.builder()
+                        .id(q.getId())
+                        .isRequired(q.getIsRequired())
+                        .question(q.getQuestion())
+                        .testId(q.getTest().getId())
+                        .options(q.getOptions()
+                                .stream()
+                                .map(o -> OptionDto.builder()
+                                        .id(o.getId())
+                                        .optionText(o.getOptionText())
+                                        .isCorrect(o.getIsCorrect())
+                                        .questionId(o.getQuestion().getId())
+                                        .build()).toList())
+                        .build()).toList();
     }
 }

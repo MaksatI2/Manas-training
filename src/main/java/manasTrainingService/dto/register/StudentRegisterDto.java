@@ -21,10 +21,8 @@ public class StudentRegisterDto {
     @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
     private String surname;
 
-    @NotBlank(message = "Email обязателен")
-    @Email(message = "Некорректный формат email")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            message = "Email должен содержать только английские символы")
+    @NotBlank(message = "Email не может быть пустым")
+    @Email(message = "Неверный формат email", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
     private String email;
 
     @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).+$",

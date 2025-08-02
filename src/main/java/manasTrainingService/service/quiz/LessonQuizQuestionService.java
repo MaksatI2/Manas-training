@@ -1,6 +1,7 @@
 package manasTrainingService.service.quiz;
 
 import manasTrainingService.dto.quiz.LessonQuizQuestionDto;
+import manasTrainingService.dto.quiz.answers.QuizAnswerDto;
 import manasTrainingService.entity.LessonQuiz;
 import manasTrainingService.entity.LessonQuizQuestion;
 
@@ -13,5 +14,9 @@ public interface LessonQuizQuestionService {
 
     List<LessonQuizQuestionDto> getQuizQuestionsByQuizId(int quizId);
 
+    List<LessonQuizQuestionDto> getQuizQuestionsByQuizIdForPassing(int quizId);
+
     LessonQuizQuestion getQuizQuestinEntityById(int id);
+
+    List<LessonQuizQuestionDto> getLessonQuizQuestionsByAnswersId(QuizAnswerDto quizAnswerDto);
 }

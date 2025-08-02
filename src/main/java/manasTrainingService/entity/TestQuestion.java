@@ -28,10 +28,6 @@ public class TestQuestion {
     @Column(name = "question", columnDefinition = "TEXT")
     String question;
 
-    @Column(name = "points", precision = 5, scale = 2)
-    @Builder.Default
-    BigDecimal points = BigDecimal.ONE;
-
     @Column(name = "is_required", nullable = false)
     @Builder.Default
     Boolean isRequired = true;

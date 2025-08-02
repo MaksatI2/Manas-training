@@ -171,6 +171,9 @@ databaseChangeLog:
       file: db/changelog/features/058_lesson_content.sql
       relativeToChangelogFile: false
   - include:
+      file: db/changelog/fixes/059_fix_certificates.sql
+      relativeToChangelogFile: false
+  - include:
       file: db/changelog/fixes/059_fix_activity_logs.sql
       relativeToChangelogFile: false
   - include:
@@ -193,6 +196,9 @@ databaseChangeLog:
       relativeToChangelogFile: false
   - include:
       file: db/changelog/fixes/066_change_foreign_key_test_id_table_test_results.sql
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/fixes/067_remove_column_points_from_test_questions_table.sql
       relativeToChangelogFile: false
 
 

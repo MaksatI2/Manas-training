@@ -26,6 +26,9 @@
                     <#if quiz.questions??>
                         <#assign bindingResult = .globals["org.springframework.validation.BindingResult.result"]>
                         <#list quiz.questions as question>
+                            <#if result.questionAnswers?has_content>
+                                <#assign userAnswer = result.questionAnswers?filter(a -> a.questionId == question.id)?first>
+                            </#if>
                             <div class="feature-card">
                                 <div class="card-body px-4">
                                     <h4 class="card-title mb-3 border-bottom border-primary-subtle pb-3">Вопрос №${question?index+1}
@@ -43,7 +46,7 @@
                                                 <input class="form-check-input me-1 fs-4" type="radio"
                                                        name="questionAnswers[${question?index}].answerId"
                                                        id="question-${question?index}-option-${option?index}"
-                                                       value="${option.id}">
+                                                       value="${option.id}" <#if userAnswer?? && userAnswer.answerId?? && userAnswer.answerId == option.id> checked </#if>>
                                                 <label class="form-check-label fs-4"
                                                        for="question-${question?index}-option-${option?index}">
                                                     ${option.optionText}

@@ -10,6 +10,7 @@ import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.user.LessonQuizAlreadyCreatedException;
 import manasTrainingService.service.LessonAccessService;
 import manasTrainingService.service.LessonService;
+import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,7 @@ public class LessonQuizController {
     private final LessonQuizService lessonQuizService;
     private final LessonService lessonService;
     private final LessonAccessService lessonAccessService;
+    private final LessonQuizQuestionService lessonQuizQuestionService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -124,7 +126,7 @@ public class LessonQuizController {
         QuizAnswerDto quizAnswerDto = new QuizAnswerDto();
         quizAnswerDto.setPassingStart(LocalTime.now());
         quizAnswerDto.setQuizId(id);
-        LessonQuizDto lessonQuizDto = lessonQuizService.getQuizById(id);
+        LessonQuizDto lessonQuizDto = lessonQuizService.getQuizByIdForPassing(id);
         if(session.getAttribute("timer") == null && session.getAttribute("startTime") == null){
             session.setAttribute("timer", lessonQuizDto.getQuestionTimeLimit());
             session.setAttribute("startTime", LocalDateTime.now());
@@ -141,6 +143,7 @@ public class LessonQuizController {
                                Model model,
                                HttpSession session) {
         LessonQuizDto lessonQuizDto = lessonQuizService.getQuizById(result.getQuizId());
+        lessonQuizDto.setQuestions(lessonQuizQuestionService.getLessonQuizQuestionsByAnswersId(result));
         if(bindingResult.hasErrors()){
             model.addAttribute("result", result);
             model.addAttribute("quiz", lessonQuizDto);

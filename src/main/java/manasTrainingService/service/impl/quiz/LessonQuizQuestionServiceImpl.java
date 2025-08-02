@@ -1,22 +1,20 @@
 package manasTrainingService.service.impl.quiz;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.quiz.LessonQuizOptionDto;
 import manasTrainingService.dto.quiz.LessonQuizQuestionDto;
-import manasTrainingService.dto.tests.QuestionDto;
+import manasTrainingService.dto.quiz.answers.QuizAnswerDto;
 import manasTrainingService.entity.ActionType;
 import manasTrainingService.entity.LessonQuiz;
 import manasTrainingService.entity.LessonQuizQuestion;
 import manasTrainingService.entity.TargetType;
-import manasTrainingService.entity.TestQuestion;
 import manasTrainingService.entity.User;
 import manasTrainingService.exceptions.nsee.LessonQuizQuestionNotFoundException;
-import manasTrainingService.exceptions.nsee.TestQuestionNotFoundException;
 import manasTrainingService.repositories.quiz.LessonQuizQuestionRepository;
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.quiz.LessonQuizOptionService;
 import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
-import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -81,6 +79,19 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
 
     @Override
     public List<LessonQuizQuestionDto> getQuizQuestionsByQuizId(int quizId){
+        List<LessonQuizQuestion> lessonQuizQuestions = lessonQuizQuestionRepository.findAllByQuizId(quizId);
+            return lessonQuizQuestions.stream().map(l ->
+                    LessonQuizQuestionDto.builder()
+                            .id(l.getId())
+                            .question(l.getQuestion())
+                            .quizId(l.getQuiz().getId())
+                            .points(l.getPoints())
+                            .options(lessonQuizOptionService.getQuizOptionsByQuestionId(l.getId()))
+                            .build()).toList();
+    }
+
+    @Override
+    public List<LessonQuizQuestionDto> getQuizQuestionsByQuizIdForPassing(int quizId){
         List<LessonQuizQuestion> lessonQuizQuestions = lessonQuizQuestionRepository.findAllByQuizId(quizId);
         if (lessonQuizQuestions.size() <= 20) {
             return lessonQuizQuestions.stream().map(l ->
@@ -162,5 +173,28 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
                 );
             }
         }
+    }
+
+    @Override
+    public List<LessonQuizQuestionDto> getLessonQuizQuestionsByAnswersId(QuizAnswerDto quizAnswerDto){
+        List<LessonQuizQuestion> questions = lessonQuizQuestionRepository.findAllByQuizId(quizAnswerDto.getQuizId());
+        return questions.stream()
+                .filter(q -> quizAnswerDto.getQuestionAnswers()
+                        .stream()
+                        .map(qa -> qa.getQuestionId()).toList().contains(q.getId()))
+                        .map(q -> LessonQuizQuestionDto.builder()
+                                .id(q.getId())
+                                .question(q.getQuestion())
+                                .quizId(q.getQuiz().getId())
+                                .options(q.getOptions().stream()
+                                        .map(o -> LessonQuizOptionDto.builder()
+                                                .id(o.getId())
+                                                .questionId(o.getQuestion().getId())
+                                                .optionText(o.getOptionText())
+                                                .isCorrect(o.getIsCorrect())
+                                                .build())
+                                        .toList())
+                                .build())
+                        .toList();
     }
 }

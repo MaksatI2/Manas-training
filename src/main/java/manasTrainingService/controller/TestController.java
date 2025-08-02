@@ -11,6 +11,7 @@ import manasTrainingService.dto.tests.TestInstanceDto;
 import manasTrainingService.entity.TestResult;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
 import manasTrainingService.exceptions.nsee.NoAccessException;
+import manasTrainingService.service.QuestionService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.test.TestAnswerService;
@@ -39,6 +40,7 @@ public class TestController {
     private final TestResultService testResultService;
     private final CourseInstanceService courseInstanceService;
     private final TestAnswerService testAnswerService;
+    private final QuestionService questionService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -185,6 +187,7 @@ public class TestController {
     public String checkTestResults(@Valid @ModelAttribute("result") TestAnswerDto result, BindingResult bindingResult, Model model) {
         TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(result.getTestInstanceId());
         TestDto test = testService.getTestById(result.getTestId());
+        test.setQuestions(questionService.getQuestionsByAnswerQuestionId(result));
         if (bindingResult.hasErrors()) {
             model.addAttribute("test", test);
             model.addAttribute("result", result);

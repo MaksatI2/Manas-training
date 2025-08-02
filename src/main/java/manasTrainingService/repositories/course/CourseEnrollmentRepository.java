@@ -1,8 +1,11 @@
 package manasTrainingService.repositories.course;
 
 import manasTrainingService.entity.CourseEnrollment;
+import manasTrainingService.entity.CourseInstance;
 import manasTrainingService.entity.Status;
 import manasTrainingService.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -45,6 +48,15 @@ public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollme
             """)
     List<CourseEnrollment> findWithCourseByStudentIn(@Param("students") List<User> students);
 
+    @Query("SELECT DISTINCT e.student FROM CourseEnrollment e WHERE e.completionDate IS NOT NULL")
+    Page<User> findStudentsWithCompletedCourses(Pageable pageable);
+
+    @Query("SELECT e.courseInstance FROM CourseEnrollment e WHERE e.student.id = :studentId AND e.completionDate IS NOT NULL")
+    List<CourseInstance> findCompletedCourseInstancesByStudentId(@Param("studentId") Integer studentId);
+
+    List<CourseEnrollment> findByStudentIdAndCompletionDateIsNotNull(Integer studentId);
+
+    List<CourseEnrollment> findByStudentIdAndCourseInstanceId(Integer studentId, Integer courseInstanceId);
     @Query("""
     SELECT e
     FROM CourseEnrollment e

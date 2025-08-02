@@ -12,6 +12,8 @@ public interface LessonQuizService {
 
     LessonQuizDto getQuizById(int id);
 
+    LessonQuizDto getQuizByIdForPassing(int id);
+
     LessonQuizDto getQuizByLessonId(int lessonId);
 
     LessonQuiz getQuizEntityByLessonId(int id);
