@@ -17,30 +17,6 @@ public class JitsiController {
 
     private final MeetingService meetingService;
 
-    @GetMapping("/meeting/{meetingId}/join")
-    public String joinMeetingPage(@PathVariable Integer meetingId,
-                                  @RequestParam(required = false) Integer userId,
-                                  @RequestParam(required = false) String userRole,
-                                  Model model) {
-        MeetingResponseDTO meeting = meetingService.getMeetingById(meetingId);
-        if (meeting == null || !"ACTIVE".equals(meeting.getStatus())) {
-            model.addAttribute("errorMessage", "Встреча не найдена или не активна");
-            return "lessons/lesson";
-        }
-
-        if (userId != null && userRole != null) {
-            boolean canAccess = meetingService.canUserAccessMeeting(userId, userRole, meetingId);
-            if (!canAccess) {
-                model.addAttribute("errorMessage", "У вас нет доступа к этой встрече");
-                return "lessons/lesson";
-            }
-        }
-
-        model.addAttribute("meeting", meeting);
-        model.addAttribute("userId", userId);
-        return "jitsi/join-meeting";
-    }
-
     @GetMapping("/schedule/{scheduleId}/start")
     public String startMeetingPage(@PathVariable Integer scheduleId,
                                    @RequestParam Integer teacherId,

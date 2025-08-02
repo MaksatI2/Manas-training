@@ -131,10 +131,6 @@
 
                             <#if isTeacher && schedule.teacherId?? && schedule.teacherId == currentUserId>
                                 <#if isMeetingActive!false>
-                                    <a href="<@spring.url '/jitsi/meeting/${activeMeeting.meetingId}/join?userId=${currentUserId}&userRole=TEACHER'/>"
-                                       class="btn btn-success btn-sm rounded-pill flex-shrink-0">
-                                        <i class="fas fa-video me-1"></i>Войти в урок
-                                    </a>
                                 <#else>
                                     <a href="<@spring.url '/jitsi/schedule/${schedule.id}/start?teacherId=${currentUserId}'/>"
                                        class="btn btn-success btn-sm rounded-pill flex-shrink-0">
