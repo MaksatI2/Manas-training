@@ -63,7 +63,6 @@
                             </div>
                         </div>
 
-                        <!-- Actions -->
                         <div class="certificate-actions">
                             <a href="${cert.viewUrl}" class="action-btn primary" title="Посмотреть подробнее" data-bs-toggle="tooltip">
                                 <i class="fa-solid fa-circle-info"></i>
