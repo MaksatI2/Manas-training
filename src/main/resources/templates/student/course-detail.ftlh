@@ -85,8 +85,8 @@
                     <h5>Результаты тестировани:</h5>
                     <#if testResult.isPassed>
                         <p class="text-success">Пройден успешно</p>
-                        <#else>
-                            <p class="text-danger">Вы не набрали нужного количества баллов</p>
+                    <#else>
+                        <p class="text-danger">Вы не набрали нужного количества баллов</p>
                     </#if>
                     <p>Количество набранных балов: ${testResult.totalPoints} из ${testInstance.test.passingScore}</p>
                     <p>Время затраченное на прохождение: ${testResult.passingTime} минут.</p>
@@ -94,19 +94,19 @@
                         <a href="/test/${testInstance.id}/result/details" class="btn btn-primary mb-2">Посмотреть подробности</a>
                     </#if>
                 <#else>
-                        <h5>
-                            Тестирование по итогам курса:
-                            <span class="fw-bold">${courseInstance.courseTitle}</span>
-                        </h5>
-                        <#if isAvailableTime>
-                            <p>Тестирование доступно с <span class="fw-bold">${startDate} ${testInstance.startTime}</span> по <span class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
-                            <p class="text-danger">По истечению данного срока доступ к тестированию будет закрыт.</p>
-                            <a href="/test/${testInstance.id}/passing"
-                               class="btn btn-primary mb-2 <#if !testInstance.test.isActive>disabled</#if>">Пройти
-                                итоговое тестирование</a>
-                            <#else>
-                            <p class="text-danger">Доступ к тестированию закрыт в связи с истечением срока.</p>
-                        </#if>
+                    <h5>
+                        Тестирование по итогам курса:
+                        <span class="fw-bold">${courseInstance.courseTitle}</span>
+                    </h5>
+                    <#if isAvailableTime>
+                        <p>Тестирование доступно с <span class="fw-bold">${startDate} ${testInstance.startTime}</span>по <span class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
+                        <p class="text-danger">По истечению данного срока доступ к тестированию будет закрыт.</p>
+                        <a href="/test/${testInstance.id}/passing"
+                           class="btn btn-primary mb-2 <#if !testInstance.test.isActive>disabled</#if>">Пройти
+                            итоговое тестирование</a>
+                    <#else>
+                        <p class="text-danger">Доступ к тестированию закрыт в связи с истечением срока.</p>
+                    </#if>
                 </#if>
             <#else>
                 <p>${testInstanceNotFound!}</p>

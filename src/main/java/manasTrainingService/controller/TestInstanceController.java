@@ -85,6 +85,7 @@ public class TestInstanceController {
         Integer courseInstanceId = testInstanceDto.getCourseInstanceId();
         if(bindingResult.hasErrors()) {
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));
+            model.addAttribute("testInstanceDto", testInstanceService.getTestInstanceByCourseInstanceId(courseInstanceId));
             model.addAttribute("tests", testService.getAllTestsByCourseId(courseInstanceId).stream().filter(TestDto::getIsActive).toList());
             model.addAttribute("courseInstanceId", courseInstanceId);
             return "tests/change-test-to-course-instance";
@@ -97,6 +98,7 @@ public class TestInstanceController {
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));
             model.addAttribute("tests", testService.getAllTestsByCourseId(courseInstanceId).stream().filter(TestDto::getIsActive).toList());
             model.addAttribute("courseInstanceId", courseInstanceId);
+            model.addAttribute("testInstanceDto", testInstanceService.getTestInstanceByCourseInstanceId(courseInstanceId));
             model.addAttribute("error", e.getMessage());
             return "tests/change-test-to-course-instance";
         }
