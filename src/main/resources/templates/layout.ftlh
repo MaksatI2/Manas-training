@@ -152,7 +152,7 @@
                     </div>
                     <div class="nav-item">
                         <a href="/applications/organization" class="nav-link d-flex justify-content-between align-items-center" data-tooltip="Заявки на курсы">
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center" style="gap: 15px">
                                 <i class="fas fa-file-alt"></i>
                                 <span>Заявки на курсы</span>
                             </div>
@@ -175,7 +175,7 @@
                     </div>
                     <div class="nav-item">
                         <a href="/applications/student/applications" class="nav-link d-flex justify-content-between align-items-center" data-tooltip="Мои заявки">
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center" style="gap: 15px">
                                 <i class="fas fa-file-alt"></i>
                                 <span>Мои заявки</span>
                             </div>
