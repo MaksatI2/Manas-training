@@ -33,7 +33,7 @@
                 <div class="alert alert-info mb-0">Вы ещё не подавали заявки.</div>
             <#else>
                 <table id="studentApplicationsTable" class="table table-hover table-bordered align-middle display nowrap" width="100%">
-                    <thead class="table-light">
+                    <thead>
                     <tr>
                         <th>№</th>
                         <th>Курс</th>
@@ -265,5 +265,10 @@
                 font-size: 1.25rem;
             }
         }
+
+        table.dataTable thead th {
+            color: white !important;
+        }
+
     </style>
 </@layout.page>

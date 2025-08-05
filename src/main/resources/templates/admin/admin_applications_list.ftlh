@@ -21,7 +21,7 @@
                 <div class="alert alert-info mb-0">Нет активных заявок.</div>
             <#else>
                 <table id="adminApplicationsTable" class="table table-hover table-bordered align-middle display nowrap" width="100%">
-                    <thead class="table-light">
+                    <thead >
                     <tr>
                         <th>№</th>
                         <th>Компания</th>
@@ -215,6 +215,11 @@
                 margin-bottom: 1rem;
             }
         }
+
+        table.dataTable thead th {
+            color: white !important;
+        }
+
     </style>
     <script>
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');

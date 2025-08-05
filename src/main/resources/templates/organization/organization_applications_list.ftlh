@@ -36,7 +36,7 @@
             <#else>
                 <table id="applicationsTable" class="table table-hover table-bordered align-middle display nowrap"
                        width="100%">
-                    <thead class="table-light">
+                    <thead >
                     <tr>
                         <th>№</th>
                         <th>Курс</th>
@@ -286,5 +286,10 @@
                 margin-top: 0.5rem;
             }
         }
+
+        table.dataTable thead th {
+            color: white !important;
+        }
+
     </style>
 </@layout.page>
