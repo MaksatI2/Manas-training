@@ -7,7 +7,7 @@ public enum FileType {
     IMAGE(Arrays.asList(".jpg", ".jpeg"), Arrays.asList("image/jpeg", "image/jpg")),
     DOCUMENT(
             Arrays.asList(
-                    ".pdf", ".docx", ".pptx", ".zip", ".rar", ".mp4",
+                    ".pdf", ".docx", ".pptx", ".zip", ".rar",
                     ".jpg", ".jpeg",
                     ".xls", ".xlsx"
             ),
@@ -17,7 +17,6 @@ public enum FileType {
                     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                     "application/zip",
                     "application/x-rar-compressed",
-                    "video/mp4",
                     "image/jpeg", "image/jpg",
                     "application/vnd.ms-excel",
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

@@ -245,7 +245,7 @@
 
                 <div class="file-input-wrapper">
                     <input type="file" id="materialFile" name="file" class="file-input"
-                           accept=".pdf,.docx,.pptx,.zip,.rar,.mp4,.jpg,.jpeg,.xls,.xlsx" required>
+                           accept=".pdf,.docx,.pptx,.zip,.rar,.jpg,.jpeg,.xls,.xlsx">
                     <label for="materialFile" class="file-input-label" id="fileLabel">
                         <div>
                             <div class="file-input-icon">
