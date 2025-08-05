@@ -20,8 +20,8 @@
                     <div class="col">
                         <div class="card course-card h-100 shadow-sm border-0 d-flex flex-column">
                             <a href="/teacher/course/${course.courseInstanceId}" class="text-decoration-none text-body flex-grow-1 d-flex flex-column p-3">
-                                <h5 class="card-title mb-2">${course.courseTitle}</h5>
-                                <h6 class="card-subtitle mb-3 text-muted">${course.instanceTitle}</h6>
+                                <h5 class="card-title mb-2">${course.instanceTitle}</h5>
+                                <h6 class="card-subtitle mb-3 text-muted">${course.courseTitle}</h6>
                                 <p class="card-text mt-auto">
                                     <span class="d-block text-muted small">Срок: ${course.startDate} – ${course.endDate}</span>
                                 </p>
