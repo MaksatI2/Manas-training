@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -49,4 +50,8 @@ public class TestResult {
 
     @Column(name = "time_spent_minutes")
     Integer timeSpentMinutes;
+
+    @OneToMany(mappedBy = "attempt", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    List<TestAnswer> answers;
+
 }
