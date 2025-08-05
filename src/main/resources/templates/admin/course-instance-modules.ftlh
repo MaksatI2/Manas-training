@@ -16,11 +16,6 @@
         <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
 
-    <div class="container mb-4">
-        <div class="d-flex flex-wrap gap-2">
-            <a href="/admin/course-instances/${courseInstance.id}" class="btn btn-secondary">Назад</a>
-        </div>
-    </div>
     <div class="container py-4">
         <div class="hero-section mb-4 text-center">
             <h2 class="hero-title mb-2">Управление модулями курса: <strong>${courseInstance.title}</strong></h2>

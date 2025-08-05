@@ -11,7 +11,7 @@
 
                     <div class="mb-3">
                         <label for="title" class="form-label">
-                            <i class="fas fa-heading me-1"></i>Название *
+                            Название *
                         </label>
                         <@spring.formInput "courseInstanceDto.title", "class='form-control' id='title'" />
                         <div class="error-block text-danger">
@@ -21,7 +21,7 @@
 
                     <div class="mb-3">
                         <label for="startDate" class="form-label">
-                            <i class="fas fa-calendar-alt me-1"></i>Дата начала *
+                            Дата начала *
                         </label>
                         <@spring.formInput "courseInstanceDto.startDate", "class='form-control' id='startDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
@@ -31,7 +31,7 @@
 
                     <div class="mb-3">
                         <label for="endDate" class="form-label">
-                            <i class="fas fa-calendar-alt me-1"></i>Дата окончания *
+                            Дата окончания *
                         </label>
                         <@spring.formInput "courseInstanceDto.endDate", "class='form-control' id='endDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
@@ -44,7 +44,6 @@
                             <@spring.formCheckbox "courseInstanceDto.isActive", "class='form-check-input' id='isActive', name='isActive'"/>
 
                             <label class="form-check-label" for="isActive">
-                                <i class="fas fa-check-circle me-1" style="color: #28a745;"></i>
                                 Активный курс
                             </label>
                             <div class="error-block text-danger">

@@ -19,7 +19,7 @@
                         <#assign errors = Request["org.springframework.validation.BindingResult.courseInstanceDto"] />
 
                         <label for="courseId" class="form-label">
-                            <i class="fas fa-book me-1"></i>Курс *
+                            Курс *
                         </label>
 
                         <select class="form-select" id="courseId" name="courseId">
@@ -41,7 +41,7 @@
 
                     <div class="mb-3">
                         <label for="title" class="form-label">
-                            <i class="fas fa-heading me-1"></i>Название *
+                            Название *
                         </label>
                         <@spring.formInput "courseInstanceDto.title", "class='form-control' id='title'" />
                         <div class="error-block text-danger">
@@ -51,7 +51,7 @@
 
                     <div class="mb-3">
                         <label for="startDate" class="form-label">
-                            <i class="fas fa-calendar-alt me-1"></i>Дата начала *
+                            Дата начала *
                         </label>
                         <@spring.formInput "courseInstanceDto.startDate", "class='form-control' id='startDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
@@ -61,7 +61,7 @@
 
                     <div class="mb-3">
                         <label for="endDate" class="form-label">
-                            <i class="fas fa-calendar-alt me-1"></i>Дата окончания *
+                            Дата окончания *
                         </label>
                         <@spring.formInput "courseInstanceDto.endDate", "class='form-control' id='endDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
@@ -71,12 +71,15 @@
 
 
                     <div class="mb-3">
-                        <label for="isActive" class="form-label">
-                            <i class="fas fa-toggle-on me-1"></i>Активен
-                        </label>
-                        <@spring.formCheckbox "courseInstanceDto.isActive", "class='form-check-input' id='isActive'" />
-                        <div class="error-block text-danger">
-                            <@spring.showErrors "isActive", "error-message" />
+                        <div class="form-check form-switch">
+                            <@spring.formCheckbox "courseInstanceDto.isActive", "class='form-check-input' id='isActive', name='isActive'"/>
+
+                            <label class="form-check-label" for="isActive">
+                                Активный курс
+                            </label>
+                            <div class="error-block text-danger">
+                                <@spring.showErrors "isActive", "error-message" />
+                            </div>
                         </div>
                     </div>
 
@@ -87,6 +90,76 @@
             </div>
         </div>
     </div>
+    <style>
+        .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066cc, #003d7a);
+            border-color: #0066cc;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #003d7a, #002a5a);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+            transform: translateY(-1px);
+        }
+
+        .form-check-input:checked {
+            background-color: #0066cc;
+            border-color: #0066cc;
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+    </style>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             flatpickr("#startDate", {
