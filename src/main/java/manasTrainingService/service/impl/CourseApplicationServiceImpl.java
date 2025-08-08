@@ -147,6 +147,10 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                 .orElseThrow(() -> new NotFoundException("Заявка не найдена"));
 
         Status newStatus = dto.getNewStatus();
+        if (app.getStatus() == Status.APPROVED) {
+            throw new BadRequestException("Нельзя изменить статус принятой заявки");
+        }
+
         if (app.getStatus() == Status.REJECTED && newStatus != Status.REJECTED) {
             throw new BadRequestException("Нельзя изменить статус отклонённой заявки");
         }
@@ -170,7 +174,6 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
             }
             courseApplicationEmployeeRepository.saveAll(applicationEmployees);
 
-            emailService.sendApplicationStatusUpdateEmail(app);
 
         } else if (newStatus == Status.APPROVED) {
             List<CourseApplicationEmployee> applicationEmployees = courseApplicationEmployeeRepository
@@ -187,13 +190,11 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
             app.setStatus(Status.APPROVED);
             courseApplicationRepository.save(app);
 
-            emailService.sendApplicationStatusUpdateEmail(app);
 
         } else {
             app.setStatus(newStatus);
             courseApplicationRepository.save(app);
 
-            emailService.sendApplicationStatusUpdateEmail(app);
         }
 
         activityLogService.log(
@@ -228,7 +229,6 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
         c.setAdmin(author);
         c.setCreatedAt(LocalDateTime.now());
         ApplicationComment saved = applicationCommentRepository.save(c);
-        emailService.sendNewCommentNotification(app, comment, author);
         activityLogService.log(
                 userService.getAuthorizedUser(),
                 ActionType.CREATE,

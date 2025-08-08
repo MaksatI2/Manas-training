@@ -58,7 +58,7 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
 
     @Override
     public List<CourseInstanceDTO> findAll() {
-        return courseInstanceRepository.findAll().stream()
+        return courseInstanceRepository.findAllByOrderByIsActiveDesc().stream()
                 .map(this::convertToDtoForList)
                 .collect(Collectors.toList());
     }

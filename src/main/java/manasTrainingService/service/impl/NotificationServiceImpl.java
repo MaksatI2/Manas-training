@@ -14,6 +14,7 @@ import manasTrainingService.util.StatusUtil;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import manasTrainingService.util.DateUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -239,5 +240,151 @@ public class NotificationServiceImpl implements NotificationService {
         int deleted = deleteOldNotifications(60);
         log.info("Автоудалено {} устаревших уведомлений", deleted);
     }
+
+
+    @Override
+    public void notifyAdminsAboutCourseCompletion(CourseEnrollment courseEnrollment) {
+        String studentName = courseEnrollment.getStudent().getName();
+        String courseName = courseEnrollment.getCourseInstance().getCourse().getTitle();
+        Integer courseInstanceId = courseEnrollment.getCourseInstance().getId();
+
+        String link = "/certificates/create/" + courseInstanceId + "/" + courseEnrollment.getStudent().getId();
+
+        List<User> admins = userRepository.findAllByRole_Name("ADMIN");
+
+        for (User admin : admins) {
+            Notification notification = Notification.builder()
+                    .user(admin)
+                    .title("Завершение курса студентом")
+                    .body(studentName + " завершил(а) курс \"" + courseName + "\".")
+                    .targetType(TargetType.COURSE_INSTANCE)
+                    .targetId(courseInstanceId)
+                    .notificationType(NotificationType.COURSE_INSTANCE_FINISHED)
+                    .link(link)
+                    .build();
+            create(notification);
+            sendToWebSocket(admin, notification);
+        }
+    }
+
+    @Override
+    public void notifyTeacherAssignedToCourse(User teacher, CourseInstance courseInstance) {
+        String courseName = courseInstance.getCourse().getTitle();
+        String link = "/teacher/course/" + courseInstance.getId();
+
+        Notification notification = Notification.builder()
+                .user(teacher)
+                .title("Вы назначены учителем на курс")
+                .body("Курс: " + courseName + ", Даты проведения: " + DateUtil.formatDateOnly(courseInstance.getStartDate()) + " - " + DateUtil.formatDateOnly(courseInstance.getEndDate()))
+                .targetType(TargetType.COURSE_INSTANCE)
+                .targetId(courseInstance.getId())
+                .notificationType(NotificationType.GENERAL)
+                .link(link)
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        createAndSend(notification);
+    }
+
+    @Override
+    public void notifyTeacherRemovedFromCourse(User teacher, CourseInstance courseInstance) {
+        String courseName = courseInstance.getCourse().getTitle();
+        String link = "/teacher/my-courses" + courseInstance.getId();
+
+        Notification notification = Notification.builder()
+                .user(teacher)
+                .title("Удаление с курса")
+                .body("Вы больше не ведёте данный курс: " + courseName)
+                .targetType(TargetType.COURSE_INSTANCE)
+                .targetId(courseInstance.getId())
+                .notificationType(NotificationType.GENERAL)
+                .link(link)
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        createAndSend(notification);
+    }
+
+    @Override
+    public void notifyStudentEnrolledToCourse(User student, CourseInstance courseInstance) {
+        String courseName = courseInstance.getCourse().getTitle();
+        String link = "/student/course/" + courseInstance.getId();
+
+        Notification notification = Notification.builder()
+                .user(student)
+                .title("Вы записаны на курс")
+                .body("Курс: " + courseName + ", Даты проведения: " + DateUtil.formatDateOnly(courseInstance.getStartDate()) + " - " + DateUtil.formatDateOnly(courseInstance.getEndDate()))
+                .targetType(TargetType.COURSE_INSTANCE)
+                .targetId(courseInstance.getId())
+                .notificationType(NotificationType.GENERAL)
+                .link(link)
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        createAndSend(notification);
+    }
+
+    @Override
+    public void notifyStudentAboutEnrollmentStatusChange(User student, CourseInstance courseInstance, Status status) {
+        String courseName = courseInstance.getCourse().getTitle();
+        String title;
+        String body;
+        String link = "/courses/student/" + courseInstance.getId();
+
+        if (status == Status.ENROLLED) {
+            title = "Запись на курс подтверждена";
+            body = "Вы успешно записаны на курс: " + courseName;
+        } else if (status == Status.DROPPED) {
+            title = "Удаление с курса";
+            body = "Вы больше не участвуете в курсе: " + courseName;
+        } else {
+            return;
+        }
+
+        Notification notification = Notification.builder()
+                .user(student)
+                .title(title)
+                .body(body)
+                .targetType(TargetType.COURSE_INSTANCE)
+                .targetId(courseInstance.getId())
+                .notificationType(NotificationType.GENERAL)
+                .link(link)
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        createAndSend(notification);
+    }
+
+    @Transactional
+    @Override
+    public void notifyStudentsAboutTest(CourseInstance instance, TestInstance testInstance, String action) {
+        List<User> students = instance.getEnrollments().stream()
+                .map(CourseEnrollment::getStudent)
+                .toList();
+
+        String testTitle = testInstance.getTest().getTitle();
+        String link = "/student/course/" + instance.getId();
+
+        for (User student : students) {
+            Notification notification = Notification.builder()
+                    .user(student)
+                    .title("Тест " + action + ": " + testTitle)
+                    .body("Тест доступен с " + DateUtil.formatWithTime(testInstance.getScheduledStart()) + " до " + DateUtil.formatWithTime(testInstance.getScheduledEnd()))
+                    .targetType(TargetType.TEST_INSTANCE)
+                    .targetId(testInstance.getId())
+                    .notificationType(NotificationType.GENERAL)
+                    .link(link)
+                    .isRead(false)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            createAndSend(notification);
+        }
+    }
+
 
 }

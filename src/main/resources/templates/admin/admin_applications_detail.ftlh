@@ -178,7 +178,7 @@
                 </#list>
             </div>
         </div>
-        <#if application.status != "APPROVED">
+        <#if application.status != "APPROVED" && application.status != "REJECTED">
             <div class="card-body-custom">
                 <form action="/applications/admin/${application.id}/status" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
@@ -204,9 +204,13 @@
             </div>
         <#else>
             <div class="alert alert-info mt-3">
-                Заявка уже <strong>одобрена</strong>, её статус изменить нельзя.
+                Заявка уже
+                <#if application.status == "APPROVED"><strong>одобрена</strong></#if>
+                <#if application.status == "REJECTED"><strong>отклонена</strong></#if>
+                , её статус изменить нельзя.
             </div>
         </#if>
+
     </div>
 </div>
 

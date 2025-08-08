@@ -8,6 +8,7 @@ import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.user.UserNotFoundException;
 import manasTrainingService.repositories.course.CourseInstanceTeacherRepository;
 import manasTrainingService.service.ActivityLogService;
+import manasTrainingService.service.NotificationService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.test.TestService;
@@ -27,6 +28,7 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     private final CourseInstanceService courseInstanceService;
     private final UserService userService;
     private final ActivityLogService activityLogService;
+    private final NotificationService notificationService;
 
     @Override
     public List<CourseInstanceTeacherDTO> getTeachersByCourseInstanceId(Integer courseInstanceId) {
@@ -66,6 +68,8 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
                     TargetType.COURSE_INSTANCE_TEACHER,
                     entity.getId()
             );
+
+            notificationService.notifyTeacherAssignedToCourse(teacher, courseInstance);
         }
     }
 
@@ -81,6 +85,8 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
                 TargetType.COURSE_INSTANCE_TEACHER,
                 teacher.getId()
         );
+        notificationService.notifyTeacherRemovedFromCourse(teacher.getTeacher(), teacher.getCourseInstance());
+
     }
 
     @Override
