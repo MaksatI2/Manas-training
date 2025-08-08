@@ -130,12 +130,7 @@
                             <span>Мои курсы</span>
                         </a>
                     </div>
-                    <div class="nav-item">
-                        <a href="/#" class="nav-link" data-tooltip="Тесты">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Тесты</span>
-                        </a>
-                    </div>
+
                     <div class="nav-item">
                         <a href="/schedules" class="nav-link" data-tooltip="Расписание">
                             <i class="fas fa-calendar"></i>
@@ -156,7 +151,6 @@
                                 <i class="fas fa-file-alt"></i>
                                 <span>Заявки на курсы</span>
                             </div>
-                            <span id="notificationCount" class="badge bg-danger ms-2" style="display: none;">0</span>
                         </a>
                     </div>
                 </#if>
@@ -179,7 +173,6 @@
                                 <i class="fas fa-file-alt"></i>
                                 <span>Мои заявки</span>
                             </div>
-                            <span id="notificationCountStudent" class="badge bg-danger ms-2" style="display: none;">0</span>
                         </a>
                     </div>
                     <div class="nav-item">

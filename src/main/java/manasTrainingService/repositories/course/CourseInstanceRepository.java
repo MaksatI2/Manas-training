@@ -28,4 +28,7 @@ public interface CourseInstanceRepository extends JpaRepository<CourseInstance, 
 
     long countByIsActiveFalse();
 
+    List<CourseInstance> findAllByOrderByIsActiveDesc();
+
+
 }

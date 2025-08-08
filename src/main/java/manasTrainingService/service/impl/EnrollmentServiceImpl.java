@@ -9,6 +9,7 @@ import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.repositories.course.CourseEnrollmentRepository;
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.EnrollmentService;
+import manasTrainingService.service.NotificationService;
 import manasTrainingService.service.course.CourseApplicationEmployeeService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.user.UserService;
@@ -30,6 +31,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final UserService userService;
     private final ActivityLogService activityLogService;
     private final CourseEnrollmentRepository courseEnrollmentRepository;
+    private final NotificationService notificationService;
 
     @Override
     public void enrollEmployees(Integer courseInstanceId, List<Integer> employeeIds) {
@@ -55,6 +57,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                         TargetType.COURSE_ENROLLMENT,
                         saved.getId()
                 );
+                notificationService.notifyStudentEnrolledToCourse(student, courseInstance);
+
 
                 employee.setApplicationStatus(Status.APPROVED);
                 courseApplicationEmployeeService.save(employee);
@@ -158,6 +162,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 TargetType.COURSE_ENROLLMENT,
                 saved.getId()
         );
+        notificationService.notifyStudentAboutEnrollmentStatusChange(saved.getStudent(), saved.getCourseInstance(), newStatus);
+
     }
 
     @Override
@@ -179,6 +185,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         courseEnrollment.setCompletionDate(LocalDateTime.now());
         courseEnrollment.setFinalGrade(testResult.getScore());
         courseEnrollmentRepository.saveAndFlush(courseEnrollment);
+        notificationService.notifyAdminsAboutCourseCompletion(courseEnrollment);
 
     }
 

@@ -9,6 +9,7 @@ import manasTrainingService.entity.TestInstance;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
 import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
 import manasTrainingService.repositories.test.TestInstanceRepository;
+import manasTrainingService.service.NotificationService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestService;
@@ -27,6 +28,7 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     private final TestInstanceRepository testInstanceRepository;
     private final CourseInstanceService courseInstanceService;
     private final TestService testService;
+    private final NotificationService notificationService;
 
     @Transactional
     @Override
@@ -54,6 +56,8 @@ public class TestInstanceServiceImpl implements TestInstanceService {
         testInstance.setScheduledEnd(scheduledEnd);
 
         testInstanceRepository.saveAndFlush(testInstance);
+        notificationService.notifyStudentsAboutTest(courseInstanceService.getCourseInstanceModelById(testInstanceDto.getCourseInstanceId()), testInstance, "добавлен");
+
     }
 
     @Transactional
@@ -83,6 +87,8 @@ public class TestInstanceServiceImpl implements TestInstanceService {
         testInstance.setScheduledEnd(scheduledEnd);
 
         testInstanceRepository.saveAndFlush(testInstance);
+        notificationService.notifyStudentsAboutTest(courseInstanceService.getCourseInstanceModelById(testInstanceDto.getCourseInstanceId()), testInstance, "обновлен");
+
     }
 
         private List<LocalDateTime> parseDateRange(TestInstanceDto testInstanceDto) {

@@ -29,5 +29,6 @@ public enum TargetType {
     LESSON_QUIZ_OPTION,
     LESSON_QUIZ_QUESTION,
     LESSON_QUIZ,
-    TEST
+    TEST,
+    TEST_INSTANCE
 }

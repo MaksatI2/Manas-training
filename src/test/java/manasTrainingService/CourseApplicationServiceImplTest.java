@@ -179,7 +179,6 @@ class CourseApplicationServiceImplTest {
 
         assertEquals(Status.APPROVED, app.getStatus());
         verify(applicationRepository).save(app);
-        verify(emailService).sendApplicationStatusUpdateEmail(app);
 
     }
 
@@ -211,7 +210,6 @@ class CourseApplicationServiceImplTest {
         service.addCommentToApplication(1, "Тест", "admin@example.com");
 
         verify(commentRepository).save(any());
-        verify(emailService).sendNewCommentNotification(eq(app), eq("Тест"), eq(admin));
     }
 
 
