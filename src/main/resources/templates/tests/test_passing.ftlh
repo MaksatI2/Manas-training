@@ -12,7 +12,7 @@
         <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Итоговый тест курса "${courseInstance.title}"</h1>
     </div>
     <div class="row justify-content-center">
-        <div class="col-lg-10 col-md-10">
+        <div class="col-lg-8 col-md-8">
             <div class="feature-card">
                 <div class="card-body">
                     <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3">${test.title}</h5>

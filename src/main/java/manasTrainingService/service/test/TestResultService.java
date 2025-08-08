@@ -2,6 +2,7 @@ package manasTrainingService.service.test;
 
 import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.answers.TestResultDto;
+import manasTrainingService.dto.tests.TestResultAdminDto;
 import manasTrainingService.entity.TestResult;
 
 import java.math.BigDecimal;
@@ -16,6 +17,8 @@ public interface TestResultService {
 
     TestResultDto getResultsByTestInstanceIdAndStudentId(int testInstanceId);
 
+    TestResultDto getResultsByTestInstanceIdAndStudentId(int testInstanceId, int userId);
+
     Boolean userHasTestAttempt(int testId);
 
     List<TestResult> getTestResultsByStudentId(Integer studentId);
@@ -27,4 +30,8 @@ public interface TestResultService {
     Boolean hasResultsByTestInstanceId(int testInstanceId);
 
     List<TestResult> getTestResultsByCourseInstanceId(Integer id);
+
+    List<TestResultAdminDto> getAllResults();
+
+    TestResultAdminDto getTestResultById(int id);
 }

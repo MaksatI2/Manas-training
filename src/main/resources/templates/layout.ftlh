@@ -122,6 +122,12 @@
                             <span>Сертификаты</span>
                         </a>
                     </div>
+                    <div class="nav-item">
+                        <a href="/admin/test-results" class="nav-link" data-tooltip="Результаты тестирований">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>Результаты тестирований</span>
+                        </a>
+                    </div>
                 </#if>
                 <#if isTeacher?? && isTeacher>
                     <div class="nav-item">

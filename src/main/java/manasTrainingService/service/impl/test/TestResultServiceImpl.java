@@ -1,10 +1,14 @@
 package manasTrainingService.service.impl.test;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.CourseDto;
 import manasTrainingService.dto.answers.TestAnswerDto;
 import manasTrainingService.dto.answers.TestResultDto;
+import manasTrainingService.dto.certificate.StudentDto;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
+import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.dto.tests.TestInstanceDto;
+import manasTrainingService.dto.tests.TestResultAdminDto;
 import manasTrainingService.entity.TestInstance;
 import manasTrainingService.entity.TestResult;
 import manasTrainingService.exceptions.nsee.TestResultNotFoundException;
@@ -85,6 +89,24 @@ public class TestResultServiceImpl implements TestResultService {
     }
 
     @Override
+    public TestResultDto getResultsByTestInstanceIdAndStudentId(int testInstanceId, int userId){
+        TestResult testResult = testResultRepository.findOneByStudentIdAndTestInstanceId(userId, testInstanceId)
+                .orElseThrow(() -> new TestResultNotFoundException("Результатов по данному запросу не найденно"));
+        return TestResultDto.builder()
+                .id(testResult.getId())
+                .totalPoints(testResult.getScore().intValue())
+                .passingTime(testResult.getTimeSpentMinutes())
+                .testInstance(TestInstanceDto.builder()
+                        .courseInstance(CourseInstanceDTO.builder()
+                                .id(testResult.getTestInstance().getInstance().getId())
+                                .title(testResult.getTestInstance().getInstance().getTitle())
+                                .build())
+                        .build())
+                .isPassed(testResult.getIsPassed())
+                .build();
+    }
+
+    @Override
     public Boolean userHasTestAttempt(int testId) {
         return testResultRepository.existsByStudentIdAndTestInstanceId(userService.getAuthorizedUser().getId(), testId);
     }
@@ -118,6 +140,95 @@ public class TestResultServiceImpl implements TestResultService {
         }
 
         return testResultRepository.findAllByTestInstanceId(testInstanceOpt.get().getId());
+    }
+
+    @Override
+    public List<TestResultAdminDto> getAllResults(){
+        List<TestResult> testResults = testResultRepository.findAll();
+        return testResults
+                .stream()
+                .map(t ->
+                        TestResultAdminDto
+                                .builder()
+                                .id(t.getId())
+                                .student(StudentDto
+                                        .builder()
+                                        .id(t.getStudent().getId())
+                                        .email(t.getStudent().getEmail())
+                                        .name(t.getStudent().getName())
+                                        .lastName(t.getStudent().getLastName())
+                                        .build())
+                                .testInstance(TestInstanceDto
+                                        .builder()
+                                        .id(t.getTestInstance().getId())
+                                        .test(TestDto
+                                                .builder()
+                                                .id(t.getTestInstance().getTest().getId())
+                                                .title(t.getTestInstance().getTest().getTitle())
+                                                .description(t.getTestInstance().getTest().getDescription())
+                                                .passingScore(t.getTestInstance().getTest().getPassingScore().intValue())
+                                                .course(CourseDto
+                                                        .builder()
+                                                        .id(t.getTestInstance().getTest().getCourse().getId())
+                                                        .title(t.getTestInstance().getTest().getCourse().getTitle())
+                                                        .description(t.getTestInstance().getTest().getCourse().getDescription())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .courseInstance(CourseInstanceDTO
+                                        .builder()
+                                        .id(t.getTestInstance().getInstance().getId())
+                                        .title(t.getTestInstance().getInstance().getTitle())
+                                        .build())
+                                .isPassed(t.getIsPassed())
+                                .percentage(t.getPercentage())
+                                .score(t.getScore())
+                                .timeSpentMinutes(t.getTimeSpentMinutes())
+                                .build())
+                .toList();
+    }
+
+    @Override
+    public TestResultAdminDto getTestResultById(int id){
+        TestResult testResult = testResultRepository.findById(id)
+                .orElseThrow(() -> new TestResultNotFoundException("Результатов по данному запросу не найденно"));
+        return TestResultAdminDto
+                                .builder()
+                                .id(testResult.getId())
+                                .student(StudentDto
+                                        .builder()
+                                        .id(testResult.getStudent().getId())
+                                        .email(testResult.getStudent().getEmail())
+                                        .name(testResult.getStudent().getName())
+                                        .lastName(testResult.getStudent().getLastName())
+                                        .build())
+                                .testInstance(TestInstanceDto
+                                        .builder()
+                                        .id(testResult.getTestInstance().getId())
+                                        .test(TestDto
+                                                .builder()
+                                                .id(testResult.getTestInstance().getTest().getId())
+                                                .title(testResult.getTestInstance().getTest().getTitle())
+                                                .description(testResult.getTestInstance().getTest().getDescription())
+                                                .passingScore(testResult.getTestInstance().getTest().getPassingScore().intValue())
+                                                .course(CourseDto
+                                                        .builder()
+                                                        .id(testResult.getTestInstance().getTest().getCourse().getId())
+                                                        .title(testResult.getTestInstance().getTest().getCourse().getTitle())
+                                                        .description(testResult.getTestInstance().getTest().getCourse().getDescription())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .courseInstance(CourseInstanceDTO
+                                        .builder()
+                                        .id(testResult.getTestInstance().getInstance().getId())
+                                        .title(testResult.getTestInstance().getInstance().getTitle())
+                                        .build())
+                                .isPassed(testResult.getIsPassed())
+                                .percentage(testResult.getPercentage())
+                                .score(testResult.getScore())
+                                .timeSpentMinutes(testResult.getTimeSpentMinutes())
+                                .build();
     }
 
 }

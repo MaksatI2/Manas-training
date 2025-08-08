@@ -28,4 +28,7 @@ public interface TestInstanceService {
     Boolean isAvailableTime(int courseInstanceId);
 
     Optional<TestInstance> getTestInstanceModelByCourseInstanceId(Integer id);
+
+    @Transactional
+    void changeTestInstanceTime(TestInstanceDto testInstanceDto);
 }

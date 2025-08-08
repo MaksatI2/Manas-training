@@ -10,12 +10,15 @@ import manasTrainingService.dto.instance.CourseModuleListDTO;
 import manasTrainingService.dto.instance.CourseModuleUpdateDTO;
 import manasTrainingService.dto.instance.LessonCreateRequest;
 import manasTrainingService.dto.teacher.TeacherFormDTO;
+import manasTrainingService.dto.tests.TestInstanceDto;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseModuleService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.course.CourseTeacherService;
 import manasTrainingService.service.ScheduleService;
+import manasTrainingService.service.test.TestInstanceService;
+import manasTrainingService.service.test.TestResultService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -40,6 +44,8 @@ public class CourseInstanceController {
     private final CourseTeacherService courseTeacherService;
     private final CourseTeacherInstanceService courseInstanceTeacherService;
     private final ScheduleService scheduleService;
+    private final TestInstanceService testInstanceService;
+    private final TestResultService testResultService;
 
     @GetMapping
     public String listCourseInstances(Model model) {
@@ -98,8 +104,15 @@ public class CourseInstanceController {
     @GetMapping("/{id}")
     public String viewCourseInstance(@PathVariable Integer id, Model model) {
         CourseInstanceDTO courseInstanceDto = courseInstanceService.getCourseInstanceById(id);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         model.addAttribute("courseInstance", courseInstanceDto);
         model.addAttribute("lessonCreateRequest", new LessonCreateRequest());
+        if(testInstanceService.isTestInstanceExist(courseInstanceDto.getId())){
+            TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceByCourseInstanceId(courseInstanceDto.getId());
+            model.addAttribute("testInstance", testInstanceDto);
+            model.addAttribute("startDate", testInstanceDto.getStartDate().format(formatter));
+            model.addAttribute("endDate", testInstanceDto.getEndDate().format(formatter));
+        }
         return "admin/course-instance-detail";
     }
 

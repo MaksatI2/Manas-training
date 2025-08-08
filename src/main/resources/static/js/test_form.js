@@ -8,7 +8,7 @@ function createQuestionBlock(count, testId) {
     for (let i = 0; i < count; i++) {
         let questionIndex = index + i;
         let question = `
-                <div class="col-lg-10 col-md-10" id="questionId-${questionIndex}" data-new="true">
+                <div class="col-lg-8 col-md-10" id="questionId-${questionIndex}" data-new="true">
                     <div class="feature-card">
                         <div class="text-end">
                              <button type="button" class="btn btn-outline-danger fs-5"
@@ -249,7 +249,7 @@ function deleteQuestionFromEdit(id, index) {
         input.remove()
         div.querySelectorAll('input').forEach(input => input.readOnly = false)
         div.querySelectorAll("button").forEach(button => button.disabled = false)
-        div.setAttribute("class", "col-lg-10 col-md-10")
+        div.setAttribute("class", "col-lg-8 col-md-8")
         div.removeAttribute("deleted");
 
         btn.remove()
@@ -259,7 +259,7 @@ function deleteQuestionFromEdit(id, index) {
     let btnDiv = document.getElementById("question-" + index + "-btnDiv")
 
     div.append(input);
-    div.setAttribute("class", "col-lg-10 col-md-10 opacity-50")
+    div.setAttribute("class", "col-lg-8 col-md-8 opacity-50")
     div.setAttribute("deleted", 'true');
     div.append(btn)
     btnDiv.append(btn)

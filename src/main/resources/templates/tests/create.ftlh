@@ -19,20 +19,23 @@
 
 
         <div class="row justify-content-center" id="test">
-            <div class="col-lg-10 col-md-10">
+            <div class="col-lg-8 col-md-10">
                 <div class="feature-card">
                     <div class="mb-3">
-                        <label for="test.title" class="form-label fw-bold required">Название теста <span class="text-danger">*</span></label>
+                        <label for="test.title" class="form-label fw-bold required">Название теста <span
+                                    class="text-danger">*</span></label>
                         <@spring.formInput "test.title" 'class="form-control" id="test.title"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="test.description" class="form-label fw-bold required">Описание теста <span class="text-danger">*</span></label>
+                        <label for="test.description" class="form-label fw-bold required">Описание теста <span
+                                    class="text-danger">*</span></label>
                         <@spring.formTextarea "test.description" 'class="form-control" rows="3" id="test.description"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="test.passingScore" class="form-label fw-bold required">Проходной балл <span class="text-danger">*</span></label>
+                        <label for="test.passingScore" class="form-label fw-bold required">Проходной балл <span
+                                    class="text-danger">*</span></label>
                         <@spring.formInput "test.passingScore" 'class="form-control points" id="test.passingScore"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
@@ -41,7 +44,7 @@
             <h3 class="text-center mb-4">Список вопросов</h3>
             <#if 0 < test.questions?size>
                 <#list (test.questions)![] as question>
-                    <div class="col-lg-10 col-md-10" id="questionId-${question?index}">
+                    <div class="col-lg-8 col-md-10" id="questionId-${question?index}">
                         <div class="feature-card">
                             <#if question?index != 0>
                                 <div class="text-end">
@@ -114,7 +117,8 @@
                                 </div>
                                 <div class="mb-3" id="createOption-questionId-${question?index}">
                                     <button type="button" class="btn btn-primary-custom"
-                                            onclick="addOption(${question?index})" id="add-options-button-question-${question?index}">
+                                            onclick="addOption(${question?index})"
+                                            id="add-options-button-question-${question?index}">
                                         Добавить вариант ответа
                                     </button>
                                 </div>
@@ -127,7 +131,7 @@
                     </div>
                 </#list>
             <#else>
-                <div class="col-lg-10 col-md-10" id="questionId-0">
+                <div class="col-lg-8 col-md-10" id="questionId-0">
                     <div class="feature-card">
                         <div class="mb-3">
                             <label for="questions[0].question" class="form-label fw-bold">Введите текст
@@ -214,7 +218,8 @@
                             </div>
                         </div>
                         <div class="mb-3" id="createOption">
-                            <button type="button" class="btn btn-primary-custom" onclick="createOption(0)" id="add-options-button-question-0">
+                            <button type="button" class="btn btn-primary-custom" onclick="createOption(0)"
+                                    id="add-options-button-question-0">
                                 Добавить вариант ответа
                             </button>
                         </div>
@@ -227,30 +232,33 @@
                 </div>
             </#if>
 
-            <div class=" mb-3 col-lg-10 col-md-10 dropdown" id="createQuestionContainer">
-                <button type="button" class="btn btn-primary-custom dropdown-toggle" id="createQuestion" data-bs-toggle="dropdown">
-                    Добавить вопросы
-                </button>
-                <ul class="dropdown-menu">
-                    <li class="dropdown-item" onclick="createQuestionBlock(1)">1</li>
-                    <li class="dropdown-item" onclick="createQuestionBlock(3)">3</li>
-                    <li class="dropdown-item" onclick="createQuestionBlock(5)">5</li>
-                    <li class="dropdown-item" onclick="createQuestionBlock(10)">10</li>
-                    <li class="dropdown-item" onclick="createQuestionBlock(15)">15</li>
-                    <li class="dropdown-item" onclick="createQuestionBlock(20)">20</li>
-                </ul>
-            </div>
-            <div class="mb-3 form-check col-lg-10 col-md-10" id="active-test-block">
-                <@spring.formCheckbox "test.isActive" 'class="form-check-input fs-4" checked'/>
-                <label class="form-check-label fw-bold" for="test.isActive">Активный?</label>
+            <div class=" mb-3 col-lg-8 col-md-10 dropdown" id="createQuestionContainer">
+                <div class="row">
+                    <div class="col-12 col-md-6 col-lg-3 mb-3 d-flex align-items-center">
+                        <@spring.formCheckbox "test.isActive" 'class="form-check-input fs-4 ms-3" checked'/>
+                        <label class="form-check-label fw-bold" for="test.isActive">Активный?</label>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-9 mb-3 d-flex justify-content-end flex-wrap gap-2">
+                        <button type="button" class="btn btn-primary-custom dropdown-toggle me-3" id="createQuestion"
+                                data-bs-toggle="dropdown">
+                            Добавить вопросы
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-item" onclick="createQuestionBlock(1)">1</li>
+                            <li class="dropdown-item" onclick="createQuestionBlock(3)">3</li>
+                            <li class="dropdown-item" onclick="createQuestionBlock(5)">5</li>
+                            <li class="dropdown-item" onclick="createQuestionBlock(10)">10</li>
+                            <li class="dropdown-item" onclick="createQuestionBlock(15)">15</li>
+                            <li class="dropdown-item" onclick="createQuestionBlock(20)">20</li>
+                        </ul>
+                        <button type="submit" class="btn btn-primary-custom me-3">Создать тест</button>
+                    </div>
+                </div>
             </div>
             <#if _csrf??>
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             </#if>
             <input type="hidden" name="courseInstanceId" value="${test.courseInstanceId}">
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary-custom w-75">Создать тест</button>
-            </div>
         </div>
     </form>
     <script>

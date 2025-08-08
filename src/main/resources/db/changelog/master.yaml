@@ -200,7 +200,3 @@ databaseChangeLog:
   - include:
       file: db/changelog/fixes/067_remove_column_points_from_test_questions_table.sql
       relativeToChangelogFile: false
-
-
-
-

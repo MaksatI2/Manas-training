@@ -39,4 +39,6 @@ public interface TestService {
     Boolean testExistById(int id);
 
     TestDto getTestByIdForTestResult(int testInstanceId);
+
+    TestDto getTestByIdForTestResult(int testInstanceId, int userId);
 }

@@ -14,7 +14,7 @@
         <p class="hero-subtitle fs-4">У вас осталось: <span class="fw-bold" id="countdown">${quiz.questionTimeLimit}:00</span></p>
     </div>
     <div class="row justify-content-center">
-        <div class="col-lg-10 col-md-10">
+        <div class="col-lg-8 col-md-8">
                 <div class="feature-card">
                     <div class="card-body">
                         <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3">${quiz.title}</h5>

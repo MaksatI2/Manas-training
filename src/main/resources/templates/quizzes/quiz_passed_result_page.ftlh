@@ -45,7 +45,7 @@
                     </div>
                     <div class="stat-card">
                         <i class="fa-solid fa-clock"></i>
-                        <p>Затраченное время</p>
+                        <p>Время затраченное на прохождение теста в минутах —</p>
                         <h3>${results.passingTime} мин</h3>
                     </div>
                 </div>

@@ -190,4 +190,30 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     public Optional<TestInstance> getTestInstanceModelByCourseInstanceId(Integer id) {
         return testInstanceRepository.findByInstanceId(id);
     }
+
+    @Transactional
+    @Override
+    public void changeTestInstanceTime(TestInstanceDto testInstanceDto){
+        TestInstance testInstance = testInstanceRepository.findByInstanceId(testInstanceDto.getCourseInstanceId())
+                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+        LocalDateTime scheduledStart = parseDateRange(testInstanceDto).get(0);
+        LocalDateTime scheduledEnd = parseDateRange(testInstanceDto).get(1);
+        if (LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)) {
+            throw new IncorrectDateException("Дата не может быть в прошлом");
+        }
+        if (scheduledStart.isAfter(scheduledEnd)) {
+            throw new IncorrectDateException("Дата открытия доступа не может быть после даты закрытия доступа");
+        }
+        if (scheduledStart.equals(scheduledEnd)) {
+            throw new IncorrectDateException("Дата и время не могут быть равны");
+        }
+        if (courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate().isBefore(scheduledStart.toLocalDate())
+                || courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate().isBefore(scheduledEnd.toLocalDate())) {
+            throw new IncorrectDateException("Дата начала тестирования не может быть позднее даты окончания курса");
+        }
+        testInstance.setScheduledStart(scheduledStart);
+        testInstance.setScheduledEnd(scheduledEnd);
+
+        testInstanceRepository.saveAndFlush(testInstance);
+    }
 }
