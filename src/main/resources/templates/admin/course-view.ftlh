@@ -19,7 +19,7 @@
 <@layout.page>
     <@roadmap.breadcrumbs items=[
     {"label": "Главная", "url": "/"},
-    {"label": "Курсы", "url": "/courses"},
+    {"label": "Курсы", "url": "/admin/courses"},
     {"label": "${course.title}", "url": ""}
     ] />
     <div class="card shadow mb-4">
@@ -35,7 +35,7 @@
                 Информация о курсе
             </h5>
             <div>
-                <a href="/courses" class="btn btn-light btn-sm me-2" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                <a href="/admin/courses" class="btn btn-light btn-sm me-2" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
                     <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
                 </a>
             </div>
@@ -59,9 +59,15 @@
                                         <i class="fas fa-times-circle me-1"></i>Неактивен
                                     </span>
                                 </#if>
+                                <#if course.individual>
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-user me-1"></i>Индивидуальный
+                                    </span>
+                                <#else>
                                     <span class="badge bg-info">
                                         <i class="fas fa-users me-1"></i>Групповой
                                     </span>
+                                </#if>
                             </div>
                         </div>
 
@@ -76,7 +82,7 @@
 
                             <#if course.description?? && course.description != ''>
                                 <div class="detail-item mb-4">
-                                    <label class="detail-label">
+                                    <label class="detail-label mb-3">
                                         <i class="fas fa-align-left me-2" style="color: #0066cc;"></i>
                                         Описание:
                                     </label>
@@ -109,6 +115,19 @@
                                 </div>
                             </#if>
                         </div>
+
+                        <#if isAdmin>
+                            <div class="action-buttons mt-4">
+                                <a href="/admin/courses/edit/${course.id}" class="btn btn-primary btn-sm w-100 mb-2">
+                                    <i class="fas fa-edit me-1"></i> Редактировать курс
+                                </a>
+                                <button type="button"
+                                        class="btn btn-danger btn-sm w-100 js-delete-course-btn"
+                                        data-course-id="${course.id}">
+                                    <i class="fas fa-trash me-1"></i> Удалить курс
+                                </button>
+                            </div>
+                        </#if>
                     </div>
                 </div>
             </div>

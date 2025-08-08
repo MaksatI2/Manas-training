@@ -148,24 +148,6 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <div class="form-check form-switch">
-                                <input type="hidden" name="individual" value="false">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       id="individual"
-                                       name="individual"
-                                       value="true"
-                                       <#if course.individual?? && course.individual == true>checked</#if>>
-                                <label class="form-check-label" for="individual">
-                                    <i class="fas fa-user me-1" style="color: #0066cc;"></i>
-                                    Индивидуальный курс
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
                                 <input type="hidden" name="active" value="false">
                                 <input class="form-check-input"
                                        type="checkbox"
