@@ -16,7 +16,6 @@ import manasTrainingService.exceptions.nsee.course.CourseDeletionException;
 import manasTrainingService.entity.TargetType;
 import manasTrainingService.repositories.course.CourseRepository;
 import manasTrainingService.service.ActivityLogService;
-import manasTrainingService.repositories.course.CourseTeacherRepository;
 import manasTrainingService.service.CourseApplicationService;
 import manasTrainingService.service.course.CourseAdminService;
 import manasTrainingService.service.course.CourseCategoryService;

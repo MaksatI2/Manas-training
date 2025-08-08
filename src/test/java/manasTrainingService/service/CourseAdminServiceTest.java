@@ -113,7 +113,6 @@ class CourseAdminServiceTest {
                 .code("SPRING_BOOT")
                 .description("Изучение Spring Boot")
                 .duration(60)
-                .individual(true)
                 .active(true)
                 .categoryId(1)
                 .build();
@@ -124,7 +123,6 @@ class CourseAdminServiceTest {
                 .code("JAVA_ADV")
                 .description("Продвинутая Java")
                 .duration(80)
-                .individual(true)
                 .active(false)
                 .categoryId(1)
                 .build();
@@ -145,21 +143,6 @@ class CourseAdminServiceTest {
                     editDto, activeValues, individualValues);
 
             assertThat(result.getActive()).isTrue();
-            assertThat(result.getIndividual()).isFalse();
-        }
-
-        @Test
-        @DisplayName("Should set individual to true when individualValues contains 'true'")
-        void shouldSetIndividualToTrueWhenIndividualValuesContainsTrue() {
-            CourseEditDto editDto = new CourseEditDto();
-            String[] activeValues = {"false"};
-            String[] individualValues = {"false", "true"};
-
-            CourseEditDto result = courseAdminService.prepareEditDtoWithRequestParams(
-                    editDto, activeValues, individualValues);
-
-            assertThat(result.getActive()).isFalse();
-            assertThat(result.getIndividual()).isTrue();
         }
 
         @Test
@@ -173,7 +156,6 @@ class CourseAdminServiceTest {
                     editDto, activeValues, individualValues);
 
             assertThat(result.getActive()).isFalse();
-            assertThat(result.getIndividual()).isFalse();
         }
 
         @Test
@@ -185,7 +167,6 @@ class CourseAdminServiceTest {
                     editDto, null, null);
 
             assertThat(result.getActive()).isFalse();
-            assertThat(result.getIndividual()).isFalse();
         }
 
         @Test
@@ -198,7 +179,6 @@ class CourseAdminServiceTest {
                     editDto, emptyArray, emptyArray);
 
             assertThat(result.getActive()).isFalse();
-            assertThat(result.getIndividual()).isFalse();
         }
     }
 
@@ -305,7 +285,6 @@ class CourseAdminServiceTest {
             assertThat(result.getId()).isEqualTo(2);
             assertThat(result.getTitle()).isEqualTo("Spring Boot");
             assertThat(result.getCode()).isEqualTo("SPRING_BOOT");
-            assertThat(result.getIndividual()).isTrue();
             assertThat(result.getActive()).isTrue();
 
             verify(courseRepository).existsByCode("SPRING_BOOT");
@@ -329,7 +308,6 @@ class CourseAdminServiceTest {
         @Test
         @DisplayName("Should handle null boolean values in CreateCourseDto")
         void shouldHandleNullBooleanValuesInCreateCourseDto() {
-            createCourseDto.setIndividual(null);
             createCourseDto.setActive(null);
 
             when(courseRepository.existsByCode("SPRING_BOOT")).thenReturn(false);
@@ -367,7 +345,6 @@ class CourseAdminServiceTest {
             assertThat(result.getTitle()).isEqualTo("Java Advanced");
             assertThat(result.getCode()).isEqualTo("JAVA_ADV");
             assertThat(result.getDuration()).isEqualTo(80);
-            assertThat(result.getIndividual()).isTrue();
             assertThat(result.getActive()).isFalse();
 
             verify(courseRepository).findById(1);
@@ -406,7 +383,6 @@ class CourseAdminServiceTest {
         @Test
         @DisplayName("Should handle null boolean values in CourseEditDto")
         void shouldHandleNullBooleanValuesInCourseEditDto() {
-            courseEditDto.setIndividual(null);
             courseEditDto.setActive(null);
 
             when(courseRepository.findById(1)).thenReturn(Optional.of(testCourse));
@@ -529,7 +505,6 @@ class CourseAdminServiceTest {
             assertThat(result.getCode()).isEqualTo(testCourseDto.getCode());
             assertThat(result.getDescription()).isEqualTo(testCourseDto.getDescription());
             assertThat(result.getDuration()).isEqualTo(testCourseDto.getDuration());
-            assertThat(result.getIndividual()).isEqualTo(testCourseDto.getIndividual());
             assertThat(result.getActive()).isEqualTo(testCourseDto.getActive());
             assertThat(result.getCategoryId()).isEqualTo(testCourseDto.getCategoryId());
         }
@@ -552,7 +527,6 @@ class CourseAdminServiceTest {
             assertThat(result.getId()).isEqualTo(1);
             assertThat(result.getTitle()).isEqualTo("Test Course");
             assertThat(result.getCode()).isEqualTo("TEST");
-            assertThat(result.getIndividual()).isNull();
             assertThat(result.getActive()).isNull();
             assertThat(result.getCategoryId()).isEqualTo(1);
         }
@@ -627,7 +601,6 @@ class CourseAdminServiceTest {
                     .code("NEW_COURSE")
                     .description("New course description")
                     .duration(30)
-                    .individual(false)
                     .active(true)
                     .categoryId(1)
                     .build();
@@ -659,7 +632,6 @@ class CourseAdminServiceTest {
                     .code("UPDATED_COURSE")
                     .description("Updated description")
                     .duration(40)
-                    .individual(true)
                     .active(false)
                     .categoryId(1)
                     .build();

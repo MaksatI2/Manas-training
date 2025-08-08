@@ -88,8 +88,8 @@ class CertificateServiceImplTest {
         assertThat(dto.getId()).isEqualTo(100);
         assertThat(dto.getCertificateNumber()).isEqualTo("ABC");
         assertThat(dto.getCourseTitle()).isEqualTo("Java");
-        assertThat(dto.getIssueDate()).isEqualTo(LocalDate.of(2025,1,1));
-        assertThat(dto.getExpiryDate()).isEqualTo(LocalDate.of(2025,12,31));
+        assertThat(dto.getIssueDate()).isEqualTo("01-01-2025");
+        assertThat(dto.getExpiryDate()).isEqualTo("31-12-2025");
         assertThat(dto.getViewUrl()).endsWith("/student/certificates/100");
         assertThat(dto.getDownloadUrl()).endsWith("/student/certificates/100/pdf");
     }
