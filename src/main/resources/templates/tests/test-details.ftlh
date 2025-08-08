@@ -13,7 +13,7 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-lg-10 col-md-10">
+        <div class="col-lg-8 col-md-8">
             <div class="mb-3 text-end">
                 <a href="/test/${test.id}/edit" class="btn btn-warning btn-sm rounded-pill p-2">
                     <i class="fas fa-edit me-1"></i>Редактировать

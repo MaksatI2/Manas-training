@@ -62,8 +62,10 @@ public class LessonQuizController {
     public String createQuiz(@Valid @ModelAttribute("lessonQuiz") LessonQuizDto lessonQuizDto,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes,
-                             HttpServletRequest request) {
+                             HttpServletRequest request,
+                             Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
             return "quizzes/quiz_create";
         }
         String redirectUrl = request.getSession().getAttribute("redirectAfterCreate").toString();

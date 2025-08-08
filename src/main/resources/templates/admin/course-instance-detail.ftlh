@@ -31,10 +31,12 @@
 
 
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary">Модули</a>
+        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>"
+           class="btn btn-primary">Модули</a>
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary">Участники</a>
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary">Преподаватели</a>
-        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">Статистика потока</a>
+        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">Статистика
+            потока</a>
     </div>
     <div class="container">
         <h2>Модули курса</h2>
@@ -50,7 +52,8 @@
                                         aria-controls="collapse${module.id}">
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
-                                <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>" class="btn btn-primary btn-sm ms-3">
+                                <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
+                                   class="btn btn-primary btn-sm ms-3">
                                     + Урок
                                 </a>
                             </div>
@@ -65,7 +68,8 @@
                                         <div class="row row-cols-1 row-cols-md-2 g-3">
                                             <#list module.lessons as lesson>
                                                 <div class="col">
-                                                    <a href="<@spring.url '/lessons/${lesson.id}'/>" class="text-decoration-none">
+                                                    <a href="<@spring.url '/lessons/${lesson.id}'/>"
+                                                       class="text-decoration-none">
                                                         <div class="card h-100 shadow-sm">
                                                             <div class="card-body">
                                                                 <h6 class="card-title">${lesson.title}</h6>
@@ -90,38 +94,58 @@
         <#else>
             <p>Модули отсутствуют</p>
         </#if>
+
+        <h2>Тестирование</h2>
+        <div class="feature-card mb-3">
+            <#if testInstance?has_content>
+                <p>Тест назначенный на данный поток: <span class="fw-bold">${testInstance.test.title}</span></p>
+                <p>Начало: <span class="fw-bold">${startDate} ${testInstance.startTime}</span> | Окончание: <span
+                            class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
+                <a href="/instance/${courseInstance.id}/change-time" class="btn btn-warning mb-2">Изменить время доступа к
+                    тесту</a>
+            <#else>
+                <p>На данный поток пока не был назначен тест.</p>
+            </#if>
+        </div>
     </div>
     <style>
         .btn-primary {
             background: linear-gradient(135deg, #0066cc, #003d7a);
             border-color: #0066cc;
         }
+
         .btn-primary:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
             box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
+
         .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
         }
+
         .feature-card {
             background-color: #fff;
             border-radius: 0.375rem;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
+
         .accordion-button {
             font-weight: 500;
         }
+
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: all 0.2s ease-in-out;
         }
+
         .card-title {
             font-size: 1.1rem;
             font-weight: 500;
         }
+
         .card-text {
             font-size: 0.875rem;
         }
@@ -132,6 +156,7 @@
             overflow-wrap: break-word;
             white-space: normal;
         }
+
         .hero-subtitle {
             color: var(--text-dark);
             font-size: 1.4rem;

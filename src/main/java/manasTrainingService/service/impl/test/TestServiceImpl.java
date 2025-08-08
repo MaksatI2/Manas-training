@@ -90,6 +90,7 @@ public class TestServiceImpl implements TestService {
         test.setTitle(testDto.getTitle());
         test.setDescription(testDto.getDescription());
         test.setPassingScore(BigDecimal.valueOf(testDto.getPassingScore()));
+        test.setIsActive(testDto.getIsActive());
         Test updated = testRepository.saveAndFlush(test);
         questionService.editQuestions(testDto.getQuestions());
 
@@ -340,6 +341,44 @@ public class TestServiceImpl implements TestService {
         Test test = testRepository.findById(testInstance.getTest().getId())
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
         List<QuestionAnswerDto> answers = testAnswerService.getAnswersByAttemtId(testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceId).getId());
+        List<QuestionDto> questions = test.getQuestions()
+                .stream()
+                .filter(q -> answers.stream().map(qa -> qa.getQuestionId()).toList().contains(q.getId()))
+                .map(q -> QuestionDto.builder()
+                        .id(q.getId())
+                        .testId(q.getTest().getId())
+                        .question(q.getQuestion())
+                        .options(q.getOptions().stream().map(o -> OptionDto.builder()
+                                .optionText(o.getOptionText())
+                                .isCorrect(o.getIsCorrect())
+                                .questionId(o.getQuestion().getId())
+                                .id(o.getId())
+                                .build()).toList())
+                        .isRequired(q.getIsRequired())
+                        .build())
+                .toList();
+
+        return TestDto.builder()
+                .id(test.getId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .isActive(test.getIsActive())
+                .courseInstanceId(test.getCourse().getId())
+                .course(CourseDto.builder()
+                        .id(test.getCourse().getId())
+                        .title(test.getCourse().getTitle())
+                        .build())
+                .passingScore(test.getPassingScore().intValue())
+                .questions(questions)
+                .build();
+    }
+
+    @Override
+    public TestDto getTestByIdForTestResult(int testInstanceId, int userId) {
+        TestInstance testInstance = testInstanceService.getTestInstanceEntityById(testInstanceId);
+        Test test = testRepository.findById(testInstance.getTest().getId())
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+        List<QuestionAnswerDto> answers = testAnswerService.getAnswersByAttemtId(testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceId, userId).getId());
         List<QuestionDto> questions = test.getQuestions()
                 .stream()
                 .filter(q -> answers.stream().map(qa -> qa.getQuestionId()).toList().contains(q.getId()))

@@ -113,4 +113,36 @@ public class TestInstanceController {
         redirectAttributes.addFlashAttribute("successMessage", "Тест успешно отвязан от данного потока");
         return "redirect:/teacher/course/"+id;
     }
+
+    @GetMapping("{id}/change-time")
+    public String changeTime(@PathVariable Integer id, Model model) {
+        model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(id));
+        model.addAttribute("testInstanceDto", testInstanceService.getTestInstanceByCourseInstanceId(id));
+        model.addAttribute("courseInstanceId", id);
+        return "tests/change_test_time";
+    }
+
+    @PostMapping("change-time")
+    public String changeTime(@Valid TestInstanceDto testInstanceDto, BindingResult bindingResult,Model model, RedirectAttributes redirectAttributes) {
+        Integer courseInstanceId = testInstanceDto.getCourseInstanceId();
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));
+            model.addAttribute("testInstanceDto", testInstanceService.getTestInstanceByCourseInstanceId(courseInstanceId));
+            model.addAttribute("tests", testService.getAllTestsByCourseId(courseInstanceId).stream().filter(TestDto::getIsActive).toList());
+            model.addAttribute("courseInstanceId", courseInstanceId);
+            return "tests/change_test_time";
+        }
+        try{
+            testInstanceService.changeTestInstanceTime(testInstanceDto);
+            redirectAttributes.addFlashAttribute("successMessage", "Время доступа к тесту успешно изменено");
+            return "redirect:/admin/course-instances/"+testInstanceDto.getCourseInstanceId();
+        } catch (IncorrectDateException e){
+            model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));
+            model.addAttribute("tests", testService.getAllTestsByCourseId(courseInstanceId).stream().filter(TestDto::getIsActive).toList());
+            model.addAttribute("courseInstanceId", courseInstanceId);
+            model.addAttribute("testInstanceDto", testInstanceService.getTestInstanceByCourseInstanceId(courseInstanceId));
+            model.addAttribute("error", e.getMessage());
+            return "tests/change_test_time";
+        }
+    }
 }

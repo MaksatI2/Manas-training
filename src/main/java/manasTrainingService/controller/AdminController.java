@@ -5,13 +5,20 @@ import lombok.RequiredArgsConstructor;
 import manasTrainingService.config.CustomUserDetails;
 import manasTrainingService.dto.UserEditDto;
 import manasTrainingService.dto.register.TeacherRegisterDto;
+import manasTrainingService.dto.tests.TestInstanceDto;
+import manasTrainingService.dto.tests.TestResultAdminDto;
 import manasTrainingService.entity.MonthYear;
 import manasTrainingService.entity.User;
+import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.exceptions.nsee.user.EmailAlreadyExistsException;
 import manasTrainingService.exceptions.nsee.user.PhoneAlreadyExistsException;
 import manasTrainingService.service.AdminStatisticsService;
 import manasTrainingService.service.ScheduleService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
+import manasTrainingService.service.test.TestAnswerService;
+import manasTrainingService.service.test.TestInstanceService;
+import manasTrainingService.service.test.TestResultService;
+import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.OrganizationService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserProfileService;
@@ -38,6 +45,10 @@ public class AdminController {
     private final OrganizationService organizationService;
     private final CourseTeacherInstanceService courseTeacherInstanceService;
     private final ScheduleService scheduleService;
+    private final TestResultService testResultService;
+    private final TestInstanceService testInstanceService;
+    private final TestService testService;
+    private final TestAnswerService testAnswerService;
 
     @GetMapping("/teachers/add")
     public String showAddTeacherForm(Model model) {
@@ -212,8 +223,22 @@ public class AdminController {
         return "admin/statistics";
     }
 
+    @GetMapping("/test-results")
+    public String viewStudentsTestsResults(Model model){
+        model.addAttribute("results", testResultService.getAllResults());
+        return "admin/test-results";
+    }
 
-
-
-
+    @GetMapping("/test-results/{id}")
+    public String viewTestResultDetails(@PathVariable int id, Model model){
+        TestResultAdminDto testResultAdminDto = testResultService.getTestResultById(id);
+        TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(testResultAdminDto.getTestInstance().getId());
+        if(!testService.testExistById(testInstanceDto.getTest().getId())){
+            throw new NoAccessException("Такого теста уже не существует");
+        }
+        model.addAttribute("test", testService.getTestByIdForTestResult(testInstanceDto.getId(), testResultAdminDto.getStudent().getId()));
+        model.addAttribute("result", testResultAdminDto);
+        model.addAttribute("answers", testAnswerService.getAnswersByAttemtId(testResultAdminDto.getId()));
+        return "admin/test_result_details";
+    }
 }
