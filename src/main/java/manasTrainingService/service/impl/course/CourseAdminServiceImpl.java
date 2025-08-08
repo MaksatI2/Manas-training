@@ -67,7 +67,6 @@ public class CourseAdminServiceImpl implements CourseAdminService {
         }
 
         updateCourseDto.setActive(active);
-        updateCourseDto.setIndividual(individual);
 
         return updateCourseDto;
     }
@@ -105,7 +104,6 @@ public class CourseAdminServiceImpl implements CourseAdminService {
                 .code(createCourseDto.getCode())
                 .description(createCourseDto.getDescription())
                 .durationHours(createCourseDto.getDuration())
-                .isIndividual(Boolean.TRUE.equals(createCourseDto.getIndividual()))
                 .isActive(Boolean.TRUE.equals(createCourseDto.getActive()))
                 .category(category)
                 .createdAt(LocalDateTime.now())
@@ -143,7 +141,6 @@ public class CourseAdminServiceImpl implements CourseAdminService {
         existingCourse.setCode(updateCourseDto.getCode());
         existingCourse.setDescription(updateCourseDto.getDescription());
         existingCourse.setDurationHours(updateCourseDto.getDuration());
-        existingCourse.setIsIndividual(Boolean.TRUE.equals(updateCourseDto.getIndividual()));
         existingCourse.setIsActive(Boolean.TRUE.equals(updateCourseDto.getActive()));
         existingCourse.setCategory(category);
         existingCourse.setUpdatedAt(LocalDateTime.now());
@@ -227,7 +224,6 @@ public class CourseAdminServiceImpl implements CourseAdminService {
                 .code(dto.getCode())
                 .description(dto.getDescription())
                 .duration(dto.getDuration())
-                .individual(dto.getIndividual())
                 .active(dto.getActive())
                 .categoryId(dto.getCategoryId())
                 .build();

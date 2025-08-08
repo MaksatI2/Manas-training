@@ -33,8 +33,6 @@ public class CourseEditDto {
     @Max(value = 10000, message = "Слишком большая продолжительность, максимальное значение 10000")
     private Integer duration;
 
-    private Boolean individual;
-
     private Boolean active;
 
     @NotNull(message = "Категория обязательна")

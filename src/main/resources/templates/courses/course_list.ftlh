@@ -51,11 +51,11 @@
                                 <td><span class="badge"
                                           style="background: #87ceeb; color: #2c3e50;">${course.code}</span></td>
                                 <td><span class="badge"
-                                          style="background: #003d7a; color: white;">${course.category.name}</span></td>
+                                          style="background: #003d7a; color: white; font-size: 0.7rem">${course.category.name}</span></td>
                                 <td class="duration-col">
                                     <span class="duration-content">
                                         <i class="fas fa-clock me-1" style="color: #0066cc;">
-                                        </i>${course.duration}
+                                        </i>${course.duration}ч
                                     </span>
                                 </td>
                             </tr>

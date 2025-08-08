@@ -94,7 +94,7 @@
                     <tbody>
                     <#if courses?has_content>
                         <#list courses as course>
-                            <tr onclick="window.location.href='/courses/${course.id}'" style="cursor: pointer;">
+                            <tr onclick="window.location.href='/admin/courses/${course.id}'" style="cursor: pointer;">
                                 <td>${course.id}</td>
                                 <td>${course.title}</td>
                                 <td>
@@ -105,7 +105,7 @@
                                     <span class="badge bg-primary">${course.category.name}</span>
                                 </td>
                                 <td>
-                                    <i class="fas fa-clock me-1" style="color: #0066cc;"></i>${course.duration} ч
+                                    <i class="fas fa-clock me-1" style="color: #0066cc;"></i>${course.duration}ч
                                 </td>
                                 <td>
                                     <#if course.active>

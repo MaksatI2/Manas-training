@@ -31,9 +31,6 @@ public class CreateCourseDto {
     private Integer duration;
 
     @Builder.Default
-    private Boolean individual = false;
-
-    @Builder.Default
     private Boolean active = true;
 
     @NotNull(message = "Категория обязательна")

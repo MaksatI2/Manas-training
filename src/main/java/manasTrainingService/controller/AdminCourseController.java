@@ -1,5 +1,6 @@
 package manasTrainingService.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import manasTrainingService.dto.create.CreateCourseDto;
 import manasTrainingService.dto.edit.CourseEditDto;
 import manasTrainingService.service.course.CourseAdminService;
 import manasTrainingService.service.course.CourseCategoryService;
+import manasTrainingService.service.course.CourseService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
@@ -28,6 +31,7 @@ public class AdminCourseController {
 
     private final CourseAdminService courseAdminService;
     private final CourseCategoryService categoryAdminService;
+    private final CourseService courseService;
 
 
     @GetMapping
@@ -77,7 +81,7 @@ public class AdminCourseController {
         try {
             CourseDto savedCourse = courseAdminService.create(createCourseDto);
             redirectAttributes.addFlashAttribute("successMessage", "Курс успешно создан");
-            return "redirect:/courses/" + savedCourse.getId();
+            return "redirect:/admin/courses/" + savedCourse.getId();
         } catch (Exception e) {
             List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
             model.addAttribute("categories", categories);
@@ -134,7 +138,7 @@ public class AdminCourseController {
         try {
             CourseDto updatedCourse = courseAdminService.update(updateCourseDto);
             redirectAttributes.addFlashAttribute("successMessage", "Курс успешно обновлен");
-            return "redirect:/courses/" + updatedCourse.getId();
+            return "redirect:/admin/courses/" + updatedCourse.getId();
         } catch (Exception e) {
             List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
             model.addAttribute("categories", categories);
@@ -152,6 +156,21 @@ public class AdminCourseController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/admin/courses";
+    }
+
+    @GetMapping("/{id}")
+    public String getCourseDetails(@PathVariable Integer id, Model model, Authentication authentication) {
+        try {
+            CourseDto course = courseService.getById(id);
+            model.addAttribute("course", course);
+            boolean canEnroll = authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_STUDENT") || a.getAuthority().equals("ROLE_ORGANIZATION"));
+            model.addAttribute("canEnroll", canEnroll);
+            return "admin/course-view";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("errorMessage", "Курс не найден");
+            return "error/error";
+        }
     }
 
 }
