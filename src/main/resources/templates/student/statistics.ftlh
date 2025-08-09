@@ -19,8 +19,8 @@
                 <thead class="bg-blue-50">
                 <tr>
                     <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Курс</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Всего часов</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Пропущено</th>
+                    <th class="hidden">Пропущено</th>
+
                     <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Пропуски</th>
                     <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Статус</th>
                 </tr>
@@ -36,17 +36,16 @@
                                     ${stat.courseInstance.title}
                                 </#if>
                             </td>
-                            <td class="px-4 py-3 text-center text-sm text-gray-600">
-                                ${stat.totalHours!'—'}
-                            </td>
-                            <td class="px-4 py-3 text-center text-sm text-gray-600">
-                                ${stat.absentHours!'—'}
-                            </td>
-                            <td class="px-4 py-3 text-center text-sm text-gray-600">
+                            <td class="hidden">${stat.absentHours!'—'}</td>
+
+                            <td class="px-4 py-3 text-center text-sm text-gray-600 relative group cursor-pointer">
                                 <#if stat.attendancePercentage??>
                                     ${stat.attendancePercentage}%
                                     <div class="mt-1 bg-gray-200 rounded-full h-2.5">
                                         <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${stat.attendancePercentage}%"></div>
+                                    </div>
+                                    <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
+                                        Пропущено часов: ${stat.absentHours!'—'}
                                     </div>
                                 <#else>
                                     —
@@ -77,9 +76,7 @@
                     <thead class="bg-blue-50">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Курс</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Тест</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Оценка</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Статус</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Дата сдачи</th>
                     </tr>
                     </thead>
@@ -94,17 +91,7 @@
                                 </#if>
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-600">
-                                <#if result.testTitle?length gt 20>
-                                    ${result.testTitle?substring(0, 20)}...
-                                <#else>
-                                    ${result.testTitle!'—'}
-                                </#if>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-gray-600">
                                 ${result.score!'—'}
-                            </td>
-                            <td class="px-4 py-3 text-sm font-semibold ${result.isPassed?string('text-green-600', 'text-red-600')}">
-                                ${result.isPassed?string('Пройден', 'Не пройден')}
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-600">
                                 ${result.localisedTime!'—'}

@@ -1,512 +1,7 @@
-
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
 <@layout.page>
-    <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Пользователи", "url": "/admin/users"},
-    {"label": "Профиль", "url": ""}
-    ] />
-
-    <style>
-        .profile-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .page-title {
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .profile-card {
-            background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .profile-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.15);
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            overflow: hidden;
-        }
-
-
-        .avatar-container {
-            position: relative;
-            flex-shrink: 0;
-            cursor: pointer;
-        }
-
-        .avatar-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--light-blue);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .avatar-image:hover {
-            transform: scale(1.03);
-            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
-        }
-
-        .avatar-edit-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .avatar-container:hover .avatar-edit-overlay {
-            opacity: 1;
-        }
-
-        .avatar-edit-text {
-            color: white;
-            font-weight: 600;
-            text-align: center;
-            padding: 0.5rem;
-        }
-
-        .user-info {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .user-name {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .user-email {
-            font-size: 1.2rem;
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-
-        .profile-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .detail-item {
-            background: rgba(135, 206, 235, 0.05);
-            padding: 1.5rem;
-            border-radius: 10px;
-            border-left: 3px solid var(--light-blue);
-        }
-
-        .detail-label {
-            font-size: 0.9rem;
-            color: var(--dark-blue);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-value {
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .bio-section {
-            grid-column: 1 / -1;
-            background: rgba(135, 206, 235, 0.05);
-            padding: 1.5rem;
-            border-radius: 10px;
-            border-left: 3px solid var(--light-blue);
-            overflow: hidden;
-
-        }
-
-        .user-role,
-        .edit-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            color: var(--white);
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            gap: 0.5rem;
-            text-decoration: none;
-            min-width: 220px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .edit-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-            color: var(--white);
-        }
-
-        .user-role-and-edit {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-
-        .alert {
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 8px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-
-        .statistics-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .statistics-title {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .stats-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 3rem;
-        }
-
-        .stats-table th,
-        .stats-table td {
-            padding: 1rem;
-            border: 1px solid #e1ecf4;
-            text-align: center;
-
-        }
-
-        .stats-table th {
-            background: linear-gradient(135deg, #0066cc, #003d7a);
-            color: white;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .stats-table td {
-            font-size: 1rem;
-            overflow-wrap: break-word;
-            word-break: break-word;
-        }
-
-        .status-enrolled {
-            color: #28a745;
-            font-weight: 600;
-        }
-
-        .status-dropped {
-            color: #dc3545;
-            font-weight: 600;
-        }
-
-        .percentage-bar {
-            background-color: #e6f2ff;
-            border-radius: 5px;
-            overflow: hidden;
-            height: 20px;
-            margin-top: 5px;
-        }
-
-        .percentage-fill {
-            height: 100%;
-            background-color: #007bff;
-            transition: width 0.4s ease;
-        }
-
-        .card.course-card {
-            border: none;
-            border-radius: 10px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card.course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.15);
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            overflow-wrap: break-word;
-            word-break: break-word;
-        }
-
-        .card-subtitle {
-            font-size: 1rem;
-            overflow-wrap: break-word;
-            word-break: break-word;
-        }
-
-
-        .btn-outline-primary {
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--primary-blue);
-            color: var(--white);
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        @media (max-width: 768px) {
-            .page-title, .statistics-title {
-                font-size: 1.8rem;
-            }
-
-            .profile-card, .statistics-container {
-                padding: 1.5rem;
-            }
-
-            .profile-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 1.5rem;
-            }
-
-            .avatar-image {
-                width: 120px;
-                height: 120px;
-            }
-
-            .user-name {
-                font-size: 1.5rem;
-            }
-
-            .profile-details {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-table th,
-            .stats-table td {
-                font-size: 0.9rem;
-                padding: 0.7rem;
-            }
-
-            .user-name, .user-email {
-                overflow-wrap: break-word;
-                word-break: break-word;
-                white-space: normal;
-                max-width: 100%;
-            }
-
-            .user-info {
-                flex: 1;
-                min-width: 250px;
-                max-width: 100%;
-                overflow: hidden;
-            }
-
-            @media (max-width: 768px) {
-                .user-info {
-                    min-width: 100%;
-                    max-width: 100%;
-                    text-align: center;
-                }
-            }
-        }
-        .detail-value {
-            overflow-wrap: break-word;
-            word-break: break-word;
-            white-space: normal;
-            max-width: 100%;
-        }
-
-        .user-name {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            max-width: 100%;
-        }
-
-        .user-email {
-            font-size: 1.2rem;
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            max-width: 100%;
-        }
-
-        /* Стили для карточек курсов */
-        .card.course-card {
-            border: none;
-            border-radius: 12px;
-            background: var(--white);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card.course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.2);
-            border-color: var(--primary-blue);
-        }
-
-        .card.course-card .card-body {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .card.course-card .card-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--dark-blue);
-            margin-bottom: 0.5rem;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            line-height: 1.3;
-        }
-
-        .card.course-card .card-subtitle {
-            font-size: 1rem;
-            color: var(--primary-blue);
-            font-weight: 500;
-            margin-bottom: 1rem;
-            overflow-wrap: break-word;
-            word-break: break-word;
-        }
-
-        .card.course-card .card-text {
-            font-size: 0.9rem;
-            color: var(--dark-blue);
-            margin-top: auto;
-            line-height: 1.5;
-        }
-
-        .card.course-card .card-text .date-range {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-blue);
-            font-weight: 500;
-        }
-
-        .card.course-card .card-text .date-range i {
-            color: var(--light-blue);
-        }
-
-        .card.course-card .status-indicator {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.4rem 0.8rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--white);
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-        }
-
-        .card.course-card .status-indicator.inactive {
-            background: linear-gradient(135deg, #dc3545, #a71d2a);
-        }
-
-        .card.course-card a {
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .card.course-card a:hover {
-            color: inherit;
-        }
-
-        .card.course-card .course-icon {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            font-size: 1.2rem;
-            color: var(--light-blue);
-            opacity: 0.3;
-            transition: opacity 0.3s ease;
-        }
-
-        .card.course-card:hover .course-icon {
-            opacity: 0.7;
-        }
-
-        @media (max-width: 768px) {
-            .card.course-card .card-title {
-                font-size: 1.2rem;
-            }
-
-            .card.course-card .card-subtitle {
-                font-size: 0.9rem;
-            }
-
-            .card.course-card .card-text {
-                font-size: 0.85rem;
-            }
-
-            .card.course-card .status-indicator {
-                font-size: 0.7rem;
-                padding: 0.3rem 0.6rem;
-            }
-        }
-    </style>
-
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -514,272 +9,241 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
-    <div class="profile-container">
+    <div class="max-w-6xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <@roadmap.breadcrumbs items=[
+        {"label": "Главная", "url": "/"},
+        {"label": "Пользователи", "url": "/admin/users"},
+        {"label": "Профиль", "url": ""}
+        ] />
+
         <#if successMessage??>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
-                ${successMessage}
+            <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-lg">
+                <i class="fas fa-check-circle mr-2"></i>${successMessage}
             </div>
         </#if>
-
         <#if errorMessage??>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
-                ${errorMessage}
+            <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
+                <i class="fas fa-exclamation-circle mr-2"></i>${errorMessage}
             </div>
         </#if>
 
-        <h1 class="page-title">
-            <i class="fas fa-user-circle" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
-            Профиль пользователя
+        <h1 class="text-3xl font-bold text-gray-900 text-center mb-8">
+            <i class="fas fa-user-circle mr-2 text-blue-600"></i>Профиль пользователя
         </h1>
 
-        <div class="profile-card">
-            <div class="profile-header">
-                <div class="avatar-container" >
-                    <#if profile.user.avatarUrl?has_content>
-                        <img src="/data/images/${profile.user.avatarUrl}"
-                             class="avatar-image"
-                             alt="Фото профиля">
-                    <#else>
-                        <img src="/static/images/default_avatar.jpg"
-                             class="avatar-image"
-                             alt="Фото профиля по умолчанию">
-                    </#if>
-                </div>
-
-                <div class="user-info">
-                    <h2 class="user-name">${profile.user.name} ${profile.user.lastName}</h2>
-                    <p class="user-email">
-                        <i class="fas fa-envelope" style="margin-right: 0.5rem;"></i>
-                        ${profile.user.email}
-                    </p>
-                    <div class="user-role-and-edit">
-                        <div class="user-role">
-                            <i class="fas fa-user-tag" style="margin-right: 0.5rem;"></i>
-                            Роль: ${profile.user.role.name}
-                        </div>
+        <div class="bg-white shadow-sm rounded-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+                <div class="relative group">
+                    <img src="${profile.user.avatarUrl?has_content?then('/data/images/' + profile.user.avatarUrl, '/static/images/default_avatar.jpg')}"
+                         class="w-32 h-32 rounded-full object-cover border-4 border-blue-200 shadow-md group-hover:scale-105 transition-transform duration-300"
+                         alt="Фото профиля">
+                    <div class="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span class="text-white font-semibold text-sm">Изменить</span>
                     </div>
                 </div>
+                <div class="flex-1 text-left md:text-left">
+                    <h2 class="text-2xl font-semibold text-gray-900 break-words">${profile.user.name} ${profile.user.lastName}</h2>
+                    <p class="text-lg text-blue-600 mt-1 break-words">
+                        <i class="fas fa-envelope mr-2"></i>${profile.user.email}
+                    </p>
+                    <div class="mt-2 flex flex-col gap-2 items-start">
+        <span class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold w-auto max-w-max">
+            <i class="fas fa-user-tag mr-2"></i>Роль: ${profile.user.role.name}
+        </span>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="profile-details">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                 <#if profile.user.phone?has_content>
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-phone" style="margin-right: 0.5rem;"></i>
-                            Телефон
-                        </div>
-                        <div class="detail-value">${profile.user.phone}</div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200">
+                        <div class="text-sm font-semibold text-blue-800"><i class="fas fa-phone mr-2"></i>Телефон</div>
+                        <div class="text-gray-700 break-words">${profile.user.phone}</div>
                     </div>
                 </#if>
-
-                <div class="detail-item">
-                    <div class="detail-label">
-                        <i class="fas fa-calendar-check" style="margin-right: 0.5rem;"></i>
-                        Статус
-                    </div>
-                    <div class="detail-value">
-                        <#if profile.user.isActive>
-                            <span style="color: #28a745;">
-                                <i class="fas fa-check-circle"></i> Активный
-                            </span>
-                        <#else>
-                            <span style="color: #dc3545;">
-                                <i class="fas fa-times-circle"></i> Неактивный
-                            </span>
-                        </#if>
+                <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200">
+                    <div class="text-sm font-semibold text-blue-800"><i class="fas fa-calendar-check mr-2"></i>Статус</div>
+                    <div class="text-sm font-semibold ${profile.user.isActive?string('text-green-600', 'text-red-600')}">
+                        <i class="fas ${profile.user.isActive?string('fa-check-circle', 'fa-times-circle')} mr-1"></i>
+                        ${profile.user.isActive?string('Активный', 'Неактивный')}
                     </div>
                 </div>
-
                 <#if profile.specialization?has_content>
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-laptop-code" style="margin-right: 0.5rem;"></i>
-                            Специализация
-                        </div>
-                        <div class="detail-value">${profile.specialization}</div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200">
+                        <div class="text-sm font-semibold text-blue-800"><i class="fas fa-laptop-code mr-2"></i>Специализация</div>
+                        <div class="text-gray-700 break-words">${profile.specialization}</div>
                     </div>
                 </#if>
-
                 <#if profile.organizationName?has_content>
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                            Организация
-                        </div>
-                        <div class="detail-value">${profile.organizationName}</div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200">
+                        <div class="text-sm font-semibold text-blue-800"><i class="fas fa-building mr-2"></i>Организация</div>
+                        <div class="text-gray-700 break-words">${profile.organizationName}</div>
                     </div>
                 </#if>
-
                 <#if profile.department?has_content>
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                            Отделение
-                        </div>
-                        <div class="detail-value">${profile.department}</div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200">
+                        <div class="text-sm font-semibold text-blue-800"><i class="fas fa-building mr-2"></i>Отделение</div>
+                        <div class="text-gray-700 break-words">${profile.department}</div>
                     </div>
                 </#if>
-
                 <#if profile.qualifications?has_content>
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-certificate" style="margin-right: 0.5rem;"></i>
-                            Квалификация
-                        </div>
-                        <div class="detail-value">${profile.qualifications}</div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200">
+                        <div class="text-sm font-semibold text-blue-800"><i class="fas fa-certificate mr-2"></i>Квалификация</div>
+                        <div class="text-gray-700 break-words">${profile.qualifications}</div>
                     </div>
                 </#if>
-
                 <#if profile.organization?has_content>
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                            Код организации
-                        </div>
-                        <div class="detail-value">${profile.organization.code}</div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200">
+                        <div class="text-sm font-semibold text-blue-800"><i class="fas fa-building mr-2"></i>Код организации</div>
+                        <div class="text-gray-700 break-words">${profile.organization.code}</div>
                     </div>
                     <#if profile.organization.description?has_content>
-                        <div class="bio-section">
-                            <div class="detail-label">
-                                <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
-                                Описание организации
-                            </div>
-                            <div class="detail-value">${profile.organization.description}</div>
+                        <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200 col-span-1 sm:col-span-2">
+                            <div class="text-sm font-semibold text-blue-800"><i class="fas fa-info-circle mr-2"></i>Описание организации</div>
+                            <div class="text-gray-700 break-words">${profile.organization.description}</div>
                         </div>
                     </#if>
                 </#if>
-
                 <#if profile.bio?has_content>
-                    <div class="bio-section">
-                        <div class="detail-label">
-                            <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
-                            О себе
-                        </div>
-                        <div class="detail-value">${profile.bio}</div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-200 col-span-1 sm:col-span-2">
+                        <div class="text-sm font-semibold text-blue-800"><i class="fas fa-info-circle mr-2"></i>О себе</div>
+                        <div class="text-gray-700 break-words">${profile.bio}</div>
                     </div>
                 </#if>
             </div>
         </div>
 
         <#if profile.user.role.name == "STUDENT">
-            <div class="statistics-container">
-                <h2 class="statistics-title">
-                    <i class="fas fa-chart-bar" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
-                    Статистика посещаемости
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 text-center mb-6">
+                    <i class="fas fa-chart-bar mr-2 text-blue-600"></i>Статистика посещаемости
                 </h2>
-                <table class="stats-table">
-                    <thead>
-                    <tr>
-                        <th>Курс</th>
-                        <th>Всего часов</th>
-                        <th>Пропущено</th>
-                        <th>Пропуски</th>
-                        <th>Статус</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <#list attendanceStatsList as stat>
-                        <tr <#if !stat.courseInstance.isActive>style="background-color: #f8d7da;"</#if>>
-                            <td>${stat.courseInstance.title}</td>
-                            <td>${stat.totalHours}</td>
-                            <td>${stat.absentHours}</td>
-                            <td>
-                                ${stat.attendancePercentage}%
-                                <div class="percentage-bar">
-                                    <div class="percentage-fill" style="width: ${stat.attendancePercentage}%;"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <#if stat.enrollmentStatus == "DROPPED">
-                                    <span class="status-dropped">${stat.localisedStatus}</span>
-                                <#else>
-                                    <span class="status-enrolled">${stat.localisedStatus}</span>
-                                </#if>
-                            </td>
-                        </tr>
-                    </#list>
-                    <#if attendanceStatsList?size == 0>
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-blue-50">
                         <tr>
-                            <td colspan="5">Нет данных по статистике.</td>
-                        </tr>
-                    </#if>
-                    </tbody>
-                </table>
-
-                <#if testResults?? && (testResults?size > 0)>
-                    <h2 class="statistics-title">Результаты тестов</h2>
-                    <table class="stats-table">
-                        <thead>
-                        <tr>
-                            <th>Курс</th>
-                            <th>Тест</th>
-                            <th>Оценка</th>
-                            <th>Статус</th>
-                            <th>Дата сдачи</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Курс</th>
+                            <th class="hidden">Пропущено</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Пропуски</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Статус</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <#list testResults as result>
-                            <tr style="background-color: ${result.isPassed?string('#d4edda', '#f8d7da')}; color: ${result.isPassed?string('#155724', '#721c24')};">
-                                <td>${result.courseTitle}</td>
-                                <td>${result.testTitle}</td>
-                                <td>${result.score}%</td>
-                                <td>
-                                    <#if result.isPassed>
-                                        Пройден
-                                    <#else>
-                                        Не пройден
-                                    </#if>
-                                </td>
-                                <td>
-                                    <#if result.submittedAt??>
-                                        ${result.localisedTime}
-                                    <#else>
-                                        —
-                                    </#if>
-                                </td>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <#if attendanceStatsList?? && attendanceStatsList?size gt 0>
+                            <#list attendanceStatsList as stat>
+                                <tr class="${stat.courseInstance.isActive?string('', 'bg-red-50')}">
+                                    <td class="px-4 py-3 text-center text-sm text-gray-900">
+                                        <#if stat.courseInstance.title?length gt 15>
+                                            ${stat.courseInstance.title?substring(0, 15)}...
+                                        <#else>
+                                            ${stat.courseInstance.title!'—'}
+                                        </#if>
+                                    </td>
+
+                                    <td class="hidden">${stat.absentHours!'—'}</td>
+
+                                    <td class="px-4 py-3 text-center text-sm text-gray-600 relative group cursor-pointer">
+                                        <#if stat.attendancePercentage??>
+                                            ${stat.attendancePercentage}%
+                                            <div class="mt-1 bg-gray-200 rounded-full h-2.5">
+                                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${stat.attendancePercentage}%"></div>
+                                            </div>
+                                            <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
+                                                Пропущено часов: ${stat.absentHours!'—'}
+                                            </div>
+                                        <#else>
+                                            —
+                                        </#if>
+                                    </td>
+
+                                    <td class="px-4 py-3 text-center text-sm font-semibold">
+                                        <#if stat.enrollmentStatus?? && stat.enrollmentStatus == "DROPPED">
+                                            <span class="text-red-600">${stat.localisedStatus!'Неизвестно'}</span>
+                                        <#else>
+                                            <span class="text-green-600">${stat.localisedStatus!'Неизвестно'}</span>
+                                        </#if>
+                                    </td>
+                                </tr>
+                            </#list>
+                        <#else>
+                            <tr>
+                                <td colspan="4" class="px-4 py-3 text-center text-sm text-gray-500">Нет данных по статистике.</td>
                             </tr>
-                        </#list>
+                        </#if>
+
                         </tbody>
                     </table>
+                </div>
+
+                <#if testResults?? && testResults?size gt 0>
+                    <h2 class="text-2xl font-semibold text-gray-900 text-center mt-8 mb-6">Результаты тестов</h2>
+                    <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-blue-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Курс</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Оценка</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Дата сдачи</th>
+                            </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                            <#list testResults as result>
+                                <tr class="${result.isPassed?string('bg-green-50', 'bg-red-50')}">
+                                    <td class="px-4 py-3 text-sm text-gray-900">
+                                        <#if result.courseTitle?length gt 15>
+                                            ${result.courseTitle?substring(0, 15)}...
+                                        <#else>
+                                            ${result.courseTitle!'—'}
+                                        </#if>
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm text-gray-600">${result.score!'—'}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">${result.localisedTime!'—'}</td>
+                                </tr>
+                            </#list>
+                            </tbody>
+                        </table>
+                    </div>
                 </#if>
             </div>
         </#if>
 
         <#if profile.user.role.name == "TEACHER">
-            <div class="statistics-container">
-                <h2 class="statistics-title">
-                    <i class="fas fa-book" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
-                    Курсы преподавателя
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 text-center mb-6">
+                    <i class="fas fa-book mr-2 text-blue-600"></i>Курсы преподавателя
                 </h2>
                 <#if courses?size == 0>
-                    <div class="alert alert-info text-center" role="alert">
-                        У преподавателя нет курсов.
-                    </div>
+                    <div class="p-4 bg-blue-100 text-blue-700 rounded-lg text-center">У преподавателя нет курсов.</div>
                 <#else>
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <#list courses as course>
-                            <div class="col">
-                                <div class="card course-card h-100 shadow-sm border-0">
-                                    <i class="fas fa-book-open course-icon"></i>
-                                    <div class="card-body">
-                                        <a href="/admin/course-instances/${course.courseInstanceId}" class="text-decoration-none text-body d-flex flex-column flex-grow-1">
-                                            <h5 class="card-title">${course.courseTitle}</h5>
-                                            <h6 class="card-subtitle">${course.instanceTitle}</h6>
-                                            <p class="card-text mt-auto">
-                                        <span class="date-range">
-                                            <i class="fas fa-calendar-alt"></i>
-                                            ${course.startDate} – ${course.endDate}
-                                        </span>
-                                            </p>
-                                        </a>
-                                    </div>
-                                    <span class="status-indicator <#if course.isActive?? && !course.isActive>inactive</#if>">
-                                <#if course.isActive?? && course.isActive>Активный<#else>Завершён</#if>
-                            </span>
-                                </div>
+                            <div class="relative bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                                <i class="fas fa-book-open absolute top-4 left-4 text-blue-200 text-xl opacity-50 group-hover:opacity-75 transition-opacity"></i>
+                                <span class="absolute top-4 right-4 px-2 py-1 text-xs font-semibold text-white rounded-full ${course.isActive?string('bg-blue-600', 'bg-red-600')}">
+                                    ${course.isActive?string('Активный', 'Завершён')}
+                                </span>
+                                <a href="/admin/course-instances/${course.courseInstanceId}" class="block text-decoration-none text-gray-900">
+                                    <h5 class="text-lg font-semibold mb-2">
+                                        <#if course.courseTitle?length gt 15>
+                                            ${course.courseTitle?substring(0, 15)}...
+                                        <#else>
+                                            ${course.courseTitle}
+                                        </#if>
+                                    </h5>
+                                    <h6 class="text-sm text-blue-600 mb-3">
+                                        <#if course.instanceTitle?length gt 15>
+                                            ${course.instanceTitle?substring(0, 15)}...
+                                        <#else>
+                                            ${course.instanceTitle!'—'}
+                                        </#if>
+                                    </h6>
+                                    <p class="text-sm text-gray-600 flex items-center gap-2">
+                                        <i class="fas fa-calendar-alt text-blue-200"></i>
+                                        ${course.startDate!'—'} – ${course.endDate!'—'}
+                                    </p>
+                                </a>
                             </div>
                         </#list>
                     </div>
@@ -788,70 +252,72 @@
         </#if>
 
         <#if profile.user.role.name == "ORGANIZATION">
-            <div class="statistics-container">
-                <h2 class="statistics-title">
-                    <i class="fas fa-users" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
-                    Студенты организации
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 text-center mb-6">
+                    <i class="fas fa-users mr-2 text-blue-600"></i>Студенты организации
                 </h2>
-                <div class="table-responsive">
-                    <table class="stats-table" id="studentsTable">
-                        <thead>
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200" id="studentsTable">
+                        <thead class="bg-blue-50">
                         <tr>
-                            <th>ФИО</th>
-                            <th>Email</th>
-                            <th>Телефон</th>
-                            <th>Курсы</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">ФИО</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Телефон</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Курсы</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="bg-white divide-y divide-gray-200">
                         <#assign grouped = {} />
                         <#list students as s>
                             <#assign sid = s.studentId?string>
                             <#assign grouped = grouped + { (sid): (grouped[sid]![]) + [s] } >
                         </#list>
-                        <#list grouped?keys as sid>
-                            <#assign courseList = grouped[sid]>
-                            <#assign first = courseList[0]>
+                        <#if grouped?size gt 0>
+                            <#list grouped?keys as sid>
+                                <#assign courseList = grouped[sid]>
+                                <#assign first = courseList[0]>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-900 break-words">${first.fullName!'—'}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600 break-words">${first.email!'—'}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600 break-words">${first.phone!'—'}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">
+                                        <ul class="list-disc pl-4 mb-0">
+                                            <#list courseList as c>
+                                                <li>
+                                                    <#if c.courseTitle?length gt 15>
+                                                        ${c.courseTitle?substring(0, 15)}...
+                                                    <#else>
+                                                        ${c.courseTitle!'—'}
+                                                    </#if>
+                                                    — ${c.localizedStatus!'Неизвестно'}, ${c.progress!'0'}%
+                                                    <#if c.finalGrade??>, оценка: ${c.finalGrade}</#if>
+                                                </li>
+                                            </#list>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </#list>
+                        <#else>
                             <tr>
-                                <td>${first.fullName}</td>
-                                <td>${first.email}</td>
-                                <td>${first.phone}</td>
-                                <td>
-                                    <ul class="mb-0 ps-3 small">
-                                        <#list courseList as c>
-                                            <li>
-                                                <strong>${c.courseTitle}</strong> — ${c.localizedStatus}, ${c.progress}%
-                                                <#if c.finalGrade??>, оценка: ${c.finalGrade}</#if>
-                                            </li>
-                                        </#list>
-                                    </ul>
-                                </td>
-                            </tr>
-                        </#list>
-                        <#if students?size == 0>
-                            <tr>
-                                <td colspan="4">Нет студентов в организации.</td>
+                                <td colspan="4" class="px-4 py-3 text-center text-sm text-gray-500">Нет студентов в организации.</td>
                             </tr>
                         </#if>
                         </tbody>
                     </table>
                 </div>
-            </div>
-            <script>
-                $(document).ready(function () {
-                    $('#studentsTable').DataTable({
-                        language: {
-                            url: '/js/datatables/ru.json',
-                            paginate: {previous: '‹', next: '›'}
-                        },
-                        responsive: true,
-                        pageLength: 10,
-                        order: [[0, 'asc']],
-                        autoWidth: false,
-                        info: false
+                <script>
+                    $(document).ready(function () {
+                        $('#studentsTable').DataTable({
+                            language: { url: '/js/datatables/ru.json', paginate: { previous: '‹', next: '›' } },
+                            responsive: true,
+                            pageLength: 10,
+                            order: [[0, 'asc']],
+                            autoWidth: false,
+                            info: false
+                        });
                     });
-                });
-            </script>
+                </script>
+            </div>
         </#if>
     </div>
 </@layout.page>
