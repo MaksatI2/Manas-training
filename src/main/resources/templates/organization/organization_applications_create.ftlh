@@ -109,7 +109,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="courseId" class="form-label fw-bold">Курс <span class="text-danger">*</span></label>
-                            <select id="courseId" name="courseId" class="form-select" required>
+                            <select id="courseId" name="courseId" class="form-select" >
                                 <option value="">Выберите курс</option>
                                 <#list courses as course>
                                     <option value="${course.id}"
@@ -152,7 +152,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="employeeIds" class="form-label fw-bold">Сотрудники <span class="text-danger">*</span></label>
-                            <select id="employeeIds" name="employeeIds" class="form-select" multiple required>
+                            <select id="employeeIds" name="employeeIds" class="form-select" multiple >
                                 <#list employees as emp>
                                     <option value="${emp.id}"
                                             <#if application.employeeIds?? && application.employeeIds?seq_contains(emp.id)>selected</#if>>
@@ -168,7 +168,7 @@
                         <div class="mb-3">
                             <label for="outgoingCode" class="form-label fw-bold">Исходящий код компании <span class="text-danger">*</span></label>
                             <input type="text" id="outgoingCode" name="outgoingCode" class="form-control"
-                                   value="${(application.outgoingCode)!''}" required>
+                                   value="${(application.outgoingCode)!''}" >
                             <#if errors?? && errors.hasFieldErrors("outgoingCode")>
                                 <div class="text-danger small mt-1">${errors.getFieldError("outgoingCode").defaultMessage}</div>
                             </#if>

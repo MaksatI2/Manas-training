@@ -81,12 +81,22 @@
                     url: '/js/datatables/ru.json',
                     paginate: {previous: '‹', next: '›'}
                 },
-                responsive: false,
+                responsive: true,
                 order: [[0, 'desc']],
                 pageLength: 10,
                 lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Все"]],
                 dom: '<"row mb-3 px-3 pt-2"<"col-md-6"l><"col-md-6 text-end"f>>rt<"row mt-3 px-3 pb-2"<"col-md-6"i><"col-md-6"p>>',
-                info: false
+                info: false,
+                columnDefs: [
+                    { responsivePriority: 4, targets: 0 },
+                    { responsivePriority: 1, targets: 1 },
+                    { responsivePriority: 5, targets: 2 },
+                    { responsivePriority: 6, orderable: false, targets: 3 },
+                    { responsivePriority: 7, orderable: false, targets: 4 },
+                    { responsivePriority: 2, targets: 5 },
+                    { responsivePriority: 8, targets: 6 },
+                    { responsivePriority: 3, orderable: false, targets: 7 }
+                ]
             });
         });
         $('.clickable-row').on('click', function () {
