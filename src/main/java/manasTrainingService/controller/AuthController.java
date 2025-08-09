@@ -188,6 +188,11 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public String sendResetEmail(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        if (email.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Почта не может быть пустой");
+            return "redirect:/auth/forgot-password";
+
+        }
         try {
             userService.sendResetToken(email);
             redirectAttributes.addFlashAttribute("message", "Инструкция по сбросу пароля отправлена на указанный email.");

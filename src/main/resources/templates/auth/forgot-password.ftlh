@@ -1,5 +1,9 @@
 <#include "../layout.ftlh">
 <@page>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <div class="hero-section">
         <h1 class="hero-title">
             <i class="fas fa-key me-3"></i>Восстановление пароля
