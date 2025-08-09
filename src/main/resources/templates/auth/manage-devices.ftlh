@@ -51,17 +51,17 @@
                                                     </div>
                                                     <div class="mb-1">
                                                         <i class="fas fa-clock me-1"></i>
-                                                        Создан: ${token.createdAt}
+                                                        Создан: ${token.getCreatedAtFormatted()}
                                                     </div>
                                                     <#if token.lastUsedAt??>
                                                         <div class="mb-1">
                                                             <i class="fas fa-history me-1"></i>
-                                                            Последнее использование: ${token.lastUsedAt}
+                                                            Последнее использование: ${token.getLastUsedAtFormatted()}
                                                         </div>
                                                     </#if>
                                                     <div>
                                                         <i class="fas fa-calendar-times me-1"></i>
-                                                        Истекает: ${token.expiresAt}
+                                                        Истекает: ${token.getExpiresAtFormatted()}
                                                     </div>
                                                 </div>
 
