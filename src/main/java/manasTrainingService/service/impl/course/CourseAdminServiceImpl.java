@@ -88,7 +88,10 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     @Override
     public CourseDto create(CreateCourseDto createCourseDto) {
         if (existsByCode(createCourseDto.getCode())) {
-            throw new ValidationException("Курс с кодом '" + createCourseDto.getCode() + "' уже существует");
+            throw new ValidationException("Курс с кодом " + createCourseDto.getCode() + " уже существует");
+        }
+        if (existsByTitle(createCourseDto.getTitle())) {
+            throw new ValidationException("Курс с названием " + createCourseDto.getTitle() + " уже существует");
         }
 
         CourseCategoryDto categoryDto = categoryService.getById(createCourseDto.getCategoryId());
@@ -126,8 +129,12 @@ public class CourseAdminServiceImpl implements CourseAdminService {
                 .orElseThrow(() -> new EntityNotFoundException("Курс с ID " + updateCourseDto.getId() + " не найден"));
 
         if (existsByCodeAndIdNot(updateCourseDto.getCode(), updateCourseDto.getId())) {
-            throw new ValidationException("Курс с кодом '" + updateCourseDto.getCode() + "' уже существует");
+            throw new ValidationException("Курс с кодом " + updateCourseDto.getCode() + " уже существует");
         }
+        if (existsByTitleAndIdNot(updateCourseDto.getTitle(), updateCourseDto.getId())) {
+            throw new ValidationException("Курс с названием " + updateCourseDto.getTitle() + " уже существует");
+        }
+
 
         CourseCategoryDto categoryDto = categoryService.getById(updateCourseDto.getCategoryId());
         CourseCategory category = CourseCategory.builder()
@@ -226,6 +233,16 @@ public class CourseAdminServiceImpl implements CourseAdminService {
                 .active(dto.getActive())
                 .categoryId(dto.getCategoryId())
                 .build();
+    }
+
+    @Override
+    public boolean existsByTitle(String title) {
+        return courseRepository.existsByTitle(title);
+    }
+
+    @Override
+    public boolean existsByTitleAndIdNot(String title, Integer id) {
+        return courseRepository.existsByTitleAndIdNot(title, id);
     }
 
 }

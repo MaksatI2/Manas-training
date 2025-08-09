@@ -14,4 +14,8 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     boolean existsByCodeAndIdNot(String code, Integer id);
 
     List<Course> findByCategoryId(Integer categoryId);
+
+    boolean existsByTitle(String title);
+
+    boolean existsByTitleAndIdNot(String title, Integer id);
 }

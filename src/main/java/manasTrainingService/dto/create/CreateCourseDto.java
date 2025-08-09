@@ -6,12 +6,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import manasTrainingService.validation.UniqueCourseCreate;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@UniqueCourseCreate
+
 public class CreateCourseDto {
 
     @NotBlank(message = "Название обязательно")

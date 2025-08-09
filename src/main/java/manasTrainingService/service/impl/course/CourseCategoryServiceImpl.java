@@ -131,7 +131,7 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
 
 
     private void validateCategory(CourseCategoryDto dto) {
-        if (categoryRepository.existsByName(dto.getName())) {
+        if (categoryRepository.existsByName(dto.getName().strip())) {
             throw new ValidationException("Категория с именем " + dto.getName() + " уже существует");
         }
     }
