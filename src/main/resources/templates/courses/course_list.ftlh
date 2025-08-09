@@ -35,11 +35,11 @@
                 <table class="table table-bordered table-hover" id="coursesTable" width="100%">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
                     <tr>
-                        <th>№</th>
-                        <th>Название</th>
-                        <th>Код курса</th>
-                        <th>Категория</th>
-                        <th class="duration-col">Длительность</th>
+                        <th class="col-id">№</th>
+                        <th class="col-title">Название</th>
+                        <th class="col-code">Код курса</th>
+                        <th class="col-category">Категория</th>
+                        <th class="col-duration duration-col">Длительность</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -47,7 +47,7 @@
                         <#list courses as course>
                             <tr style="cursor: pointer;" onclick="window.location.href='/courses/${course.id}'">
                                 <td>${course.id}</td>
-                                <td>${course.title}</td>
+                                <td class="title-column">${course.title}</td>
                                 <td><span class="badge"
                                           style="background: #87ceeb; color: #2c3e50;">${course.code}</span></td>
                                 <td><span class="badge"
@@ -105,11 +105,11 @@
                 autoWidth: false,
                 stateSave: true,
                 columnDefs: [
-                    {targets: 0, responsivePriority: 1},
-                    {targets: 1, responsivePriority: 1},
-                    {targets: 4, responsivePriority: 2},
-                    {targets: 2, responsivePriority: 3},
-                    {targets: 3, responsivePriority: 4}
+                    { targets: 1, responsivePriority: 1 },
+                    { targets: 0, responsivePriority: 2 },
+                    { targets: 4, responsivePriority: 3 },
+                    { targets: 2, responsivePriority: 4 },
+                    { targets: 3, responsivePriority: 5 }
                 ]
             });
 
@@ -196,9 +196,10 @@
                 align-items: center;
             }
         }
+
         .filter-controls {
             display: flex;
-            gap: -10px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: flex-start;
         }
@@ -226,6 +227,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         select.category-filter option {
             white-space: normal;
         }
@@ -281,21 +283,94 @@
             margin-bottom: 1rem;
             flex-wrap: wrap;
         }
+
         .duration-col {
-            width: 1%;
+            width: 10%;
             white-space: nowrap;
             text-align: center;
         }
 
         .duration-content {
             display: inline-block;
-            padding-right: 6rem;
+            padding-right: 1rem;
         }
 
-        @media (max-width: 768px) {
+        .title-column {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Column widths for general use */
+        #coursesTable .col-id {
+            width: 5%;
+        }
+
+        #coursesTable .col-title {
+            width: 40%;
+        }
+
+        #coursesTable .col-code {
+            width: 15%;
+        }
+
+        #coursesTable .col-category {
+            width: 20%;
+        }
+
+        #coursesTable .col-duration {
+            width: 20%;
+        }
+
+        /* Adjustments for 770–933px with sidebar */
+        @media (min-width: 770px) and (max-width: 933px) {
+            #coursesTable .col-id {
+                width: 8%;
+            }
+
+            #coursesTable .col-title {
+                width: 35%;
+            }
+
+            #coursesTable .col-code {
+                width: 15%;
+            }
+
+            #coursesTable .col-category {
+                width: 22%;
+            }
+
+            #coursesTable .col-duration {
+                width: 20%;
+            }
+
+            .title-column {
+                max-width: 120px;
+            }
+
+            #coursesTable th, #coursesTable td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .duration-content {
+                padding-right: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .badge {
+                font-size: 0.65rem;
+            }
+        }
+
+        @media (max-width: 955px) {
             .duration-content {
                 font-size: 0.8rem;
                 padding-right: 0.5rem;
+            }
+            .title-column {
+                max-width: 150px;
             }
         }
 
@@ -313,7 +388,7 @@
             }
         }
 
-        @media (min-width: 570px) and (max-width: 770px) {
+        @media (min-width: 570px) and (max-width: 1050px) {
             div.dataTables_wrapper .dataTables_length,
             div.dataTables_wrapper .dataTables_filter {
                 flex-direction: row;
