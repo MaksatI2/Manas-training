@@ -11,15 +11,14 @@
                 <i class="fas fa-calendar me-2"></i>
                 Расписание занятий - <span id="currentMonth"></span>
             </h1>
-            <div class="user-info">
-                <span class="user-role-badge ${userRole}">${userRole?upper_case}</span>
-                <span class="user-name">${userName}</span>
-            </div>
             <div class="calendar-nav">
                 <button class="nav-btn" onclick="changeMonth(-1)">
                     <i class="fas fa-chevron-left"></i>
                 </button>
-                <button class="nav-btn today-btn" onclick="goToToday()">Сегодня</button>
+                <button class="nav-btn today-btn" onclick="goToToday()">
+                    <span class="today-text">Сегодня</span>
+                    <span class="today-dot">•</span>
+                </button>
                 <button class="nav-btn" onclick="changeMonth(1)">
                     <i class="fas fa-chevron-right"></i>
                 </button>
@@ -595,58 +594,30 @@
             flex-wrap: wrap;
             gap: 1rem;
             box-shadow: 0 2px 10px rgba(0,102,204,0.3);
+            min-height: 80px;
         }
 
         .calendar-title {
             font-size: 2rem;
             font-weight: 600;
             flex: 1;
-            min-width: 300px;
+            min-width: 280px;
             display: flex;
             align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .calendar-title i {
             color: var(--light-blue);
             margin-right: 0.5rem;
+            flex-shrink: 0;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.9rem;
-        }
-
-        .user-role-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        .user-role-badge.teacher {
-            background: rgba(76, 175, 80, 0.8);
-        }
-
-        .user-role-badge.student {
-            background: rgba(135, 206, 235, 0.8);
-        }
-
-        .user-role-badge.admin {
-            background: rgba(255, 152, 0, 0.8);
-        }
-
-        .user-role-badge.other {
-            background: rgba(158, 158, 158, 0.8);
-        }
-
-        .user-name {
-            font-weight: 500;
-            color: var(--light-blue);
+        #currentMonth {
+            display: inline-block;
+            white-space: nowrap;
+            margin-left: 10px;
         }
 
         .calendar-nav {
@@ -682,6 +653,112 @@
         .today-btn:hover {
             background: var(--white);
             border-color: var(--white);
+        }
+
+        .today-text {
+            display: inline;
+        }
+
+        .today-dot {
+            display: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1024px) {
+            .calendar-title {
+                font-size: 1.8rem;
+                min-width: 250px;
+            }
+
+            .today-text {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .calendar-container {
+                margin: 1rem;
+                border-radius: 10px;
+            }
+
+            .calendar-header {
+                padding: 1.5rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .calendar-title {
+                font-size: 1.4rem;
+                min-width: auto;
+                text-align: center;
+                justify-content: center;
+                flex-direction: column;
+                gap: 0.5rem;
+                white-space: normal;
+            }
+
+            .calendar-title i {
+                margin-right: 0;
+                margin-bottom: 0.25rem;
+            }
+
+            .calendar-nav {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .nav-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .today-text {
+                display: none;
+            }
+
+            .today-dot {
+                display: inline;
+            }
+
+            .today-btn {
+                padding: 0.6rem 0.8rem;
+                min-width: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-title {
+                font-size: 1.2rem;
+                line-height: 1.2;
+            }
+
+            .calendar-header {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .calendar-title {
+                font-size: 1rem;
+            }
+        }
+
+        .user-role-badge.teacher {
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        .user-role-badge.student {
+            background: rgba(135, 206, 235, 0.8);
+        }
+
+        .user-role-badge.admin {
+            background: rgba(255, 152, 0, 0.8);
+        }
+
+        .user-role-badge.other {
+            background: rgba(158, 158, 158, 0.8);
         }
 
         .filters-panel {
@@ -1183,33 +1260,6 @@
         }
 
         @media (max-width: 768px) {
-            .calendar-container {
-                margin: 1rem;
-                border-radius: 10px;
-            }
-
-            .calendar-header {
-                padding: 1.5rem;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .calendar-title {
-                font-size: 1.5rem;
-                min-width: auto;
-                text-align: center;
-                justify-content: center;
-            }
-
-            .calendar-nav {
-                justify-content: center;
-            }
-
-            .nav-btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.9rem;
-            }
-
             .filters-header {
                 padding: 1rem;
             }
