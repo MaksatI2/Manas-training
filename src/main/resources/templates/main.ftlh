@@ -74,11 +74,10 @@
 
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-brain feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Адаптивное тестирование</h4>
+                    <i class="fas fa-video feature-icon-enhanced"></i>
+                    <h4 class="feature-title">Вебинары и эфиры</h4>
                     <p class="feature-description">
-                        Система интеллектуального тестирования с адаптацией под уровень знаний
-                        и мгновенной обратной связью
+                        Живое общение с преподавателями и экспертами: разбирайте темы в прямом эфире
                     </p>
                 </div>
             </div>
@@ -107,18 +106,17 @@
 
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-mobile-alt feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Мобильная платформа</h4>
+                    <i class="fas fa-folder-open feature-icon-enhanced"></i>
+                    <h4 class="feature-title">Портфолио достижений</h4>
                     <p class="feature-description">
-                        Полнофункциональное мобильное приложение для обучения в любом месте
-                        и в любое время с синхронизацией прогресса
+                        Собирайте все свои курсы, сертификаты и проекты в одном месте — делитесь портфолио с работодателями
                     </p>
                 </div>
             </div>
 
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
-                    <i class="fas fa-analytics feature-icon-enhanced"></i>
+                    <i class="fas fa-chart-line feature-icon-enhanced"></i>
                     <h4 class="feature-title">Аналитика успеваемости</h4>
                     <p class="feature-description">
                         Детальная аналитика прогресса обучения с персональными рекомендациями
@@ -166,7 +164,6 @@
                         <p>Полный курс по техническому обслуживанию воздушных судов</p>
                         <div class="course-meta">
                             <span class="duration"><i class="fas fa-clock"></i> 120 часов</span>
-                            <span class="price">от 15,000 сом</span>
                         </div>
                         <a href="https://manastraining.kg/courses/aircraft-maintenance" class="btn btn-outline-primary btn-sm mt-2">
                             Подробнее
@@ -184,7 +181,6 @@
                         <p>Изучение принципов радиосвязи и управления полетами</p>
                         <div class="course-meta">
                             <span class="duration"><i class="fas fa-clock"></i> 80 часов</span>
-                            <span class="price">от 12,000 сом</span>
                         </div>
                         <a href="https://manastraining.kg/courses/radio-communication" class="btn btn-outline-primary btn-sm mt-2">
                             Подробнее
@@ -202,7 +198,6 @@
                         <p>Курс по обеспечению безопасности в гражданской авиации</p>
                         <div class="course-meta">
                             <span class="duration"><i class="fas fa-clock"></i> 60 часов</span>
-                            <span class="price">от 10,000 сом</span>
                         </div>
                         <a href="https://manastraining.kg/courses/aviation-security" class="btn btn-outline-primary btn-sm mt-2">
                             Подробнее
@@ -247,45 +242,47 @@
             <a href="https://manastraining.kg/courses" class="btn btn-primary-custom btn-lg">
                 <i class="fas fa-play me-2"></i>Просмотреть курсы
             </a>
-            <a href="#features" class="btn btn-outline-primary btn-lg">
-                <i class="fas fa-info-circle me-2"></i>Узнать больше
-            </a>
-            <a href="tel:+996312123456" class="btn btn-success btn-lg">
-                <i class="fas fa-phone me-2"></i>Позвонить сейчас
-            </a>
         </div>
     </div>
 
     <div class="contact-info-bar">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-3 col-md-6 mb-2 mb-lg-0">
+                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
                     <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <span>+996 312 123-456</span>
+                        <a href="tel:+996312123456" class="contact-link">
+                            <i class="fas fa-phone contact-icon"></i>
+                            <span class="contact-text">+996 557 87-83-00</span>
+                        </a>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-2 mb-lg-0">
+
+                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
                     <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <span>info@manastraining.kg</span>
+                        <a href="mailto:info@manastraining.kg" class="contact-link">
+                            <i class="fas fa-envelope contact-icon"></i>
+                            <span class="contact-text">manas.training25@gmail.com</span>
+                        </a>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-2 mb-lg-0">
+
+                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
                     <div class="contact-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>г. Бишкек, ул. Манаса 123</span>
+                        <div class="contact-link" onclick="showOnMap()" style="cursor: pointer;">
+                            <i class="fas fa-map-marker-alt contact-icon"></i>
+                            <span class="contact-text">г. Бишкек, ул. Анарбека Бакаева 132Б</span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="social-links">
-                        <a href="https://wa.me/996312123456" target="_blank" class="social-link whatsapp">
+                    <div class="social-links d-flex justify-content-center justify-content-lg-end">
+                        <a href="https://wa.me/996557878300" target="_blank" class="social-link whatsapp" aria-label="WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                         </a>
-                        <a href="https://t.me/manastraining" target="_blank" class="social-link telegram">
+                        <a href="https://t.me/0557878300" target="_blank" class="social-link telegram" aria-label="Telegram">
                             <i class="fab fa-telegram"></i>
                         </a>
-                        <a href="https://instagram.com/manastraining" target="_blank" class="social-link instagram">
+                        <a href="https://instagram.com/manas.training" target="_blank" class="social-link instagram" aria-label="Instagram">
                             <i class="fab fa-instagram"></i>
                         </a>
                     </div>
@@ -301,17 +298,17 @@
             "name": "Манас Тренинг Центр",
             "description": "Профессиональная подготовка специалистов в сфере гражданской авиации",
             "url": "https://manastraining.kg",
-            "telephone": "+996312123456",
-            "email": "info@manastraining.kg",
+            "telephone": "+996557878300",
+            "email": "manas.training25@gmail.com",
             "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "ул. Манаса 123",
+                "streetAddress": "ул. Анарбека Бакаева 132Б",
                 "addressLocality": "Бишкек",
                 "addressCountry": "KG"
             },
             "sameAs": [
-                "https://instagram.com/manastraining",
-                "https://t.me/manastraining"
+                "https://instagram.com/manas.training",
+                "https://t.me/0557878300"
             ]
         }
     </script>
@@ -444,15 +441,44 @@
         .contact-info-bar {
             background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
             color: white;
-            padding: 1rem 0;
+            padding: 1.5rem 0;
             margin-bottom: 2rem;
+            font-size: 1rem;
         }
 
         .contact-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
+            justify-content: center;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+
+        .contact-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .contact-icon {
+            color: var(--light-blue);
+            width: 24px;
+            text-align: center;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .contact-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .contact-item i {
@@ -462,7 +488,6 @@
 
         .social-links {
             display: flex;
-            justify-content: flex-end;
             gap: 1rem;
         }
 
@@ -470,21 +495,92 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             color: white;
             text-decoration: none;
             transition: all 0.3s ease;
+            font-size: 1.2rem;
         }
 
         .social-link.whatsapp { background: #25D366; }
         .social-link.telegram { background: #0088cc; }
-        .social-link.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .social-link.instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
 
         .social-link:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.1);
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 1199px) {
+            .contact-text {
+                font-size: 0.95rem;
+            }
+
+            .social-link {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .contact-info-bar {
+                padding: 1.25rem 0;
+            }
+
+            .contact-item {
+                justify-content: flex-start;
+                margin-bottom: 0.5rem;
+            }
+
+            .social-links {
+                justify-content: flex-start;
+                margin-top: 0.5rem;
+            }
+
+            .contact-icon {
+                margin-right: 0.5rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .contact-info-bar {
+                padding: 1rem 0;
+            }
+
+            .contact-item {
+                justify-content: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+
+            .contact-text {
+                white-space: normal;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .contact-icon {
+                width: 20px;
+                font-size: 1rem;
+            }
+
+            .contact-text {
+                font-size: 0.9rem;
+            }
+
+            .social-link {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
         }
 
         .hero-buttons-group {
@@ -568,6 +664,25 @@
             box-shadow: 0 8px 30px rgba(0, 102, 204, 0.08);
             transition: all 0.3s ease;
             margin-bottom: 2rem;
+        }
+
+        .course-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .course-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+
+        .row > [class*="col-"] {
+            display: flex;
+            flex-direction: column;
         }
 
         .course-card:hover {
@@ -1032,7 +1147,6 @@
             }
         }
 
-        /* Loading Animation */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -1043,7 +1157,6 @@
             animation: pulse 1s infinite;
         }
 
-        /* Scroll to top button */
         .scroll-to-top {
             position: fixed;
             bottom: 30px;
@@ -1119,4 +1232,6 @@
             });
         }
     </script>
+
+    <script src="/static/js/map.js"></script>
 </@layout.page>
