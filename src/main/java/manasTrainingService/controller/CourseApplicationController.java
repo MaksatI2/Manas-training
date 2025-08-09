@@ -111,11 +111,17 @@ public class CourseApplicationController {
     @PostMapping("/admin/{id}/status")
     @PreAuthorize("hasRole('admin')")
     public String updateStatus(@PathVariable Integer id,
-                               @ModelAttribute ApplicationStatusUpdateDto dto,
+                               @Valid @ModelAttribute ApplicationStatusUpdateDto dto,
+                               BindingResult bindingResult,
                                Principal principal,
                                RedirectAttributes redirectAttributes,
                                Model model) {
-        try {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Укажите статус и комментарий при необходимости");
+            return "redirect:/applications/admin/" + id;
+        }
+
+            try {
             applicationService.updateApplicationStatus(id, dto, principal.getName());
             redirectAttributes.addFlashAttribute("successMessage", "Статус заявки успешно обновлён.");
         } catch (BadRequestException ex) {
