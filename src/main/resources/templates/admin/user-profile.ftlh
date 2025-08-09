@@ -379,6 +379,132 @@
             word-break: break-word;
             max-width: 100%;
         }
+
+        /* Стили для карточек курсов */
+        .card.course-card {
+            border: none;
+            border-radius: 12px;
+            background: var(--white);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card.course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        .card.course-card .card-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card.course-card .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        .card.course-card .card-subtitle {
+            font-size: 1rem;
+            color: var(--primary-blue);
+            font-weight: 500;
+            margin-bottom: 1rem;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .card.course-card .card-text {
+            font-size: 0.9rem;
+            color: var(--dark-blue);
+            margin-top: auto;
+            line-height: 1.5;
+        }
+
+        .card.course-card .card-text .date-range {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .card.course-card .card-text .date-range i {
+            color: var(--light-blue);
+        }
+
+        .card.course-card .status-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--white);
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        }
+
+        .card.course-card .status-indicator.inactive {
+            background: linear-gradient(135deg, #dc3545, #a71d2a);
+        }
+
+        .card.course-card a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card.course-card a:hover {
+            color: inherit;
+        }
+
+        .card.course-card .course-icon {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 1.2rem;
+            color: var(--light-blue);
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+
+        .card.course-card:hover .course-icon {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .card.course-card .card-title {
+                font-size: 1.2rem;
+            }
+
+            .card.course-card .card-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .card.course-card .card-text {
+                font-size: 0.85rem;
+            }
+
+            .card.course-card .status-indicator {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+        }
     </style>
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
@@ -633,17 +759,26 @@
                         У преподавателя нет курсов.
                     </div>
                 <#else>
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4">
                         <#list courses as course>
                             <div class="col">
-                                <div class="card course-card h-100 shadow-sm border-0 d-flex flex-column">
-                                    <a href="/admin/course-instances/${course.courseInstanceId}" class="text-decoration-none text-body flex-grow-1 d-flex flex-column p-3">
-                                        <h5 class="card-title mb-2">${course.courseTitle}</h5>
-                                        <h6 class="card-subtitle mb-3 text-muted">${course.instanceTitle}</h6>
-                                        <p class="card-text mt-auto">
-                                            <span class="d-block text-muted small">Срок: ${course.startDate} – ${course.endDate}</span>
-                                        </p>
-                                    </a>
+                                <div class="card course-card h-100 shadow-sm border-0">
+                                    <i class="fas fa-book-open course-icon"></i>
+                                    <div class="card-body">
+                                        <a href="/admin/course-instances/${course.courseInstanceId}" class="text-decoration-none text-body d-flex flex-column flex-grow-1">
+                                            <h5 class="card-title">${course.courseTitle}</h5>
+                                            <h6 class="card-subtitle">${course.instanceTitle}</h6>
+                                            <p class="card-text mt-auto">
+                                        <span class="date-range">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            ${course.startDate} – ${course.endDate}
+                                        </span>
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <span class="status-indicator <#if course.isActive?? && !course.isActive>inactive</#if>">
+                                <#if course.isActive?? && course.isActive>Активный<#else>Завершён</#if>
+                            </span>
                                 </div>
                             </div>
                         </#list>

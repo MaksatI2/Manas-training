@@ -101,6 +101,7 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
                             .startDate(DateUtil.formatDateOnly(ci.getStartDate()))
                             .endDate(DateUtil.formatDateOnly(ci.getEndDate()))
                             .isPrimary(relation.getIsPrimary())
+                            .isActive(ci.getIsActive())
                             .build();
                 })
                 .collect(Collectors.toList());

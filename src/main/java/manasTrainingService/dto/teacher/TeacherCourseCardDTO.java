@@ -23,4 +23,5 @@ public class TeacherCourseCardDTO {
     String startDate;
     String endDate;
     Boolean isPrimary;
+    Boolean isActive;
 }
