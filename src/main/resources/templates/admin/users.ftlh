@@ -85,8 +85,7 @@
                             <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}'">
                             <td>${user.id}</td>
                                 <td>${user.name}</td>
-                                <td>${user.lastName!"-"}</td>
-                                <td>${user.email}</td>
+                                <td>${(user.lastName?has_content && user.lastName != "null")?then(user.lastName, "-")}</td>                                <td>${user.email}</td>
                                 <td>${user.phone}</td>
                                 <td>
                                     <span class="badge bg-primary">${user.role.name}</span>

@@ -42,7 +42,8 @@
                     </div>
                 </div>
                 <div class="flex-1 text-left md:text-left">
-                    <h2 class="text-2xl font-semibold text-gray-900 break-words">${profile.user.name} ${profile.user.lastName}</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900 break-words">${profile.user.name} ${(profile.user.lastName?has_content && profile.user.lastName != "null")?then(profile.user.lastName, "")}
+                    </h2>
                     <p class="text-lg text-blue-600 mt-1 break-words">
                         <i class="fas fa-envelope mr-2"></i>${profile.user.email}
                     </p>
