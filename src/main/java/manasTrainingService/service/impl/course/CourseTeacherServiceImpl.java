@@ -30,7 +30,9 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
     public List<CourseTeacherDTO> getEligibleTeachersForCourseInstance(Integer courseInstanceId) {
         Integer courseId = courseInstanceService.getCourseInstanceById(courseInstanceId).getCourseId();
 
-        return repository.findByCourseId(courseId).stream()
+        List<CourseTeacher> eligibleTeachers = repository.findEligibleTeachers(courseId, courseInstanceId);
+
+        return eligibleTeachers.stream()
                 .map(teacher -> CourseTeacherDTO.builder()
                         .id(teacher.getId())
                         .teacherId(teacher.getTeacher().getId())

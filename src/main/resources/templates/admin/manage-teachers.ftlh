@@ -21,9 +21,6 @@
         <div class="container py-4">
             <div class="hero-section mb-4 text-center">
                 <h2 class="hero-title mb-2">Управление преподавателями: <strong>${courseInstance.title}</strong></h2>
-                <p class="hero-subtitle fs-5 text-muted">
-                    Текущий поток: <span class="fw-semibold">${courseInstance.title}</span>
-                </p>
             </div>
 
 
