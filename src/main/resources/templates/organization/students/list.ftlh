@@ -54,10 +54,10 @@
                         <#assign courseList = grouped[sid]>
                         <#assign first = courseList[0]>
                         <tr>
-                            <td>${first.fullName}</td>
-                            <td>${first.email}</td>
+                            <td class="field-value">${first.fullName}</td>
+                            <td class="field-value">${first.email}</td>
                             <td>${first.phone}</td>
-                            <td>
+                            <td class="field-value">
                                 <ul class="mb-0 ps-3 small">
                                     <#list courseList as c>
                                         <li>
@@ -78,19 +78,39 @@
                                     </#list>
                                 </ul>
                             </td>
-                            <td class="text-nowrap">
+                            <td class="text-nowrap text-center align-middle">
                                 <a href="/organization/students/${sid}/edit"
-                                   class="btn btn-sm btn-outline-secondary me-1">
+                                   class="btn btn-sm btn-outline-secondary me-1" title="Редактировать">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <form action="/organization/students/${sid}/delete"
-                                      method="post" class="d-inline"
-                                      onsubmit="return confirm('Удалить студента?')">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                    <button type="submit" class="btn btn-sm btn-outline-danger me-1">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-danger me-1" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal${sid}" title="Удалить">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                                <div class="modal fade" id="deleteModal${sid}" tabindex="-1" aria-labelledby="deleteModalLabel${sid}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title" id="deleteModalLabel${sid}">Подтверждение удаления</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                            </div>
+                                            <div class="modal-body text-break">
+                                                <p class="mb-0">
+                                                    Вы уверены, что хотите удалить студента
+                                                    <strong class="text-danger">«${first.fullName}»</strong>?
+                                                    Это действие необратимо.
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form action="/organization/students/${sid}/delete" method="post">
+                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                                    <button type="submit" class="btn btn-danger">Удалить</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </#list>
@@ -118,12 +138,38 @@
                 pageLength: 10,
                 order: [[0, 'asc']],
                 autoWidth: false,
-                info:false
+                info: false,
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 4, targets: 1 },
+                    { responsivePriority: 5, targets: 2 },
+                    { responsivePriority: 3, targets: 3 },
+                    { responsivePriority: 2, orderable: false, targets: 4 }
+                ]
             });
         });
     </script>
 
     <style>
+        .modal-body {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .modal-dialog {
+            max-width: 600px; /* или увеличить */
+            width: 100%;
+        }
+
+        @media (max-width: 576px) {
+            .modal-dialog {
+                max-width: 90vw;
+            }
+        }
+
+
         thead {
             background: linear-gradient(135deg, #0066cc, #003d7a);
             color: white;
@@ -148,6 +194,13 @@
 
         .d-flex.gap-2 > *:first-child {
             margin-left: 0;
+        }
+
+        .field-value {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
         }
     </style>
 </@layout.page>
