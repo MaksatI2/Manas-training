@@ -41,7 +41,7 @@
                     <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('email')>
                         <div class="invalid-feedback">
                             <#list .globals['org.springframework.validation.BindingResult.userEditDto'].getFieldErrors('email') as error>
-                                ${error.defaultMessage}
+                                ${error.defaultMessage}<#if error_has_next><br></#if>
                             </#list>
                         </div>
                     </#if>
@@ -61,10 +61,11 @@
                         <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('name')>
                             <div class="invalid-feedback">
                                 <#list .globals['org.springframework.validation.BindingResult.userEditDto'].getFieldErrors('name') as error>
-                                    ${error.defaultMessage}
+                                    ${error.defaultMessage}<#if error_has_next><br></#if>
                                 </#list>
                             </div>
                         </#if>
+
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -76,10 +77,10 @@
                                value="${userEditDto.lastName!''}"
                                maxlength="50"
                                required>
-                        <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('lastName')>
+                        <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('phone')>
                             <div class="invalid-feedback">
                                 <#list .globals['org.springframework.validation.BindingResult.userEditDto'].getFieldErrors('lastName') as error>
-                                    ${error.defaultMessage}
+                                    ${error.defaultMessage}<#if error_has_next><br></#if>
                                 </#list>
                             </div>
                         </#if>
