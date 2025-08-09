@@ -174,7 +174,7 @@ public class AuthController {
     public String verifyEmail(@RequestParam("token") String token, RedirectAttributes redirectAttributes) {
         boolean success = userService.verifyEmailToken(token);
         if (success) {
-            redirectAttributes.addAttribute("message", "Email успешно подтверждён! Теперь вы можете войти.");
+            redirectAttributes.addAttribute("message", "Email успешно подтверждён! Теперь Вы можете войти.");
         } else {
             redirectAttributes.addAttribute("error", "Ссылка недействительна или истекла.");
         }

@@ -25,7 +25,7 @@
                     </div>
                     <p class="small mb-3">
                         <i class="fas fa-clock me-1"></i>
-                        Прошлый раз вы заходили с этого устройства. Хотите войти снова?
+                        Прошлый раз Вы заходили с этого устройства. Хотите войти снова?
                     </p>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <form action="/auth/quick-login" method="post" class="me-md-2">

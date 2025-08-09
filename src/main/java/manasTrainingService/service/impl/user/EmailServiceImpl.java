@@ -87,7 +87,7 @@ public class EmailServiceImpl implements EmailService {
                     <a href="%s" style="color: #007BFF;">%s</a>
                 </p>
                 <p style="color: #888; font-size: 13px;">
-                    Если вы не запрашивали сброс, просто проигнорируйте это письмо.
+                    Если Вы не запрашивали сброс, просто проигнорируйте это письмо.
                 </p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
                 <p style="color: #999; font-size: 12px;">

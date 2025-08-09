@@ -18,7 +18,7 @@
         <div class="card-wrapper">
             <div class="feature-card">
                 <#if results.isPassed>
-                    <h4 class="text-success result-header"><i class="fa-solid fa-check-circle"></i> Поздравляем, вы успешно окончили курс!</h4>
+                    <h4 class="text-success result-header"><i class="fa-solid fa-check-circle"></i> Поздравляем, Вы успешно окончили курс!</h4>
                 <#else>
                     <h4 class="text-danger result-header"><i class="fa-solid fa-xmark-circle"></i> Вы не набрали нужного количества баллов</h4>
                 </#if>
