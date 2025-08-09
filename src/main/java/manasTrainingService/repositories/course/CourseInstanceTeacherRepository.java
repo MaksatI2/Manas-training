@@ -13,5 +13,5 @@ public interface CourseInstanceTeacherRepository extends JpaRepository<CourseIns
     boolean existsByCourseInstanceIdAndTeacherIdAndIsPrimaryTrue(Integer courseInstance, Integer teacherId);
     boolean existsByCourseInstanceIdAndTeacherId(Integer courseInstance, Integer teacherId);
     Optional<CourseInstanceTeacher> findByCourseInstanceIdAndTeacherId(Integer courseId, Integer teacherId);
-    List<CourseInstanceTeacher> findByTeacherIdAndIsPrimaryTrue(Integer teacherId);
+    List<CourseInstanceTeacher> findByTeacherIdAndIsPrimaryTrueOrderByCourseInstanceIsActiveDesc(Integer teacherId);
 }
