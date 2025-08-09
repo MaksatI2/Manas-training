@@ -18,6 +18,7 @@ public class EndDateAfterStartDateValidator implements ConstraintValidator<EndDa
         LocalDate startDate = null;
         LocalDate endDate = null;
 
+
         if (obj instanceof CourseInstanceCreationDTO dto) {
             startDate = dto.getStartDate();
             endDate = dto.getEndDate();
@@ -32,17 +33,27 @@ public class EndDateAfterStartDateValidator implements ConstraintValidator<EndDa
             startDate = dto.getPreferredStartDate();
             endDate = dto.getPreferredEndDate();
         } else {
-            return true; //На будущее, если вам понадобится для валидации
+            return true;
         }
 
         if (startDate == null || endDate == null) return true;
 
         boolean isValid = !endDate.isBefore(startDate);
 
+        String fieldName;
+
+        if (obj instanceof CourseInstanceCreationDTO || obj instanceof CourseInstanceUpdateDTO) {
+            fieldName = "endDate";
+        } else if (obj instanceof CourseApplicationCreateDto || obj instanceof StudentCourseApplicationCreateDto) {
+            fieldName = "preferredEndDate";
+        } else {
+            return true;
+        }
+
         if (!isValid) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("Дата окончания должна быть после даты начала")
-                    .addPropertyNode("preferredEndDate")
+                    .addPropertyNode(fieldName)
                     .addConstraintViolation();
         }
 

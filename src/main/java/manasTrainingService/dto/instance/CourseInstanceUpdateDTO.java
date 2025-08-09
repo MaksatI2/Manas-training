@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @Builder
 @EndDateAfterStartDate
 @UniqueCourseInstanceTitleUpdate
-
 public class CourseInstanceUpdateDTO {
     private Integer id;
 
