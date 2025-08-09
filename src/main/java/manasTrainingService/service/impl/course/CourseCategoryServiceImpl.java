@@ -11,6 +11,7 @@ import manasTrainingService.repositories.course.CourseCategoryRepository;
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseCategoryService;
 import manasTrainingService.service.user.UserService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +91,12 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new EntityNotFoundException("Категория с ID " + id + " не найдена");
         }
+
+        CourseCategory category = getCategoryById(id);
+        if (!category.getCourses().isEmpty()) {
+            throw new IllegalStateException("У категории есть курсы. Удаление невозможно");
+        }
+
         categoryRepository.deleteById(id);
         activityLogService.log(
                 userService.getAuthorizedUser(),

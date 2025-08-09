@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.dto.CourseDto;
 import manasTrainingService.dto.CourseOption;
+import manasTrainingService.dto.CourseSummaryDto;
 import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.course.CourseNotFoundException;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -159,6 +161,17 @@ public class CourseServiceImpl implements CourseService {
                 .filter(distinctByKey(Course::getId))
                 .map(course -> new CourseOption(course.getId(), course.getTitle()))
                 .toList();
+    }
+
+    @Override
+    public List<CourseSummaryDto> getCoursesByCategory(Integer categoryId) {
+        List<Course> courses = courseRepository.findByCategoryId(categoryId);
+        return courses.stream()
+                .map(course -> CourseSummaryDto.builder()
+                        .id(course.getId())
+                        .title(course.getTitle())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 
