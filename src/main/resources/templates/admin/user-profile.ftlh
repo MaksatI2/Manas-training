@@ -40,7 +40,9 @@
             gap: 2rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
+            overflow: hidden;
         }
+
 
         .avatar-container {
             position: relative;
@@ -140,6 +142,8 @@
             padding: 1.5rem;
             border-radius: 10px;
             border-left: 3px solid var(--light-blue);
+            overflow: hidden;
+
         }
 
         .user-role,
@@ -216,6 +220,7 @@
             padding: 1rem;
             border: 1px solid #e1ecf4;
             text-align: center;
+
         }
 
         .stats-table th {
@@ -227,6 +232,8 @@
 
         .stats-table td {
             font-size: 1rem;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .status-enrolled {
@@ -267,11 +274,16 @@
         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .card-subtitle {
             font-size: 1rem;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
+
 
         .btn-outline-primary {
             border-color: var(--primary-blue);
@@ -320,6 +332,52 @@
                 font-size: 0.9rem;
                 padding: 0.7rem;
             }
+
+            .user-name, .user-email {
+                overflow-wrap: break-word;
+                word-break: break-word;
+                white-space: normal;
+                max-width: 100%;
+            }
+
+            .user-info {
+                flex: 1;
+                min-width: 250px;
+                max-width: 100%;
+                overflow: hidden;
+            }
+
+            @media (max-width: 768px) {
+                .user-info {
+                    min-width: 100%;
+                    max-width: 100%;
+                    text-align: center;
+                }
+            }
+        }
+        .detail-value {
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+            max-width: 100%;
+        }
+
+        .user-name {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        .user-email {
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-width: 100%;
         }
     </style>
 
