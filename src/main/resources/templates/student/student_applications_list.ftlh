@@ -49,8 +49,8 @@
                     <#list applications as app>
                         <tr class="clickable-row" data-href="/applications/student/applications/${app.id}">
                             <td>${app?index + 1}</td>
-                            <td>${app.courseTitle}</td>
-                            <td>
+                            <td class="field-value">${app.courseTitle}</td>
+                            <td class="field-value">
                                 <#if app.preferredTeacher??>
                                     ${app.preferredTeacher.name} ${app.preferredTeacher.lastName}
                                 <#else>
@@ -64,6 +64,7 @@
                                     <span class="text-muted">—</span>
                                 </#if>
                             </td>
+
                             <td>
                                 <#if app.formattedPreferredEndDate??>
                                     ${app.formattedPreferredEndDate}
@@ -87,19 +88,10 @@
                                        class="btn btn-sm btn-warning me-1" title="Редактировать">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                <#else>
-                                    <button type="button" class="btn btn-sm btn-secondary me-1" disabled
-                                            title="Редактирование доступно только в статусе 'На рассмотрении'">
-                                        <i class="fas fa-lock"></i>
-                                    </button>
-                                </#if>
-
-                                <#if app.status == "PENDING">
                                     <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
                                             data-bs-target="#deleteModal${app.id}" title="Удалить">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
-
                                     <div class="modal fade" id="deleteModal${app.id}" tabindex="-1" aria-labelledby="deleteModalLabel${app.id}" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
@@ -126,6 +118,10 @@
                                         </div>
                                     </div>
                                 <#else>
+                                    <button type="button" class="btn btn-sm btn-secondary me-1" disabled
+                                            title="Редактирование доступно только в статусе 'На рассмотрении'">
+                                        <i class="fas fa-lock"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-secondary" disabled
                                             title="Удаление доступно только в статусе 'На рассмотрении'">
                                         <i class="fas fa-lock"></i>
@@ -154,12 +150,22 @@
                     url: '/js/datatables/ru.json',
                     paginate: {previous: '‹', next: '›'}
                 },
-                responsive: false,
+                responsive: true,
                 order: [[0, 'desc']],
                 pageLength: 10,
                 lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Все"]],
                 dom: '<"row mb-3 px-3 pt-2"<"col-md-6"l><"col-md-6 text-end"f>>rt<"row mt-3 px-3 pb-2"<"col-md-6"i><"col-md-6"p>>',
-                info: false
+                info: false,
+                columnDefs: [
+                    { responsivePriority: 4, targets: 0 },
+                    { responsivePriority: 1, targets: 1 },
+                    { responsivePriority: 3, targets: 2 },
+                    { responsivePriority: 5, targets: 3, orderable: false },
+                    { responsivePriority: 6, targets: 4, orderable: false },
+                    { responsivePriority: 7, targets: 5 },
+                    { responsivePriority: 8, targets: 6 },
+                    { responsivePriority: 2, orderable: false, targets: 7 }
+                ]
             });
 
             $(".clickable-row").click(function (e) {
@@ -185,9 +191,6 @@
             font-size: 0.75em;
             font-weight: 700;
             border-radius: 0.375rem;
-        }
-
-        td span.badge {
             display: inline-block;
             width: 100px;
             text-align: center;
@@ -196,12 +199,6 @@
         td.status-cell {
             text-align: center;
             vertical-align: middle;
-        }
-
-        td.status-cell .badge {
-            display: inline-block;
-            width: 100px;
-            text-align: center;
         }
 
         .bg-warning { background-color: #ffc107 !important; color: #212529 !important; }
@@ -259,6 +256,12 @@
             cursor: pointer;
         }
 
+        .field-value {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
+        }
 
         @media (max-width: 768px) {
             .card-header h5 {
@@ -269,6 +272,5 @@
         table.dataTable thead th {
             color: white !important;
         }
-
     </style>
 </@layout.page>

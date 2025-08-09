@@ -231,7 +231,7 @@
                         targets: [1],
                         orderable: true,
                         searchable: true,
-                        responsivePriority: 1  // самая высокая важность
+                        responsivePriority: 1
                     },
                     {
                         targets: [2],
@@ -249,13 +249,11 @@
                         targets: [3, 4, 5],
                         orderable: true,
                         searchable: true
-                        // без responsivePriority — будут иметь меньший приоритет
                     },
                     {
                         targets: [6],
                         orderable: false,
                         searchable: false
-                        // без responsivePriority — будут иметь меньший приоритет
                     },
                     {
                         targets: [4, 5],

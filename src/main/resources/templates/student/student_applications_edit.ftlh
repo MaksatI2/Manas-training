@@ -67,7 +67,7 @@
                         <label for="preferredStartDate" class="form-label">Желаемая дата начала</label>
                         <input type="date" class="form-control" id="preferredStartDate"
                                name="preferredStartDate"
-                               value="${application.preferredStartDate}">
+                               value="<#if application.preferredStartDate?? && application.preferredStartDate?has_content>${application.preferredStartDate}</#if>">
                         <#if errors?? && errors.hasFieldErrors("preferredStartDate")>
                             <div class="text-danger small mt-1">${errors.getFieldError("preferredStartDate").defaultMessage}</div>
                         </#if>
@@ -76,12 +76,13 @@
                         <label for="preferredEndDate" class="form-label">Желаемая дата окончания</label>
                         <input type="date" class="form-control" id="preferredEndDate"
                                name="preferredEndDate"
-                               value="${application.preferredEndDate}">
+                               value="<#if application.preferredEndDate?? && application.preferredEndDate?has_content>${application.preferredEndDate}</#if>">
                         <#if errors?? && errors.hasFieldErrors("preferredEndDate")>
                             <div class="text-danger small mt-1">${errors.getFieldError("preferredEndDate").defaultMessage}</div>
                         </#if>
                     </div>
                 </div>
+
 
                 <div class="d-flex justify-content-between">
                     <button type="submit" class="btn btn-primary">
