@@ -90,7 +90,6 @@ public class OrganizationStudentController {
         if (bindingResult.hasErrors()) {
             return "organization/students/edit";
         }
-
         try {
             organizationService.editStudentProfileByOrganization(dto);
             redirectAttributes.addFlashAttribute("successMessage", "Данные студента обновлены");

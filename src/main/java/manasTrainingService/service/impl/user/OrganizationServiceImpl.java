@@ -202,6 +202,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     public void editStudentProfileByOrganization(StudentEditByOrganizationDto dto) {
         User user = userRepository.findById(dto.getStudentId().intValue())
                 .orElseThrow(() -> new UserNotFoundException("Студент не найден"));
+        if (userRepository.existsByEmailAndIdNot(dto.getEmail(), user.getId())) {
+            throw new EmailAlreadyExistsException("Данная почта уже используется");
+        }
 
         user.setName(dto.getName());
         user.setLastName(dto.getLastName());
