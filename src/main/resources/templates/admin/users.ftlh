@@ -318,16 +318,36 @@
                 ],
                 columnDefs: [
                     {
-                        targets: [5, 6],
+                        targets: [1],
+                        responsivePriority: 3,
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        targets: [2],
+                        responsivePriority: 4,
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        targets: [3],
+                        responsivePriority: 1,
                         orderable: true,
                         searchable: true
                     },
                     {
                         targets: [7],
+                        responsivePriority: 2,
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        targets: [4, 5],
+                        orderable: true,
+                        searchable: true
                     }
                 ],
+
                 initComplete: function() {
                     this.api().page.len(10).draw();
                     table.buttons().container().appendTo('#usersTable_buttons');
