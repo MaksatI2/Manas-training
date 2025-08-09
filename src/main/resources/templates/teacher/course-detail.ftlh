@@ -50,7 +50,7 @@
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
                                 <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
-                                   class="btn btn-primary btn-sm ms-3">
+                                   class="btn btn-primary btn-sm ms-3 lesson-btn d-none d-sm-block">
                                     + Урок
                                 </a>
                             </div>
@@ -58,6 +58,10 @@
                                  aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
                                 <div class="accordion-body">
                                     <p>${module.description!''}</p>
+                                    <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
+                                       class="btn btn-primary btn-sm lesson-btn d-sm-none mb-3">
+                                        + Урок
+                                    </a>
                                     <h5>Уроки</h5>
                                     <#if module.lessons?has_content>
                                         <div class="row row-cols-1 row-cols-md-2 g-3">
@@ -148,6 +152,44 @@
             color: var(--text-dark);
             font-size: 1.4rem;
             margin-bottom: 2rem;
+        }
+        @media (max-width: 576px) {
+            .lesson-btn {
+                width: 100%;
+                text-align: center;
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+
+            .accordion-body {
+                padding-top: 0.5rem;
+            }
+        }
+
+        .accordion-button {
+            font-weight: 500;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .card-text {
+            font-size: 0.875rem;
+        }
+
+        .accordion-body,
+        .card-text {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
         }
     </style>
 </@layout.page>
