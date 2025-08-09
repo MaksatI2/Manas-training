@@ -138,7 +138,7 @@ public class AdminController {
                 long activeAdmins = userService.countActiveAdmins();
                 if (activeAdmins <= 1) {
                     redirectAttributes.addFlashAttribute("errorMessage",
-                            "Невозможно деактивировать себя, так как вы — последний активный администратор.");
+                            "Невозможно деактивировать себя, так как Вы — последний активный администратор.");
                     return "redirect:/admin/users";
                 }
             }

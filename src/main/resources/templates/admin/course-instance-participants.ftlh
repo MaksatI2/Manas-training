@@ -18,9 +18,7 @@
         </div>
 
         <#if errorMessage??>
-            <div class="alert alert-danger mt-3 mx-auto" style="max-width: 600px;">
-                ${errorMessage}
-            </div>
+            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
 
         <div class="feature-card mb-5 p-4 bg-white shadow-sm rounded">

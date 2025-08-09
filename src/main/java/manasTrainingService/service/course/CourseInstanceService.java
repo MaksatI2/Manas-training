@@ -31,4 +31,8 @@ public interface CourseInstanceService {
     List<ShortDto> getByCourseId(Integer courseId);
 
     long getCompletedCoursesCount();
+
+    boolean existsByTitle(String title);
+
+    boolean existsByTitleAndIdNot(String title, Integer id);
 }

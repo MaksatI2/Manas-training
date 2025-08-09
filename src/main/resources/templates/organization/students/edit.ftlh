@@ -50,13 +50,14 @@
         }
     </style>
 
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <h1 class="page-title">Редактирование студента</h1>
 
-    <#if errorMessage??>
-        <div class="alert alert-danger" role="alert">
-            ${errorMessage}
-        </div>
-    </#if>
 
     <form method="post" action="/organization/students/${student.studentId}/edit" class="form-wrapper mt-4">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

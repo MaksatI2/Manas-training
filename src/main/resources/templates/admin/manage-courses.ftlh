@@ -27,14 +27,14 @@
                         <#list allCourses as course>
                             <div class="course-section mb-3 p-3 border rounded" data-course-id="${course.id}">
                                 <div class="row align-items-center">
-                                    <div class="col-md-1">
+                                    <div class="col-1">
                                         <input type="checkbox" class="form-check-input" name="courseIds" value="${course.id}"
                                                <#if assignedCourses?seq_contains(course.id)>checked</#if>>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-6">
                                         <span>${course.title}</span>
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-5">
                                         <span>Код курса: ${course.code}</span>
                                     </div>
                                 </div>

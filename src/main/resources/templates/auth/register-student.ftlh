@@ -83,7 +83,7 @@
                         <div class="error-block">
                             <@spring.showErrors "<br>" "error-message" />
                         </div>
-                        <div class="form-text">Если вы обучаетесь от компании, введите код компании</div>
+                        <div class="form-text">Если Вы обучаетесь от компании, введите код компании</div>
                     </div>
 
                     <div class="mb-4">

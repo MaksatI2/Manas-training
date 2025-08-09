@@ -13,7 +13,7 @@ public class StudentRegisterDto {
 
     @NotBlank(message = "Имя обязательно для заполнения")
     @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
-    @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
+    @Size(max = 100, message = "Имя не должно превышать 100 символов")
     private String name;
 
     @NotBlank(message = "Фамилия обязательна для заполнения")

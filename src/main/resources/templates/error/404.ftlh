@@ -8,7 +8,7 @@
                     <i class="fas fa-exclamation-circle-fill text-danger fs-1 me-3"></i>
                     <div>
                         <h2 class="h3 fw-bold mb-1" style="color: var(--text-dark);">Cтраница не найдена</h2>
-                        <p style="color: var(--text-dark); font-size: 1rem;">Такой страницы нет. Возможно, вы ввели неправильный адрес.</p>
+                        <p style="color: var(--text-dark); font-size: 1rem;">Такой страницы нет. Возможно, Вы ввели неправильный адрес.</p>
                     </div>
                 </div>
                 <div class="text-center">

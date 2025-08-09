@@ -3,12 +3,14 @@ package manasTrainingService.dto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import manasTrainingService.validation.EndDateAfterStartDate;
+import manasTrainingService.validation.UniqueCourseInstanceTitleCreate;
 
 import java.time.LocalDate;
 
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EndDateAfterStartDate
+@UniqueCourseInstanceTitleCreate
 public class CourseInstanceCreationDTO {
     private Integer id;
 
@@ -26,6 +29,7 @@ public class CourseInstanceCreationDTO {
     private Integer courseId;
 
     @NotBlank(message = "Название необходимо")
+    @Size(max = 50, message = "Максимальная длина названия — 50 символов")
     private String title;
 
     @NotNull(message = "Дата начала курса необходима")

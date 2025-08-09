@@ -19,4 +19,16 @@ public interface CourseTeacherRepository extends JpaRepository<CourseTeacher, In
     @Transactional
     @Query("delete from CourseTeacher ct where ct.teacher.id = :teacherId")
     void deleteByTeacherId(@Param("teacherId") Integer teacherId);
+
+    @Query("""
+        select ct from CourseTeacher ct
+        where ct.course.id = :courseId
+          and ct.teacher.id not in (
+              select cit.teacher.id
+              from CourseInstanceTeacher cit
+              where cit.courseInstance.id = :courseInstanceId
+          )
+        """)
+    List<CourseTeacher> findEligibleTeachers(@Param("courseId") Integer courseId,
+                                             @Param("courseInstanceId") Integer courseInstanceId);
 }

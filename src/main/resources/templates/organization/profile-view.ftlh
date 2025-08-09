@@ -22,14 +22,14 @@
             background: var(--white);
             border-radius: 15px;
             border-left: 4px solid var(--primary-blue);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
             padding: 2rem;
             transition: all 0.3s ease;
         }
 
         .profile-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,102,204,0.15);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.15);
         }
 
         .profile-header {
@@ -42,7 +42,7 @@
 
         .avatar-image:hover {
             transform: scale(1.03);
-            box-shadow: 0 6px 20px rgba(0,102,204,0.3);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
         }
 
         .avatar-edit-overlay {
@@ -83,7 +83,7 @@
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid var(--light-blue);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.2);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.2);
             transition: all 0.3s ease;
         }
 
@@ -104,7 +104,7 @@
             margin-bottom: 1rem;
         }
 
-          .profile-details {
+        .profile-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
@@ -153,7 +153,7 @@
 
         .edit-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
             color: var(--white);
         }
 
@@ -233,10 +233,10 @@
                         ${organization.user.email}
                     </p>
                     <div class="user-role-and-edit">
-                    <a href="/organization/profile/edit" class="edit-button">
-                        <i class="fas fa-edit"></i>
-                        Редактировать профиль
-                    </a>
+                        <a href="/organization/profile/edit" class="edit-button">
+                            <i class="fas fa-edit"></i>
+                            Редактировать профиль
+                        </a>
                     </div>
                 </div>
             </div>
@@ -258,7 +258,10 @@
                             <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
                             Организация
                         </div>
-                        <div class="detail-value">${organization.organization.description}</div>
+                        <#if organization.organization.description?has_content>
+                            <div class="detail-value">${organization.organization.description}</div>
+                        </#if>
+
                     </div>
                 </#if>
 

@@ -30,35 +30,118 @@ public class EmailServiceImpl implements EmailService {
     public void sendVerificationEmail(User user, String token) {
         String subject = "Подтверждение регистрации";
         String link = baseUrl + "/auth/verify-email?token=" + token;
-        String message = "<p>Здравствуйте, " + user.getName() + "!</p>" + "<p>Пожалуйста, подтвердите регистрацию:</p>" + "<p><a href=\"" + link + "\">Подтвердить Email</a></p>";
+
+        String message = """
+    <html>
+    <body style="font-family: Arial, sans-serif; background-color: #f7f9fc; padding: 20px;">
+        <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; border: 1px solid #e0e0e0;">
+            <h2 style="color: #333;">Здравствуйте, %s!</h2>
+            <p style="color: #555; font-size: 15px;">
+                Спасибо за регистрацию в <strong>Manas Training Service</strong>!<br>
+                Чтобы завершить процесс, пожалуйста, подтвердите ваш адрес электронной почты.
+            </p>
+            <p style="text-align: center; margin: 30px 0;">
+                <a href="%s" style="background-color: #007BFF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                    ✅ Подтвердить Email
+                </a>
+            </p>
+            <p style="color: #888; font-size: 13px;">
+                Если кнопка не работает, скопируйте и вставьте эту ссылку в адресную строку браузера:<br>
+                <a href="%s" style="color: #007BFF;">%s</a>
+            </p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="color: #999; font-size: 12px;">
+                Это письмо отправлено автоматически. Пожалуйста, не отвечайте на него.
+            </p>
+        </div>
+    </body>
+    </html>
+    """.formatted(user.getName(), link, link, link);
 
         asyncEmailSender.sendEmail(user.getEmail(), subject, message);
     }
+
+
 
     @Override
     public void sendPasswordResetEmail(User user, String token) {
         String subject = "Сброс пароля";
         String link = baseUrl + "/auth/reset-password?token=" + token;
-        String message = "<p>Здравствуйте, " + user.getName() + "!</p>" + "<p>Для сброса пароля перейдите по ссылке ниже:</p>" + "<p><a href=\"" + link + "\">Сбросить пароль</a></p>" + "<p>Если вы не запрашивали сброс, просто проигнорируйте это письмо.</p>";
+
+        String message = """
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #f7f9fc; padding: 20px;">
+            <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; border: 1px solid #e0e0e0;">
+                <h2 style="color: #333;">Здравствуйте, %s!</h2>
+                <p style="color: #555; font-size: 15px;">
+                    Вы запросили сброс пароля для своей учётной записи в <strong>Manas Training Center</strong>.<br>
+                    Для продолжения нажмите кнопку ниже:
+                </p>
+                <p style="text-align: center; margin: 30px 0;">
+                    <a href="%s" style="background-color: #007BFF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                        🔒 Сбросить пароль
+                    </a>
+                </p>
+                <p style="color: #888; font-size: 13px;">
+                    Если кнопка не работает, используйте эту ссылку:<br>
+                    <a href="%s" style="color: #007BFF;">%s</a>
+                </p>
+                <p style="color: #888; font-size: 13px;">
+                    Если Вы не запрашивали сброс, просто проигнорируйте это письмо.
+                </p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                <p style="color: #999; font-size: 12px;">
+                    Это письмо отправлено автоматически. Пожалуйста, не отвечайте на него.
+                </p>
+            </div>
+        </body>
+        </html>
+        """.formatted(user.getName(), link, link, link);
 
         asyncEmailSender.sendEmail(user.getEmail(), subject, message);
     }
 
-
-
     @Override
     public void sendStudentWelcomeEmail(String email, String name, String rawPassword) {
         String subject = "Добро пожаловать в Manas Training Center!";
+
+        String loginUrl = baseUrl + "/auth/login";
+
         String message = """
-                <p>Здравствуйте, <strong>%s</strong>!</p>
-                <p>Вы были зарегистрированы как студент в системе <strong>Manas Training Center</strong>.</p>
-                <p><strong>Ваш временный пароль:</strong> <code>%s</code></p>
-                <p>Пожалуйста, войдите в систему и <strong>смените пароль</strong> после первого входа.</p>
-                <p>Ссылка на вход: <a href="%s/auth/login">%s/auth/login</a></p>
-                """.formatted(name, rawPassword, baseUrl, baseUrl);
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #f7f9fc; padding: 20px;">
+            <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; border: 1px solid #e0e0e0;">
+                <h2 style="color: #333;">Здравствуйте, %s!</h2>
+                <p style="color: #555; font-size: 15px;">
+                    Вы были успешно зарегистрированы как студент в системе <strong>Manas Training Center</strong>.
+                </p>
+                <p style="color: #555; font-size: 15px;">
+                    <strong>Ваш временный пароль:</strong> <code style="background: #eef3fc; padding: 3px 6px; border-radius: 4px;">%s</code>
+                </p>
+                <p style="color: #555; font-size: 15px;">
+                    Пожалуйста, войдите в систему и <strong>смените пароль</strong> после первого входа.
+                </p>
+                <p style="text-align: center; margin: 30px 0;">
+                    <a href="%s" style="background-color: #007BFF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                        🔑 Войти в систему
+                    </a>
+                </p>
+                <p style="color: #888; font-size: 13px;">
+                    Если кнопка не работает, используйте эту ссылку:<br>
+                    <a href="%s" style="color: #007BFF;">%s</a>
+                </p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                <p style="color: #999; font-size: 12px;">
+                    Это письмо отправлено автоматически. Пожалуйста, не отвечайте на него.
+                </p>
+            </div>
+        </body>
+        </html>
+        """.formatted(name, rawPassword, loginUrl, loginUrl, loginUrl);
 
         asyncEmailSender.sendEmail(email, subject, message);
     }
+
 
     @Override
     public void sendApplicationStatusUpdateEmail(CourseApplication app) {

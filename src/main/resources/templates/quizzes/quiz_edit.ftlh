@@ -31,7 +31,13 @@
                     <div class="mb-3">
                         <label for="lessonQuiz.questionTimeLimit" class="form-label fw-bold">Время на прохождение теста (В минутах) <span class="text-danger">*</span></label>
                         <@spring.formInput "lessonQuiz.questionTimeLimit" 'class="form-control" id="lessonQuiz.questionTimeLimit"' />
-                        <@spring.showErrors "<br>" "error text-danger" />
+                        <#if .globals['org.springframework.validation.BindingResult.lessonQuiz']?? &&
+                        .globals['org.springframework.validation.BindingResult.lessonQuiz'].hasFieldErrors('questionTimeLimit')>
+                            <#list .globals['org.springframework.validation.BindingResult.lessonQuiz'].getFieldErrors('questionTimeLimit') as validationError>
+                                <span class="text-danger">${validationError.defaultMessage}</span>
+                            </#list>
+                        </#if>
+
                     </div>
                 </div>
             </div>
@@ -52,7 +58,13 @@
                                 <label for="questions[${question?index}].question" class="form-label fw-bold">Введите
                                     текст вопроса <span class="text-danger">*</span></label>
                                 <@spring.formInput "lessonQuiz.questions[${question?index}].question" 'class="form-control" id="questions[${question?index}].question"' />
-                                <@spring.showErrors "<br>" "error text-danger" />
+                                <#if .globals['org.springframework.validation.BindingResult.lessonQuiz']?? &&
+                                .globals['org.springframework.validation.BindingResult.lessonQuiz'].hasFieldErrors("questions[${question?index}].question")>
+                                    <#list .globals['org.springframework.validation.BindingResult.lessonQuiz'].getFieldErrors("questions[${question?index}].question") as validationError>
+                                        <span class="text-danger">${validationError.defaultMessage}</span>
+                                    </#list>
+                                </#if>
+
                             </div>
                             <#if question.options??>
                                 <div class="mt-3 border <#if .globals['org.springframework.validation.BindingResult.test']?? && .globals['org.springframework.validation.BindingResult.test'].hasFieldErrors('questions[${question?index}].correctOptionIndex')>border-danger</#if> rounded-4 px-4 py-3 mb-3"

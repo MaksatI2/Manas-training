@@ -45,6 +45,9 @@
             font-weight: 600;
             border-radius: 0.375rem;
             padding: 0.35em 0.65em;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
         }
 
         .bg-warning { background-color: #ffc107 !important; color: #212529 !important; }
@@ -88,6 +91,30 @@
             color: #6c757d;
             margin-right: 0.5rem;
         }
+
+        .field-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 100%;
+        }
+
+        .field-container strong {
+            white-space: nowrap;
+        }
+
+        .field-value {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
+        }
+
+        .field-container-status {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: auto;
+        }
     </style>
 
     <div class="card-custom">
@@ -103,12 +130,12 @@
 
         <div class="card-body-custom">
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <strong>Курс:</strong><br>
-                    ${application.courseTitle!"—"}
+                <div class="col-md-6 mb-3 field-container">
+                    <strong>Курс:</strong>
+                    <span class="field-value">${application.courseTitle!"—"}</span>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <strong>Статус:</strong><br>
+                <div class="col-md-6 mb-3 field-container-status">
+                    <strong>Статус:</strong>
                     <span class="badge
                         <#if application.status == "PENDING">bg-warning
                         <#elseif application.status == "APPROVED">bg-success
@@ -117,38 +144,38 @@
                         ${application.localizedStatus!"—"}
                     </span>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <strong>Дата подачи:</strong><br>
-                    ${application.formattedSubmittedAt!"—"}
+                <div class="col-md-6 mb-3 field-container">
+                    <strong>Дата подачи:</strong>
+                    <span class="field-value">${application.formattedSubmittedAt!"—"}</span>
                 </div>
 
                 <#if application.preferredTeacher??>
-                    <div class="col-md-6 mb-3">
-                        <strong>Предпочтительный преподаватель:</strong><br>
-                        ${application.preferredTeacher.name} ${application.preferredTeacher.lastName}
+                    <div class="col-md-6 mb-3 field-container">
+                        <strong>Предпочтительный преподаватель:</strong>
+                        <span class="field-value">${application.preferredTeacher.name} ${application.preferredTeacher.lastName}</span>
                     </div>
                 </#if>
 
                 <#if application.formattedPreferredStartDate??>
-                    <div class="col-md-6 mb-3">
-                        <strong>Желаемая дата начала:</strong><br>
-                        ${application.formattedPreferredStartDate}
+                    <div class="col-md-6 mb-3 field-container">
+                        <strong>Желаемая дата начала:</strong>
+                        <span class="field-value">${application.formattedPreferredStartDate}</span>
                     </div>
                 </#if>
 
                 <#if application.formattedPreferredEndDate??>
-                    <div class="col-md-6 mb-3">
-                        <strong>Желаемая дата окончания:</strong><br>
-                        ${application.formattedPreferredEndDate}
+                    <div class="col-md-6 mb-3 field-container">
+                        <strong>Желаемая дата окончания:</strong>
+                        <span class="field-value">${application.formattedPreferredEndDate}</span>
                     </div>
                 </#if>
 
                 <#if application.employees?? && application.employees?size == 1>
-                    <div class="col-md-6 mb-3">
-                        <strong>Студент:</strong><br>
+                    <div class="col-md-6 mb-3 field-container">
+                        <strong>Студент:</strong>
                         <div class="employee-item">
                             <i class="fas fa-user"></i>
-                            <span>${application.employees[0].fullName} &lt;${application.employees[0].email}&gt;</span>
+                            <span class="field-value">${application.employees[0].fullName} &lt;${application.employees[0].email}&gt;</span>
                         </div>
                     </div>
                 </#if>
@@ -168,7 +195,7 @@
                     <#list comments as c>
                         <li class="list-group-item">
                             <div class="fw-bold">${c.authorName}</div>
-                            <div>${c.comment}</div>
+                            <div class="field-value">${c.comment}</div>
                             <div class="text-muted small">${c.formattedCreatedAt!"—"}</div>
                         </li>
                     </#list>

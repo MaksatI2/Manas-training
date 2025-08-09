@@ -1,6 +1,7 @@
 package manasTrainingService.controller.rest;
 
 import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.CourseSummaryDto;
 import manasTrainingService.dto.TeacherCardDto;
 import manasTrainingService.service.course.CourseService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,5 +21,10 @@ public class CourseApiController {
     @GetMapping("/{id}/teachers")
     public List<TeacherCardDto> getTeachersByCourse(@PathVariable Integer id) {
         return courseService.getTeachersByCourse(id);
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public List<CourseSummaryDto> getCoursesByCategory(@PathVariable Integer categoryId) {
+        return courseService.getCoursesByCategory(categoryId);
     }
 }

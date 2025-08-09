@@ -17,6 +17,7 @@ import java.util.List;
 public class LessonQuizQuestionDto {
     private Integer id;
     private Integer quizId;
+    @NotBlank(message = "Вопрос нужно указать")
     private String question;
     private BigDecimal points;
     @Valid

@@ -141,7 +141,7 @@
                     <i class="fas fa-search text-muted"></i>
                 </span>
                 <input type="text" id="searchInput" class="form-control border-start-0"
-                       placeholder="Поиск по имени или списку преподаваемых дисциплин...">
+                       placeholder="Поиск по имени или списку преподаваемых дисциплин">
             </div>
         </div>
 

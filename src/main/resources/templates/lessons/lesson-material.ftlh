@@ -228,7 +228,7 @@
             <div class="requirements">
                 <h6><i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>Требования к файлу:</h6>
                 <ul>
-                    <li>Формат: PDF, DOCX, PPTX, ZIP, RAR, MP4, JPG, JPEG, XLS, XLSX</li>
+                    <li>Формат: PDF, DOCX, PPTX, ZIP, RAR, JPG, JPEG, XLS, XLSX</li>
                     <li>Максимальный размер: 50 МБ</li>
                 </ul>
             </div>
@@ -262,7 +262,7 @@
                 <div class="file-preview" id="filePreview"></div>
                 <div class="file-info" id="fileInfo"></div>
 
-                <div class="d-flex gap-2">
+                <div class="btn-container">
                     <button type="submit" class="submit-btn" id="submitBtn" disabled>
                         <i class="fas fa-upload" style="margin-right: 0.5rem;"></i>
                         Сохранить
@@ -276,6 +276,25 @@
         </div>
     </div>
 
+    <style>
+        .btn-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+        @media (max-width: 450px) {
+            .btn-container {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+        }
+
+        .cancel-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+    </style>
     <script src="/static/js/lesson-material.js">
 
     </script>

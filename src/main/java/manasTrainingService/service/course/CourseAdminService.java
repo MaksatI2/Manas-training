@@ -28,4 +28,8 @@ public interface CourseAdminService {
 
     boolean existsByCode(String code);
     boolean existsByCodeAndIdNot(String code, Integer id);
+
+    boolean existsByTitle(String title);
+
+    boolean existsByTitleAndIdNot(String title, Integer id);
 }

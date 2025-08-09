@@ -70,8 +70,13 @@ public class CategoryController {
             }
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Произошла ошибка: " + e.getMessage());
-            return "redirect:/admin/categories";
+            model.addAttribute("errorMessage", "Произошла ошибка: " + e.getMessage());
+
+            if (dto.getId() != null) {
+                return "admin/category-edit";
+            } else {
+                return "admin/category-add";
+            }
         }
     }
 

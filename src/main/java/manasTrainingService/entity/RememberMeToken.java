@@ -3,6 +3,7 @@ package manasTrainingService.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import manasTrainingService.util.DateUtil;
 
 import java.time.LocalDateTime;
 
@@ -56,5 +57,17 @@ public class RememberMeToken {
 
     public void updateLastUsed() {
         this.lastUsedAt = LocalDateTime.now();
+    }
+
+    public String getCreatedAtFormatted() {
+        return DateUtil.formatWithTime(createdAt);
+    }
+
+    public String getExpiresAtFormatted() {
+        return DateUtil.formatWithTime(expiresAt);
+    }
+
+    public String getLastUsedAtFormatted() {
+        return DateUtil.formatWithTime(lastUsedAt);
     }
 }

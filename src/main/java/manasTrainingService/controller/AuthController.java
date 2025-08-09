@@ -174,7 +174,7 @@ public class AuthController {
     public String verifyEmail(@RequestParam("token") String token, RedirectAttributes redirectAttributes) {
         boolean success = userService.verifyEmailToken(token);
         if (success) {
-            redirectAttributes.addAttribute("message", "Email успешно подтверждён! Теперь вы можете войти.");
+            redirectAttributes.addAttribute("message", "Email успешно подтверждён! Теперь Вы можете войти.");
         } else {
             redirectAttributes.addAttribute("error", "Ссылка недействительна или истекла.");
         }
@@ -188,6 +188,11 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public String sendResetEmail(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        if (email.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Почта не может быть пустой");
+            return "redirect:/auth/forgot-password";
+
+        }
         try {
             userService.sendResetToken(email);
             redirectAttributes.addFlashAttribute("message", "Инструкция по сбросу пароля отправлена на указанный email.");

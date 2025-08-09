@@ -28,8 +28,6 @@
         </p>
     </div>
 
-
-
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
         <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>"
            class="btn btn-primary">Модули</a>
@@ -53,7 +51,7 @@
                                     ${module.title} (Продолжительность: ${module.durationHours} ч.)
                                 </button>
                                 <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
-                                   class="btn btn-primary btn-sm ms-3">
+                                   class="btn btn-primary btn-sm ms-3 lesson-btn d-none d-sm-block">
                                     + Урок
                                 </a>
                             </div>
@@ -63,6 +61,10 @@
                                     <p class="card-text text-muted small text-break">
                                         ${module.description!''}
                                     </p>
+                                    <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
+                                       class="btn btn-primary btn-sm lesson-btn d-sm-none mb-3">
+                                        + Урок
+                                    </a>
                                     <h5>Уроки</h5>
                                     <#if module.lessons?has_content>
                                         <div class="row row-cols-1 row-cols-md-2 g-3">
@@ -163,5 +165,17 @@
             margin-bottom: 2rem;
         }
 
+        @media (max-width: 576px) {
+            .lesson-btn {
+                width: 100%;
+                text-align: center;
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+
+            .accordion-body {
+                padding-top: 0.5rem;
+            }
+        }
     </style>
 </@layout.page>

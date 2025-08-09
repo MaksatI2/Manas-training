@@ -1,5 +1,5 @@
-<#import "/layout.ftlh" as layout>
-<#import "/RoadMap.ftlh" as roadmap>
+<#import "../../layout.ftlh" as layout>
+<#import "../../RoadMap.ftlh" as roadmap>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/css/intlTelInput.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/intlTelInput.min.js"></script>
@@ -168,19 +168,20 @@
         }
     </style>
 
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <h1 class="page-title">
         <i class="fas fa-user-graduate me-3"></i>
         Добавление нового студента
     </h1>
 
     <div class="form-wrapper">
-        <#if errorMessage??>
-            <div class="alert alert-danger alert-compact text-center shadow-sm">${errorMessage}</div>
-        </#if>
 
-        <#if successMessage??>
-            <div class="alert alert-success alert-compact text-center shadow-sm">${successMessage}</div>
-        </#if>
 
         <form method="post" action="/organization/students/add" id="studentForm">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

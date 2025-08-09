@@ -8,9 +8,21 @@
     {"label": "Потоки курсов", "url": "/admin/course-instances"},
     {"label": "Добавить поток", "url": ""}
     ] />
+
     <div class="container">
-        <h2 class="section-title">Создать поток курса</h2>
-        <div class="card feature-card-enhanced">
+        <div class="card" style="border-radius: 10px; box-shadow: 0 4px 15px rgba(0,102,204,0.1);">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a); border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                <h5 class="m-0 font-weight-bold text-white">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Добавить поток
+                </h5>
+                <div>
+                    <a href="/admin/course-instances" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                        <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                    </a>
+                </div>
+            </div>
+
             <div class="card-body">
                 <form action="/admin/course-instances/create" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -23,9 +35,9 @@
                         </label>
 
                         <select class="form-select" id="courseId" name="courseId">
-                                <#list courses as course>
-                                    <option value="${course.id}" <#if (courseInstanceDto.courseId)?? && courseInstanceDto.courseId = course.id> selected </#if>>${course.title}</option>
-                                </#list>
+                            <#list courses as course>
+                                <option value="${course.id}" <#if (courseInstanceDto.courseId)?? && courseInstanceDto.courseId = course.id> selected </#if>>${course.title}</option>
+                            </#list>
                         </select>
                         <div class="error-block text-danger">
                             <#if errors??>
@@ -35,7 +47,6 @@
                                     </#if>
                                 </#list>
                             </#if>
-
                         </div>
                     </div>
 
@@ -69,7 +80,6 @@
                         </div>
                     </div>
 
-
                     <div class="mb-3">
                         <div class="form-check form-switch">
                             <@spring.formCheckbox "courseInstanceDto.isActive", "class='form-check-input' id='isActive', name='isActive'"/>
@@ -90,15 +100,11 @@
             </div>
         </div>
     </div>
+
     <style>
         .required::after {
             content: " *";
             color: #dc3545;
-        }
-
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
         }
 
         .form-control, .form-select {
@@ -119,25 +125,16 @@
             transition: all 0.3s ease;
         }
 
-        .btn-primary {
+        .btn-primary-custom {
             background: linear-gradient(135deg, #0066cc, #003d7a);
             border-color: #0066cc;
+            color: white;
         }
 
-        .btn-primary:hover {
+        .btn-primary-custom:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
             box-shadow: 0 4px 15px rgba(0,102,204,0.3);
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background-color: #545b62;
-            transform: translateY(-1px);
         }
 
         .form-check-input:checked {
@@ -145,18 +142,8 @@
             border-color: #0066cc;
         }
 
-        .alert {
-            border-radius: 8px;
-            border: none;
-        }
-
-        .form-text {
-            font-size: 0.875rem;
-            color: #6c757d;
-        }
-
-        .gap-2 {
-            gap: 0.5rem;
+        .error-block {
+            margin-top: 0.25rem;
         }
     </style>
 

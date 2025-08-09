@@ -6,12 +6,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import manasTrainingService.validation.UniqueCourseUpdate;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@UniqueCourseUpdate
 public class CourseEditDto {
 
     @NotNull(message = "ID курса обязателен")

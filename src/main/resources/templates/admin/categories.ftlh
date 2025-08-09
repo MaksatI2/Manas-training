@@ -21,7 +21,7 @@
             <div class="filter-controls">
                 <a href="/admin/categories/add" class="btn btn-light"
                    style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                <i class="fas fa-plus me-1" style="color:#0066cc;"></i>Добавить категорию
+                    <i class="fas fa-plus me-1" style="color:#0066cc;"></i>Добавить категорию
                 </a>
             </div>
         </div>
@@ -44,24 +44,15 @@
                             </td>
                             <td style="color: #2c3e50;">${category.description!''}</td>
                             <td onclick="event.stopPropagation();" class="actions-col">
-                                <#if _csrf??>
-                                    <form action="/admin/categories/delete/${category.id}" method="post" style="display:inline;">
-                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                        <button type="submit"
-                                                class="btn btn-sm btn-danger"
-                                                title="Удалить"
-                                                onclick="return confirm('Вы уверены, что хотите удалить категорию?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                <#else>
-                                    <a href="/admin/categories/delete/${category.id}"
-                                       class="btn btn-sm btn-danger"
-                                       title="Удалить"
-                                       onclick="return confirm('Вы уверены, что хотите удалить категорию?')">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </#if>
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        title="Удалить"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteCategoryModal"
+                                        data-category-id="${category.id}"
+                                        data-category-name="${category.name?js_string}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     </#list>
@@ -75,6 +66,33 @@
                 </div>
                 <div class="col-md-6 d-flex justify-content-end">
                     <div id="categoriesTable_paginate" class="dataTables_paginate"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCategoryModalLabel">Удаление категории</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите удалить категорию "<span id="categoryName"></span>"?</p>
+                    <p>Курсы, связанные с этой категорией:</p>
+                    <ul id="courseList" class="list-group"></ul>
+                    <p id="noCoursesMessage" class="text-success mt-2" style="display: none;">Нет связанных курсов. Категорию можно удалить.</p>
+                    <p id="hasCoursesMessage" class="text-danger mt-2" style="display: none;">Невозможно удалить категорию, так как она связана с курсами.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <form id="deleteCategoryForm" action="" method="post" style="display:inline;">
+                        <#if _csrf??>
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        </#if>
+                        <button type="submit" class="btn btn-danger" id="deleteCategoryButton" disabled>Удалить</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -107,6 +125,43 @@
                 columnDefs: [
                     { targets: 2, orderable: false }
                 ]
+            });
+
+            $('#deleteCategoryModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var categoryId = button.data('category-id');
+                var categoryName = button.data('category-name');
+
+                $('#categoryName').text(categoryName);
+                $('#deleteCategoryForm').attr('action', '/admin/categories/delete/' + categoryId);
+
+                $('#courseList').empty();
+                $('#noCoursesMessage').hide();
+                $('#hasCoursesMessage').hide();
+                $('#deleteCategoryButton').prop('disabled', true);
+
+                $.ajax({
+                    url: '/api/courses/category/' + categoryId,
+                    method: 'GET',
+                    success: function (courses) {
+                        if (courses.length === 0) {
+                            $('#noCoursesMessage').show();
+                            $('#deleteCategoryButton').prop('disabled', false);
+                        } else {
+                            courses.forEach(function (course) {
+                                $('#courseList').append(
+                                    '<li class="list-group-item">' + course.title + '</li>'
+                                );
+                            });
+                            $('#hasCoursesMessage').show();
+                        }
+                    },
+                    error: function () {
+                        $('#courseList').append(
+                            '<li class="list-group-item text-danger">Ошибка при загрузке курсов.</li>'
+                        );
+                    }
+                });
             });
         });
     </script>
@@ -202,7 +257,7 @@
             border-radius: 0.375rem;
         }
 
-         .actions-col {
+        .actions-col {
             max-width: 130px;
             width: 1%;
             white-space: nowrap;
@@ -267,6 +322,7 @@
                 justify-content: flex-end;
             }
         }
+
         #categoriesTable thead {
             background: linear-gradient(135deg, #0066cc, #003d7a) !important;
             color: white !important;
@@ -277,7 +333,5 @@
             background-color: unset !important;
             color: #ffffff !important;
         }
-
-
     </style>
 </@layout.page>

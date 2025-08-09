@@ -6,14 +6,19 @@
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">${(lesson.title)!"Без названия"}</h2>
                 <#if isTeacherOrAdmin?? && isTeacherOrAdmin>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-light btn-sm" id="toggleEditor">
-                            <i class="fas fa-eye"></i> Просмотр
-                        </button>
-                        <button id="saveButton" class="btn btn-success btn-sm d-none">
-                            <i class="fas fa-save"></i> Сохранить
-                        </button>
-                    </div>
+                    <button type="button" class="btn btn-light btn-sm" id="toggleEditor">
+                        <i class="fas fa-pen"></i> Редактировать
+                    </button>
+                    <button id="saveButton" class="btn btn-success btn-sm d-none">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                    <a href="/lessons/${lessonId}" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                        <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                    </a>
+                <#else>
+                    <a href="/lessons/${lessonId}" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                        <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                    </a>
                 </#if>
             </div>
 
@@ -145,7 +150,7 @@
                         });
                         contentDiv.contentEditable = true;
                         if (titleInput) titleInput.readOnly = false;
-                        this.innerHTML = '<i class="fas fa-pen"></i> Редактировать';
+                        this.innerHTML = '<i class="fas fa-eye"></i> Просмотр';
                         if (saveButton) saveButton.classList.remove('d-none');
                     }
                     isEditorEnabled = !isEditorEnabled;
@@ -161,6 +166,7 @@
                 }
             }
         });
+        // TODO удаление редактора при выделении
     </script>
 
 
