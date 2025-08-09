@@ -10,7 +10,6 @@ import manasTrainingService.dto.instance.CourseModuleDTO;
 import manasTrainingService.dto.instance.LessonDTO;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.course.CourseNotFoundException;
-import manasTrainingService.repositories.ScheduleRepository;
 import manasTrainingService.repositories.course.CourseInstanceRepository;
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.LessonService;
@@ -217,5 +216,14 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
         return courseInstanceRepository.countByIsActiveFalse();
     }
 
+    @Override
+    public boolean existsByTitle(String title) {
+        return courseInstanceRepository.existsByTitle(title);
+    }
+
+    @Override
+    public boolean existsByTitleAndIdNot(String title, Integer id) {
+        return courseInstanceRepository.existsByTitleAndIdNot(title, id);
+    }
 
 }

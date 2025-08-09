@@ -30,5 +30,8 @@ public interface CourseInstanceRepository extends JpaRepository<CourseInstance, 
 
     List<CourseInstance> findAllByOrderByIsActiveDesc();
 
+    boolean existsByTitle(String title);
+
+    boolean existsByTitleAndIdNot(String title, Integer id);
 
 }

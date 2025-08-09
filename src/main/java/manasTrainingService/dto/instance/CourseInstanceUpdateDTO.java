@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import manasTrainingService.validation.EndDateAfterStartDate;
+import manasTrainingService.validation.UniqueCourseInstanceTitleUpdate;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @EndDateAfterStartDate
+@UniqueCourseInstanceTitleUpdate
+
 public class CourseInstanceUpdateDTO {
     private Integer id;
 

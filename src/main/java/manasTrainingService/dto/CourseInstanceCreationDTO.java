@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import manasTrainingService.validation.EndDateAfterStartDate;
+import manasTrainingService.validation.UniqueCourseInstanceTitleCreate;
 
 import java.time.LocalDate;
 
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EndDateAfterStartDate
+@UniqueCourseInstanceTitleCreate
 public class CourseInstanceCreationDTO {
     private Integer id;
 
