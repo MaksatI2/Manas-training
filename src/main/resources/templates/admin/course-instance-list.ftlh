@@ -21,26 +21,6 @@
                 <div class="d-flex align-items-center flex-wrap gap-2">
                     <div class="d-flex flex-wrap align-items-center gap-2">
                         <div id="exportButtonsContainer" class="btn-group"></div>
-                        <div class="input-group input-group-sm" style="width: 180px;">
-
-                          <span class="input-group-text" style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
-                            <i class="fas fa-filter"></i>
-                          </span>
-                            <select class="form-select form-select-sm" id="statusFilter"
-                                    style="border: 1px solid #0066cc; border-left: 0; color: #0066cc;">
-                                <option hidden disabled selected value="">Выберите тип</option>
-                                <option value="Активен">Активен</option>
-                                <option value="Неактивен">Неактивен</option>
-                            </select>
-
-                            <button id="resetFilters"
-                                    class="btn btn-link text-white btn-sm px-2"
-                                    title="Сбросить фильтры"
-                                    style="font-size: 1rem;">
-                                <i class="fas fa-times-circle"></i>
-                            </button>
-
-                        </div>
 
                         <a href="/admin/course-instances/create" class="btn btn-sm"
                            style="border-radius: 25px; background-color: white; color: #0066cc; border: 1px solid #0066cc;">
@@ -242,43 +222,47 @@
                                     doc.pageMargins = [20, 60, 20, 30];
                                 },
                                 orientation: 'landscape'
-                            },
-                            {
-                                extend: 'print',
-                                text: '<i class="fas fa-print me-1"></i> Печать',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
-                                title: 'Список потоков курсов',
-                                messageTop: '<h3 class="text-center">Список потоков курсов</h3><p class="text-center">На ' + new Date().toLocaleDateString() + '</p>',
-                                customize: function (win) {
-                                    $(win.document.body).find('table').addClass('display').css('font-size', '10px');
-                                    $(win.document.body).find('tr:nth-child(odd) td').each(function (index) {
-                                        $(this).css('background-color', '#f8f9fa');
-                                    });
-                                    $(win.document.body).find('h1').css('text-align', 'center');
-                                }
                             }
                         ]
                     }
                 ],
                 columnDefs: [
                     {
-                        targets: [1, 2, 3, 4, 5],
+                        targets: [1],
+                        orderable: true,
+                        searchable: true,
+                        responsivePriority: 1  // самая высокая важность
+                    },
+                    {
+                        targets: [2],
+                        orderable: true,
+                        searchable: true,
+                        responsivePriority: 2
+                    },
+                    {
+                        targets: [7],
+                        orderable: false,
+                        searchable: false,
+                        responsivePriority: 3
+                    },
+                    {
+                        targets: [3, 4, 5],
                         orderable: true,
                         searchable: true
+                        // без responsivePriority — будут иметь меньший приоритет
                     },
                     {
                         targets: [6],
                         orderable: false,
                         searchable: false
+                        // без responsivePriority — будут иметь меньший приоритет
                     },
                     {
                         targets: [4, 5],
                         type: 'date'
                     }
                 ],
+
                 initComplete: function () {
                     this.api().page.len(10).draw();
                     $('.dt-buttons').appendTo('#exportButtonsContainer');
