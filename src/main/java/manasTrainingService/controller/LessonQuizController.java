@@ -39,7 +39,7 @@ public class LessonQuizController {
     }
 
     @GetMapping("create/{lessonId}")
-    public String createQuizPage(@PathVariable Integer lessonId, Model model, HttpServletRequest request) {
+    public String createQuizPage(@PathVariable Integer lessonId, Model model) {
         if(!lessonAccessService.canAccessLessonQuizCreate(lessonService.getLessonModelById(lessonId))){
             throw new NoAccessException("У вас нет доступа к созданию теста");
         }
@@ -47,12 +47,7 @@ public class LessonQuizController {
             throw new LessonQuizAlreadyCreatedException("Тест к данному уроку уже был создан");
         }
         LessonQuizDto lessonQuizDto = new LessonQuizDto();
-        String url = request.getHeader("Referer");
-        if(url != null){
-            request.getSession().setAttribute("redirectAfterCreate", url);
-        }else {
-            request.getSession().setAttribute("redirectAfterCreate", "/");
-        }
+
         model.addAttribute("lessonQuiz", lessonQuizDto);
         model.addAttribute("lesson", lessonService.getLessonById(lessonId));
         return "quizzes/quiz_create";
@@ -68,24 +63,18 @@ public class LessonQuizController {
             model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
             return "quizzes/quiz_create";
         }
-        String redirectUrl = request.getSession().getAttribute("redirectAfterCreate").toString();
         request.getSession().removeAttribute("redirectAfterCreate");
         lessonQuizService.createQuiz(lessonQuizDto);
         redirectAttributes.addFlashAttribute("successMessage", "Тест успешно создан");
-        return "redirect:" + redirectUrl;
+        return "redirect:/lessons/" + lessonQuizDto.getLessonId();
     }
 
     @GetMapping("{id}/edit")
-    public String editQuizPage(@PathVariable Integer id, Model model, HttpServletRequest request) {
+    public String editQuizPage(@PathVariable Integer id, Model model) {
         if(!lessonAccessService.canAccessLessonQuizEdit(lessonQuizService.getQuizEntityById(id))){
             throw new NoAccessException("У вас нет доступа к редактированию теста");
         }
-        String url = request.getHeader("Referer");
-        if(url != null){
-            request.getSession().setAttribute("redirectAfterEdit", url);
-        } else {
-            request.getSession().setAttribute("redirectAfterEdit", "/");
-        }
+
         LessonQuizDto lessonQuizDto = lessonQuizService.getQuizById(id);
         model.addAttribute("lessonQuiz", lessonQuizDto);
         model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
@@ -93,7 +82,7 @@ public class LessonQuizController {
     }
 
     @PostMapping("edit")
-    public String editQuiz(@Valid LessonQuizDto lessonQuizDto,
+    public String editQuiz(@Valid @ModelAttribute("lessonQuiz") LessonQuizDto lessonQuizDto,
                            BindingResult bindingResult,
                            RedirectAttributes redirectAttributes,
                            Model model,
@@ -104,15 +93,14 @@ public class LessonQuizController {
             model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
             return "quizzes/quiz_edit";
         }
-        String redirectUrl = request.getSession().getAttribute("redirectAfterEdit").toString();
-        request.getSession().removeAttribute("redirectAfterEdit");
+
         lessonQuizService.editQuiz(lessonQuizDto);
         if(session.getAttribute("timer") != null && session.getAttribute("startTime") != null){
             session.removeAttribute("timer");
             session.removeAttribute("startTime");
         }
         redirectAttributes.addFlashAttribute("successMessage", "Тест успешно изменен");
-        return "redirect:" + redirectUrl;
+        return "redirect:/lessons/" + lessonQuizDto.getLessonId();
     }
 
     @GetMapping("{id}/passing")
