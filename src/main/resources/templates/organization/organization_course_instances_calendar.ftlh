@@ -10,11 +10,11 @@
     {"label": "Календарь потоков курсов", "url": ""}
     ] />
 
-    <div class="container-fluid px-4 mt-4">
-        <div class="card shadow-sm border-0 rounded-3 mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center text-white"
+    <div class="container-fluid px-2 px-md-4 mt-3 mt-md-4">
+        <div class="card shadow-sm border-0 rounded-3 mb-3 mb-md-4">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center text-white"
                  style="background: linear-gradient(135deg, #0066cc, #003d7a); border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
-                <h5 class="mb-0">
+                <h5 class="mb-2 mb-md-0">
                     <i class="fas fa-calendar-alt me-2"></i>
                     Календарь потоков курсов
                 </h5>
@@ -25,9 +25,9 @@
             </div>
         </div>
         <div class="card shadow-sm border-0 rounded-3">
-            <div class="my-3 mx-4" >
+            <div class="my-3 mx-2 mx-md-4">
                 <label for="courseFilter" class="form-label fw-semibold text-dark">Фильтр по курсу:</label>
-                <select id="courseFilter" class="form-select" style="max-width: 400px;">
+                <select id="courseFilter" class="form-select" style="max-width: 100%; width: 100%;">
                     <option value="all">Все курсы</option>
                     <#list courseOptions as option>
                         <option value="${option.id()}">${option.title()}</option>
@@ -35,16 +35,14 @@
                 </select>
             </div>
 
-            <div class="card-body p-4">
+            <div class="card-body p-2 p-md-4">
                 <div id="calendar"></div>
             </div>
         </div>
     </div>
 
-
-
     <div class="modal fade" id="courseModal" tabindex="-1" aria-labelledby="courseModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-dialog modal-dialog-scrollable modal-sm modal-md modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-primary" id="courseModalLabel">Детали потока курса</h5>
@@ -52,23 +50,23 @@
                 </div>
                 <div class="modal-body">
                     <dl class="row">
-                        <dt class="col-sm-4">Название потока:</dt>
-                        <dd class="col-sm-8" id="modalInstanceTitle"></dd>
+                        <dt class="col-5 col-md-4">Название потока:</dt>
+                        <dd class="col-7 col-md-8" id="modalInstanceTitle"></dd>
 
-                        <dt class="col-sm-4">Курс:</dt>
-                        <dd class="col-sm-8" id="modalCourseTitle"></dd>
+                        <dt class="col-5 col-md-4">Курс:</dt>
+                        <dd class="col-7 col-md-8" id="modalCourseTitle"></dd>
 
-                        <dt class="col-sm-4">Категория:</dt>
-                        <dd class="col-sm-8" id="modalCategory"></dd>
+                        <dt class="col-5 col-md-4">Категория:</dt>
+                        <dd class="col-7 col-md-8" id="modalCategory"></dd>
 
-                        <dt class="col-sm-4">Дата начала:</dt>
-                        <dd class="col-sm-8" id="modalStartDate"></dd>
+                        <dt class="col-5 col-md-4">Дата начала:</dt>
+                        <dd class="col-7 col-md-8" id="modalStartDate"></dd>
 
-                        <dt class="col-sm-4">Дата окончания:</dt>
-                        <dd class="col-sm-8" id="modalEndDate"></dd>
+                        <dt class="col-5 col-md-4">Дата окончания:</dt>
+                        <dd class="col-7 col-md-8" id="modalEndDate"></dd>
 
-                        <dt class="col-sm-4">Статус:</dt>
-                        <dd class="col-sm-8" id="modalStatus"></dd>
+                        <dt class="col-5 col-md-4">Статус:</dt>
+                        <dd class="col-7 col-md-8" id="modalStatus"></dd>
                     </dl>
                 </div>
             </div>
@@ -110,7 +108,7 @@
             ];
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
+                initialView: window.innerWidth < 768 ? 'dayGridWeek' : 'dayGridMonth',
                 locale: 'ru',
                 firstDay: 1,
                 moreLinkText: function(n) {
@@ -123,7 +121,7 @@
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,dayGridWeek'
+                    right: window.innerWidth < 768 ? 'dayGridWeek' : 'dayGridMonth,dayGridWeek'
                 },
                 buttonText: {
                     today: 'Сегодня',
@@ -152,8 +150,6 @@
                     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('courseModal'));
                     modal.show();
                 }
-
-
             });
 
             calendar.render();
@@ -168,12 +164,20 @@
                 calendar.addEventSource(filteredEvents);
             });
 
+            window.addEventListener('resize', () => {
+                calendar.updateSize();
+                calendar.setOption('headerToolbar', {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: window.innerWidth < 768 ? 'dayGridWeek' : 'dayGridMonth,dayGridWeek'
+                });
+                calendar.setOption('initialView', window.innerWidth < 768 ? 'dayGridWeek' : 'dayGridMonth');
+            });
+
             setTimeout(() => {
                 calendar.updateSize();
             }, 5);
-
         });
-
     </script>
     <style>
         :root {
@@ -186,32 +190,26 @@
 
         .page-title {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             font-weight: 600;
             color: var(--primary-blue);
         }
 
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 2rem;
-            }
-        }
-
         #calendar {
             background: var(--white);
-            border-radius: 15px;
-            padding: 1.5rem;
+            border-radius: 10px;
+            padding: 1rem;
             box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
+
         .fc-day-today {
             background: rgba(0, 102, 204, 0.08) !important;
             border-radius: 6px;
         }
 
-
         .fc-toolbar-title {
             text-transform: uppercase !important;
-            font-size: 1.75rem !important;
+            font-size: clamp(1rem, 4vw, 1.25rem) !important;
             font-weight: 600 !important;
             color: var(--text-dark) !important;
             font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -227,11 +225,12 @@
 
         .fc-event {
             border-radius: 6px !important;
-            font-size: 0.9rem;
+            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
             font-weight: 500;
-            padding: 2px 6px !important;
+            padding: 2px 4px !important;
             border: none !important;
             color: #fff !important;
+            line-height: 1.2;
         }
 
         .fc-event:hover {
@@ -242,7 +241,7 @@
         }
 
         .fc-daygrid-more-link {
-            font-size: 0.85rem;
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
             font-weight: 600;
             color: var(--primary-blue);
         }
@@ -251,9 +250,11 @@
             background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
             border: none;
             border-radius: 25px;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             color: white;
             font-weight: 600;
+            font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+            touch-action: manipulation;
         }
 
         .fc .fc-button:hover {
@@ -261,14 +262,8 @@
             box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
-        .fc-toolbar-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
         .modal-content {
-            border-radius: 15px;
+            border-radius: 10px;
             border: none;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
@@ -276,11 +271,11 @@
         .modal-header {
             background: #f5f7ff;
             border-bottom: none;
-            border-radius: 15px 15px 0 0;
+            border-radius: 10px 10px 0 0;
         }
 
         .modal-title {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 4vw, 1.4rem);
             font-weight: 600;
             color: var(--primary-blue);
         }
@@ -288,11 +283,62 @@
         dt {
             font-weight: 600;
             color: var(--text-dark);
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
         }
 
         dd {
             color: #444;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+        }
+
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+
+            .card-header {
+                padding: 0.75rem;
+            }
+
+            .card-body {
+                padding: 0.5rem !important;
+            }
+
+            .my-3 {
+                margin: 0.5rem 0 !important;
+            }
+
+            .mx-2 {
+                margin-left: 0.5rem !important;
+                margin-right: 0.5rem !important;
+            }
+
+            .fc-event {
+                padding: 1px 3px !important;
+                font-size: clamp(0.65rem, 2.2vw, 0.75rem);
+            }
+
+            .fc .fc-button {
+                padding: 0.3rem 0.6rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .modal-dialog {
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-dialog {
+                margin: 0.5rem;
+                max-width: 100%;
+            }
+
+            .fc-daygrid-day {
+                min-height: 80px;
+            }
         }
     </style>
-
 </@layout.page>
