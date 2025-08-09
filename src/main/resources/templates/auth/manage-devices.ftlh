@@ -28,8 +28,11 @@
                         <#if _csrf??>
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                         </#if>
-                        <button type="submit" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Вы уверены, что хотите выйти из всех устройств?')">
+                        <button type="button" class="btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmModal"
+                                data-action="/auth/logout-all-devices"
+                                data-message="Вы уверены, что хотите выйти из всех устройств?">
                             <i class="fas fa-sign-out-alt me-1"></i>Выйти из всех устройств
                         </button>
                     </form>
@@ -79,8 +82,13 @@
                                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                                     </#if>
                                                     <input type="hidden" name="tokenId" value="${token.id}"/>
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                            onclick="return confirm('Отключить это устройство?')"
+                                                    <!-- Кнопка "Отключить устройство" -->
+                                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#confirmModal"
+                                                            data-action="/auth/revoke-token"
+                                                            data-message="Отключить это устройство?"
+                                                            data-token-id="${token.id}"
                                                             title="Отключить устройство">
                                                         <i class="fas fa-times"></i>
                                                     </button>
@@ -109,6 +117,28 @@
                 </a>
             </div>
         </div>
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="post">
+                        <#if _csrf??>
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        </#if>
+                        <input type="hidden" name="tokenId" id="modalTokenId"/>
+                        <div class="modal-header">
+                            <h5 class="modal-title">Подтверждение действия</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="modalMessage"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="submit" class="btn btn-danger">Подтвердить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -160,4 +190,25 @@
             });
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmModal = document.getElementById('confirmModal');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalTokenId = document.getElementById('modalTokenId');
+            const form = confirmModal.querySelector('form');
+
+            confirmModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const action = button.getAttribute('data-action');
+                const message = button.getAttribute('data-message');
+                const tokenId = button.getAttribute('data-token-id');
+
+                form.setAttribute('action', action);
+                modalMessage.textContent = message || 'Вы уверены?';
+                modalTokenId.value = tokenId || '';
+            });
+        });
+    </script>
+
 </@page>
