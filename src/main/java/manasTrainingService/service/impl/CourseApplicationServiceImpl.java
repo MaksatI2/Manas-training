@@ -183,7 +183,7 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                     -> cae.getApplicationStatus() == Status.APPROVED);
 
             if (!allApproved) {
-                throw new BadRequestException("Нельзя одобрить заявку, пока все сотрудники не зачислены на поток курса. Пожалуйста, перейдите в раздел 'Потоки курсов' и назначьте студентов вручную.");
+                throw new BadRequestException("Нельзя одобрить заявку, пока все сотрудники не зачислены на поток курса. Пожалуйста, перейдите в раздел Потоки курсов и назначьте студентов вручную.");
             }
 
             app.setStatus(Status.APPROVED);
