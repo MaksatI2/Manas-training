@@ -63,6 +63,8 @@
             padding: 1.2rem 1.5rem;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
+            box-sizing: border-box;
+            min-height: 80px;
         }
 
         .section-title {
@@ -75,6 +77,11 @@
         .section-content {
             color: #444;
             font-size: 1rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
+            word-break: break-all;
         }
 
         .contact-line {
@@ -83,6 +90,12 @@
             margin-bottom: 0.5rem;
             color: #444;
             cursor: pointer;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
+            flex-wrap: wrap;
+            word-break: break-all;
         }
 
         .contact-line i {
@@ -93,13 +106,31 @@
         .contact-line a {
             color: inherit;
             text-decoration: none;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
+            word-break: break-all;
         }
 
         .contact-line:hover {
             color: var(--primary-blue);
         }
 
-        @media (max-width: 768px) {
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            border-color: var(--primary-blue);
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--dark-blue), #002a5a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        }
+
+        @media (max-width: 992px) {
             .teacher-profile-container {
                 grid-template-columns: 1fr;
                 text-align: center;
@@ -110,11 +141,23 @@
             }
 
             .contact-line {
-                justify-content: center;
+                justify-content: flex-start;
             }
 
             .page-title {
                 font-size: 2rem;
+            }
+
+            .info-section {
+                padding: 1rem;
+            }
+
+            .section-title {
+                font-size: 0.95rem;
+            }
+
+            .section-content {
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -128,8 +171,8 @@
     </#if>
 
     <#if successMessage??>
-    <div id="successMessage" data-message="${successMessage?js_string}"></div>
-</#if>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
     <#if errorMessage??>
         <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
@@ -138,8 +181,6 @@
         <h1 class="page-title">
             <i class="fas fa-user-graduate"></i>Информация о преподавателе
         </h1>
-
-
     </div>
 
     <div class="teacher-profile-container">
