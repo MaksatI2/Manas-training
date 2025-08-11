@@ -1,9 +1,14 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
+<#assign bcHome><@spring.message code='organization.profile.view.breadcrumb.home'/></#assign>
+<#assign bcProfile><@spring.message code='organization.profile.view.breadcrumb.profile'/></#assign>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Профиль", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcProfile, "url": ""}
     ] />
     <style>
         .profile-container {
@@ -132,8 +137,7 @@
             font-weight: 500;
         }
 
-        .user-role,
-        .edit-button {
+        .user-role, .edit-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -193,7 +197,6 @@
             }
         }
     </style>
-
     <div class="profile-container">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -203,7 +206,7 @@
         </#if>
         <h1 class="page-title">
             <i class="fas fa-user-circle" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
-            Личный кабинет
+            <@spring.message code="organization.profile.view.title"/>
         </h1>
 
         <div class="profile-card">
@@ -212,16 +215,16 @@
                     <#if organization.user.avatarUrl?has_content>
                         <img src="/data/images/${organization.user.avatarUrl}"
                              class="avatar-image"
-                             alt="Фото профиля">
+                             alt="<@spring.message code='organization.profile.view.photoAlt'/>">
                     <#else>
                         <img src="/static/images/default_avatar.jpg"
                              class="avatar-image"
-                             alt="Фото профиля по умолчанию">
+                             alt="<@spring.message code='organization.profile.view.photoDefaultAlt'/>">
                     </#if>
                     <div class="avatar-edit-overlay">
                         <div class="avatar-edit-text">
                             <i class="fa-solid fa-pencil"></i><br>
-                            Изменить фото
+                            <@spring.message code="organization.profile.view.changePhoto"/>
                         </div>
                     </div>
                 </div>
@@ -235,7 +238,7 @@
                     <div class="user-role-and-edit">
                         <a href="/organization/profile/edit" class="edit-button">
                             <i class="fas fa-edit"></i>
-                            Редактировать профиль
+                            <@spring.message code="organization.profile.view.editProfile"/>
                         </a>
                     </div>
                 </div>
@@ -246,7 +249,7 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-phone" style="margin-right: 0.5rem;"></i>
-                            Телефон
+                            <@spring.message code="organization.profile.view.phone"/>
                         </div>
                         <div class="detail-value">${organization.user.phone}</div>
                     </div>
@@ -256,12 +259,11 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                            Организация
+                            <@spring.message code="organization.profile.view.organization"/>
                         </div>
                         <#if organization.organization.description?has_content>
                             <div class="detail-value">${organization.organization.description}</div>
                         </#if>
-
                     </div>
                 </#if>
 
@@ -269,7 +271,7 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                            Код организации
+                            <@spring.message code="organization.profile.view.organizationCode"/>
                         </div>
                         <div class="detail-value">${organization.organization.code}</div>
                     </div>
@@ -278,21 +280,37 @@
                 <div class="detail-item">
                     <div class="detail-label">
                         <i class="fas fa-calendar-check" style="margin-right: 0.5rem;"></i>
-                        Статус
+                        <@spring.message code="organization.profile.view.status"/>
                     </div>
                     <div class="detail-value">
                         <#if organization.user.isActive>
                             <span style="color: #28a745;">
-                                <i class="fas fa-check-circle"></i> Активная
-                            </span>
+                            <i class="fas fa-check-circle"></i> <@spring.message code="organization.profile.view.status.active"/>
+                        </span>
                         <#else>
                             <span style="color: #dc3545;">
-                                <i class="fas fa-times-circle"></i> Неактивная
-                            </span>
+                            <i class="fas fa-times-circle"></i> <@spring.message code="organization.profile.view.status.inactive"/>
+                        </span>
                         </#if>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const _loc = "${springMacroRequestContext.locale?string}";
+            const _l = _loc.toLowerCase();
+            const _lang2 = _l.startsWith("ru") ? "ru" : (_l.startsWith("ky") ? "ky" : "en");
+            if (window.jQuery && $.fn.dataTable) {
+                $.extend(true, $.fn.dataTable.defaults, {
+                    language: {
+                        url: '/js/datatables/' + _lang2 + '.json',
+                        paginate: {previous: '‹', next: '›'}
+                    }
+                });
+            }
+        });
+    </script>
 </@layout.page>

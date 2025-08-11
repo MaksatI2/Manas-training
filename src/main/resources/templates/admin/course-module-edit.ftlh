@@ -10,7 +10,7 @@
             <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
 
-        <h2 class="section-title">Редактировать модуль курса</h2>
+        <h2 class="section-title"><@spring.message code="course.module.edit.title"/></h2>
 
         <div class="card feature-card-enhanced">
             <div class="card-body">
@@ -19,7 +19,7 @@
 
                     <div class="mb-3">
                         <label for="title" class="form-label">
-                            <i class="fas fa-heading me-1"></i>Название модуля *
+                            <i class="fas fa-heading me-1"></i><@spring.message code="course.module.field.title"/>
                         </label>
                         <@spring.formInput "module.title", "class='form-control' id='title'" />
                         <div class="error-block text-danger">
@@ -29,7 +29,7 @@
 
                     <div class="mb-3">
                         <label for="durationHours" class="form-label">
-                            <i class="fas fa-hourglass-half me-1"></i>Продолжительность (часы) *
+                            <i class="fas fa-hourglass-half me-1"></i><@spring.message code="course.module.field.duration"/>
                         </label>
                         <@spring.formInput
                         "module.durationHours",
@@ -40,10 +40,9 @@
                         </div>
                     </div>
 
-
                     <div class="mb-3">
                         <label for="description" class="form-label">
-                            <i class="fas fa-align-left me-1"></i>Описание
+                            <i class="fas fa-align-left me-1"></i><@spring.message code="course.module.field.description"/>
                         </label>
                         <@spring.formTextarea "module.description", "class='form-control' id='description' rows='3'" />
                         <div class="error-block text-danger">
@@ -52,10 +51,10 @@
                     </div>
 
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save me-2"></i>Сохранить изменения
+                        <i class="fas fa-save me-2"></i><@spring.message code="course.module.button.save"/>
                     </button>
                     <a href="/admin/course-instances/${courseInstanceId}/modules" class="btn btn-secondary ms-2">
-                        Отмена
+                        <@spring.message code="course.module.button.cancel"/>
                     </a>
                 </form>
             </div>

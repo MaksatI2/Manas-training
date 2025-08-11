@@ -1,9 +1,14 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
+<#assign bcHome><@spring.message code='admin.user.list.breadcrumb.home'/></#assign>
+<#assign bcUsers><@spring.message code='admin.user.list.breadcrumb.users'/></#assign>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Пользователи", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcUsers, "url": ""}
     ] />
     <div class="card shadow mb-4">
         <#if successMessage??>
@@ -15,19 +20,21 @@
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="m-0 font-weight-bold text-white">
-                    <i class="fas fa-users me-2"></i> Управление пользователями
+                    <i class="fas fa-users me-2"></i> <@spring.message code='admin.user.list.title'/>
                 </h5>
 
                 <div class="d-flex align-items-center flex-wrap gap-2">
                     <div id="usersTable_buttons"></div>
                     <div class="d-flex align-items-center flex-wrap gap-2">
                         <div class="input-group input-group-sm" style="width: 180px;">
-                             <span class="input-group-text" style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
-                               <i class="fas fa-filter"></i>
-                             </span>
+                            <span class="input-group-text"
+                                  style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
+                                <i class="fas fa-filter"></i>
+                            </span>
                             <select class="form-select form-select-sm" id="roleFilter"
                                     style="border: 1px solid #0066cc; border-left: 0; color: #0066cc;">
-                                <option hidden disabled selected value="">Все пользователи</option>
+                                <option hidden disabled selected
+                                        value=""><@spring.message code='admin.user.list.filter.allUsers'/></option>
                                 <#list roles as role>
                                     <option value="${role}" <#if selectedRole?? && selectedRole == role>selected</#if>>
                                         ${roleDisplayNames[role]!role}
@@ -37,20 +44,22 @@
                         </div>
 
                         <div class="input-group input-group-sm" style="width: 180px;">
-                          <span class="input-group-text" style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
-                           <i class="fas fa-filter"></i>
-                          </span>
+                            <span class="input-group-text"
+                                  style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
+                                <i class="fas fa-filter"></i>
+                            </span>
                             <select class="form-select form-select-sm" id="statusFilter"
                                     style="border: 1px solid #0066cc; border-left: 0; color: #0066cc;">
-                                <option hidden disabled selected value="">Все статусы</option>
-                                <option value="Активен">Активен</option>
-                                <option value="Неактивен">Неактивен</option>
+                                <option hidden disabled selected
+                                        value=""><@spring.message code='admin.user.list.filter.allStatuses'/></option>
+                                <option value="<@spring.message code='admin.user.list.status.active'/>"><@spring.message code='admin.user.list.status.active'/></option>
+                                <option value="<@spring.message code='admin.user.list.status.inactive'/>"><@spring.message code='admin.user.list.status.inactive'/></option>
                             </select>
                         </div>
 
                         <button id="resetFilters"
                                 class="btn btn-link text-white btn-sm px-2"
-                                title="Сбросить фильтры"
+                                title="<@spring.message code='admin.user.list.resetFilters'/>"
                                 style="font-size: 1rem;">
                             <i class="fas fa-times-circle"></i>
                         </button>
@@ -58,7 +67,7 @@
 
                     <a href="/admin/teachers/add" class="btn btn-light btn-sm"
                        style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                        <i class="fas fa-plus me-1"></i> Добавить преподавателя
+                        <i class="fas fa-plus me-1"></i> <@spring.message code='admin.user.list.addTeacher'/>
                     </a>
                 </div>
             </div>
@@ -69,32 +78,33 @@
                 <table class="table table-bordered table-hover" id="usersTable" width="100%" cellspacing="0">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
                     <tr>
-                        <th>№</th>
-                        <th>Имя</th>
-                        <th>Фамилия</th>
-                        <th>Email</th>
-                        <th>Телефон</th>
-                        <th>Роль</th>
-                        <th>Статус</th>
-                        <th class="text-center">Действия</th>
+                        <th><@spring.message code='admin.user.list.table.number'/></th>
+                        <th><@spring.message code='admin.user.list.table.name'/></th>
+                        <th><@spring.message code='admin.user.list.table.lastName'/></th>
+                        <th><@spring.message code='admin.user.list.table.email'/></th>
+                        <th><@spring.message code='admin.user.list.table.phone'/></th>
+                        <th><@spring.message code='admin.user.list.table.role'/></th>
+                        <th><@spring.message code='admin.user.list.table.status'/></th>
+                        <th class="text-center"><@spring.message code='admin.user.list.table.actions'/></th>
                     </tr>
                     </thead>
                     <tbody>
                     <#if users?has_content>
                         <#list users as user>
                             <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}'">
-                            <td>${user.id}</td>
+                                <td>${user.id}</td>
                                 <td>${user.name}</td>
-                                <td>${(user.lastName?has_content && user.lastName != "null")?then(user.lastName, "-")}</td>                                <td>${user.email}</td>
+                                <td>${(user.lastName?has_content && user.lastName != "null")?then(user.lastName, "-")}</td>
+                                <td>${user.email}</td>
                                 <td>${user.phone}</td>
                                 <td>
                                     <span class="badge bg-primary">${user.role.name}</span>
                                 </td>
                                 <td>
                                     <#if user.isActive>
-                                        <span class="badge bg-success">Активен</span>
+                                        <span class="badge bg-success"><@spring.message code='admin.user.list.status.active'/></span>
                                     <#else>
-                                        <span class="badge bg-warning">Неактивен</span>
+                                        <span class="badge bg-warning"><@spring.message code='admin.user.list.status.inactive'/></span>
                                     </#if>
                                 </td>
                                 <td class="text-center">
@@ -129,7 +139,7 @@
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">
                                 <i class="fas fa-users fa-2x mb-2"></i>
-                                <p>Пользователи не найдены</p>
+                                <p><@spring.message code='admin.user.list.table.notFound'/></p>
                             </td>
                         </tr>
                     </#if>
@@ -145,36 +155,63 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div id="i18n-holder"
+         data-delete-title="<@spring.message code='admin.user.list.modal.deleteTitle'/>"
+         data-delete-confirm="<@spring.message code='admin.user.list.modal.deleteConfirm'/>"
+         data-delete-warning="<@spring.message code='admin.user.list.modal.deleteWarning'/>"
+         data-relations-error="<@spring.message code='admin.user.list.modal.relationsError'/>"
+         data-cancel="<@spring.message code='admin.user.list.modal.cancel'/>"
+         data-delete="<@spring.message code='admin.user.list.modal.delete'/>"
+         data-export="<@spring.message code='admin.user.list.export'/>"
+         data-export-copy="<@spring.message code='admin.user.list.export.copy'/>"
+         data-export-excel="<@spring.message code='admin.user.list.export.excel'/>"
+         data-export-pdf="<@spring.message code='admin.user.list.export.pdf'/>"
+         data-export-print="<@spring.message code='admin.user.list.export.print'/>">
+    </div>
+
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteUserModalLabel">Подтверждение удаления</h5>
+                    <h5 class="modal-title"
+                        id="deleteUserModalLabel"><@spring.message code='admin.user.list.modal.deleteTitle'/></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Вы уверены, что хотите удалить пользователя <strong id="userName"></strong>?</p>
-                    <p class="text-warning">Это действие необратимо. Пожалуйста, проверьте связанные данные:</p>
+                    <p id="deleteConfirmText"></p>
+                    <p class="text-warning"><@spring.message code='admin.user.list.modal.deleteWarning'/></p>
                     <ul id="userRelationsList" class="list-group">
                         <li class="list-group-item"><strong>Расписания:</strong> <span id="schedulesCount">0</span></li>
                         <li class="list-group-item"><strong>Сотрудники:</strong> <span id="employeesCount">0</span></li>
-                        <li class="list-group-item"><strong>Заявки на курсы:</strong> <span id="courseApplicationEmployeesCount">0</span></li>
-                        <li class="list-group-item"><strong>Результаты тестов:</strong> <span id="testResultsCount">0</span></li>
-                        <li class="list-group-item"><strong>Посещения:</strong> <span id="attendancesAsStudentCount">0</span></li>
-                        <li class="list-group-item"><strong>Отмеченные посещения:</strong> <span id="attendancesMarkedByCount">0</span></li>
-                        <li class="list-group-item"><strong>Сертификаты:</strong> <span id="certificatesAsStudentCount">0</span></li>
-                        <li class="list-group-item"><strong>Выданные сертификаты:</strong> <span id="certificatesIssuedByUserCount">0</span></li>
-                        <li class="list-group-item"><strong>Преподаватели потоков:</strong> <span id="courseInstanceTeachersCount">0</span></li>
-                        <li class="list-group-item"><strong>Преподаватели курсов:</strong> <span id="courseTeachersCount">0</span></li>
-                        <li class="list-group-item"><strong>Записи на курсы:</strong> <span id="enrollmentsCount">0</span></li>
+                        <li class="list-group-item"><strong>Заявки на курсы:</strong> <span
+                                    id="courseApplicationEmployeesCount">0</span></li>
+                        <li class="list-group-item"><strong>Результаты тестов:</strong> <span
+                                    id="testResultsCount">0</span></li>
+                        <li class="list-group-item"><strong>Посещения:</strong> <span
+                                    id="attendancesAsStudentCount">0</span></li>
+                        <li class="list-group-item"><strong>Отмеченные посещения:</strong> <span
+                                    id="attendancesMarkedByCount">0</span></li>
+                        <li class="list-group-item"><strong>Сертификаты:</strong> <span id="certificatesAsStudentCount">0</span>
+                        </li>
+                        <li class="list-group-item"><strong>Выданные сертификаты:</strong> <span
+                                    id="certificatesIssuedByUserCount">0</span></li>
+                        <li class="list-group-item"><strong>Преподаватели потоков:</strong> <span
+                                    id="courseInstanceTeachersCount">0</span></li>
+                        <li class="list-group-item"><strong>Преподаватели курсов:</strong> <span
+                                    id="courseTeachersCount">0</span></li>
+                        <li class="list-group-item"><strong>Записи на курсы:</strong> <span
+                                    id="enrollmentsCount">0</span></li>
                     </ul>
                     <div id="relationsError" class="alert alert-danger d-none mt-3">
-                        Не удалось загрузить связанные данные. Пожалуйста, попробуйте снова.
+                        <@spring.message code='admin.user.list.modal.relationsError'/>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Удалить</a>
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal"><@spring.message code='admin.user.list.modal.cancel'/></button>
+                    <a id="confirmDeleteBtn" href="#"
+                       class="btn btn-danger"><@spring.message code='admin.user.list.modal.delete'/></a>
                 </div>
             </div>
         </div>
@@ -182,7 +219,8 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
@@ -197,16 +235,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+            var dtLangUrl = "<#if springMacroRequestContext.locale?string?lower_case?starts_with('ru')>/js/datatables/ru.json" +
+                "<#elseif springMacroRequestContext.locale?string?lower_case?starts_with('ky')>/js/datatables/ky.json" +
+                "<#else>/js/datatables/en.json</#if>";
+
+            var allLabel = "<#if springMacroRequestContext.locale?string?lower_case?starts_with('ru')>Все" +
+                "<#elseif springMacroRequestContext.locale?string?lower_case?starts_with('ky')>Баары" +
+                "<#else>All</#if>";
+
+            var i18n = document.getElementById('i18n-holder').dataset;
+
             var table = $('#usersTable').DataTable({
-                language: {
-                    url: '/js/datatables/ru.json',
-                    paginate: {previous: '‹', next: '›'}
-                },
+                language: {url: dtLangUrl, paginate: {previous: '‹', next: '›'}},
                 responsive: true,
                 pageLength: 10,
                 lengthChange: true,
-                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
+                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, allLabel]],
                 order: [[0, 'asc']],
                 searching: true,
                 info: false,
@@ -219,145 +264,100 @@
                 buttons: [
                     {
                         extend: 'collection',
-                        text: '<i class="fas fa-download me-1"></i> Экспорт',
+                        text: '<i class="fas fa-download me-1"></i> ' + i18n.export,
                         className: 'btn btn-primary btn-sm dropdown-toggle',
                         buttons: [
                             {
                                 extend: 'copy',
-                                text: '<i class="fas fa-copy me-1"></i> Копировать',
+                                text: '<i class="fas fa-copy me-1"></i> ' + i18n.exportCopy,
                                 className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
+                                exportOptions: {columns: ':visible'},
                                 title: 'Список пользователей',
                                 messageTop: 'Список пользователей на ' + new Date().toLocaleDateString()
                             },
                             {
                                 extend: 'excel',
-                                text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                                text: '<i class="fas fa-file-excel me-1"></i> ' + i18n.exportExcel,
                                 className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
+                                exportOptions: {columns: ':visible'},
                                 title: 'Список пользователей',
                                 messageTop: 'Список пользователей на ' + new Date().toLocaleDateString(),
                                 autoFilter: true,
-                                customize: function(xlsx) {
+                                customize: function (xlsx) {
                                     var sheet = xlsx.xl.worksheets['sheet1.xml'];
                                     $('row c[r^="A"]', sheet).attr('s', '2');
                                 }
                             },
                             {
                                 extend: 'pdf',
-                                text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                                text: '<i class="fas fa-file-pdf me-1"></i> ' + i18n.exportPdf,
                                 className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
+                                exportOptions: {columns: ':visible'},
                                 title: 'Список пользователяй Manas - ' + new Date().toLocaleDateString(),
                                 customize: function (doc) {
-                                    if (!doc.content || doc.content.length < 2 || !doc.content[1].table) {
-                                        console.error('PDF generation error: Invalid document structure', doc);
-                                        return;
-                                    }
-
-                                    doc.defaultStyle = {
-                                        fontSize: 8,
-                                        color: '#2c3e50'
-                                    };
-
+                                    if (!doc.content || doc.content.length < 2 || !doc.content[1].table) return;
+                                    doc.defaultStyle = {fontSize: 8, color: '#2c3e50'};
                                     doc.styles.title = {
                                         color: '#0066cc',
                                         fontSize: 14,
                                         alignment: 'center',
                                         margin: [0, 0, 0, 15]
                                     };
-
-                                    const table = doc.content[1].table;
-
-                                    table.widths = Array(table.body[0].length).fill('*');
-                                    table.body[0].forEach(function(cell) {
-                                        cell.fillColor = '#003d7a';
-                                        cell.color = '#ffffff';
-                                        cell.alignment = 'center';
-                                        cell.bold = true;
+                                    const t = doc.content[1].table;
+                                    t.widths = Array(t.body[0].length).fill('*');
+                                    t.body[0].forEach(function (c) {
+                                        c.fillColor = '#003d7a';
+                                        c.color = '#ffffff';
+                                        c.alignment = 'center';
+                                        c.bold = true;
                                     });
-
-                                    for (let i = 1; i < table.body.length; i++) {
+                                    for (let i = 1; i < t.body.length; i++) {
                                         if (i % 2 === 0) {
-                                            table.body[i].forEach(function(cell) {
-                                                cell.fillColor = '#f8f9fa';
+                                            t.body[i].forEach(function (c) {
+                                                c.fillColor = '#f8f9fa';
                                             });
                                         }
                                     }
-
                                     doc.pageMargins = [20, 60, 20, 30];
                                 },
                                 orientation: 'landscape'
                             },
                             {
                                 extend: 'print',
-                                text: '<i class="fas fa-print me-1"></i> Печать',
+                                text: '<i class="fas fa-print me-1"></i> ' + i18n.exportPrint,
                                 className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
+                                exportOptions: {columns: ':visible'},
                                 title: 'Список пользователей',
                                 messageTop: '<h3 class="text-center">Список пользователей</h3><p class="text-center">На ' + new Date().toLocaleDateString() + '</p>',
-                                customize: function(win) {
+                                customize: function (win) {
                                     $(win.document.body).find('table').addClass('display').css('font-size', '10px');
-                                    $(win.document.body).find('tr:nth-child(odd) td').each(function(index){
-                                        $(this).css('background-color','#f8f9fa');
+                                    $(win.document.body).find('tr:nth-child(odd) td').each(function () {
+                                        $(this).css('background-color', '#f8f9fa');
                                     });
-                                    $(win.document.body).find('h1').css('text-align','center');
+                                    $(win.document.body).find('h1').css('text-align', 'center');
                                 }
                             }
                         ]
                     }
                 ],
                 columnDefs: [
-                    {
-                        targets: [1],
-                        responsivePriority: 3,
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        targets: [2],
-                        responsivePriority: 4,
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        targets: [3],
-                        responsivePriority: 1,
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        targets: [7],
-                        responsivePriority: 2,
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        targets: [4, 5],
-                        orderable: true,
-                        searchable: true
-                    }
+                    {targets: [1], responsivePriority: 3, orderable: true, searchable: true},
+                    {targets: [2], responsivePriority: 4, orderable: true, searchable: true},
+                    {targets: [3], responsivePriority: 1, orderable: true, searchable: true},
+                    {targets: [7], responsivePriority: 2, orderable: false, searchable: false},
+                    {targets: [4, 5], orderable: true, searchable: true}
                 ],
-
-                initComplete: function() {
+                initComplete: function () {
                     this.api().page.len(10).draw();
                     table.buttons().container().appendTo('#usersTable_buttons');
                 }
             });
 
-            $('#roleFilter').on('change', function() {
+            $('#roleFilter').on('change', function () {
                 table.column(5).search(this.value).draw();
             });
 
-            $('#statusFilter').on('change', function() {
+            $('#statusFilter').on('change', function () {
                 table.column(6).search(this.value).draw();
             });
 
@@ -371,13 +371,16 @@
                 table.search('').columns().search('').draw();
             });
 
-            $('.delete-user-btn').on('click', function() {
+            $('.delete-user-btn').on('click', function (event) {
                 event.stopPropagation();
 
                 const userId = $(this).data('user-id');
                 const userName = $(this).data('user-name');
 
-                $('#userName').text(userName);
+                const tmpl = document.getElementById('i18n-holder').dataset.deleteConfirm;
+                const text = tmpl.replace('{0}', '<strong>' + userName + '</strong>');
+                $('#deleteConfirmText').html(text);
+
                 $('#confirmDeleteBtn').attr('href', '/admin/users/' + userId + '/delete');
 
                 $('#userRelationsList span').text('0');
@@ -386,7 +389,7 @@
                 $.ajax({
                     url: '/api/users/' + userId + '/relations-count',
                     method: 'GET',
-                    success: function(data) {
+                    success: function (data) {
                         $('#schedulesCount').text(data.schedules);
                         $('#employeesCount').text(data.employees);
                         $('#courseApplicationEmployeesCount').text(data.courseApplicationEmployees);
@@ -399,7 +402,7 @@
                         $('#courseTeachersCount').text(data.courseTeachers);
                         $('#enrollmentsCount').text(data.enrollments);
                     },
-                    error: function() {
+                    error: function () {
                         $('#relationsError').removeClass('d-none');
                     }
                 });
@@ -412,7 +415,7 @@
     <style>
         .card {
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
 
         .card-header {
@@ -449,7 +452,7 @@
         }
 
         #usersTable tr:hover {
-            background-color: rgba(0,102,204,0.05);
+            background-color: rgba(0, 102, 204, 0.05);
             transform: translateY(-1px);
             transition: all 0.3s ease;
         }
@@ -524,6 +527,7 @@
             border-left: 0;
             border-color: #d1d3e2;
         }
+
         .form-select-sm {
             padding-right: 2rem !important;
         }
@@ -539,7 +543,7 @@
 
         .btn-light:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         .dt-buttons {
@@ -557,7 +561,7 @@
 
         .btn-sm:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .btn-secondary {
@@ -633,8 +637,6 @@
             padding-right: 2rem;
             background-position: right 0.5rem center;
             background-size: 12px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
             appearance: none;
         }
 

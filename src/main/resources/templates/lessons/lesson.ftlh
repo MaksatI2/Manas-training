@@ -30,14 +30,13 @@
                 <div class="d-flex gap-2 flex-shrink-0">
                     <a href="<@spring.url '/admin/lessons/${lesson.id}/edit'/>"
                        class="btn btn-primary btn-sm rounded-pill">
-                        <i class="fas fa-edit me-1"></i>Редактировать
+                        <i class="fas fa-edit me-1"></i><@spring.message code="lesson.edit"/>
                     </a>
-
                     <form method="post" action="<@spring.url '/admin/lessons/${lesson.id}/delete'/>"
-                          onsubmit="return confirm('Вы уверены, что хотите удалить этот урок?')">
+                          onsubmit="return confirm('<@spring.message code="lesson.delete.confirm"/>')">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                         <button type="submit" class="btn btn-danger btn-sm rounded-pill">
-                            <i class="fas fa-trash-alt me-1"></i>Удалить
+                            <i class="fas fa-trash-alt me-1"></i><@spring.message code="lesson.delete"/>
                         </button>
                     </form>
                 </div>
@@ -46,33 +45,31 @@
 
         <div class="card shadow-sm mb-5 border-0 rounded-3">
             <div class="card-body">
-                <h5 class="card-title fw-semibold">Описание</h5>
+                <h5 class="card-title fw-semibold"><@spring.message code="lesson.description"/></h5>
                 <p class="card-text text-secondary">
                     <#if lesson.description?has_content>
                         ${lesson.description}
                     <#else>
-                        <span class="text-muted fst-italic">Описание отсутствует</span>
+                        <span class="text-muted fst-italic"><@spring.message code="lesson.description.empty"/></span>
                     </#if>
                 </p>
             </div>
         </div>
 
-
         <div class="mb-5">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
-                <h4 class="fw-bold flex-grow-1">Материалы</h4>
+                <h4 class="fw-bold flex-grow-1"><@spring.message code="lesson.materials"/></h4>
                 <a href="/lessons/${lesson.id}/content-page" target="_blank"
                    class="btn btn-primary btn-sm rounded-pill flex-shrink-0">
-                    <i class="fas fa-external-link-alt me-1"></i>Содержимое урока
+                    <i class="fas fa-external-link-alt me-1"></i><@spring.message code="lesson.contentPage"/>
                 </a>
                 <#if isAdmin || isTeacher>
                     <a href="<@spring.url '/lessons/${lesson.id}/materials/new'/>"
                        class="btn btn-primary btn-sm rounded-pill flex-shrink-0">
-                        <i class="fas fa-plus me-1"></i>Добавить
+                        <i class="fas fa-plus me-1"></i><@spring.message code="lesson.materials.add"/>
                     </a>
                 </#if>
             </div>
-
             <#if materials?has_content>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                     <#list materials as material>
@@ -83,12 +80,12 @@
                                     <div class="mt-auto d-flex justify-content-between align-items-center">
                                         <a href="/data/lesson-materials/${material.url}" target="_blank"
                                            class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-external-link-alt me-1"></i>Открыть
+                                            <i class="fas fa-external-link-alt me-1"></i><@spring.message code="lesson.materials.open"/>
                                         </a>
                                         <#if isAdmin>
                                             <form action="<@spring.url '/lessons/${lesson.id}/materials/${material.id}/delete'/>"
                                                   method="post" class="d-inline"
-                                                  onsubmit="return confirm('Удалить материал?')">
+                                                  onsubmit="return confirm('<@spring.message code="lesson.materials.delete.confirm"/>')">
                                                 <input type="hidden" name="${_csrf.parameterName}"
                                                        value="${_csrf.token}"/>
                                                 <button type="submit" class="btn btn-outline-danger btn-sm">
@@ -104,77 +101,79 @@
                 </div>
             <#else>
                 <div class="text-center py-5 bg-light rounded-3">
-                    <p class="text-muted mb-0">Материалы не добавлены.</p>
+                    <p class="text-muted mb-0"><@spring.message code="lesson.materials.empty"/></p>
                 </div>
             </#if>
         </div>
 
         <div class="mb-5">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
-                <h4 class="fw-bold flex-grow-1">Расписание</h4>
+                <h4 class="fw-bold flex-grow-1"><@spring.message code="lesson.schedule"/></h4>
                 <#if isAdmin>
                     <#if schedule??>
                         <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>"
-                           class="btn btn-primary btn-sm rounded-pill flex-shrink-0">Редактировать расписание</a>
+                           class="btn btn-primary btn-sm rounded-pill flex-shrink-0"><@spring.message code="lesson.schedule.edit"/></a>
                     <#else>
                         <a href="<@spring.url '/schedules/lessons/${lesson.id}'/>"
-                           class="btn btn-primary btn-sm rounded-pill flex-shrink-0">Создать расписание</a>
+                           class="btn btn-primary btn-sm rounded-pill flex-shrink-0"><@spring.message code="lesson.schedule.create"/></a>
                     </#if>
                 </#if>
             </div>
-
             <#if schedule??>
                 <div class="card shadow-sm border-0 rounded-3">
                     <div class="card-body">
                         <div class="d-flex flex-wrap justify-content-between align-items-start mb-3 gap-3">
                             <h6 class="card-title fw-semibold flex-grow-1 text-break">${schedule.title!lesson.title}</h6>
-
                             <#if isTeacher && schedule.teacherId?? && schedule.teacherId == currentUserId>
                                 <#if isMeetingActive!false>
                                 <#else>
                                     <a href="<@spring.url '/jitsi/schedule/${schedule.id}/start?teacherId=${currentUserId}'/>"
                                        class="btn btn-success btn-sm rounded-pill flex-shrink-0">
-                                        <i class="fas fa-play me-1"></i>Начать урок
+                                        <i class="fas fa-play me-1"></i><@spring.message code="lesson.start"/>
                                     </a>
                                 </#if>
                             </#if>
                         </div>
-
                         <div class="lesson-info-grid">
                             <div class="lesson-info-item">
-                                <span class="lesson-info-label"><i class="fas fa-calendar me-2"></i>Дата:</span>
+                                <span class="lesson-info-label"><i
+                                            class="fas fa-calendar me-2"></i><@spring.message code="lesson.schedule.date"/></span>
                                 <span class="lesson-info-value">${schedule.formattedLessonDate}</span>
                             </div>
                             <div class="lesson-info-item">
-                                <span class="lesson-info-label"><i class="fas fa-clock me-2"></i>Длительность:</span>
+                                <span class="lesson-info-label"><i
+                                            class="fas fa-clock me-2"></i><@spring.message code="lesson.schedule.duration"/></span>
                                 <span class="lesson-info-value">${schedule.durationHours} ч.</span>
                             </div>
                             <div class="lesson-info-item">
-                                <span class="lesson-info-label"><i class="fas fa-user me-2"></i>Преподаватель:</span>
-                                <span class="lesson-info-value">${schedule.teacherName!'Не указан'}</span>
+                                <span class="lesson-info-label"><i
+                                            class="fas fa-user me-2"></i><@spring.message code="lesson.schedule.teacher"/></span>
+                                <span class="lesson-info-value">${schedule.teacherName!'<@spring.message code="lesson.schedule.teacher.none"/>'}</span>
                             </div>
                             <div class="lesson-info-item">
-                                <span class="lesson-info-label"><i class="fas fa-chalkboard me-2"></i>Тип урока:</span>
+                                <span class="lesson-info-label"><i
+                                            class="fas fa-chalkboard me-2"></i><@spring.message code="lesson.schedule.type"/></span>
                                 <span class="lesson-info-value">${schedule.lessonType.value}</span>
                             </div>
                             <#if schedule.meetingUrl?has_content>
                                 <div class="lesson-info-item">
-                                    <span class="lesson-info-label"><i class="fas fa-link me-2"></i>Ссылка:</span>
+                                    <span class="lesson-info-label"><i
+                                                class="fas fa-link me-2"></i><@spring.message code="lesson.schedule.link"/></span>
                                     <span class="lesson-info-value"><a href="${schedule.meetingUrl}" target="_blank"
-                                                                       class="link-primary">Присоединиться</a></span>
+                                                                       class="link-primary"><@spring.message code="lesson.schedule.join"/></a></span>
                                 </div>
                             </#if>
                             <#if schedule.notes?has_content>
                                 <div class="lesson-info-item">
                                     <span class="lesson-info-label"><i
-                                                class="fas fa-note-sticky me-2"></i>Примечания:</span>
+                                                class="fas fa-note-sticky me-2"></i><@spring.message code="lesson.schedule.notes"/></span>
                                     <span class="lesson-info-value">${schedule.notes}</span>
                                 </div>
                             </#if>
                             <#if isMeetingActive!false>
                                 <div class="lesson-info-item">
                                     <span class="lesson-info-label"><i class="fas fa-circle text-success me-2"></i>Статус:</span>
-                                    <span class="lesson-info-value fw-bold text-success">Урок активен</span>
+                                    <span class="lesson-info-value fw-bold text-success"><@spring.message code="lesson.schedule.active"/></span>
                                 </div>
                             </#if>
                         </div>
@@ -182,38 +181,38 @@
                 </div>
             <#else>
                 <div class="text-center py-5 bg-light rounded-3">
-                    <p class="text-muted mb-0">Расписание пока не задано.</p>
+                    <p class="text-muted mb-0"><@spring.message code="lesson.schedule.empty"/></p>
                 </div>
             </#if>
         </div>
 
         <div class="mb-5">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
-                <h4 class="fw-bold flex-grow-1">Тестирование</h4>
+                <h4 class="fw-bold flex-grow-1"><@spring.message code="lesson.testing"/></h4>
                 <#if isTeacher>
                     <#if lesson.quiz??>
                         <a href="/quiz/${lesson.quiz.id}/edit"
                            class="btn btn-warning btn-sm rounded-pill flex-shrink-0">
-                            <i class="fas fa-edit me-1"></i> Редактировать тест
+                            <i class="fas fa-edit me-1"></i> <@spring.message code="lesson.quiz.edit"/>
                         </a>
                         <a href="/quiz/${lesson.quiz.id}/delete"
                            class="btn btn-danger btn-sm rounded-pill flex-shrink-0">
-                            <i class="fas fa-trash-alt me-1"></i> Удалить тест
+                            <i class="fas fa-trash-alt me-1"></i> <@spring.message code="lesson.quiz.delete"/>
                         </a>
                         <#if !lesson.quiz.isActive>
                             <a href="/quiz/${lesson.quiz.id}/activate"
                                class="btn btn-success btn-sm rounded-pill flex-shrink-0">
-                                <i class="fa-solid fa-check"></i> Активировать тест
+                                <i class="fa-solid fa-check"></i> <@spring.message code="lesson.quiz.activate"/>
                             </a>
                         <#else>
                             <a href="/quiz/${lesson.quiz.id}/deactivate"
                                class="btn btn-warning btn-sm rounded-pill flex-shrink-0">
-                                <i class="fas fa-ban"></i> Деактивировать тест
+                                <i class="fas fa-ban"></i> <@spring.message code="lesson.quiz.deactivate"/>
                             </a>
                         </#if>
                     <#else>
                         <a href="/quiz/create/${lesson.id}" class="btn btn-primary btn-sm rounded-pill flex-shrink-0">
-                            <i class="fas fa-plus me-1"></i> Создать тест
+                            <i class="fas fa-plus me-1"></i> <@spring.message code="lesson.quiz.create"/>
                         </a>
                     </#if>
                 </#if>
@@ -221,17 +220,19 @@
             <#if lesson.quiz?has_content>
                 <div class="card shadow-sm mb-5 border-0 rounded-3 mt-4">
                     <div class="card-body">
-                        <h5>Тестовое задание по итогам урока: <span class="fw-bold">${lesson.title}</span></h5>
-                        <p>Время на прохождения теста: <span
-                                    class="fw-bold">${lesson.quiz.questionTimeLimit} минут.</span></p>
+                        <h5><@spring.message code="lesson.quiz.title"/> <span class="fw-bold">${lesson.title}</span>
+                        </h5>
+                        <p><@spring.message code="lesson.quiz.time"/> <span
+                                    class="fw-bold">${lesson.quiz.questionTimeLimit} <@spring.message code="lesson.quiz.minutes"/></span>
+                        </p>
                         <#if (isStudent || isTeacher)>
                             <a href="/quiz/${lesson.quiz.id}/passing"
                                class="btn btn-primary rounded-pill <#if !lesson.quiz.isActive>disabled</#if>">
                                 <i class="fa-solid fa-list-check"></i>
                                 <#if timer??>
-                                    Вернуться к тесту
+                                    <@spring.message code="lesson.quiz.return"/>
                                 <#else>
-                                    Начать тест
+                                    <@spring.message code="lesson.quiz.start"/>
                                 </#if>
                             </a>
                         </#if>
@@ -239,7 +240,7 @@
                 </div>
             <#else>
                 <div class="text-center py-5 bg-light rounded-3">
-                    <p class="text-muted mb-0">Тестовое задание еще не загружено.</p>
+                    <p class="text-muted mb-0"><@spring.message code="lesson.quiz.empty"/></p>
                 </div>
             </#if>
         </div>
@@ -400,6 +401,7 @@
             }
 
             .d-flex.justify-content-between {
+                flex-direction: column;
                 gap: 1rem;
             }
 

@@ -1,18 +1,23 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring/>
+
+<#assign bcHome><@spring.message code='teacher.myCourses.breadcrumb.home'/></#assign>
+<#assign bcMy><@spring.message code='teacher.myCourses.breadcrumb.myCourses'/></#assign>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Мои курсы", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcMy, "url": ""}
     ] />
     <div class="hero-section py-4 text-center bg-light border-bottom">
-        <h1 class="hero-title"><i class="fas fa-book me-2"></i>Мои курсы</h1>
+        <h1 class="hero-title"><i class="fas fa-book me-2"></i><@spring.message code='teacher.myCourses.title'/></h1>
     </div>
 
     <div class="container my-5">
         <#if courses?size == 0>
             <div class="alert alert-info text-center" role="alert">
-                У вас пока нет курсов.
+                <@spring.message code='teacher.myCourses.alert.noCourses'/>
             </div>
         <#else>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -25,13 +30,19 @@
                             <div class="card-body d-flex flex-column">
                                 <h6 class="card-subtitle mb-2 text-muted">${course.courseTitle}</h6>
                                 <p class="card-text text-muted small mb-3">
-                                    Даты: ${course.startDate} – ${course.endDate}
+                                    <@spring.message code='teacher.myCourses.course.term'/> ${course.startDate}
+                                    – ${course.endDate}
                                 </p>
                                 <span class="badge mb-3 <#if course.isActive>bg-success<#else>bg-secondary</#if>">
-                                    <#if course.isActive>Активен<#else>Завершен</#if>
+                                    <#if course.isActive>
+                                        <@spring.message code='teacher.course.detail.status.active'/>
+                                    <#else>
+                                        <@spring.message code='teacher.course.detail.status.completed'/>
+                                    </#if>
                                 </span>
-                                <a href="/teacher/course/${course.courseInstanceId}" class="btn btn-primary w-100 mt-auto">
-                                    Перейти к курсу
+                                <a href="/teacher/course/${course.courseInstanceId}"
+                                   class="btn btn-primary w-100 mt-auto">
+                                    <@spring.message code='teacher.myCourses.course.goTo'/>
                                 </a>
                             </div>
                         </div>
@@ -63,13 +74,13 @@
 
         .course-card {
             border-radius: 12px;
-            transition: all 0.3s ease-in-out;
+            transition: all .3s ease-in-out;
             overflow: hidden;
         }
 
         .course-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, .2);
         }
 
         .card-header.bg-gradient-primary {
@@ -92,26 +103,26 @@
         }
 
         .card-text {
-            font-size: 0.875rem;
+            font-size: .875rem;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
             border-color: var(--primary-blue);
             font-weight: 500;
-            transition: all 0.2s ease-in-out;
+            transition: all .2s ease-in-out;
         }
 
         .btn-primary:hover {
             background: linear-gradient(135deg, var(--dark-blue), #002a5a);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, .3);
         }
 
         .badge {
-            font-size: 0.75rem;
-            padding: 0.5em 1em;
-            border-radius: 0.5rem;
+            font-size: .75rem;
+            padding: .5em 1em;
+            border-radius: .5rem;
         }
 
         .bg-success {
@@ -124,7 +135,7 @@
 
         @media (min-width: 770px) and (max-width: 933px) {
             .course-card {
-                font-size: 0.95rem;
+                font-size: .95rem;
             }
 
             .card-title {
@@ -132,26 +143,26 @@
             }
 
             .card-subtitle {
-                font-size: 0.9rem;
+                font-size: .9rem;
             }
 
             .card-text {
-                font-size: 0.8rem;
+                font-size: .8rem;
             }
 
             .btn-primary {
-                padding: 0.5rem;
-                font-size: 0.9rem;
+                padding: .5rem;
+                font-size: .9rem;
             }
 
             .badge {
-                font-size: 0.7rem;
+                font-size: .7rem;
             }
         }
 
         @media (max-width: 576px) {
             .course-card {
-                font-size: 0.9rem;
+                font-size: .9rem;
             }
 
             .card-title {
@@ -159,16 +170,16 @@
             }
 
             .card-subtitle {
-                font-size: 0.85rem;
+                font-size: .85rem;
             }
 
             .card-text {
-                font-size: 0.75rem;
+                font-size: .75rem;
             }
 
             .btn-primary {
-                padding: 0.5rem;
-                font-size: 0.85rem;
+                padding: .5rem;
+                font-size: .85rem;
             }
         }
     </style>

@@ -1,0 +1,236 @@
+{
+  "processing": "Processing...",
+  "search": "Search:",
+  "lengthMenu": "Show _MENU_ entries",
+  "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+  "infoEmpty": "Showing 0 to 0 of 0 entries",
+  "infoFiltered": "(filtered from _MAX_ total entries)",
+  "loadingRecords": "Loading...",
+  "zeroRecords": "No matching records found",
+  "emptyTable": "No data available in table",
+  "paginate": {
+    "first": "First",
+    "previous": "Previous",
+    "next": "Next",
+    "last": "Last"
+  },
+  "aria": {
+    "sortAscending": ": activate to sort column ascending",
+    "sortDescending": ": activate to sort column descending"
+  },
+  "select": {
+    "rows": {
+      "_": "%d rows selected",
+      "1": "1 row selected"
+    },
+    "cells": {
+      "_": "%d cells selected",
+      "1": "1 cell selected"
+    },
+    "columns": {
+      "_": "%d columns selected",
+      "1": "1 column selected"
+    }
+  },
+  "searchBuilder": {
+    "conditions": {
+      "string": {
+        "startsWith": "Starts with",
+        "contains": "Contains",
+        "empty": "Empty",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "not": "Not",
+        "notEmpty": "Not empty",
+        "notContains": "Does not contain",
+        "notStartsWith": "Does not start with",
+        "notEndsWith": "Does not end with"
+      },
+      "date": {
+        "after": "After",
+        "before": "Before",
+        "between": "Between",
+        "empty": "Empty",
+        "equals": "Equals",
+        "not": "Not",
+        "notBetween": "Not between",
+        "notEmpty": "Not empty"
+      },
+      "number": {
+        "empty": "Empty",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "not": "Not",
+        "notEmpty": "Not empty",
+        "between": "Between",
+        "notBetween": "Not between"
+      },
+      "array": {
+        "equals": "Equals",
+        "empty": "Empty",
+        "contains": "Contains",
+        "not": "Not equal",
+        "notEmpty": "Not empty",
+        "without": "Without"
+      }
+    },
+    "data": "Data",
+    "deleteTitle": "Delete filtering rule",
+    "logicAnd": "And",
+    "logicOr": "Or",
+    "title": {
+      "0": "Search Builder",
+      "_": "Search Builder (%d)"
+    },
+    "value": "Value",
+    "add": "Add condition",
+    "button": {
+      "0": "Search Builder",
+      "_": "Search Builder (%d)"
+    },
+    "clearAll": "Clear all",
+    "condition": "Condition",
+    "leftTitle": "Outdent criteria",
+    "rightTitle": "Indent criteria"
+  },
+  "searchPanes": {
+    "clearMessage": "Clear all",
+    "collapse": {
+      "0": "Search panes",
+      "_": "Search panes (%d)"
+    },
+    "count": "{total}",
+    "countFiltered": "{shown} ({total})",
+    "emptyPanes": "No search panes",
+    "loadMessage": "Loading search panes",
+    "title": "Active filters - %d",
+    "showMessage": "Show all",
+    "collapseMessage": "Collapse all"
+  },
+  "buttons": {
+    "pdf": "PDF",
+    "print": "Print",
+    "collection": "Collection <span class=\"ui-button-icon-primary ui-icon ui-icon-triangle-1-s\"><\/span>",
+    "colvis": "Column visibility",
+    "colvisRestore": "Restore visibility",
+    "copy": "Copy",
+    "copyTitle": "Copy to clipboard",
+    "csv": "CSV",
+    "excel": "Excel",
+    "pageLength": {
+      "-1": "Show all rows",
+      "_": "Show %d rows",
+      "1": "Show 1 row"
+    },
+    "removeState": "Remove",
+    "renameState": "Rename",
+    "copySuccess": {
+      "1": "1 row copied to clipboard",
+      "_": "%d rows copied to clipboard"
+    },
+    "createState": "Create state",
+    "removeAllStates": "Remove all states",
+    "savedStates": "Saved states",
+    "stateRestore": "State %d",
+    "updateState": "Update",
+    "copyKeys": "Press ctrl or ⌘ + C to copy table data to the clipboard. To cancel, click this message or press escape."
+  },
+  "decimal": ".",
+  "infoThousands": ",",
+  "autoFill": {
+    "cancel": "Cancel",
+    "fill": "Fill all cells with <i>%d<i><\/i><\/i>",
+    "fillHorizontal": "Fill cells horizontally",
+    "fillVertical": "Fill cells vertically",
+    "info": "Information"
+  },
+  "datetime": {
+    "previous": "Previous",
+    "next": "Next",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "unknown": "Unknown",
+    "amPm": ["AM", "PM"],
+    "months": {
+      "0": "January",
+      "1": "February",
+      "2": "March",
+      "3": "April",
+      "4": "May",
+      "5": "June",
+      "6": "July",
+      "7": "August",
+      "8": "September",
+      "9": "October",
+      "10": "November",
+      "11": "December"
+    },
+    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  },
+  "editor": {
+    "close": "Close",
+    "create": {
+      "button": "New",
+      "title": "Create new record",
+      "submit": "Create"
+    },
+    "edit": {
+      "button": "Edit",
+      "title": "Edit record",
+      "submit": "Edit"
+    },
+    "remove": {
+      "button": "Delete",
+      "title": "Delete",
+      "submit": "Delete",
+      "confirm": {
+        "_": "Are you sure you want to delete %d rows?",
+        "1": "Are you sure you want to delete 1 row?"
+      }
+    },
+    "multi": {
+      "restore": "Undo changes",
+      "title": "Multiple values",
+      "info": "Selected items contain different values for this input. To edit and set the same value for all, click or tap here, otherwise they will keep their individual values.",
+      "noMulti": "This field should be edited individually, not as part of a group"
+    },
+    "error": {
+      "system": "A system error has occurred (<a target=\"\\\" rel=\"nofollow\" href=\"\\\">More information<\/a>)."
+    }
+  },
+  "searchPlaceholder": "What are you looking for?",
+  "stateRestore": {
+    "creationModal": {
+      "button": "Create",
+      "search": "Search",
+      "columns": {
+        "search": "Search columns",
+        "visible": "Column visibility"
+      },
+      "name": "Name:",
+      "order": "Order",
+      "paging": "Paging",
+      "scroller": "Scroll position",
+      "searchBuilder": "Search Builder",
+      "select": "Selection",
+      "title": "Create new state",
+      "toggleLabel": "Includes:"
+    },
+    "removeJoiner": "and",
+    "removeSubmit": "Delete",
+    "renameButton": "Rename",
+    "duplicateError": "A state with this name already exists.",
+    "emptyError": "Name cannot be empty.",
+    "emptyStates": "No saved states",
+    "removeConfirm": "Are you sure you want to delete %s?",
+    "removeError": "Failed to delete state.",
+    "removeTitle": "Delete state",
+    "renameLabel": "New name for %s:",
+    "renameTitle": "Rename state"
+  },
+  "thousands": " "
+}

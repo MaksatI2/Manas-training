@@ -1,26 +1,46 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring/>
 
+<#assign bcHome><@spring.message code='teacher.course.statistics.breadcrumb.home'/></#assign>
+<#assign bcMyCourses><@spring.message code='teacher.course.statistics.breadcrumb.myCourses'/></#assign>
+<#assign bcCourse><@spring.message code='teacher.course.statistics.breadcrumb.course'/></#assign>
+<#assign bcStatistics><@spring.message code='teacher.course.statistics.breadcrumb.statistics'/></#assign>
+
+<#assign attendanceTitle><@spring.message code='teacher.course.statistics.attendance.title'/></#assign>
+<#assign thStudent><@spring.message code='teacher.course.statistics.attendance.header.student'/></#assign>
+<#assign thAbsentHours><@spring.message code='teacher.course.statistics.attendance.header.absentHours'/></#assign>
+<#assign thAbsentPercent><@spring.message code='teacher.course.statistics.attendance.header.absentPercent'/></#assign>
+<#assign thStatus><@spring.message code='teacher.course.statistics.attendance.header.status'/></#assign>
+
+<#assign testsTitle><@spring.message code='teacher.course.statistics.tests.title'/></#assign>
+<#assign testsThName><@spring.message code='teacher.course.statistics.tests.header.name'/></#assign>
+<#assign testsThTest><@spring.message code='teacher.course.statistics.tests.header.test'/></#assign>
+<#assign testsThScore><@spring.message code='teacher.course.statistics.tests.header.score'/></#assign>
+<#assign testsThStatus><@spring.message code='teacher.course.statistics.tests.header.status'/></#assign>
+<#assign testsThDate><@spring.message code='teacher.course.statistics.tests.header.date'/></#assign>
+<#assign statusPassed><@spring.message code='teacher.course.statistics.tests.status.passed'/></#assign>
+<#assign statusFailed><@spring.message code='teacher.course.statistics.tests.status.failed'/></#assign>
+<#assign testsNoDate><@spring.message code='teacher.course.statistics.tests.noDate'/></#assign>
 
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Мои курсы", "url": "/teacher/my-courses"},
-    {"label": "Курс #${courseInstance.id}", "url": "/teacher/course/${courseInstance.id}"},
-    {"label": "Статистика", "url": "/"}
+    {"label": bcHome, "url": "/"},
+    {"label": bcMyCourses, "url": "/teacher/my-courses"},
+    {"label": bcCourse + " #" + courseInstance.id, "url": "/teacher/course/${courseInstance.id}"},
+    {"label": bcStatistics, "url": "/"}
     ] />
-
     <div class="statistics-container">
         <h2 class="statistics-title">
             <i class="fas fa-chart-bar" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
-            Посещаемость студентов</h2>
+            ${attendanceTitle}</h2>
         <table class="stats-table">
             <thead>
             <tr>
-                <th>Студент</th>
-                <th>Пропущено часов</th>
-                <th>Процент пропусков</th>
-                <th>Статус</th>
+                <th>${thStudent}</th>
+                <th>${thAbsentHours}</th>
+                <th>${thAbsentPercent}</th>
+                <th>${thStatus}</th>
             </tr>
             </thead>
             <tbody>
@@ -45,15 +65,15 @@
 
         <#if results?? && (results?size > 0)>
             <div class="test-results">
-                <h2 style="margin-bottom: 1rem;" class="statistics-title">Результаты тестов</h2>
+                <h2 style="margin-bottom: 1rem;" class="statistics-title">${testsTitle}</h2>
                 <table style="width: 100%; border-collapse: collapse; text-align: left;">
                     <thead>
                     <tr style="background-color: #f0f8ff;">
-                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Имя</th>
-                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Тест</th>
-                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Оценка</th>
-                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Статус</th>
-                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">Дата сдачи</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">${testsThName}</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">${testsThTest}</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">${testsThScore}</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">${testsThStatus}</th>
+                        <th style="padding: 0.75rem; border-bottom: 2px solid #ccc;">${testsThDate}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -67,16 +87,16 @@
                             <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${result.score}</td>
                             <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
                                 <#if result.isPassed>
-                                    Пройден
+                                    ${statusPassed}
                                 <#else>
-                                    Не пройден
+                                    ${statusFailed}
                                 </#if>
                             </td>
                             <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
                                 <#if result.submittedAt??>
                                     ${result.localisedTime}
                                 <#else>
-                                    —
+                                    ${testsNoDate}
                                 </#if>
                             </td>
                         </tr>

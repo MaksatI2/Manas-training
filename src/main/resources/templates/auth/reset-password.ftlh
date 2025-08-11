@@ -12,9 +12,9 @@
 <@page>
     <div class="hero-section">
         <h1 class="hero-title">
-            <i class="fas fa-lock me-3"></i>Установка нового пароля
+            <i class="fas fa-lock me-3"></i><@spring.message code="reset.password.title" />
         </h1>
-        <p class="hero-subtitle">Введите новый пароль для восстановления доступа</p>
+        <p class="hero-subtitle"><@spring.message code="reset.password.subtitle" /></p>
     </div>
 
     <#if message??>
@@ -42,23 +42,23 @@
 
                     <div class="mb-3">
                         <label for="password" class="form-label">
-                            <i class="fas fa-key me-1"></i>Новый пароль *
+                            <i class="fas fa-key me-1"></i><@spring.message code="reset.password.new" />
                         </label>
                         <div class="input-group">
-                            <@spring.formPasswordInput "passwordResetDto.password", "class='form-control' id='password' placeholder='Введите новый пароль'" />
+                            <@spring.formPasswordInput "passwordResetDto.password", "class='form-control' id='password' placeholder='" + (springMacroRequestContext.getMessage('reset.password.new.placeholder')) + "'" />
                             <button type="button" class="btn btn-outline-secondary" id="togglePassword">
                                 <i class="fas fa-eye" id="eyeIcon"></i>
                             </button>
                         </div>
                         <div class="error-block"><@spring.showErrors "<br>" /></div>
-                        <div class="form-text">Минимум 8 символов, хотя бы одна заглавная буква и цифра</div>
+                        <div class="form-text"><@spring.message code="reset.password.hint" /></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="confirmPassword" class="form-label">
-                            <i class="fas fa-key me-1"></i>Повторите пароль *
+                            <i class="fas fa-key me-1"></i><@spring.message code="reset.password.confirm" />
                         </label>
-                        <@spring.formPasswordInput "passwordResetDto.confirmPassword", "class='form-control' id='confirmPassword' placeholder='Повторите новый пароль'" />
+                        <@spring.formPasswordInput "passwordResetDto.confirmPassword", "class='form-control' id='confirmPassword' placeholder='" + (springMacroRequestContext.getMessage('reset.password.confirm.placeholder')) + "'" />
                         <div class="error-block"><@spring.showErrors "passwordResetDto.confirmPassword", "<br>" /></div>
                     </div>
 
@@ -70,7 +70,7 @@
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary-custom">
-                            <i class="fas fa-check me-2"></i>Сбросить пароль
+                            <i class="fas fa-check me-2"></i><@spring.message code="reset.password.button" />
                         </button>
                     </div>
                 </form>
@@ -78,7 +78,7 @@
 
             <div class="text-center mt-4">
                 <a href="/auth/login" style="color: var(--primary-blue);">
-                    <i class="fas fa-arrow-left me-1"></i>Вернуться к входу
+                    <i class="fas fa-arrow-left me-1"></i><@spring.message code="reset.password.back.login" />
                 </a>
             </div>
         </div>
@@ -113,26 +113,24 @@
 
         function validatePasswords() {
             let isValid = true;
-
             if (password.value !== confirmPassword.value) {
-                showError(confirmPassword, 'Пароли не совпадают');
+                showError(confirmPassword, "<@spring.message code='reset.password.confirm.error' />");
                 isValid = false;
             } else {
                 hideError(confirmPassword);
             }
-
             return isValid;
         }
 
-        resetForm.addEventListener('submit', function(e) {
+        resetForm.addEventListener('submit', function (e) {
             if (!validatePasswords()) {
                 e.preventDefault();
             }
         });
 
-        confirmPassword.addEventListener('input', function() {
+        confirmPassword.addEventListener('input', function () {
             if (password.value !== confirmPassword.value) {
-                showError(confirmPassword, 'Пароли не совпадают');
+                showError(confirmPassword, "<@spring.message code='reset.password.confirm.error' />");
             } else {
                 hideError(confirmPassword);
             }

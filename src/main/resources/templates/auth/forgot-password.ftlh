@@ -1,14 +1,10 @@
 <#include "../layout.ftlh">
 <@page>
-    <#if errorMessage??>
-        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-    </#if>
-
     <div class="hero-section">
         <h1 class="hero-title">
-            <i class="fas fa-key me-3"></i>Восстановление пароля
+            <i class="fas fa-key me-3"></i><@spring.message code="forgot.password.title" />
         </h1>
-        <p class="hero-subtitle">Введите свой email для получения ссылки на сброс пароля</p>
+        <p class="hero-subtitle"><@spring.message code="forgot.password.subtitle" /></p>
     </div>
 
     <div class="row justify-content-center">
@@ -34,15 +30,15 @@
 
                     <div class="mb-3">
                         <label for="email" class="form-label">
-                            <i class="fas fa-envelope me-1"></i>Email
+                            <i class="fas fa-envelope me-1"></i><@spring.message code="forgot.password.email" />
                         </label>
                         <input type="email" class="form-control" name="email" id="email"
-                               placeholder="Введите ваш email">
+                               placeholder="<@spring.message code='forgot.password.email.placeholder' />">
                     </div>
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary-custom">
-                            <i class="fas fa-paper-plane me-2"></i>Отправить ссылку
+                            <i class="fas fa-paper-plane me-2"></i><@spring.message code="forgot.password.send.link" />
                         </button>
                     </div>
                 </form>
@@ -50,7 +46,7 @@
 
             <div class="text-center mt-4">
                 <a href="/auth/login" style="color: var(--primary-blue);">
-                    <i class="fas fa-arrow-left me-1"></i>Вернуться к входу
+                    <i class="fas fa-arrow-left me-1"></i><@spring.message code="forgot.password.back.to.login" />
                 </a>
             </div>
         </div>

@@ -2,8 +2,8 @@
 
 <@page>
     <div class="hero-section">
-        <h1 class="hero-title">Регистрация</h1>
-        <p class="hero-subtitle">Выберите тип аккаунта для регистрации</p>
+        <h1 class="hero-title"><@spring.message code="register.choice.title" /></h1>
+        <p class="hero-subtitle"><@spring.message code="register.choice.subtitle" /></p>
     </div>
 
     <div class="row justify-content-center">
@@ -14,16 +14,25 @@
                         <div class="feature-icon">
                             <i class="fas fa-user-graduate"></i>
                         </div>
-                        <h4 class="mb-3" style="color: var(--primary-blue);">Студент</h4>
-                        <p class="mb-4">Зарегистрируйтесь как студент для прохождения курсов и получения сертификатов</p>
+                        <h4 class="mb-3"
+                            style="color: var(--primary-blue);"><@spring.message code="register.choice.student.title" /></h4>
+                        <p class="mb-4"><@spring.message code="register.choice.student.description" /></p>
                         <ul class="list-unstyled text-start mb-2">
-                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Доступ к курсам</li>
-                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Получение сертификатов</li>
-                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Отслеживание прогресса</li>
-                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Личный кабинет</li>
+                            <li class="mb-2"><i
+                                        class="fas fa-check-circle text-success me-2"></i><@spring.message code="register.choice.student.feature.courses" />
+                            </li>
+                            <li class="mb-2"><i
+                                        class="fas fa-check-circle text-success me-2"></i><@spring.message code="register.choice.student.feature.certificates" />
+                            </li>
+                            <li class="mb-2"><i
+                                        class="fas fa-check-circle text-success me-2"></i><@spring.message code="register.choice.student.feature.progress" />
+                            </li>
+                            <li class="mb-2"><i
+                                        class="fas fa-check-circle text-success me-2"></i><@spring.message code="register.choice.student.feature.profile" />
+                            </li>
                         </ul>
                         <a href="/auth/register/student" class="btn btn-primary-custom">
-                            <i class="fas fa-user-plus me-2"></i>Регистрация студента
+                            <i class="fas fa-user-plus me-2"></i><@spring.message code="register.choice.student.button" />
                         </a>
                     </div>
                 </div>
@@ -33,15 +42,22 @@
                         <div class="feature-icon">
                             <i class="fas fa-building"></i>
                         </div>
-                        <h4 class="mb-3" style="color: var(--primary-blue);">Компания</h4>
-                        <p class="mb-4">Зарегистрируйте вашу компанию для обучения сотрудников</p>
+                        <h4 class="mb-3"
+                            style="color: var(--primary-blue);"><@spring.message code="register.choice.company.title" /></h4>
+                        <p class="mb-4"><@spring.message code="register.choice.company.description" /></p>
                         <ul class="list-unstyled text-start mb-2">
-                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Управление сотрудниками</li>
-                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Корпоративные курсы</li>
-                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Отчеты по обучению</li>
+                            <li class="mb-2"><i
+                                        class="fas fa-check-circle text-success me-2"></i><@spring.message code="register.choice.company.feature.manage" />
+                            </li>
+                            <li class="mb-2"><i
+                                        class="fas fa-check-circle text-success me-2"></i><@spring.message code="register.choice.company.feature.courses" />
+                            </li>
+                            <li class="mb-2"><i
+                                        class="fas fa-check-circle text-success me-2"></i><@spring.message code="register.choice.company.feature.reports" />
+                            </li>
                         </ul>
                         <a href="/auth/register/company" class="btn btn-primary-custom">
-                            <i class="fas fa-building me-2"></i>Регистрация компании
+                            <i class="fas fa-building me-2"></i><@spring.message code="register.choice.company.button" />
                         </a>
                     </div>
                 </div>
@@ -51,8 +67,9 @@
 
     <div class="text-center mt-4">
         <p class="text-muted">
-            Уже есть аккаунт?
-            <a href="/auth/login" style="color: var(--primary-blue);">Войти</a>
+            <@spring.message code="register.choice.login.question" />
+            <a href="/auth/login"
+               style="color: var(--primary-blue);"><@spring.message code="register.choice.login.link" /></a>
         </p>
     </div>
     <style>
@@ -63,12 +80,11 @@
             border: 1px solid #ddd;
             border-radius: 10px;
             background-color: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .feature-card .btn {
             margin-top: auto;
         }
-
     </style>
 </@page>

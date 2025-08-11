@@ -2,24 +2,29 @@
 <#import "/spring.ftl" as spring />
 <#import "../RoadMap.ftlh" as roadmap>
 
+<#assign bcHome    = "Главная">
+<#assign bcList    = "Потоки курсов">
+<#assign bcCurrent = "Редактировать поток">
 
-<@layout.page>
+<@layout.page title="<@spring.message code='course.instance.edit.title'/>">
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Потоки курсов", "url": "/admin/course-instances"},
-    {"label": "Редактировать поток", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcList, "url": "/admin/course-instances"},
+    {"label": bcCurrent, "url": ""}
     ] />
 
     <div class="container">
         <div class="card" style="border-radius: 10px; box-shadow: 0 4px 15px rgba(0,102,204,0.1);">
-            <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a); border-top-left-radius: 10px; border-top-right-radius: 10px;">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                 style="background: linear-gradient(135deg, #0066cc, #003d7a); border-top-left-radius: 10px; border-top-right-radius: 10px;">
                 <h5 class="m-0 font-weight-bold text-white">
                     <i class="fas fa-edit me-2"></i>
-                    Редактировать поток курса
+                    <@spring.message code="course.instance.edit.title"/>
                 </h5>
                 <div>
-                    <a href="/admin/course-instances" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                        <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                    <a href="/admin/course-instances" class="btn btn-light btn-sm"
+                       style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                        <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> ${bcList}
                     </a>
                 </div>
             </div>
@@ -30,7 +35,7 @@
 
                     <div class="mb-3">
                         <label for="title" class="form-label">
-                            Название *
+                            <@spring.message code="course.instance.field.title"/> <@spring.message code="course.instance.validation.required"/>
                         </label>
                         <@spring.formInput "courseInstanceDto.title", "class='form-control' id='title'" />
                         <div class="error-block text-danger">
@@ -40,7 +45,7 @@
 
                     <div class="mb-3">
                         <label for="startDate" class="form-label">
-                            Дата начала *
+                            <@spring.message code="course.instance.field.startDate"/> <@spring.message code="course.instance.validation.required"/>
                         </label>
                         <@spring.formInput "courseInstanceDto.startDate", "class='form-control' id='startDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
@@ -50,7 +55,7 @@
 
                     <div class="mb-3">
                         <label for="endDate" class="form-label">
-                            Дата окончания *
+                            <@spring.message code="course.instance.field.endDate"/> <@spring.message code="course.instance.validation.required"/>
                         </label>
                         <@spring.formInput "courseInstanceDto.endDate", "class='form-control' id='endDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
@@ -61,9 +66,8 @@
                     <div class="mb-3">
                         <div class="form-check form-switch">
                             <@spring.formCheckbox "courseInstanceDto.isActive", "class='form-check-input' id='isActive', name='isActive'"/>
-
                             <label class="form-check-label" for="isActive">
-                                Активный курс
+                                <@spring.message code="course.instance.field.isActive"/>
                             </label>
                             <div class="error-block text-danger">
                                 <@spring.showErrors "isActive", "error-message" />
@@ -72,7 +76,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary-custom">
-                        <i class="fas fa-save me-1"></i> Сохранить изменения
+                        <i class="fas fa-save me-1"></i> <@spring.message code="course.instance.button.save"/>
                     </button>
                 </form>
             </div>
@@ -80,13 +84,12 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             flatpickr("#startDate", {
                 dateFormat: "Y-m-d",
                 minDate: "today",
                 defaultDate: "${courseInstanceDto.startDate!}"
             });
-
             flatpickr("#endDate", {
                 dateFormat: "Y-m-d",
                 minDate: "today",
@@ -128,7 +131,7 @@
         .btn-primary-custom:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         .form-check-input:checked {

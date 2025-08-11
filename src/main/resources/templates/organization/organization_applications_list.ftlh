@@ -1,13 +1,17 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
 
 <#setting datetime_format="dd.MM.yyyy HH:mm">
 <#setting date_format="dd.MM.yyyy">
 
-<@layout.page title="Мои заявки на курсы">
+<#assign bcHome = springMacroRequestContext.getMessage("organization.applications.list.breadcrumb.home")>
+<#assign bcApps = springMacroRequestContext.getMessage("organization.applications.list.breadcrumb.applications")>
+
+<@layout.page title="<@spring.message code='organization.applications.list.title'/>">
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Заявки на курсы", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcApps, "url": ""}
     ] />
 
     <#if successMessage??>
@@ -21,31 +25,31 @@
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h5 class="m-0 font-weight-bold text-white mb-2 mb-md-0">
-                    <i class="fas fa-list me-2"></i> Мои заявки
+                    <i class="fas fa-list me-2"></i> <@spring.message code="organization.applications.list.header"/>
                 </h5>
                 <a href="/applications/organization/create" class="btn btn-sm"
                    style="border-radius: 25px; background-color: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-plus me-1"></i> Подать заявку
+                    <i class="fas fa-plus me-1"></i> <@spring.message code="organization.applications.list.create"/>
                 </a>
             </div>
         </div>
 
         <div class="table-responsive p-3">
             <#if applications?size == 0>
-                <div class="alert alert-info mb-0">Заявки не найдены.</div>
+                <div class="alert alert-info mb-0"><@spring.message code="organization.applications.list.notfound"/></div>
             <#else>
                 <table id="applicationsTable" class="table table-hover table-bordered align-middle display nowrap"
                        width="100%">
-                    <thead >
+                    <thead>
                     <tr>
-                        <th>№</th>
-                        <th>Курс</th>
-                        <th>Преподаватель</th>
-                        <th>Дата начала</th>
-                        <th>Дата окончания</th>
-                        <th>Статус</th>
-                        <th>Дата подачи</th>
-                        <th class="text-center">Действия</th>
+                        <th><@spring.message code="organization.applications.list.table.number"/></th>
+                        <th><@spring.message code="organization.applications.list.table.course"/></th>
+                        <th><@spring.message code="organization.applications.list.table.teacher"/></th>
+                        <th><@spring.message code="organization.applications.list.table.start"/></th>
+                        <th><@spring.message code="organization.applications.list.table.end"/></th>
+                        <th><@spring.message code="organization.applications.list.table.status"/></th>
+                        <th><@spring.message code="organization.applications.list.table.submitted"/></th>
+                        <th class="text-center"><@spring.message code="organization.applications.list.table.actions"/></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -57,65 +61,83 @@
                                 <#if app.preferredTeacher??>
                                     ${app.preferredTeacher.name} ${app.preferredTeacher.lastName}
                                 <#else>
-                                    <span class="text-muted">—</span>
+                                    <span class="text-muted"><@spring.message code="organization.applications.list.teacher.none"/></span>
                                 </#if>
                             </td>
                             <td>
                                 <#if app.formattedPreferredStartDate??>
                                     ${app.formattedPreferredStartDate}
-
                                 <#else>
-                                    <span class="text-muted">—</span>
+                                    <span class="text-muted"><@spring.message code="organization.applications.list.date.none"/></span>
                                 </#if>
                             </td>
                             <td>
                                 <#if app.formattedPreferredEndDate??>
                                     ${app.formattedPreferredEndDate}
                                 <#else>
-                                    <span class="text-muted">—</span>
+                                    <span class="text-muted"><@spring.message code="organization.applications.list.date.none"/></span>
                                 </#if>
                             </td>
-                            <td class="status-cell">
-        <span class="badge
-            <#if app.status == "PENDING">bg-warning
-            <#elseif app.status == "APPROVED">bg-success
-            <#elseif app.status == "REJECTED">bg-danger
-            <#else>bg-secondary</#if>">
-            ${app.localizedStatus!"—"}
-        </span>
+                            <td class="status-cell text-center">
+                                <span class="badge status-badge
+                                    <#if app.status == "PENDING"> bg-warning
+                                    <#elseif app.status == "APPROVED"> bg-success
+                                    <#elseif app.status == "REJECTED"> bg-danger
+                                    <#else> bg-secondary</#if>">
+                                    <#if app.status == "PENDING">
+                                        <@spring.message code="organization.applications.list.status.pending"/>
+                                    <#elseif app.status == "APPROVED">
+                                        <@spring.message code="organization.applications.list.status.approved"/>
+                                    <#elseif app.status == "REJECTED">
+                                        <@spring.message code="organization.applications.list.status.rejected"/>
+                                    <#else>
+                                        <@spring.message code="organization.applications.list.status.other"/>
+                                    </#if>
+                                </span>
                             </td>
                             <td>${app.formattedSubmittedAt!"—"}</td>
                             <td class="text-center align-middle">
                                 <#if app.status == "PENDING">
                                     <a href="/applications/organization/${app.id}/edit"
-                                       class="btn btn-sm btn-warning me-1" title="Редактировать">
+                                       class="btn btn-sm btn-warning me-1"
+                                       title="<@spring.message code='organization.applications.list.edit'/>">
                                         <i class="fas fa-edit"></i>
                                     </a>
-
                                     <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal${app.id}" title="Удалить">
+                                            data-bs-target="#deleteModal${app.id}"
+                                            title="<@spring.message code='organization.applications.list.delete'/>">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
-
                                     <div class="modal fade" id="deleteModal${app.id}" tabindex="-1"
                                          aria-labelledby="deleteModalLabel${app.id}" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                                 <div class="modal-header bg-danger text-white">
-                                                    <h5 class="modal-title" id="deleteModalLabel${app.id}">Подтверждение удаления</h5>
-                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                                                            aria-label="Закрыть"></button>
+                                                    <h5 class="modal-title" id="deleteModalLabel${app.id}">
+                                                        <@spring.message code="organization.applications.list.delete.confirm.title"/>
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
+                                                <
                                                 <div class="modal-body">
-                                                    Вы уверены, что хотите удалить заявку на курс
-                                                    "<strong>${app.courseTitle}</strong>"?
-                                                    Это действие необратимо.
+                                                    ${springMacroRequestContext.getMessage(
+                                                    "organization.applications.list.delete.confirm.message",
+                                                    [app.courseTitle]
+                                                    )}
                                                 </div>
+
                                                 <div class="modal-footer">
-                                                    <form action="/applications/organization/${app.id}/delete" method="post">
+                                                    <form action="/applications/organization/${app.id}/delete"
+                                                          method="post">
                                                         <input type="hidden" name="_csrf" value="${_csrf.token}">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                                        <button type="submit" class="btn btn-danger">Удалить</button>
+                                                        <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">
+                                                            <@spring.message code="organization.applications.list.cancel"/>
+                                                        </button>
+                                                        <button type="submit" class="btn btn-danger">
+                                                            <@spring.message code="organization.applications.list.delete"/>
+                                                        </button>
                                                     </form>
                                                 </div>
                                             </div>
@@ -123,17 +145,16 @@
                                     </div>
                                 <#else>
                                     <button type="button" class="btn btn-sm btn-secondary me-1" disabled
-                                            title="Редактирование доступно только в статусе 'На рассмотрении'">
+                                            title="<@spring.message code='organization.applications.list.locked.edit'/>">
                                         <i class="fas fa-lock"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-secondary" disabled
-                                            title="Удаление доступно только в статусе 'На рассмотрении'">
+                                            title="<@spring.message code='organization.applications.list.locked.delete'/>">
                                         <i class="fas fa-lock"></i>
                                     </button>
                                 </#if>
                             </td>
                         </tr>
-
                     </#list>
                     </tbody>
                 </table>
@@ -152,24 +173,26 @@
         $(document).ready(function () {
             $('#applicationsTable').DataTable({
                 language: {
-                    url: '/js/datatables/ru.json',
+                    url: '/js/datatables/' + (
+                        ('${springMacroRequestContext.locale?lower_case}'.startsWith('ru')) ? 'ru' :
+                            (('${springMacroRequestContext.locale?lower_case}'.startsWith('ky')) ? 'ky' : 'en')
+                    ) + '.json',
                     paginate: {previous: '‹', next: '›'}
                 },
                 responsive: true,
                 order: [[0, 'desc']],
                 pageLength: 10,
-                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Все"]],
                 dom: '<"row mb-3 px-3 pt-2"<"col-md-6"l><"col-md-6 text-end"f>>rt<"row mt-3 px-3 pb-2"<"col-md-6"i><"col-md-6"p>>',
                 info: false,
                 columnDefs: [
-                    { responsivePriority: 4, targets: 0 },
-                    { responsivePriority: 1, targets: 1 },
-                    { responsivePriority: 5, targets: 2 },
-                    { responsivePriority: 6, orderable: false, targets: 3 },
-                    { responsivePriority: 7, orderable: false, targets: 4 },
-                    { responsivePriority: 2, targets: 5 },
-                    { responsivePriority: 8, targets: 6 },
-                    { responsivePriority: 3, orderable: false, targets: 7 }
+                    {responsivePriority: 4, targets: 0},
+                    {responsivePriority: 1, targets: 1},
+                    {responsivePriority: 5, targets: 2},
+                    {responsivePriority: 6, orderable: false, targets: 3},
+                    {responsivePriority: 7, orderable: false, targets: 4},
+                    {responsivePriority: 2, targets: 5},
+                    {responsivePriority: 8, targets: 6},
+                    {responsivePriority: 3, orderable: false, targets: 7}
                 ]
             });
 
@@ -180,6 +203,7 @@
             });
         });
     </script>
+
     <style>
         .card {
             border-radius: 10px;
@@ -190,21 +214,15 @@
             border-bottom: none;
         }
 
-        .modal-body {
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-
         .modal-dialog {
             max-width: 500px;
         }
 
         .modal-body {
-            word-break: break-word !important;
-            overflow-wrap: break-word !important;
-            white-space: normal !important;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
         }
-
 
         .badge {
             display: inline-block;
@@ -235,6 +253,17 @@
             background-color: #6c757d !important;
         }
 
+        .status-cell {
+            text-align: center;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 140px;
+        }
+
         .btn-outline-primary {
             color: #0066cc;
             border-color: #0066cc;
@@ -244,6 +273,7 @@
             background-color: #0066cc;
             color: white;
         }
+
         .btn-view {
             background-color: #0aa7c6;
             border: 1px solid #0aa7c6;
@@ -300,6 +330,5 @@
         table.dataTable thead th {
             color: white !important;
         }
-
     </style>
 </@layout.page>

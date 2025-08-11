@@ -3,11 +3,16 @@
 <#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page>
+    <#assign bcHome><@spring.message code='student.course.detail.breadcrumb.home'/></#assign>
+    <#assign bcMyCourses><@spring.message code='student.course.detail.breadcrumb.myCourses'/></#assign>
+    <#assign bcCourse><@spring.message code='student.course.detail.breadcrumb.course'/></#assign>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Мои курсы", "url": "/student/my-courses"},
-    {"label": "Курс #${courseInstance.title}", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcMyCourses, "url": "/student/my-courses"},
+    {"label": bcCourse + " #" + courseInstance.title, "url": ""}
     ] />
+
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
     </#if>
@@ -17,18 +22,21 @@
     <div class="hero-section">
         <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
         <p class="hero-subtitle">
-            Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
-            Категория: <strong>${courseInstance.category!'-'}</strong>
+            <@spring.message code='student.course.detail.course'/>: <strong>${courseInstance.courseTitle!'-'}</strong> |
+            <@spring.message code='student.course.detail.category'/>: <strong>${courseInstance.category!'-'}</strong>
         </p>
         <p class="hero-subtitle">
-            Начало: <strong>${courseInstance.formattedStartDate}</strong> |
-            Окончание: <strong>${courseInstance.formattedEndDate}</strong> |
-            Статус: <strong><#if courseInstance.isActive>Активен<#else>Завершен</#if></strong>
+            <@spring.message code='student.course.detail.startDate'/>:
+            <strong>${courseInstance.formattedStartDate}</strong>
+            |
+            <@spring.message code='student.course.detail.endDate'/>: <strong>${courseInstance.formattedEndDate}</strong>
+            |
+            <@spring.message code='student.course.detail.status'/>:
+            <strong><#if courseInstance.isActive><@spring.message code='student.course.detail.status.active'/><#else><@spring.message code='student.course.detail.status.finished'/></#if></strong>
         </p>
     </div>
-
     <div class="container mt-4">
-        <h2>Модули курса</h2>
+        <h2><@spring.message code='student.course.detail.modules'/></h2>
 
         <#if courseInstance.modules?has_content>
             <div class="accordion" id="modulesAccordion">
@@ -40,14 +48,15 @@
                                         data-bs-toggle="collapse"
                                         data-bs-target="#collapse${module.id}" aria-expanded="false"
                                         aria-controls="collapse${module.id}">
-                                    ${module.title} (Продолжительность: ${module.durationHours} ч.)
+                                    ${module.title} (<@spring.message code='student.course.detail.module.duration'/>
+                                    : ${module.durationHours} <@spring.message code='common.hours.short'/>)
                                 </button>
                             </div>
                             <div id="collapse${module.id}" class="accordion-collapse collapse"
                                  aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
                                 <div class="accordion-body">
                                     <p>${module.description!''}</p>
-                                    <h5>Уроки</h5>
+                                    <h5><@spring.message code='student.course.detail.lessons'/></h5>
                                     <#if module.lessons?has_content>
                                         <div class="row row-cols-1 row-cols-md-2 g-3">
                                             <#list module.lessons as lesson>
@@ -67,7 +76,7 @@
                                             </#list>
                                         </div>
                                     <#else>
-                                        <p>Уроки отсутствуют</p>
+                                        <p><@spring.message code='student.course.detail.lessons.empty'/></p>
                                     </#if>
                                 </div>
                             </div>
@@ -76,36 +85,39 @@
                 </#list>
             </div>
         <#else>
-            <p>Модули отсутствуют</p>
+            <p><@spring.message code='student.course.detail.modules.empty'/></p>
         </#if>
-        <h2>Тестирование</h2>
+        <h2><@spring.message code='student.course.detail.testing'/></h2>
         <div class="feature-card mb-3">
             <#if testInstance?has_content>
                 <#if testResult??>
-                    <h5>Результаты тестировани:</h5>
+                    <h5><@spring.message code='student.course.detail.test.results'/></h5>
                     <#if testResult.isPassed>
-                        <p class="text-success">Пройден успешно</p>
+                        <p class="text-success"><@spring.message code='student.course.detail.test.passed'/></p>
                     <#else>
-                        <p class="text-danger">Вы не набрали нужного количества баллов</p>
+                        <p class="text-danger"><@spring.message code='student.course.detail.test.failed'/></p>
                     </#if>
-                    <p>Количество набранных балов: ${testResult.totalPoints} из ${testInstance.test.passingScore}</p>
-                    <p>Время затраченное на прохождение: ${testResult.passingTime} минут.</p>
+                    <p><@spring.message code='student.course.detail.test.points.prefix'/> ${testResult.totalPoints} <@spring.message code='student.course.detail.test.points.middle'/> ${testInstance.test.passingScore}</p>
+                    <p><@spring.message code='student.course.detail.test.time'/> ${testResult.passingTime} <@spring.message code='common.minutes'/>
+                        .</p>
                     <#if testInstance.isEnded && testExits>
-                        <a href="/test/${testInstance.id}/result/details" class="btn btn-primary mb-2">Посмотреть подробности</a>
+                        <a href="/test/${testInstance.id}/result/details"
+                           class="btn btn-primary mb-2"><@spring.message code='student.course.detail.test.details'/></a>
                     </#if>
                 <#else>
                     <h5>
-                        Тестирование по итогам курса:
-                        <span class="fw-bold">${courseInstance.courseTitle}</span>
+                        <@spring.message code='student.course.detail.test.final'/> <span
+                                class="fw-bold">${courseInstance.courseTitle}</span>
                     </h5>
                     <#if isAvailableTime>
-                        <p>Тестирование доступно с <span class="fw-bold">${startDate} ${testInstance.startTime}</span>по <span class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
-                        <p class="text-danger">По истечению данного срока доступ к тестированию будет закрыт.</p>
+                        <p><@spring.message code='student.course.detail.test.available.from'/> <span
+                                    class="fw-bold">${startDate} ${testInstance.startTime}</span> <@spring.message code='student.course.detail.test.available.to'/>
+                            <span class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
+                        <p class="text-danger"><@spring.message code='student.course.detail.test.warning'/></p>
                         <a href="/test/${testInstance.id}/passing"
-                           class="btn btn-primary mb-2 <#if !testInstance.test.isActive>disabled</#if>">Пройти
-                            итоговое тестирование</a>
+                           class="btn btn-primary mb-2 <#if !testInstance.test.isActive>disabled</#if>"><@spring.message code='student.course.detail.test.start'/></a>
                     <#else>
-                        <p class="text-danger">Доступ к тестированию закрыт в связи с истечением срока.</p>
+                        <p class="text-danger"><@spring.message code='student.course.detail.test.closed'/></p>
                     </#if>
                 </#if>
             <#else>

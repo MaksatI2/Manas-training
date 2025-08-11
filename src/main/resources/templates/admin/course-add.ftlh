@@ -1,12 +1,14 @@
+<#import "/spring.ftl" as spring />
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
 
-<@layout.page>
+<@layout.page title="${springMacroRequestContext.getMessage('courses.admin.add.title')}">
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Курсы", "url": "/admin/courses"},
-    {"label": "Добавить курс", "url": ""}
+    {"label": "${springMacroRequestContext.getMessage('courses.admin.add.breadcrumb.home')}", "url": "/"},
+    {"label": "${springMacroRequestContext.getMessage('courses.admin.add.breadcrumb.list')}", "url": "/admin/courses"},
+    {"label": "${springMacroRequestContext.getMessage('courses.admin.add.breadcrumb.current')}", "url": ""}
     ] />
+
     <div class="card shadow mb-4">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -14,14 +16,17 @@
         <#if errorMessage??>
             <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
-        <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center"
+             style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <h5 class="m-0 font-weight-bold text-white">
                 <i class="fas fa-plus-circle me-2"></i>
-                Добавить курс
+                <@spring.message code="courses.admin.add.header"/>
             </h5>
             <div>
-                <a href="/admin/courses" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                <a href="/admin/courses" class="btn btn-light btn-sm"
+                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                    <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i>
+                    <@spring.message code="courses.admin.add.backToList"/>
                 </a>
             </div>
         </div>
@@ -31,10 +36,13 @@
                 <#if _csrf??>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 </#if>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="title" class="form-label required">Название курса</label>
+                            <label for="title" class="form-label required">
+                                <@spring.message code="courses.admin.add.field.title"/>
+                            </label>
                             <input type="text"
                                    class="form-control <#if .globals['org.springframework.validation.BindingResult.course']?? && .globals['org.springframework.validation.BindingResult.course'].hasFieldErrors('title')>is-invalid</#if>"
                                    id="title"
@@ -54,7 +62,9 @@
 
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="code" class="form-label required">Код курса</label>
+                            <label for="code" class="form-label required">
+                                <@spring.message code="courses.admin.add.field.code"/>
+                            </label>
                             <input type="text"
                                    class="form-control <#if .globals['org.springframework.validation.BindingResult.course']?? && .globals['org.springframework.validation.BindingResult.course'].hasFieldErrors('code')>is-invalid</#if>"
                                    id="code"
@@ -69,7 +79,9 @@
                                     </#list>
                                 </div>
                             </#if>
-                            <div class="form-text">Уникальный идентификатор курса</div>
+                            <div class="form-text">
+                                <@spring.message code="courses.admin.add.field.codeHint"/>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,14 +89,19 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="categoryId" class="form-label required">Категория</label>
+                            <label for="categoryId" class="form-label required">
+                                <@spring.message code="courses.admin.add.field.category"/>
+                            </label>
                             <select class="form-select <#if .globals['org.springframework.validation.BindingResult.course']?? && .globals['org.springframework.validation.BindingResult.course'].hasFieldErrors('categoryId')>is-invalid</#if>"
                                     id="categoryId"
                                     name="categoryId"
                                     required>
-                                <option value="">Выберите категорию</option>
+                                <option value="">
+                                    ${springMacroRequestContext.getMessage('courses.admin.add.field.category.placeholder')}
+                                </option>
                                 <#list categories as category>
-                                    <option value="${category.id}" <#if course.categoryId?? && course.categoryId == category.id>selected</#if>>
+                                    <option value="${category.id}"
+                                            <#if course.categoryId?? && course.categoryId == category.id>selected</#if>>
                                         ${category.name}
                                     </option>
                                 </#list>
@@ -101,7 +118,9 @@
 
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="duration" class="form-label required">Продолжительность (часы)</label>
+                            <label for="duration" class="form-label required">
+                                <@spring.message code="courses.admin.add.field.duration"/>
+                            </label>
                             <input type="number"
                                    class="form-control <#if .globals['org.springframework.validation.BindingResult.course']?? && .globals['org.springframework.validation.BindingResult.course'].hasFieldErrors('duration')>is-invalid</#if>"
                                    id="duration"
@@ -126,12 +145,15 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="description" class="form-label">Описание</label>
-                    <textarea class="form-control <#if .globals['org.springframework.validation.BindingResult.course']?? && .globals['org.springframework.validation.BindingResult.course'].hasFieldErrors('description')>is-invalid</#if>"
-                              id="description"
-                              name="description"
-                              rows="4"
-                              maxlength="1000">${course.description!''}</textarea>
+                    <label for="description" class="form-label">
+                        <@spring.message code="courses.admin.add.field.description"/>
+                    </label>
+                    <textarea
+                            class="form-control <#if .globals['org.springframework.validation.BindingResult.course']?? && .globals['org.springframework.validation.BindingResult.course'].hasFieldErrors('description')>is-invalid</#if>"
+                            id="description"
+                            name="description"
+                            rows="4"
+                            maxlength="1000">${course.description!''}</textarea>
                     <#if .globals['org.springframework.validation.BindingResult.course']?? && .globals['org.springframework.validation.BindingResult.course'].hasFieldErrors('description')>
                         <div class="invalid-feedback">
                             <#list .globals['org.springframework.validation.BindingResult.course'].getFieldErrors('description') as error>
@@ -139,11 +161,12 @@
                             </#list>
                         </div>
                     </#if>
-                    <div class="form-text">Максимум 1000 символов</div>
+                    <div class="form-text">
+                        <@spring.message code="courses.admin.add.field.descriptionHint"/>
+                    </div>
                 </div>
 
                 <div class="row">
-
                     <div class="col-md-6">
                         <div class="mb-3">
                             <div class="form-check form-switch">
@@ -156,7 +179,7 @@
                                        <#if !course.active?? || course.active>checked</#if>>
                                 <label class="form-check-label" for="active">
                                     <i class="fas fa-check-circle me-1" style="color: #28a745;"></i>
-                                    Активный курс
+                                    <@spring.message code="courses.admin.add.field.active"/>
                                 </label>
                             </div>
                         </div>
@@ -165,10 +188,12 @@
 
                 <div class="d-flex justify-content-end gap-2">
                     <a href="/admin/courses" class="btn btn-secondary">
-                        <i class="fas fa-times me-1"></i> Отмена
+                        <i class="fas fa-times me-1"></i>
+                        <@spring.message code="courses.admin.add.button.cancel"/>
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Создать курс
+                        <i class="fas fa-save me-1"></i>
+                        <@spring.message code="courses.admin.add.button.submit"/>
                     </button>
                 </div>
             </form>
@@ -183,7 +208,7 @@
 
         .card {
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
 
         .form-control, .form-select {
@@ -212,7 +237,7 @@
         .btn-primary:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         .btn-secondary {

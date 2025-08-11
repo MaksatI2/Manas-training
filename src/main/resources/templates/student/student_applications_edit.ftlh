@@ -1,23 +1,39 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
 <#setting date_format="yyyy-MM-dd">
 
-<@layout.page title="Редактировать заявку">
+<#assign tTitle = springMacroRequestContext.getMessage("student.applications.edit.title")>
+<#assign bcHome = springMacroRequestContext.getMessage("student.applications.edit.breadcrumb.home")>
+<#assign bcMyApps = springMacroRequestContext.getMessage("student.applications.edit.breadcrumb.myApplications")>
+<#assign bcEdit = springMacroRequestContext.getMessage("student.applications.edit.breadcrumb.edit")>
+<#assign headerText = springMacroRequestContext.getMessage("student.applications.edit.header")>
+<#assign backText = springMacroRequestContext.getMessage("student.applications.edit.back")>
+<#assign lblCourse = springMacroRequestContext.getMessage("student.applications.edit.course")>
+<#assign optSelectCourse = springMacroRequestContext.getMessage("student.applications.edit.course.select")>
+<#assign lblTeacher = springMacroRequestContext.getMessage("student.applications.edit.teacher")>
+<#assign optNoneTeacher = springMacroRequestContext.getMessage("student.applications.edit.teacher.none")>
+<#assign lblStart = springMacroRequestContext.getMessage("student.applications.edit.startDate")>
+<#assign lblEnd = springMacroRequestContext.getMessage("student.applications.edit.endDate")>
+<#assign btnSave = springMacroRequestContext.getMessage("student.applications.edit.save")>
+<#assign errLoadTeachers = springMacroRequestContext.getMessage("student.applications.edit.error.loadTeachers")>
+
+<@layout.page title="${tTitle}">
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Мои заявки", "url": "/applications/student/applications"},
-    {"label": "Редактировать заявку", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcMyApps, "url": "/applications/student/applications"},
+    {"label": bcEdit, "url": ""}
     ] />
 
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center"
              style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <h5 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-edit me-2"></i> Редактировать заявку на курс
+                <i class="fas fa-edit me-2"></i> ${headerText}
             </h5>
             <a href="/applications/student/applications" class="btn btn-light btn-sm"
                style="border-radius: 25px; background: white; color: var(--primary-blue); border: 1px solid var(--primary-blue);">
-                <i class="fas fa-arrow-left me-1" style="color: var(--primary-blue);"></i> Назад
+                <i class="fas fa-arrow-left me-1" style="color: var(--primary-blue);"></i> ${backText}
             </a>
         </div>
         <div class="card-body">
@@ -33,9 +49,9 @@
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="courseId" class="form-label">Курс <span class="text-danger">*</span></label>
+                        <label for="courseId" class="form-label">${lblCourse} <span class="text-danger">*</span></label>
                         <select class="form-select" id="courseId" name="courseId" required>
-                            <option value="">Выберите курс</option>
+                            <option value="">${optSelectCourse}</option>
                             <#list courses as course>
                                 <option value="${course.id}" <#if course.id == application.courseId>selected</#if>>
                                     ${course.title}
@@ -48,12 +64,13 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="preferredTeacherId" class="form-label">Желаемый преподаватель</label>
+                        <label for="preferredTeacherId" class="form-label">${lblTeacher}</label>
                         <select class="form-select" id="preferredTeacherId" name="preferredTeacherId">
-                            <option value="">Не выбрано</option>
+                            <option value="">${optNoneTeacher}</option>
                             <#if teachers??>
                                 <#list teachers as teacher>
-                                    <option value="${teacher.id}" <#if (application.preferredTeacherId?? && teacher.id == application.preferredTeacherId)>selected</#if>>
+                                    <option value="${teacher.id}"
+                                            <#if (application.preferredTeacherId?? && teacher.id == application.preferredTeacherId)>selected</#if>>
                                         ${teacher.fullName} (${teacher.email})
                                     </option>
                                 </#list>
@@ -64,39 +81,41 @@
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="preferredStartDate" class="form-label">Желаемая дата начала</label>
+                        <label for="preferredStartDate" class="form-label">${lblStart}</label>
                         <input type="date" class="form-control" id="preferredStartDate"
                                name="preferredStartDate"
-                               value="<#if application.preferredStartDate?? && application.preferredStartDate?has_content>${application.preferredStartDate}</#if>">
+                               value="${application.preferredStartDate}">
                         <#if errors?? && errors.hasFieldErrors("preferredStartDate")>
                             <div class="text-danger small mt-1">${errors.getFieldError("preferredStartDate").defaultMessage}</div>
                         </#if>
                     </div>
                     <div class="col-md-6">
-                        <label for="preferredEndDate" class="form-label">Желаемая дата окончания</label>
+                        <label for="preferredEndDate" class="form-label">${lblEnd}</label>
                         <input type="date" class="form-control" id="preferredEndDate"
                                name="preferredEndDate"
-                               value="<#if application.preferredEndDate?? && application.preferredEndDate?has_content>${application.preferredEndDate}</#if>">
+                               value="${application.preferredEndDate}">
                         <#if errors?? && errors.hasFieldErrors("preferredEndDate")>
                             <div class="text-danger small mt-1">${errors.getFieldError("preferredEndDate").defaultMessage}</div>
                         </#if>
                     </div>
                 </div>
 
-
                 <div class="d-flex justify-content-between">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Сохранить изменения
+                        <i class="fas fa-save me-1"></i> ${btnSave}
                     </button>
                 </div>
             </form>
         </div>
     </div>
     <script>
+        const optNoneTeacher = "${optNoneTeacher?js_string}";
+        const errTeachers = "${errLoadTeachers?js_string}";
+
         document.getElementById('courseId').addEventListener('change', function () {
             const courseId = this.value;
             const teacherSelect = document.getElementById('preferredTeacherId');
-            teacherSelect.innerHTML = '<option value="">Не выбрано</option>';
+            teacherSelect.innerHTML = '<option value="">' + optNoneTeacher + '</option>';
 
             if (courseId) {
                 fetch('/api/courses/' + courseId + '/teachers')
@@ -114,7 +133,7 @@
                         }
                     })
                     .catch(error => {
-                        console.error('Ошибка при загрузке преподавателей:', error);
+                        console.error(errTeachers + ':', error);
                     });
             }
         });

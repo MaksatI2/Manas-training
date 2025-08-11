@@ -1,12 +1,13 @@
 <#include "../layout.ftlh">
+<#import "/spring.ftl" as spring>
 
 <@page>
     <div class="hero-section">
         <h1 class="hero-title">
             <i class="fas fa-mobile-alt me-3"></i>
-            Управление устройствами
+            <@spring.message code="devices.title"/>
         </h1>
-        <p class="hero-subtitle">Управляйте устройствами, на которых Вы остались авторизованы</p>
+        <p class="hero-subtitle"><@spring.message code="devices.subtitle"/></p>
     </div>
 
     <div class="row justify-content-center">
@@ -22,7 +23,7 @@
             <div class="feature-card">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="mb-0">
-                        <i class="fas fa-devices me-2"></i>Активные устройства
+                        <i class="fas fa-devices me-2"></i><@spring.message code="devices.active.title"/>
                     </h4>
                     <form action="/auth/logout-all-devices" method="post">
                         <#if _csrf??>
@@ -32,8 +33,8 @@
                                 data-bs-toggle="modal"
                                 data-bs-target="#confirmModal"
                                 data-action="/auth/logout-all-devices"
-                                data-message="Вы уверены, что хотите выйти из всех устройств?">
-                            <i class="fas fa-sign-out-alt me-1"></i>Выйти из всех устройств
+                                data-message="<@spring.message code='devices.logout.all.confirm'/>">
+                            <i class="fas fa-sign-out-alt me-1"></i><@spring.message code="devices.logout.all"/>
                         </button>
                     </form>
                 </div>
@@ -46,31 +47,35 @@
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div class="flex-grow-1">
-
                                                 <div class="small text-muted mb-2">
                                                     <div class="mb-1">
                                                         <i class="fas fa-map-marker-alt me-1"></i>
-                                                        IP: ${token.ipAddress!'Неизвестно'}
+                                                        <@spring.message code="devices.ip"/>
+                                                        : ${token.ipAddress!('<@spring.message code="devices.unknown"/>')?no_esc}
                                                     </div>
                                                     <div class="mb-1">
                                                         <i class="fas fa-clock me-1"></i>
-                                                        Создан: ${token.getCreatedAtFormatted()}
+                                                        <@spring.message code="devices.created"/>
+                                                        : ${token.getCreatedAtFormatted()}
                                                     </div>
                                                     <#if token.lastUsedAt??>
                                                         <div class="mb-1">
                                                             <i class="fas fa-history me-1"></i>
-                                                            Последнее использование: ${token.getLastUsedAtFormatted()}
+                                                            <@spring.message code="devices.last.used"/>
+                                                            : ${token.getLastUsedAtFormatted()}
                                                         </div>
                                                     </#if>
                                                     <div>
                                                         <i class="fas fa-calendar-times me-1"></i>
-                                                        Истекает: ${token.getExpiresAtFormatted()}
+                                                        <@spring.message code="devices.expires"/>
+                                                        : ${token.getExpiresAtFormatted()}
                                                     </div>
                                                 </div>
 
                                                 <#if token.userAgent??>
                                                     <div class="small text-muted" style="font-size: 0.75rem;">
                                                         <i class="fas fa-info-circle me-1"></i>
+                                                        <@spring.message code="devices.user.agent"/>:
                                                         ${token.userAgent?truncate(60, "...")}
                                                     </div>
                                                 </#if>
@@ -79,17 +84,17 @@
                                             <div class="flex-shrink-0 ms-3">
                                                 <form action="/auth/revoke-token" method="post">
                                                     <#if _csrf??>
-                                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                                        <input type="hidden" name="${_csrf.parameterName}"
+                                                               value="${_csrf.token}"/>
                                                     </#if>
                                                     <input type="hidden" name="tokenId" value="${token.id}"/>
-                                                    <!-- Кнопка "Отключить устройство" -->
                                                     <button type="button" class="btn btn-outline-danger btn-sm"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#confirmModal"
                                                             data-action="/auth/revoke-token"
-                                                            data-message="Отключить это устройство?"
+                                                            data-message="<@spring.message code='devices.revoke.confirm'/>"
                                                             data-token-id="${token.id}"
-                                                            title="Отключить устройство">
+                                                            title="<@spring.message code='devices.revoke'/>">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </form>
@@ -103,20 +108,19 @@
                 <#else>
                     <div class="text-center py-5">
                         <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">Нет активных устройств</h5>
-                        <p class="text-muted">
-                            Устройства будут отображаться здесь после того, как Вы воспользуетесь функцией "Запомнить меня" при входе.
-                        </p>
+                        <h5 class="text-muted"><@spring.message code="devices.no.active"/></h5>
+                        <p class="text-muted"><@spring.message code="devices.no.active.description"/></p>
                     </div>
                 </#if>
             </div>
 
             <div class="text-center mt-4">
                 <a href="/" class="btn btn-outline-primary">
-                    <i class="fas fa-home me-1"></i>Вернуться на главную
+                    <i class="fas fa-home me-1"></i><@spring.message code="devices.back.home"/>
                 </a>
             </div>
         </div>
+
         <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -126,7 +130,7 @@
                         </#if>
                         <input type="hidden" name="tokenId" id="modalTokenId"/>
                         <div class="modal-header">
-                            <h5 class="modal-title">Подтверждение действия</h5>
+                            <h5 class="modal-title"><@spring.message code="devices.title"/></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body" id="modalMessage"></div>
@@ -141,51 +145,37 @@
 
     </div>
 
+    <div id="i18n-holder"
+         data-type-android="<@spring.message code='device.type.android'/>"
+         data-type-iphone="<@spring.message code='device.type.iphone'/>"
+         data-type-ipad="<@spring.message code='device.type.ipad'/>"
+         data-type-unknown="<@spring.message code='device.type.unknown'/>">
+    </div>
+
     <script>
         function getDeviceIcon(userAgent) {
-            const ua = userAgent.toLowerCase();
-            if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
-                return 'mobile-alt';
-            } else if (ua.includes('tablet') || ua.includes('ipad')) {
-                return 'tablet-alt';
-            } else {
-                return 'desktop';
-            }
+            const ua = (userAgent || '').toLowerCase();
+            if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) return 'mobile-alt';
+            if (ua.includes('tablet') || ua.includes('ipad')) return 'tablet-alt';
+            return 'desktop';
         }
 
         function getDeviceName(userAgent) {
-            const ua = userAgent.toLowerCase();
-            if (ua.includes('chrome')) {
-                return 'Google Chrome';
-            } else if (ua.includes('firefox')) {
-                return 'Mozilla Firefox';
-            } else if (ua.includes('safari') && !ua.includes('chrome')) {
-                return 'Safari';
-            } else if (ua.includes('edge')) {
-                return 'Microsoft Edge';
-            } else if (ua.includes('opera')) {
-                return 'Opera';
-            } else if (ua.includes('android')) {
-                return 'Android устройство';
-            } else if (ua.includes('iphone')) {
-                return 'iPhone';
-            } else if (ua.includes('ipad')) {
-                return 'iPad';
-            } else {
-                return 'Неизвестное устройство';
-            }
+            const i18n = document.getElementById('i18n-holder').dataset;
+            const ua = (userAgent || '').toLowerCase();
+            if (ua.includes('android')) return i18n.typeAndroid;
+            if (ua.includes('iphone')) return i18n.typeIphone;
+            if (ua.includes('ipad')) return i18n.typeIpad;
+            return i18n.typeUnknown;
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const deviceCards = document.querySelectorAll('.card-title');
             deviceCards.forEach(card => {
                 const userAgent = card.getAttribute('data-user-agent');
                 if (userAgent) {
-                    const icon = card.querySelector('i');
-                    const deviceName = getDeviceName(userAgent);
-                    const deviceIcon = getDeviceIcon(userAgent);
-
-                    card.lastChild.textContent = deviceName;
+                    const name = getDeviceName(userAgent);
+                    card.lastChild.textContent = name;
                 }
             });
         });
@@ -205,10 +195,9 @@
                 const tokenId = button.getAttribute('data-token-id');
 
                 form.setAttribute('action', action);
-                modalMessage.textContent = message || 'Вы уверены?';
+                modalMessage.textContent = message || '...';
                 modalTokenId.value = tokenId || '';
             });
         });
     </script>
-
 </@page>

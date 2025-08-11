@@ -1,11 +1,18 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
+<#assign bcHome = springMacroRequestContext.getMessage("teacher.profileView.breadcrumb.home")>
+<#assign bcTeachers = springMacroRequestContext.getMessage("teacher.profileView.breadcrumb.teachers")>
+<#assign bcProfile = springMacroRequestContext.getMessage("teacher.profileView.breadcrumb.profile")>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Преподаватели", "url": "/teacher"},
-    {"label": "Профиль", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcTeachers, "url": "/teacher"},
+    {"label": bcProfile, "url": ""}
     ] />
+
     <style>
         .profile-container {
             max-width: 800px;
@@ -22,14 +29,14 @@
         .profile-card {
             background: var(--white);
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
             padding: 2rem;
             transition: all 0.3s ease;
         }
 
         .profile-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,102,204,0.15);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.15);
         }
 
         .profile-header {
@@ -52,13 +59,13 @@
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid var(--light-blue);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.2);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.2);
             transition: all 0.3s ease;
         }
 
         .avatar-image:hover {
             transform: scale(1.03);
-            box-shadow: 0 6px 20px rgba(0,102,204,0.3);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
         }
 
         .avatar-edit-overlay {
@@ -103,7 +110,6 @@
             color: var(--primary-blue);
             margin-bottom: 1rem;
         }
-
 
         .profile-details {
             display: grid;
@@ -162,7 +168,7 @@
 
         .edit-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
             color: var(--white);
         }
 
@@ -172,7 +178,6 @@
             align-items: flex-start;
             gap: 0.5rem;
         }
-
 
         .alert {
             padding: 1rem;
@@ -222,7 +227,6 @@
             }
         }
     </style>
-
     <div class="profile-container">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -237,16 +241,16 @@
                     <#if teacher.teacher.avatarUrl?has_content>
                         <img src="/data/images/${teacher.teacher.avatarUrl}"
                              class="avatar-image"
-                             alt="Фото профиля">
+                             alt="<@spring.message code='teacher.profileView.breadcrumb.profile'/>">
                     <#else>
                         <img src="/static/images/default_avatar.jpg"
                              class="avatar-image"
-                             alt="Фото профиля по умолчанию">
+                             alt="<@spring.message code='teacher.profileView.breadcrumb.profile'/>">
                     </#if>
                     <div class="avatar-edit-overlay">
                         <div class="avatar-edit-text">
                             <i class="fa-solid fa-pencil"></i><br>
-                            Изменить фото
+                            <@spring.message code='teacher.profileView.avatar.edit'/>
                         </div>
                     </div>
                 </div>
@@ -258,10 +262,10 @@
                         ${teacher.teacher.email}
                     </p>
                     <div class="user-role-and-edit">
-                    <a href="/teacher/profile/edit" class="edit-button">
-                        <i class="fas fa-edit"></i>
-                        Редактировать профиль
-                    </a>
+                        <a href="/teacher/profile/edit" class="edit-button">
+                            <i class="fas fa-edit"></i>
+                            <@spring.message code='teacher.profileView.profile.edit'/>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -271,7 +275,7 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-phone" style="margin-right: 0.5rem;"></i>
-                            Телефон
+                            <@spring.message code='teacher.profileView.phone'/>
                         </div>
                         <div class="detail-value">${teacher.teacher.phone}</div>
                     </div>
@@ -281,7 +285,7 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                            Отделение
+                            <@spring.message code='teacher.profileView.department'/>
                         </div>
                         <div class="detail-value">${teacher.department}</div>
                     </div>
@@ -291,7 +295,7 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-certificate" style="margin-right: 0.5rem;"></i>
-                            Квалификация
+                            <@spring.message code='teacher.profileView.qualification'/>
                         </div>
                         <div class="detail-value">${teacher.qualifications}</div>
                     </div>
@@ -300,17 +304,17 @@
                 <div class="detail-item">
                     <div class="detail-label">
                         <i class="fas fa-calendar-check" style="margin-right: 0.5rem;"></i>
-                        Статус
+                        <@spring.message code='teacher.profileView.status'/>
                     </div>
                     <div class="detail-value">
                         <#if teacher.teacher.isActive>
                             <span style="color: #28a745;">
-                                <i class="fas fa-check-circle"></i> Активный
-                            </span>
+                            <i class="fas fa-check-circle"></i> <@spring.message code='teacher.profileView.status.active'/>
+                        </span>
                         <#else>
                             <span style="color: #dc3545;">
-                                <i class="fas fa-times-circle"></i> Неактивный
-                            </span>
+                            <i class="fas fa-times-circle"></i> <@spring.message code='teacher.profileView.status.inactive'/>
+                        </span>
                         </#if>
                     </div>
                 </div>
@@ -319,14 +323,14 @@
                     <div class="bio-section">
                         <div class="detail-label">
                             <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
-                            О себе
+                            <@spring.message code='teacher.profileView.about'/>
                         </div>
                         <div class="detail-value">${teacher.bio}</div>
                     </div>
                 </#if>
                 <a href="/teacher/my-courses" class="edit-button">
                     <i class="fas fa-edit"></i>
-                    Мои курсы
+                    <@spring.message code='teacher.profileView.myCourses'/>
                 </a>
             </div>
         </div>

@@ -1,10 +1,16 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
-<@layout.page>
+<#import "/spring.ftl" as spring>
+
+<#assign bcHome = springMacroRequestContext.getMessage("breadcrumbs.home")>
+<#assign bcList = springMacroRequestContext.getMessage("breadcrumbs.course.instances")>
+
+<@layout.page title="<@spring.message code='course.instance.list.title'/>">
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Потоки курсов", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcList, "url": ""}
     ] />
+
     <div class="card shadow mb-4">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -12,40 +18,37 @@
         <#if errorMessage??>
             <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
+
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex flex-wrap justify-content-between align-items-center">
                 <h5 class="m-0 font-weight-bold text-white mb-2 mb-md-0">
                     <i class="fas fa-book me-2"></i>
-                    Управление потоками курсов
+                    <@spring.message code="course.instance.list.title"/>
                 </h5>
                 <div class="d-flex align-items-center flex-wrap gap-2">
                     <div class="d-flex flex-wrap align-items-center gap-2">
                         <div id="exportButtonsContainer" class="btn-group"></div>
-
                         <a href="/admin/course-instances/create" class="btn btn-sm"
                            style="border-radius: 25px; background-color: white; color: #0066cc; border: 1px solid #0066cc;">
-                            <i class="fas fa-plus me-1"></i> Добавить поток курса
+                            <i class="fas fa-plus me-1"></i> <@spring.message code="course.instance.list.add"/>
                         </a>
-
                     </div>
-
                 </div>
             </div>
         </div>
-
 
         <div class="table-responsive">
             <table class="table table-bordered table-hover" id="courseInstancesTable" width="100%" cellspacing="0">
                 <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
                 <tr>
-                    <th>№</th>
-                    <th>Курс</th>
-                    <th>Название потока</th>
-                    <th>Категория</th>
-                    <th>Дата начала</th>
-                    <th>Дата окончания</th>
-                    <th>Статус</th>
-                    <th>Действия</th>
+                    <th><@spring.message code="course.instance.table.number"/></th>
+                    <th><@spring.message code="course.instance.table.course"/></th>
+                    <th><@spring.message code="course.instance.table.title"/></th>
+                    <th><@spring.message code="course.instance.table.category"/></th>
+                    <th><@spring.message code="course.instance.table.startDate"/></th>
+                    <th><@spring.message code="course.instance.table.endDate"/></th>
+                    <th><@spring.message code="course.instance.table.status"/></th>
+                    <th><@spring.message code="course.instance.table.actions"/></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -60,29 +63,29 @@
                             <td data-order="${instance.endDate}">${instance.formattedEndDate}</td>
                             <td>
                                 <#if instance.isActive>
-                                    <span class="badge bg-success">Активен</span>
+                                    <span class="badge bg-success"><@spring.message code="course.instance.table.active"/></span>
                                 <#else>
-                                    <span class="badge bg-warning">Неактивен</span>
+                                    <span class="badge bg-warning"><@spring.message code="course.instance.table.inactive"/></span>
                                 </#if>
                             </td>
                             <td>
                                 <a href="/admin/course-instances/${instance.id}/edit" class="btn btn-sm btn-primary"
-                                   title="Редактировать">
+                                   title="<@spring.message code='course.instance.action.edit'/>">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-danger" title="Удалить"
+                                <button type="button" class="btn btn-sm btn-danger"
+                                        title="<@spring.message code='course.instance.action.delete'/>"
                                         data-id="${instance.id}">
                                     <i class="fas fa-trash"></i>
                                 </button>
-
                             </td>
                         </tr>
                     </#list>
                 <#else>
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
+                        <td colspan="8" class="text-center text-muted py-4">
                             <i class="fas fa-book fa-2x mb-2"></i>
-                            <p>Потоки курсов не найдены</p>
+                            <p><@spring.message code="course.instance.table.empty"/></p>
                         </td>
                     </tr>
                 </#if>
@@ -95,23 +98,22 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Удаление потока курса</h5>
+                    <h5 class="modal-title"><@spring.message code="course.instance.modal.delete.title"/></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <ul id="courseModulesList" class="list-group mb-3">
-                    </ul>
+                    <ul id="courseModulesList" class="list-group mb-3"></ul>
                     <div id="deleteFormContainer"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Удалить</button>
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal"><@spring.message code="course.instance.modal.cancel"/></button>
+                    <button type="button" id="confirmDeleteBtn"
+                            class="btn btn-danger"><@spring.message code="course.instance.modal.confirm.delete"/></button>
                 </div>
             </div>
         </div>
     </div>
-
-
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
@@ -133,48 +135,44 @@
         $(document).ready(function () {
             var table = $('#courseInstancesTable').DataTable({
                 language: {
-                    url: '/js/datatables/ru.json',
+                    url: '/js/datatables/${(springMacroRequestContext.locale?lower_case?starts_with("ru"))?then("ru",(springMacroRequestContext.locale?lower_case?starts_with("ky"))?then("ky","en"))}.json',
                     paginate: {previous: '‹', next: '›'}
                 },
                 responsive: true,
                 pageLength: 10,
                 lengthChange: true,
-                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
                 order: [],
                 searching: true,
                 info: false,
                 paging: true,
                 autoWidth: false,
                 stateSave: true,
-                dom: '<"row mb-3 px-3 pt-2"<"col-md-6"l><"col-md-6 text-end"f>>' +
+                dom:
+                    '<"row mb-3 px-3 pt-2"<"col-md-6"l><"col-md-6 text-end"f>>' +
                     '<"row mb-2 px-3"<"col-md-12 d-flex justify-content-end align-items-center" B>>' +
                     'rt' +
                     '<"row mt-3 align-items-center px-3 pb-2"<"col-md-6"i><"col-md-6"p>>',
                 buttons: [
                     {
                         extend: 'collection',
-                        text: '<i class="fas fa-download me-1"></i> Экспорт',
+                        text: '<i class="fas fa-download me-1"></i> ' + '${springMacroRequestContext.getMessage("export.title")?js_string}',
                         className: 'btn btn-primary btn-sm dropdown-toggle',
                         buttons: [
                             {
                                 extend: 'copy',
-                                text: '<i class="fas fa-copy me-1"></i> Копировать',
+                                text: '<i class="fas fa-copy me-1"></i> ' + '${springMacroRequestContext.getMessage("export.copy")?js_string}',
                                 className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
-                                title: 'Список потоков курсов',
-                                messageTop: 'Список потоков курсов на ' + new Date().toLocaleDateString()
+                                exportOptions: {columns: ':visible'},
+                                title: '${springMacroRequestContext.getMessage("export.list.title")?js_string}',
+                                messageTop: '${springMacroRequestContext.getMessage("export.list.message")?js_string} ' + new Date().toLocaleDateString()
                             },
                             {
                                 extend: 'excel',
-                                text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                                text: '<i class="fas fa-file-excel me-1"></i> ' + '${springMacroRequestContext.getMessage("export.excel")?js_string}',
                                 className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
-                                title: 'Список потоков курсов',
-                                messageTop: 'Список потоков курсов на ' + new Date().toLocaleDateString(),
+                                exportOptions: {columns: ':visible'},
+                                title: '${springMacroRequestContext.getMessage("export.list.title")?js_string}',
+                                messageTop: '${springMacroRequestContext.getMessage("export.list.message")?js_string} ' + new Date().toLocaleDateString(),
                                 autoFilter: true,
                                 customize: function (xlsx) {
                                     var sheet = xlsx.xl.worksheets['sheet1.xml'];
@@ -183,21 +181,15 @@
                             },
                             {
                                 extend: 'pdf',
-                                text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                                text: '<i class="fas fa-file-pdf me-1"></i> ' + '${springMacroRequestContext.getMessage("export.pdf")?js_string}',
                                 className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
-                                title: 'Список потоков курсов Manas - ' + new Date().toLocaleDateString(),
+                                exportOptions: {columns: ':visible'},
+                                title: '${springMacroRequestContext.getMessage("export.list.title")?js_string} - ' + new Date().toLocaleDateString(),
                                 customize: function (doc) {
                                     if (!doc.content || doc.content.length < 2 || !doc.content[1].table) {
-                                        console.error('PDF generation error: Invalid document structure', doc);
                                         return;
                                     }
-                                    doc.defaultStyle = {
-                                        fontSize: 8,
-                                        color: '#2c3e50'
-                                    };
+                                    doc.defaultStyle = {fontSize: 8, color: '#2c3e50'};
                                     doc.styles.title = {
                                         color: '#0066cc',
                                         fontSize: 14,
@@ -213,59 +205,37 @@
                                         cell.bold = true;
                                     });
                                     for (let i = 1; i < table.body.length; i++) {
-                                        if (i % 2 === 0) {
-                                            table.body[i].forEach(function (cell) {
-                                                cell.fillColor = '#f8f9fa';
-                                            });
-                                        }
+                                        if (i % 2 === 0) table.body[i].forEach(function (cell) {
+                                            cell.fillColor = '#f8f9fa';
+                                        });
                                     }
                                     doc.pageMargins = [20, 60, 20, 30];
                                 },
                                 orientation: 'landscape'
+                            },
+                            {
+                                extend: 'print',
+                                text: '<i class="fas fa-print me-1"></i> ' + '${springMacroRequestContext.getMessage("export.print")?js_string}',
+                                className: 'dropdown-item',
+                                exportOptions: {columns: ':visible'},
+                                title: '${springMacroRequestContext.getMessage("export.list.title")?js_string}',
+                                messageTop: '${springMacroRequestContext.getMessage("export.list.message")?js_string} ' + new Date().toLocaleDateString()
                             }
                         ]
                     }
                 ],
                 columnDefs: [
-                    {
-                        targets: [1],
-                        orderable: true,
-                        searchable: true,
-                        responsivePriority: 1
-                    },
-                    {
-                        targets: [2],
-                        orderable: true,
-                        searchable: true,
-                        responsivePriority: 2
-                    },
-                    {
-                        targets: [7],
-                        orderable: false,
-                        searchable: false,
-                        responsivePriority: 3
-                    },
-                    {
-                        targets: [3, 4, 5],
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        targets: [6],
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        targets: [4, 5],
-                        type: 'date'
-                    }
+                    {targets: [1], orderable: true, searchable: true, responsivePriority: 1},
+                    {targets: [2], orderable: true, searchable: true, responsivePriority: 2},
+                    {targets: [7], orderable: false, searchable: false, responsivePriority: 3},
+                    {targets: [3, 4, 5], orderable: true, searchable: true},
+                    {targets: [6], orderable: false, searchable: false},
+                    {targets: [4, 5], type: 'date'}
                 ],
-
                 initComplete: function () {
                     this.api().page.len(10).draw();
                     $('.dt-buttons').appendTo('#exportButtonsContainer');
                 }
-
             });
 
             $('#statusFilter').on('change', function () {
@@ -283,9 +253,8 @@
                 table.search('').columns().search('').draw();
             });
         });
-
-
     </script>
+
     <script src="/static/js/instances-list.js"></script>
 
     <style>
@@ -303,8 +272,7 @@
             border-radius: 10px;
         }
 
-        #courseInstancesTable,
-        #usersTable {
+        #courseInstancesTable, #usersTable {
             width: 100%;
             margin-bottom: 1rem;
             color: #2c3e50;
@@ -312,8 +280,7 @@
             border-spacing: 0;
         }
 
-        #courseInstancesTable th,
-        #usersTable th {
+        #courseInstancesTable th, #usersTable th {
             background: linear-gradient(135deg, #0066cc, #003d7a);
             color: white;
             padding: 0.75rem;
@@ -322,16 +289,14 @@
             font-weight: 600;
         }
 
-        #courseInstancesTable td,
-        #usersTable td {
+        #courseInstancesTable td, #usersTable td {
             padding: 0.75rem;
             vertical-align: middle;
             border-top: 1px solid #e3e6f0;
             border-bottom: 1px solid #e3e6f0;
         }
 
-        #courseInstancesTable tr:hover,
-        #usersTable tr:hover {
+        #courseInstancesTable tr:hover, #usersTable tr:hover {
             background-color: rgba(0, 102, 204, 0.05);
             transform: translateY(-1px);
             transition: all 0.3s ease;
@@ -411,7 +376,7 @@
 
         .btn-light:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .dt-buttons {
@@ -505,11 +470,8 @@
             padding-right: 2rem;
             background-position: right 0.5rem center;
             background-size: 12px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
             appearance: none;
         }
-
 
         @media (max-width: 768px) {
             .card-header {
@@ -536,8 +498,7 @@
                 flex-direction: column;
             }
 
-            .row.mb-3 .col-md-3,
-            .row.mb-3 .col-md-6 {
+            .row.mb-3 .col-md-3, .row.mb-3 .col-md-6 {
                 width: 100%;
                 margin-bottom: 1rem;
             }
@@ -548,6 +509,5 @@
                 flex-direction: column;
             }
         }
-
     </style>
 </@layout.page>

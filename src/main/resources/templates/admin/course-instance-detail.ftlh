@@ -2,11 +2,16 @@
 <#import "/spring.ftl" as spring>
 <#import "../RoadMap.ftlh" as roadmap>
 
+<#assign bcHome    = springMacroRequestContext.getMessage("courseInstances.admin.detail.breadcrumb.home")>
+<#assign bcList    = springMacroRequestContext.getMessage("courseInstances.admin.detail.breadcrumb.list")>
+<#assign bcCurrent = springMacroRequestContext.getMessage("courseInstances.admin.detail.breadcrumb.current", [courseInstance.id])>
+
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Потоки курсов", "url": "/admin/course-instances"},
-    {"label": "Поток #${courseInstance.id}", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcList, "url": "/admin/course-instances"},
+    {"label": bcCurrent, "url": ""}
     ] />
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -18,26 +23,44 @@
     <div class="hero-section">
         <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
         <p class="hero-subtitle">
-            Курс: <strong>${courseInstance.courseTitle!'-'}</strong> |
-            Категория: <strong>${courseInstance.category!'-'}</strong>
+            <@spring.message code="courseInstances.admin.detail.course"/>:
+            <strong>${courseInstance.courseTitle!'-'}</strong> |
+            <@spring.message code="courseInstances.admin.detail.category"/>:
+            <strong>${courseInstance.category!'-'}</strong>
         </p>
         <p class="hero-subtitle">
-            Начало: <strong>${courseInstance.formattedStartDate}</strong> |
-            Окончание: <strong>${courseInstance.formattedEndDate}</strong> |
-            Статус: <strong><#if courseInstance.isActive>Активен<#else>Завершен</#if></strong>
+            <@spring.message code="courseInstances.admin.detail.startDate"/>:
+            <strong>${courseInstance.formattedStartDate}</strong> |
+            <@spring.message code="courseInstances.admin.detail.endDate"/>:
+            <strong>${courseInstance.formattedEndDate}</strong> |
+            <@spring.message code="courseInstances.admin.detail.status"/>:
+            <strong>
+                <#if courseInstance.isActive>
+                    <@spring.message code="courseInstances.admin.detail.status.active"/>
+                <#else>
+                    <@spring.message code="courseInstances.admin.detail.status.completed"/>
+                </#if>
+            </strong>
         </p>
     </div>
 
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>"
-           class="btn btn-primary">Модули</a>
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary">Участники</a>
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary">Преподаватели</a>
-        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">Статистика
-            потока</a>
+        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary">
+            <@spring.message code="courseInstances.admin.detail.button.modules"/>
+        </a>
+        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary">
+            <@spring.message code="courseInstances.admin.detail.button.participants"/>
+        </a>
+        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary">
+            <@spring.message code="courseInstances.admin.detail.button.teachers"/>
+        </a>
+        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">
+            <@spring.message code="courseInstances.admin.detail.button.statistics"/>
+        </a>
     </div>
+
     <div class="container">
-        <h2>Модули курса</h2>
+        <h2><@spring.message code="courseInstances.admin.detail.modules.header"/></h2>
         <#if courseInstance.modules?has_content>
             <div class="accordion" id="modulesAccordion">
                 <#list courseInstance.modules as module>
@@ -48,24 +71,26 @@
                                         data-bs-toggle="collapse"
                                         data-bs-target="#collapse${module.id}" aria-expanded="false"
                                         aria-controls="collapse${module.id}">
-                                    ${module.title} (Продолжительность: ${module.durationHours} ч.)
+                                    ${module.title} (${module.durationHours} ч.)
                                 </button>
                                 <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
                                    class="btn btn-primary btn-sm ms-3 lesson-btn d-none d-sm-block">
-                                    + Урок
+                                    <@spring.message code="courseInstances.admin.detail.modules.addLesson"/>
                                 </a>
                             </div>
                             <div id="collapse${module.id}" class="accordion-collapse collapse"
                                  aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
                                 <div class="accordion-body">
-                                    <p class="card-text text-muted small text-break">
-                                        ${module.description!''}
-                                    </p>
+                                    <#if module.description?has_content>
+                                        <p class="card-text text-muted small text-break">
+                                            ${module.description}
+                                        </p>
+                                    </#if>
                                     <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
                                        class="btn btn-primary btn-sm lesson-btn d-sm-none mb-3">
-                                        + Урок
+                                        <@spring.message code="courseInstances.admin.detail.modules.addLesson"/>
                                     </a>
-                                    <h5>Уроки</h5>
+                                    <h5><@spring.message code="courseInstances.admin.detail.modules.lessons"/></h5>
                                     <#if module.lessons?has_content>
                                         <div class="row row-cols-1 row-cols-md-2 g-3">
                                             <#list module.lessons as lesson>
@@ -85,7 +110,7 @@
                                             </#list>
                                         </div>
                                     <#else>
-                                        <p>Уроки отсутствуют</p>
+                                        <p><@spring.message code="courseInstances.admin.detail.modules.lessons.empty"/></p>
                                     </#if>
                                 </div>
                             </div>
@@ -94,22 +119,27 @@
                 </#list>
             </div>
         <#else>
-            <p>Модули отсутствуют</p>
+            <p><@spring.message code="courseInstances.admin.detail.modules.empty"/></p>
         </#if>
 
         <h2>Тестирование</h2>
         <div class="feature-card mb-3">
             <#if testInstance?has_content>
                 <p>Тест назначенный на данный поток: <span class="fw-bold">${testInstance.test.title}</span></p>
-                <p>Начало: <span class="fw-bold">${startDate} ${testInstance.startTime}</span> | Окончание: <span
-                            class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
-                <a href="/instance/${courseInstance.id}/change-time" class="btn btn-warning mb-2">Изменить время доступа к
-                    тесту</a>
+                <p>
+                    <@spring.message code="courseInstances.admin.detail.startDate"/>:
+                    <span class="fw-bold">${startDate} ${testInstance.startTime}</span> |
+                    <@spring.message code="courseInstances.admin.detail.endDate"/>:
+                    <span class="fw-bold">${endDate} ${testInstance.endTime}</span>
+                </p>
+                <a href="/instance/${courseInstance.id}/change-time" class="btn btn-warning mb-2">Изменить время доступа
+                    к тесту</a>
             <#else>
                 <p>На данный поток пока не был назначен тест.</p>
             </#if>
         </div>
     </div>
+
     <style>
         .btn-primary {
             background: linear-gradient(135deg, #0066cc, #003d7a);
@@ -152,8 +182,7 @@
             font-size: 0.875rem;
         }
 
-        .accordion-body,
-        .card-text {
+        .accordion-body, .card-text {
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
