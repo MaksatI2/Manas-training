@@ -1,5 +1,7 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
 <#assign known = Session.SPRING_SECURITY_CONTEXT??>
 <#if known>
     <#assign user = Session.SPRING_SECURITY_CONTEXT.authentication.principal>
@@ -16,11 +18,15 @@
     <#assign isOrganization = false>
 </#if>
 
+<#assign bcHome = springMacroRequestContext.getMessage("course.view.breadcrumb.home")>
+<#assign bcCourses = springMacroRequestContext.getMessage("course.view.breadcrumb.courses")>
+<#assign bcCourseTitle = springMacroRequestContext.getMessage("course.view.breadcrumb.courseTitle", [course.title!''])>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Курсы", "url": "/admin/courses"},
-    {"label": "${course.title}", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcCourses, "url": "/admin/courses"},
+    {"label": bcCourseTitle, "url": ""}
     ] />
     <div class="card shadow mb-4">
         <#if successMessage??>
@@ -29,14 +35,17 @@
         <#if errorMessage??>
             <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
-        <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center"
+             style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <h5 class="m-0 font-weight-bold text-white">
                 <i class="fas fa-book me-2"></i>
-                Информация о курсе
+                <@spring.message code="course.view.header.title"/>
             </h5>
             <div>
-                <a href="/admin/courses" class="btn btn-light btn-sm me-2" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                <a href="/admin/courses" class="btn btn-light btn-sm me-2"
+                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                    <i class="fas fa-arrow-left me-1"
+                       style="color: #0066cc;"></i> <@spring.message code="course.view.button.back"/>
                 </a>
             </div>
         </div>
@@ -52,20 +61,20 @@
                                 <span class="badge bg-primary">${course.category.name}</span>
                                 <#if course.active>
                                     <span class="badge bg-success">
-                                        <i class="fas fa-check-circle me-1"></i>Активен
+                                        <i class="fas fa-check-circle me-1"></i>${springMacroRequestContext.getMessage("course.view.status.active")}
                                     </span>
                                 <#else>
                                     <span class="badge bg-warning">
-                                        <i class="fas fa-times-circle me-1"></i>Неактивен
+                                        <i class="fas fa-times-circle me-1"></i>${springMacroRequestContext.getMessage("course.view.status.inactive")}
                                     </span>
                                 </#if>
                                 <#if course.individual>
                                     <span class="badge bg-secondary">
-                                        <i class="fas fa-user me-1"></i>Индивидуальный
+                                        <i class="fas fa-user me-1"></i>${springMacroRequestContext.getMessage("course.view.type.individual")}
                                     </span>
                                 <#else>
                                     <span class="badge bg-info">
-                                        <i class="fas fa-users me-1"></i>Групповой
+                                        <i class="fas fa-users me-1"></i>${springMacroRequestContext.getMessage("course.view.type.group")}
                                     </span>
                                 </#if>
                             </div>
@@ -75,16 +84,16 @@
                             <div class="detail-item mb-3">
                                 <label class="detail-label">
                                     <i class="fas fa-clock me-2" style="color: #0066cc;"></i>
-                                    Продолжительность:
+                                    <@spring.message code="course.view.duration.label"/>
                                 </label>
-                                <span class="detail-value">${course.duration} часов</span>
+                                <span class="detail-value">${springMacroRequestContext.getMessage("course.view.duration.value", [course.duration?string])}</span>
                             </div>
 
                             <#if course.description?? && course.description != ''>
                                 <div class="detail-item mb-4">
                                     <label class="detail-label mb-3">
                                         <i class="fas fa-align-left me-2" style="color: #0066cc;"></i>
-                                        Описание:
+                                        <@spring.message code="course.view.description.label"/>
                                     </label>
                                     <div class="detail-value description-text">
                                         ${course.description}
@@ -96,35 +105,35 @@
                 </div>
 
                 <div class="col-md-4">
-                    <div class="course建材:course-meta">
+                    <div class="course-meta">
                         <div class="meta-card">
                             <h6 class="meta-title">
                                 <i class="fas fa-info-circle me-2" style="color: #0066cc;"></i>
-                                Метаданные
+                                <@spring.message code="course.view.meta.title"/>
                             </h6>
 
                             <div class="meta-item">
-                                <small class="meta-label">Категория:</small>
+                                <small class="meta-label"><@spring.message code="course.view.meta.category"/></small>
                                 <span class="meta-value">${course.category.name}</span>
                             </div>
 
                             <#if course.category.description?? && course.category.description != ''>
                                 <div class="meta-item">
-                                    <small class="meta-label">Описание категории:</small>
+                                    <small class="meta-label"><@spring.message code="course.view.meta.categoryDescription"/></small>
                                     <span class="meta-value">${course.category.description}</span>
                                 </div>
                             </#if>
                         </div>
 
-                        <#if isAdmin>
+                        <#if (isAdmin)!false>
                             <div class="action-buttons mt-4">
                                 <a href="/admin/courses/edit/${course.id}" class="btn btn-primary btn-sm w-100 mb-2">
-                                    <i class="fas fa-edit me-1"></i> Редактировать курс
+                                    <i class="fas fa-edit me-1"></i> <@spring.message code="course.view.button.edit"/>
                                 </a>
                                 <button type="button"
                                         class="btn btn-danger btn-sm w-100 js-delete-course-btn"
                                         data-course-id="${course.id}">
-                                    <i class="fas fa-trash me-1"></i> Удалить курс
+                                    <i class="fas fa-trash me-1"></i> <@spring.message code="course.view.button.delete"/>
                                 </button>
                             </div>
                         </#if>
@@ -136,15 +145,17 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Удаление курса</h5>
+                            <h5 class="modal-title"><@spring.message code="course.view.deleteModal.title"/></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <div id="depList"></div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                            <button type="button" id="confirmDeleteCourse" class="btn btn-danger">Удалить</button>
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal"><@spring.message code="course.view.deleteModal.cancel"/></button>
+                            <button type="button" id="confirmDeleteCourse"
+                                    class="btn btn-danger"><@spring.message code="course.view.deleteModal.confirm"/></button>
                         </div>
                     </div>
                 </div>
@@ -152,8 +163,16 @@
         </div>
     </div>
 
+    <#assign i18nApplications = springMacroRequestContext.getMessage("course.view.deleteModal.applications")>
+    <#assign i18nInstances = springMacroRequestContext.getMessage("course.view.deleteModal.instances")>
+    <#assign i18nTeachers = springMacroRequestContext.getMessage("course.view.deleteModal.teachers")>
+    <#assign i18nHasDeps = springMacroRequestContext.getMessage("course.view.deleteModal.hasDeps")>
+    <#assign i18nNoDeps = springMacroRequestContext.getMessage("course.view.deleteModal.noDeps")>
+    <#assign i18nDeleted = springMacroRequestContext.getMessage("course.view.deleteModal.success")>
+    <#assign i18nDelete = springMacroRequestContext.getMessage("course.view.deleteModal.confirm")>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function(){
+        document.addEventListener('DOMContentLoaded', function () {
             const modalEl = document.getElementById('deleteCourseModal');
             const deleteModal = new bootstrap.Modal(modalEl);
             const depList = document.getElementById('depList');
@@ -161,17 +180,29 @@
             const csrfToken = document.querySelector('meta[name="_csrf"]').content;
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
 
-            document.querySelectorAll('.js-delete-course-btn').forEach(function(btn) {
-                btn.addEventListener('click', function(e) {
+            const I18N = {
+                applications: "${i18nApplications?js_string}",
+                instances: "${i18nInstances?js_string}",
+                teachers: "${i18nTeachers?js_string}",
+                hasDeps: "${i18nHasDeps?js_string}",
+                noDeps: "${i18nNoDeps?js_string}",
+                deleted: "${i18nDeleted?js_string}",
+                deleteLabel: "${i18nDelete?js_string}"
+            };
+
+            document.querySelectorAll('.js-delete-course-btn').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
                     e.preventDefault();
                     const courseId = btn.dataset.courseId;
                     fetch('/admin/courses/api/' + courseId + '/dependencies')
-                        .then(function(res){ return res.json(); })
-                        .then(function(deps) {
+                        .then(function (res) {
+                            return res.json();
+                        })
+                        .then(function (deps) {
                             depList.innerHTML = '';
                             if (deps.applications && deps.applications.length) {
-                                let html = '<h6>Заявки:</h6><ul>';
-                                deps.applications.forEach(function(a) {
+                                let html = '<h6>' + I18N.applications + '</h6><ul>';
+                                deps.applications.forEach(function (a) {
                                     html += '<li>' + (a.name) + '</li>';
                                 });
                                 html += '</ul>';
@@ -179,8 +210,8 @@
                             }
 
                             if (deps.instances && deps.instances.length) {
-                                let html = '<h6>Потоки:</h6><ul>';
-                                deps.instances.forEach(function(i) {
+                                let html = '<h6>' + I18N.instances + '</h6><ul>';
+                                deps.instances.forEach(function (i) {
                                     html += '<li>' + (i.name || i.title) + '</li>';
                                 });
                                 html += '</ul>';
@@ -188,8 +219,8 @@
                             }
 
                             if (deps.teachers && deps.teachers.length) {
-                                let html = '<h6>Преподаватели:</h6><ul>';
-                                deps.teachers.forEach(function(t) {
+                                let html = '<h6>' + I18N.teachers + '</h6><ul>';
+                                deps.teachers.forEach(function (t) {
                                     html += '<li>' + t.name + '</li>';
                                 });
                                 html += '</ul>';
@@ -203,13 +234,13 @@
 
                             if (hasDeps) {
                                 confirmBtn.disabled = true;
-                                confirmBtn.textContent = 'Удаление невозможно — есть связи';
+                                confirmBtn.textContent = I18N.hasDeps;
                                 confirmBtn.onclick = null;
                             } else {
-                                depList.insertAdjacentHTML('beforeend', '<p>Связей не найдено. Удалить курс?</p>');
+                                depList.insertAdjacentHTML('beforeend', '<p>' + I18N.noDeps + '</p>');
                                 confirmBtn.disabled = false;
-                                confirmBtn.textContent = 'Удалить';
-                                confirmBtn.onclick = function(){
+                                confirmBtn.textContent = I18N.deleteLabel;
+                                confirmBtn.onclick = function () {
                                     fetch('/admin/courses/api/' + courseId, {
                                         method: 'DELETE',
                                         headers: {
@@ -220,12 +251,14 @@
                                             if (r.ok) {
                                                 localStorage.setItem('flashMessage', JSON.stringify({
                                                     type: 'success',
-                                                    text: 'Курс был успешно удален',
+                                                    text: I18N.deleted,
                                                     duration: 4000
                                                 }));
                                                 window.location.href = '/admin/courses';
                                             } else {
-                                                return r.json().then(err => { throw new Error(err.message || 'Unknown error') });
+                                                return r.json().then(err => {
+                                                    throw new Error(err.message || 'Unknown error')
+                                                });
                                             }
                                         })
                                         .catch(err => {
@@ -245,7 +278,7 @@
     <style>
         .card {
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
 
         .course-title {
@@ -388,7 +421,7 @@
         .btn-primary:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         .btn-danger {
@@ -399,12 +432,12 @@
         .btn-danger:hover {
             background-color: #c82333;
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(220,53,69,0.3);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
         }
 
         .btn-light:hover {
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,102,204,0.2);
+            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
         }
 
         .w-100 {

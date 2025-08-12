@@ -1,3 +1,6 @@
+<#import "/spring.ftl" as spring>
+<#import "/spring.ftl" as spring>
+
 <#macro page title="">
     <!DOCTYPE html>
     <html lang="ru">
@@ -10,22 +13,105 @@
         </style>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2"
+              as="font" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2" as="font"
+              type="font/woff2" crossorigin="anonymous">
+        <link rel="preload"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2" as="font"
+              type="font/woff2" crossorigin="anonymous">
 
-        <title>Манас Тренинг Центр</title>
+        <title><@spring.message code="app.title" /></title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css"/>
         <meta name="_csrf" content="${_csrf.token}">
         <meta name="_csrf_header" content="${_csrf.headerName}">
+
+        <script>
+            window.APP_MESSAGES = Object.assign({}, window.APP_MESSAGES, {
+                'js.instance_list.alert.invalidId': '<@spring.message code="js.instance_list.alert.invalidId"/>',
+                'js.instance_list.loading': '<@spring.message code="js.instance_list.loading"/>',
+                'js.instance_list.empty': '<@spring.message code="js.instance_list.empty"/>',
+                'js.instance_list.btn.delete': '<@spring.message code="js.instance_list.btn.delete"/>',
+                'js.instance_list.btn.disabledHasModules': '<@spring.message code="js.instance_list.btn.disabledHasModules"/>',
+                'js.instance_list.error.load': '<@spring.message code="js.instance_list.error.load"/>',
+                'js.instance_list.error.cannotCheck': '<@spring.message code="js.instance_list.error.cannotCheck"/>',
+                'js.instance_list.hours.suffix': '<@spring.message code="js.instance_list.hours.suffix"/>',
+                'js.instance_list.order.label': '<@spring.message code="js.instance_list.order.label"/>',
+                'js.instance_list.dash': '<@spring.message code="js.instance_list.dash"/>',
+                'js.instance_module.field.title': '<@spring.message code="js.instance_module.field.title"/>',
+                'js.instance_module.field.hours': '<@spring.message code="js.instance_module.field.hours"/>',
+                'js.instance_module.field.description': '<@spring.message code="js.instance_module.field.description"/>',
+                'js.instance_module.btn.remove': '<@spring.message code="js.instance_module.btn.remove"/>',
+                'js.instance_module.alert.needOne': '<@spring.message code="js.instance_module.alert.needOne"/>',
+                'js.instance_module.alert.overLimit': '<@spring.message code="js.instance_module.alert.overLimit"/>',
+                'js.instance_module.modal.blocked': '<@spring.message code="js.instance_module.modal.blocked"/>',
+                'js.instance_module.modal.deleteQuestion': '<@spring.message code="js.instance_module.modal.deleteQuestion"/>',
+                'js.instance_module.modal.deleteImpossible': '<@spring.message code="js.instance_module.modal.deleteImpossible"/>',
+                'js.instance_module.modal.deleteAction': '<@spring.message code="js.instance_module.modal.deleteAction"/>',
+
+                'js.lesson-materials.label.fileSelected': '${springMacroRequestContext.getMessage("js.lesson-materials.label.fileSelected")?js_string}',
+                'js.lesson-materials.label.clickToChooseAnother': '${springMacroRequestContext.getMessage("js.lesson-materials.label.clickToChooseAnother")?js_string}',
+                'js.lesson-materials.error.invalidType': '${springMacroRequestContext.getMessage("js.lesson-materials.error.invalidType")?js_string}',
+                'js.lesson-materials.error.tooLarge': '${springMacroRequestContext.getMessage("js.lesson-materials.error.tooLarge")?js_string}',
+                'js.lesson-materials.info.selectedFile': '${springMacroRequestContext.getMessage("js.lesson-materials.info.selectedFile")?js_string}',
+                'js.lesson-materials.info.size': '${springMacroRequestContext.getMessage("js.lesson-materials.info.size")?js_string}',
+                'js.lesson-materials.preview.alt': '${springMacroRequestContext.getMessage("js.lesson-materials.preview.alt")?js_string}',
+                'js.lesson-materials.label.clickToChoose': '${springMacroRequestContext.getMessage("js.lesson-materials.label.clickToChoose")?js_string}',
+                'js.lesson-materials.label.orDragHere': '${springMacroRequestContext.getMessage("js.lesson-materials.label.orDragHere")?js_string}',
+                'js.lesson-materials.error.pickFile': '${springMacroRequestContext.getMessage("js.lesson-materials.error.pickFile")?js_string}',
+                'js.lesson-materials.error.enterTitle': '${springMacroRequestContext.getMessage("js.lesson-materials.error.enterTitle")?js_string}',
+                'js.lesson-materials.saving': '${springMacroRequestContext.getMessage("js.lesson-materials.saving")?js_string}',
+
+                'js.map.confirm.mobile': '${springMacroRequestContext.getMessage("js.map.confirm.mobile")?js_string}',
+                'js.map.prompt.desktop': '${springMacroRequestContext.getMessage("js.map.prompt.desktop")?js_string}',
+                'js.map.choice.google': '${springMacroRequestContext.getMessage("js.map.choice.google")?js_string}',
+                'js.map.choice.yandex': '${springMacroRequestContext.getMessage("js.map.choice.yandex")?js_string}',
+                'js.map.choice.osm': '${springMacroRequestContext.getMessage("js.map.choice.osm")?js_string}',
+                'js.map.log.appleUnavailable': '${springMacroRequestContext.getMessage("js.map.log.appleUnavailable")?js_string}',
+                'js.map.log.googleAppUnavailable': '${springMacroRequestContext.getMessage("js.map.log.googleAppUnavailable")?js_string}',
+
+                'js.lesson-materials.label.enterQuestion': '${springMacroRequestContext.getMessage("js.lesson-materials.label.enterQuestion")?js_string}',
+                'js.lesson-materials.placeholder.answerOption': '${springMacroRequestContext.getMessage("js.lesson-materials.placeholder.answerOption")?js_string}',
+                'js.lesson-materials.button.addOption': '${springMacroRequestContext.getMessage("js.lesson-materials.button.addOption")?js_string}',
+
+                'quiz_form_validation.title.required': '${springMacroRequestContext.getMessage("quiz_form_validation.title.required")?js_string}',
+                'quiz_form_validation.description.required': '${springMacroRequestContext.getMessage("quiz_form_validation.description.required")?js_string}',
+                'quiz_form_validation.time.required': '${springMacroRequestContext.getMessage("quiz_form_validation.time.required")?js_string}',
+                'quiz_form_validation.question.required': '${springMacroRequestContext.getMessage("quiz_form_validation.question.required")?js_string}',
+                'quiz_form_validation.option.required': '${springMacroRequestContext.getMessage("quiz_form_validation.option.required")?js_string}',
+
+                'teachers.alert.selectOne': '${springMacroRequestContext.getMessage("teachers.alert.selectOne")?js_string}',
+
+                'test_form.label.enterQuestion': '${springMacroRequestContext.getMessage("test_form.label.enterQuestion")?js_string}',
+                'test_form.placeholder.answerOption': '${springMacroRequestContext.getMessage("test_form.placeholder.answerOption")?js_string}',
+                'test_form.button.addOption': '${springMacroRequestContext.getMessage("test_form.button.addOption")?js_string}',
+                'test_form.label.active': '${springMacroRequestContext.getMessage("test_form.label.active")?js_string}',
+
+                'test_form_validation.title.required': '${springMacroRequestContext.getMessage("test_form_validation.title.required")?js_string}',
+                'test_form_validation.description.required': '${springMacroRequestContext.getMessage("test_form_validation.description.required")?js_string}',
+                'test_form_validation.passingScore.required': '${springMacroRequestContext.getMessage("test_form_validation.passingScore.required")?js_string}',
+                'test_form_validation.question.required': '${springMacroRequestContext.getMessage("test_form_validation.question.required")?js_string}',
+                'test_form_validation.option.required': '${springMacroRequestContext.getMessage("test_form_validation.option.required")?js_string}',
+
+                'test_instance_form.test.required': '${springMacroRequestContext.getMessage("test_instance_form.test.required")?js_string}',
+                'test_instance_form.startDate.required': '${springMacroRequestContext.getMessage("test_instance_form.startDate.required")?js_string}',
+                'test_instance_form.endDate.required': '${springMacroRequestContext.getMessage("test_instance_form.endDate.required")?js_string}',
+                'test_instance_form.startTime.required': '${springMacroRequestContext.getMessage("test_instance_form.startTime.required")?js_string}',
+                'test_instance_form.endTime.required': '${springMacroRequestContext.getMessage("test_instance_form.endTime.required")?js_string}'
+            });
+        </script>
+
+
     </head>
     <div id="flash-message-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
     <script src="/static/js/notifications.js"></script>
+    <script src="/static/js/test_instance_form.js"></script>
     <body>
     <#assign known = Session.SPRING_SECURITY_CONTEXT??>
     <#if known>
@@ -48,143 +134,168 @@
         <div class="sidebar-header">
             <a href="/" class="sidebar-brand">
                 <i class="fas fa-graduation-cap"></i>
-                <span>Манас Тренинг Центр</span>
+                <span><@spring.message code="app.title" /></span>
             </a>
         </div>
 
         <div class="sidebar-content">
             <div class="sidebar-nav">
                 <div class="nav-item">
-                    <a href="/" class="nav-link" data-tooltip="Главная">
+                    <a href="/" class="nav-link" data-tooltip="<@spring.message code='sidebar.home' />">
                         <i class="fas fa-home"></i>
-                        <span>Главная</span>
+                        <span><@spring.message code="sidebar.home" /></span>
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="/courses" class="nav-link" data-tooltip="Курсы">
+                    <a href="/courses" class="nav-link" data-tooltip="<@spring.message code='sidebar.courses' />">
                         <i class="fas fa-book"></i>
-                        <span>Курсы</span>
+                        <span><@spring.message code="sidebar.courses" /></span>
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="/teacher" class="nav-link" data-tooltip="Преподаватели">
+                    <a href="/teacher" class="nav-link" data-tooltip="<@spring.message code='sidebar.teachers' />">
                         <i class="fas fa-chalkboard-teacher"></i>
-                        <span>Преподаватели</span>
+                        <span><@spring.message code="sidebar.teachers" /></span>
                     </a>
                 </div>
                 <#if isAdmin?? && isAdmin>
                     <div class="nav-item">
-                        <a href="/admin/users" class="nav-link" data-tooltip="Пользователи">
+                        <a href="/admin/users" class="nav-link" data-tooltip="<@spring.message code='sidebar.users' />">
                             <i class="fas fa-users"></i>
-                            <span>Пользователи</span>
+                            <span><@spring.message code="sidebar.users" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/schedules" class="nav-link" data-tooltip="Расписание">
+                        <a href="/schedules" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.schedule' />">
                             <i class="fas fa-calendar"></i>
-                            <span>Расписание</span>
+                            <span><@spring.message code="sidebar.schedule" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/admin/statistics" class="nav-link" data-tooltip="Статистика">
+                        <a href="/admin/statistics" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.statistics' />">
                             <i class="fas fa-chart-bar"></i>
-                            <span>Статистика</span>
+                            <span><@spring.message code="sidebar.statistics" /></span>
                         </a>
                     </div>
-
                     <div class="nav-item">
-                        <a href="/admin/courses" class="nav-link" data-tooltip="Управление курсами">
+                        <a href="/admin/courses" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.course.management' />">
                             <i class="fas fa-book-open"></i>
-                            <span>Управление курсами</span>
+                            <span><@spring.message code="sidebar.course.management" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/admin/categories" class="nav-link" data-tooltip="Категории курсов">
+                        <a href="/admin/categories" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.categories' />">
                             <i class="fas fa-tags"></i>
-                            <span>Категории курсов</span>
+                            <span><@spring.message code="sidebar.categories" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/admin/course-instances" class="nav-link" data-tooltip="Потоки курсов">
+                        <a href="/admin/course-instances" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.instances' />">
                             <i class="fas fa-chart-bar"></i>
-                            <span>Потоки курсов</span>
+                            <span><@spring.message code="sidebar.instances" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/applications/admin" class="nav-link" data-tooltip="Заявки на курсы">
+                        <a href="/applications/admin" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.applications.admin' />">
                             <i class="fas fa-file-alt"></i>
-                            <span>Заявки на курсы</span>
+                            <span><@spring.message code="sidebar.applications.admin" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/admin/certificate" class="nav-link" data-tooltip="Сертификаты">
+                        <a href="/admin/certificate" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.certificates' />">
                             <i class="fas fa-award"></i>
-                            <span>Сертификаты</span>
+                            <span><@spring.message code="sidebar.certificates" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/admin/test-results" class="nav-link" data-tooltip="Результаты тестирований">
+                        <a href="/admin/test-results" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.test.results' />">
                             <i class="fa-solid fa-list-check"></i>
-                            <span>Результаты тестирований</span>
+                            <span><@spring.message code="sidebar.test.results" /></span>
                         </a>
                     </div>
                 </#if>
                 <#if isTeacher?? && isTeacher>
                     <div class="nav-item">
-                        <a href="/teacher/my-courses" class="nav-link" data-tooltip="Мои курсы">
+                        <a href="/teacher/my-courses" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.my.courses' />">
                             <i class="fas fa-book-open"></i>
-                            <span>Мои курсы</span>
+                            <span><@spring.message code="sidebar.my.courses" /></span>
                         </a>
                     </div>
-
                     <div class="nav-item">
-                        <a href="/schedules" class="nav-link" data-tooltip="Расписание">
+                        <a href="/#" class="nav-link" data-tooltip="<@spring.message code='sidebar.tests' />">
+                            <i class="fas fa-question-circle"></i>
+                            <span><@spring.message code="sidebar.tests" /></span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/schedules" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.schedule' />">
                             <i class="fas fa-calendar"></i>
-                            <span>Расписание</span>
+                            <span><@spring.message code="sidebar.schedule" /></span>
                         </a>
                     </div>
                 </#if>
                 <#if isOrganization?? && isOrganization>
                     <div class="nav-item">
-                        <a href="/organization/students" class="nav-link" data-tooltip="Сотрудники">
+                        <a href="/organization/students" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.students' />">
                             <i class="fas fa-user-tie"></i>
-                            <span>Студенты</span>
+                            <span><@spring.message code="sidebar.students" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/applications/organization" class="nav-link d-flex justify-content-between align-items-center" data-tooltip="Заявки на курсы">
+                        <a href="/applications/organization"
+                           class="nav-link d-flex justify-content-between align-items-center"
+                           data-tooltip="<@spring.message code='sidebar.applications.org' />">
                             <div class="d-flex align-items-center" style="gap: 15px">
                                 <i class="fas fa-file-alt"></i>
-                                <span>Заявки на курсы</span>
+                                <span><@spring.message code="sidebar.applications.org" /></span>
                             </div>
+                            <span id="notificationCount" class="badge bg-danger ms-2" style="display: none;">0</span>
                         </a>
                     </div>
                 </#if>
                 <#if isStudent?? && isStudent>
                     <div class="nav-item">
-                        <a href="/student/my-courses" class="nav-link" data-tooltip="Мои курсы">
+                        <a href="/student/my-courses" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.my.courses' />">
                             <i class="fas fa-book-open"></i>
-                            <span>Мои курсы</span>
+                            <span><@spring.message code="sidebar.my.courses" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/schedules" class="nav-link" data-tooltip="Расписание">
+                        <a href="/schedules" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.schedule' />">
                             <i class="fas fa-calendar"></i>
-                            <span>Расписание</span>
+                            <span><@spring.message code="sidebar.schedule" /></span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/applications/student/applications" class="nav-link d-flex justify-content-between align-items-center" data-tooltip="Мои заявки">
+                        <a href="/applications/student/applications"
+                           class="nav-link d-flex justify-content-between align-items-center"
+                           data-tooltip="<@spring.message code='sidebar.applications.student' />">
                             <div class="d-flex align-items-center" style="gap: 15px">
                                 <i class="fas fa-file-alt"></i>
-                                <span>Мои заявки</span>
+                                <span><@spring.message code="sidebar.applications.student" /></span>
                             </div>
+                            <span id="notificationCountStudent" class="badge bg-danger ms-2"
+                                  style="display: none;">0</span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/student/certificates" class="nav-link" data-tooltip="Сертификаты">
+                        <a href="/student/certificates" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.certificates.student' />">
                             <i class="fas fa-award"></i>
-                            <span>Сертификаты</span>
+                            <span><@spring.message code="sidebar.certificates.student" /></span>
                         </a>
                     </div>
                 </#if>
@@ -193,41 +304,46 @@
                 <div class="custom-language-selector mt-4" id="languageSelector">
                     <button class="selected-language">
                         <span class="fi fi-ru"></span>
-                        <span class="language-text">Русский</span>
+                        <span class="language-text"><@spring.message code="language.russian" /></span>
                     </button>
                     <div class="language-options">
                         <div class="language-option" data-value="ru">
                             <span class="fi fi-ru"></span>
-                            <span>Русский</span>
+                            <span><@spring.message code="language.russian" /></span>
                         </div>
                         <div class="language-option" data-value="ky">
                             <span class="fi fi-kg"></span>
-                            <span>Кыргызча</span>
+                            <span><@spring.message code="language.kyrgyz" /></span>
                         </div>
                         <div class="language-option" data-value="en">
                             <span class="fi fi-gb"></span>
-                            <span>English</span>
+                            <span><@spring.message code="language.english" /></span>
                         </div>
                     </div>
                 </div>
 
                 <#if known>
                     <div class="dropdown mt-2">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button"
+                                data-bs-toggle="dropdown"
                                 style="border-color: rgba(255,255,255,0.2); color: white; text-align: left; padding: 0.5rem 1rem;">
-                            Дополнительно
+                            <@spring.message code="header.additional" />
                         </button>
                         <ul class="dropdown-menu w-100">
-                            <li><a class="dropdown-item" href="/auth/manage-devices">Управление устройствами</a></li>
+                            <li><a class="dropdown-item" href="/auth/manage-devices">
+                                    <@spring.message code="header.device.management" />
+                                </a></li>
                             <li>
                                 <form action="/auth/logout-all-devices" method="post" class="dropdown-item p-0">
                                     <#if _csrf??>
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     </#if>
-                                    <button type="submit" class="btn btn-link text-decoration-none w-100 text-start ps-3 py-2"
-                                            onclick="return confirm('Вы уверены, что хотите выйти из всех устройств?')"
+                                    <button type="submit"
+                                            class="btn btn-link text-decoration-none w-100 text-start ps-3 py-2"
+                                            onclick="return confirm('<@spring.message code="header.logout.all.confirm" />')"
                                             style="color: inherit;">
-                                        <i class="fas fa-sign-out-alt me-1"></i>Выйти из всех устройств
+                                        <i class="fas fa-sign-out-alt me-1"></i>
+                                        <@spring.message code="header.logout.all" />
                                     </button>
                                 </form>
                             </li>
@@ -238,10 +354,10 @@
                 <#if !known?? || !known>
                     <div class="profile-actions">
                         <a href="/auth/login" class="profile-btn">
-                            <i class="fas fa-sign-in-alt"></i> <span>Войти</span>
+                            <i class="fas fa-sign-in-alt"></i> <span><@spring.message code="auth.login" /></span>
                         </a>
                         <a href="/auth/register" class="profile-btn">
-                            <i class="fas fa-user-plus"></i> <span>Регистрация</span>
+                            <i class="fas fa-user-plus"></i> <span><@spring.message code="auth.register" /></span>
                         </a>
                     </div>
                 </#if>
@@ -258,7 +374,7 @@
                 </button>
                 <h1 class="text-center flex-grow-1 m-0" style="color: var(--primary-blue); font-size: 1.1rem;">
                     <i class="fas fa-graduation-cap me-2"></i>
-                    Манас Тренинг Центр
+                    <@spring.message code="app.title" />
                 </h1>
                 <span style="width: 44px;"></span>
             </div>
@@ -312,7 +428,8 @@
                 <div class="d-none d-md-flex align-items-center ms-auto rounded-pill overflow-hidden"
                      style="box-shadow: 0 0 5px rgba(0,0,0,0.1); background: var(--primary-blue); height: 48px;">
                     <#if isAdmin>
-                        <div class="d-flex align-items-center text-white px-3 text-decoration-none" style="cursor: not-allowed; opacity: 0.6;">
+                        <div class="d-flex align-items-center text-white px-3 text-decoration-none"
+                             style="cursor: not-allowed; opacity: 0.6;">
                             <div class="rounded-circle d-flex justify-content-center align-items-center me-2"
                                  style="width: 36px; height: 36px; background: var(--light-blue); color: var(--dark-blue); font-weight: bold;">
                                 ${name?substring(0, 1)?upper_case}
@@ -320,7 +437,7 @@
                             <div class="d-flex flex-column justify-content-center">
                                 <span class="fw-semibold" style="font-size: 0.85rem;">${name}</span>
                                 <small style="font-size: 0.7rem; color: var(--light-blue);">
-                                    <#if isAdmin>Администратор</#if>
+                                    <@spring.message code="role.admin" />
                                 </small>
                             </div>
                         </div>
@@ -333,9 +450,9 @@
                             <div class="d-flex flex-column justify-content-center">
                                 <span class="fw-semibold" style="font-size: 0.85rem;">${name}</span>
                                 <small style="font-size: 0.7rem; color: var(--light-blue);">
-                                    <#if isTeacher>Преподаватель</#if>
-                                    <#if isStudent>Студент</#if>
-                                    <#if isOrganization>Организация</#if>
+                                    <#if isTeacher><@spring.message code="role.teacher" /></#if>
+                                    <#if isStudent><@spring.message code="role.student" /></#if>
+                                    <#if isOrganization><@spring.message code="role.organization" /></#if>
                                 </small>
                             </div>
                         </a>
@@ -348,8 +465,8 @@
                         <span id="notificationCountHeader"
                               class="position-absolute badge rounded-pill"
                               style="top: 2px; right: 2px; font-size: 0.6rem; display: none;
-                 background-color: #dc3545; color: white; border: 1px solid white; padding: 2px 5px;">
-                           0
+                     background-color: #dc3545; color: white; border: 1px solid white; padding: 2px 5px;">
+                         0
                         </span>
                     </a>
 
@@ -365,7 +482,6 @@
                 </div>
             </#if>
         </header>
-
         <div class="main-content">
             <#nested>
         </div>
@@ -419,28 +535,27 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const languageSelector = document.querySelector('.custom-language-selector');
             const selectedBtn = languageSelector.querySelector('.selected-language');
             const optionsContainer = languageSelector.querySelector('.language-options');
 
-            selectedBtn.addEventListener('click', function(e) {
+            selectedBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const isOpen = optionsContainer.style.display === 'block';
                 optionsContainer.style.display = isOpen ? 'none' : 'block';
             });
 
             optionsContainer.querySelectorAll('.language-option').forEach(option => {
-                option.addEventListener('click', function() {
+                option.addEventListener('click', function () {
                     const lang = this.getAttribute('data-value');
-                    console.log('Selected language:', lang);
-
-                    selectedBtn.innerHTML = this.innerHTML;
-                    optionsContainer.style.display = 'none';
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('lang', lang);
+                    window.location.href = url.toString();
                 });
             });
 
-            document.addEventListener('click', function() {
+            document.addEventListener('click', function () {
                 optionsContainer.style.display = 'none';
             });
         });
@@ -452,13 +567,13 @@
             }
         });
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && sidebar.classList.contains('open')) {
                 closeMobileSidebar();
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             if (isCollapsed && window.innerWidth > 768) {
                 sidebar.classList.add('collapsed');
@@ -469,7 +584,7 @@
             }
         });
 
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             if (window.innerWidth > 768) {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
@@ -531,18 +646,18 @@
 
         .sidebar-profile .dropdown-menu {
             background: var(--dark-blue);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0;
         }
 
         .sidebar-profile .dropdown-item {
-            color: rgba(255,255,255,0.9);
+            color: rgba(255, 255, 255, 0.9);
             padding: 0.5rem 1rem;
             transition: all 0.3s ease;
         }
 
         .sidebar-profile .dropdown-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: var(--white);
         }
 
@@ -554,13 +669,13 @@
         }
 
         .sidebar-profile .btn-outline-secondary {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             transition: all 0.3s ease;
         }
 
         .sidebar-profile .btn-outline-secondary:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .sidebar.collapsed .dropdown {
@@ -965,12 +1080,15 @@
         .sidebar.collapsed #notificationCountStudent {
             display: none !important;
         }
+
         .sidebar.collapsed .nav-link.d-flex {
             justify-content: center !important;
         }
+
         .sidebar.collapsed .nav-link .badge {
             display: none !important;
         }
+
         .sidebar.collapsed .nav-link div {
             justify-content: center;
         }

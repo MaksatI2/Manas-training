@@ -1,15 +1,20 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
+<#assign bcHome><@spring.message code='course.public.list.breadcrumb.home'/></#assign>
+<#assign bcCourses><@spring.message code='course.public.list.breadcrumb.courses'/></#assign>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Курсы", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcCourses, "url": ""}
     ] />
     <div class="card shadow mb-4">
         <div class="card-header d-flex filter-panel">
             <h5 class="m-0 font-weight-bold text-white">
                 <i class="fas fa-book me-2"></i>
-                Каталог курсов
+                <@spring.message code="course.public.list.title"/>
             </h5>
             <div class="filter-controls">
                 <div class="input-group custom-filter">
@@ -17,13 +22,14 @@
                        <i class="fas fa-filter"></i>
                      </span>
                     <select id="categoryFilter" class="form-select category-filter">
-                        <option value="" selected disabled hidden>Все категории</option>
+                        <option value="" selected disabled
+                                hidden><@spring.message code="course.public.list.filter.allCategories"/></option>
                         <#list categories as category>
                             <option value="${category.name}">${category.name}</option>
                         </#list>
                     </select>
                     <button id="resetCategoryFilter" class="btn btn-outline-light reset-btn" type="button"
-                            title="Сбросить фильтр">
+                            title="<@spring.message code='course.public.list.filter.reset'/>">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -35,11 +41,11 @@
                 <table class="table table-bordered table-hover" id="coursesTable" width="100%">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
                     <tr>
-                        <th class="col-id">№</th>
-                        <th class="col-title">Название</th>
-                        <th class="col-code">Код курса</th>
-                        <th class="col-category">Категория</th>
-                        <th class="col-duration duration-col">Длительность</th>
+                        <th class="col-id"><@spring.message code="course.public.list.table.number"/></th>
+                        <th class="col-title"><@spring.message code="course.public.list.table.title"/></th>
+                        <th class="col-code"><@spring.message code="course.public.list.table.code"/></th>
+                        <th class="col-category"><@spring.message code="course.public.list.table.category"/></th>
+                        <th class="col-duration duration-col"><@spring.message code="course.public.list.table.duration"/></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -47,22 +53,42 @@
                         <#list courses as course>
                             <tr style="cursor: pointer;" onclick="window.location.href='/courses/${course.id}'">
                                 <td>${course.id}</td>
-                                <td class="title-column">${course.title}</td>
-                                <td><span class="badge"
-                                          style="background: #87ceeb; color: #2c3e50;">${course.code}</span></td>
-                                <td><span class="badge"
-                                          style="background: #003d7a; color: white; font-size: 0.7rem">${course.category.name}</span></td>
+                                <td class="title-column">
+                                    <#if course.title?? && course.title?length > 30>
+                                        ${course.title?substring(0, 30)}...
+                                    <#else>
+                                        ${course.title!""}
+                                    </#if>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: #87ceeb; color: #2c3e50;">
+                                        <#if course.code?? && course.code?length > 10>
+                                            ${course.code?substring(0, 10)}...
+                                        <#else>
+                                            ${course.code!""}
+                                        </#if>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: #003d7a; color: white; font-size: 0.7rem">
+                                        <#if course.category.name?? && course.category.name?length > 30>
+                                            ${course.category.name?substring(0, 30)}...
+                                        <#else>
+                                            ${course.category.name!""}
+                                        </#if>
+                                    </span>
+                                </td>
                                 <td class="duration-col">
                                     <span class="duration-content">
-                                        <i class="fas fa-clock me-1" style="color: #0066cc;">
-                                        </i>${course.duration}ч
+                                        <i class="fas fa-clock me-1" style="color: #0066cc;"></i>${course.duration}ч
                                     </span>
                                 </td>
                             </tr>
                         </#list>
                     <#else>
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">Курсы не найдены</td>
+                            <td colspan="5"
+                                class="text-center text-muted py-4"><@spring.message code="course.public.list.empty"/></td>
                         </tr>
                     </#if>
                     </tbody>
@@ -90,26 +116,31 @@
 
     <script>
         $(document).ready(function () {
+            var dtLangUrl = "<#if springMacroRequestContext.locale?string?lower_case?starts_with('ru')>/js/datatables/ru.json" +
+                "<#elseif springMacroRequestContext.locale?string?lower_case?starts_with('ky')>/js/datatables/ky.json" +
+                "<#else>/js/datatables/en.json</#if>";
+
+            var allLabel = "<#if springMacroRequestContext.locale?string?lower_case?starts_with('ru')>Все" +
+                "<#elseif springMacroRequestContext.locale?string?lower_case?starts_with('ky')>Баары" +
+                "<#else>All</#if>";
+
             var table = $('#coursesTable').DataTable({
-                language: {
-                    url: '/js/datatables/ru.json',
-                    paginate: {previous: '‹', next: '›'}
-                },
+                language: {url: dtLangUrl, paginate: {previous: '‹', next: '›'}},
                 responsive: true,
                 pageLength: 10,
                 lengthChange: true,
-                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
+                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, allLabel]],
                 searching: true,
                 info: false,
                 paging: true,
                 autoWidth: false,
                 stateSave: true,
                 columnDefs: [
-                    { targets: 1, responsivePriority: 1 },
-                    { targets: 0, responsivePriority: 2 },
-                    { targets: 4, responsivePriority: 3 },
-                    { targets: 2, responsivePriority: 4 },
-                    { targets: 3, responsivePriority: 5 }
+                    {targets: 1, responsivePriority: 1},
+                    {targets: 0, responsivePriority: 2},
+                    {targets: 4, responsivePriority: 3},
+                    {targets: 2, responsivePriority: 4},
+                    {targets: 3, responsivePriority: 5}
                 ]
             });
 
@@ -275,8 +306,7 @@
             border-radius: 0.375rem;
         }
 
-        div.dataTables_wrapper .dataTables_length,
-        div.dataTables_wrapper .dataTables_filter {
+        div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
             display: flex;
             align-items: center;
             gap: 1.5rem;
@@ -302,7 +332,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Column widths for general use */
         #coursesTable .col-id {
             width: 5%;
         }
@@ -323,7 +352,6 @@
             width: 20%;
         }
 
-        /* Adjustments for 770–933px with sidebar */
         @media (min-width: 770px) and (max-width: 933px) {
             #coursesTable .col-id {
                 width: 8%;
@@ -369,14 +397,14 @@
                 font-size: 0.8rem;
                 padding-right: 0.5rem;
             }
+
             .title-column {
                 max-width: 150px;
             }
         }
 
         @media (max-width: 569px) {
-            div.dataTables_wrapper .dataTables_length,
-            div.dataTables_wrapper .dataTables_filter {
+            div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
                 flex-direction: column;
                 align-items: flex-start;
                 width: 100%;
@@ -389,8 +417,7 @@
         }
 
         @media (min-width: 570px) and (max-width: 1050px) {
-            div.dataTables_wrapper .dataTables_length,
-            div.dataTables_wrapper .dataTables_filter {
+            div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
                 flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
@@ -398,8 +425,7 @@
                 gap: 1rem;
             }
 
-            div.dataTables_wrapper .dataTables_filter input,
-            div.dataTables_wrapper .dataTables_length select {
+            div.dataTables_wrapper .dataTables_filter input, div.dataTables_wrapper .dataTables_length select {
                 height: 38px;
                 line-height: 1.5;
             }

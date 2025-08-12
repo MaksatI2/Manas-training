@@ -1,10 +1,11 @@
 <#import "../../layout.ftlh" as layout>
 <#import "../../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Студенты", "url": "/organization/students"},
-    {"label": "Неприсвоенные", "url": ""}
+    {"label": springMacroRequestContext.getMessage("students.unassigned.breadcrumb.home"), "url": "/"},
+    {"label": springMacroRequestContext.getMessage("students.unassigned.breadcrumb.students"), "url": "/organization/students"},
+    {"label": springMacroRequestContext.getMessage("students.unassigned.breadcrumb.unassigned"), "url": ""}
     ] />
     <style>
         :root {
@@ -41,19 +42,19 @@
         }
     </style>
 
-    <h1 class="page-title">Студенты без организации</h1>
+    <h1 class="page-title">${springMacroRequestContext.getMessage("students.unassigned.title")}</h1>
 
     <#if unassigned?size == 0>
-        <div class="alert alert-info text-center shadow-sm">Нет доступных студентов для добавления.</div>
+        <div class="alert alert-info text-center shadow-sm">${springMacroRequestContext.getMessage("students.unassigned.empty")}</div>
     <#else>
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th>ФИО</th>
-                    <th>Email</th>
-                    <th>Телефон</th>
-                    <th>Действия</th>
+                    <th>${springMacroRequestContext.getMessage("students.unassigned.table.name")}</th>
+                    <th>${springMacroRequestContext.getMessage("students.unassigned.table.email")}</th>
+                    <th>${springMacroRequestContext.getMessage("students.unassigned.table.phone")}</th>
+                    <th>${springMacroRequestContext.getMessage("students.unassigned.table.actions")}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -63,10 +64,11 @@
                         <td>${student.email}</td>
                         <td>${student.phone}</td>
                         <td>
-                            <form action="/organization/students/unassigned/${student.id}/attach" method="post" class="d-inline">
+                            <form action="/organization/students/unassigned/${student.id}/attach" method="post"
+                                  class="d-inline">
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                 <button class="btn btn-sm btn-success rounded-pill">
-                                    <i class="fas fa-user-plus me-1"></i> Добавить
+                                    <i class="fas fa-user-plus me-1"></i> ${springMacroRequestContext.getMessage("students.unassigned.button.add")}
                                 </button>
                             </form>
                         </td>

@@ -1,22 +1,27 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
+<#assign bcHome><@spring.message code='calendar.breadcrumb.home'/></#assign>
+<#assign bcTitle><@spring.message code='calendar.breadcrumb.title'/></#assign>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Расписание", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcTitle, "url": ""}
     ] />
     <div class="calendar-container">
         <div class="calendar-header">
             <h1 class="calendar-title">
                 <i class="fas fa-calendar me-2"></i>
-                Расписание занятий - <span id="currentMonth"></span>
+                <@spring.message code="calendar.title.prefix"/> <span id="currentMonth"></span>
             </h1>
             <div class="calendar-nav">
                 <button class="nav-btn" onclick="changeMonth(-1)">
                     <i class="fas fa-chevron-left"></i>
                 </button>
                 <button class="nav-btn today-btn" onclick="goToToday()">
-                    <span class="today-text">Сегодня</span>
+                    <span class="today-text"><@spring.message code="calendar.today"/></span>
                     <span class="today-dot">•</span>
                 </button>
                 <button class="nav-btn" onclick="changeMonth(1)">
@@ -27,7 +32,7 @@
 
         <div class="filters-panel">
             <div class="filters-header" onclick="toggleFilters()">
-                <h3><i class="fas fa-filter"></i> Фильтры</h3>
+                <h3><i class="fas fa-filter"></i> <@spring.message code="calendar.filters"/></h3>
                 <button class="toggle-filters-btn" id="toggleFiltersBtn">
                     <i class="fas fa-chevron-down"></i>
                 </button>
@@ -36,49 +41,53 @@
                 <form class="filters-form" id="filtersForm">
                     <div class="filter-row">
                         <div class="filter-group">
-                            <label for="courseTitle">Курс:</label>
+                            <label for="courseTitle"><@spring.message code="calendar.filter.course"/></label>
                             <select name="courseTitle" id="courseTitle" onchange="applyFilters()">
-                                <option value="">Все курсы</option>
+                                <option value=""><@spring.message code="calendar.filter.course.all"/></option>
                                 <#list courseTitles as course>
-                                    <option value="${course}" <#if selectedCourseTitle?? && selectedCourseTitle == course>selected</#if>>
+                                    <option value="${course}"
+                                            <#if selectedCourseTitle?? && selectedCourseTitle == course>selected</#if>>
                                         ${course}
                                     </option>
                                 </#list>
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label for="courseInstanceTitle">Группа:</label>
+                            <label for="courseInstanceTitle"><@spring.message code="calendar.filter.group"/></label>
                             <select name="courseInstanceTitle" id="courseInstanceTitle" onchange="applyFilters()">
-                                <option value="">Все группы</option>
+                                <option value=""><@spring.message code="calendar.filter.group.all"/></option>
                                 <#list courseInstanceTitles as instance>
-                                    <option value="${instance}" <#if selectedCourseInstanceTitle?? && selectedCourseInstanceTitle == instance>selected</#if>>
+                                    <option value="${instance}"
+                                            <#if selectedCourseInstanceTitle?? && selectedCourseInstanceTitle == instance>selected</#if>>
                                         ${instance}
                                     </option>
                                 </#list>
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label for="teacherName">Преподаватель:</label>
+                            <label for="teacherName"><@spring.message code="calendar.filter.teacher"/></label>
                             <select name="teacherName" id="teacherName" onchange="applyFilters()">
-                                <option value="">Все преподаватели</option>
+                                <option value=""><@spring.message code="calendar.filter.teacher.all"/></option>
                                 <#list teacherNames as teacher>
-                                    <option value="${teacher}" <#if selectedTeacherName?? && selectedTeacherName == teacher>selected</#if>>
+                                    <option value="${teacher}"
+                                            <#if selectedTeacherName?? && selectedTeacherName == teacher>selected</#if>>
                                         ${teacher}
                                     </option>
                                 </#list>
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label for="lessonType">Тип занятия:</label>
+                            <label for="lessonType"><@spring.message code="calendar.filter.lessonType"/></label>
                             <select name="lessonType" id="lessonType" onchange="applyFilters()">
-                                <option value="">Все типы</option>
+                                <option value=""><@spring.message code="calendar.filter.lessonType.all"/></option>
                                 <#list lessonTypes as type>
-                                    <option value="${type}" <#if selectedLessonType?? && selectedLessonType == type>selected</#if>>
+                                    <option value="${type}"
+                                            <#if selectedLessonType?? && selectedLessonType == type>selected</#if>>
                                         <#switch type>
-                                            <#case "LECTURE">Лекция<#break>
-                                            <#case "PRACTICAL">Практика<#break>
-                                            <#case "EXAM">Экзамен<#break>
-                                            <#case "CONSULTATION">Консультация<#break>
+                                            <#case "LECTURE"><@spring.message code="calendar.lessonType.LECTURE"/><#break>
+                                            <#case "PRACTICAL"><@spring.message code="calendar.lessonType.PRACTICAL"/><#break>
+                                            <#case "EXAM"><@spring.message code="calendar.lessonType.EXAM"/><#break>
+                                            <#case "CONSULTATION"><@spring.message code="calendar.lessonType.CONSULTATION"/><#break>
                                             <#default>${type}
                                         </#switch>
                                     </option>
@@ -89,7 +98,7 @@
                     <div class="filter-row">
                         <div class="filter-actions">
                             <button type="button" class="reset-filters-btn" onclick="resetFilters()">
-                                <i class="fas fa-undo"></i> Сбросить
+                                <i class="fas fa-undo"></i> <@spring.message code="calendar.filter.reset"/>
                             </button>
                         </div>
                     </div>
@@ -98,13 +107,13 @@
         </div>
 
         <div class="calendar-grid" id="calendarGrid">
-            <div class="day-header">Пн</div>
-            <div class="day-header">Вт</div>
-            <div class="day-header">Ср</div>
-            <div class="day-header">Чт</div>
-            <div class="day-header">Пт</div>
-            <div class="day-header">Сб</div>
-            <div class="day-header">Вс</div>
+            <div class="day-header"><@spring.message code="calendar.days.mon"/></div>
+            <div class="day-header"><@spring.message code="calendar.days.tue"/></div>
+            <div class="day-header"><@spring.message code="calendar.days.wed"/></div>
+            <div class="day-header"><@spring.message code="calendar.days.thu"/></div>
+            <div class="day-header"><@spring.message code="calendar.days.fri"/></div>
+            <div class="day-header"><@spring.message code="calendar.days.sat"/></div>
+            <div class="day-header"><@spring.message code="calendar.days.sun"/></div>
         </div>
     </div>
 
@@ -117,10 +126,10 @@
             <div class="modal-body" id="modalBody"></div>
             <div class="modal-actions" id="modalActions" style="display: none;">
                 <button class="action-btn edit-btn" onclick="editLesson()">
-                    <i class="fas fa-edit"></i> Редактировать
+                    <i class="fas fa-edit"></i> <@spring.message code="calendar.lesson.edit"/>
                 </button>
                 <button class="action-btn delete-btn" onclick="deleteLesson()">
-                    <i class="fas fa-trash"></i> Удалить
+                    <i class="fas fa-trash"></i> <@spring.message code="calendar.lesson.delete"/>
                 </button>
             </div>
         </div>
@@ -147,16 +156,12 @@
         const canEditLessons = currentUserRole === 'admin' || currentUserRole === 'teacher';
 
         let currentDate = new Date();
-        const monthNames = [
-            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-        ];
 
         const lessonTypeNames = {
-            'LECTURE': 'Лекция',
-            'PRACTICAL': 'Практика',
-            'EXAM': 'Экзамен',
-            'CONSULTATION': 'Консультация'
+            'LECTURE': '<@spring.message code="calendar.lessonType.LECTURE"/>',
+            'PRACTICAL': '<@spring.message code="calendar.lessonType.PRACTICAL"/>',
+            'EXAM': '<@spring.message code="calendar.lessonType.EXAM"/>',
+            'CONSULTATION': '<@spring.message code="calendar.lessonType.CONSULTATION"/>'
         };
 
         function formatDate(date) {
@@ -212,7 +217,7 @@
                 schedulesData = JSON.parse(JSON.stringify(originalSchedulesData));
                 generateCalendar();
 
-                showFilterStatus('Фильтры сброшены');
+                showFilterStatus();
             } catch (error) {
                 console.error('Ошибка при сбросе фильтров:', error);
             }
@@ -242,7 +247,7 @@
                 const month = currentDate.getMonth();
 
                 document.getElementById('currentMonth').textContent =
-                    monthNames[month] + ' ' + year;
+                    new Intl.DateTimeFormat(undefined, {month: 'long', year: 'numeric'}).format(currentDate);
 
                 const firstDay = new Date(year, month, 1);
                 const startDate = new Date(firstDay);
@@ -287,14 +292,16 @@
                                 const lessonTypeClass = lesson.lessonType ? lesson.lessonType.toLowerCase() : 'lecture';
                                 lessonDiv.className = 'lesson-item ' + lessonTypeClass;
 
-                                const lessonTitle = lesson.lessonTitle || 'Без названия';
+                                const fallbackTitle = '<@spring.message code="calendar.lesson.noTitle"/>';
+                                const lessonTitle = lesson.lessonTitle || fallbackTitle;
                                 const displayTitle = lessonTitle.length > 20 ? lessonTitle.substring(0, 17) + '...' : lessonTitle;
                                 lessonDiv.innerHTML = displayTitle;
 
-                                const teacherName = lesson.teacherName || 'Преподаватель не указан';
+                                const fallbackTeacher = '<@spring.message code="calendar.lesson.noTeacher"/>';
+                                const teacherName = lesson.teacherName || fallbackTeacher;
                                 lessonDiv.title = lessonTitle + ' - ' + teacherName;
 
-                                lessonDiv.onclick = function(e) {
+                                lessonDiv.onclick = function (e) {
                                     e.stopPropagation();
                                     openSingleLessonModal(lesson);
                                 };
@@ -308,8 +315,8 @@
                         if (hiddenLessons.length > 0) {
                             const moreDiv = document.createElement('div');
                             moreDiv.className = 'more-lessons';
-                            moreDiv.textContent = '... еще ' + hiddenLessons.length;
-                            moreDiv.onclick = function(e) {
+                            moreDiv.textContent = '<@spring.message code="calendar.moreLessons.prefix"/>' + hiddenLessons.length;
+                            moreDiv.onclick = function (e) {
                                 e.stopPropagation();
                                 openDayLessonsModal(dateStr, dayLessons);
                             };
@@ -317,7 +324,7 @@
                         }
                     }
 
-                    dayCell.onclick = function() {
+                    dayCell.onclick = function () {
                         if (dayLessons && dayLessons.length > 0) {
                             openDayLessonsModal(dateStr, dayLessons);
                         }
@@ -328,7 +335,7 @@
             } catch (error) {
                 console.error('Ошибка при генерации календаря:', error);
                 const calendarGrid = document.getElementById('calendarGrid');
-                calendarGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #d32f2f;">Произошла ошибка при загрузке календаря. Попробуйте обновить страницу.</div>';
+                calendarGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #d32f2f;"><@spring.message code="calendar.error.load"/></div>';
             }
         }
 
@@ -338,7 +345,8 @@
             try {
                 currentLesson = lesson;
 
-                const lessonTitle = lesson.lessonTitle || 'Без названия';
+                const fallbackTitle = '<@spring.message code="calendar.lesson.noTitle"/>';
+                const lessonTitle = lesson.lessonTitle || fallbackTitle;
                 document.getElementById('modalTitle').textContent = lessonTitle;
 
                 const modalBody = document.getElementById('modalBody');
@@ -347,9 +355,11 @@
                 const lessonDiv = document.createElement('div');
                 lessonDiv.className = 'lesson-detail';
 
-                const typeText = lessonTypeNames[lesson.lessonType] || lesson.lessonType || 'Занятие';
-                const teacherName = lesson.teacherName || 'Преподаватель не указан';
-                const courseTitle = lesson.courseTitle || 'Курс не указан';
+                const typeText = lessonTypeNames[lesson.lessonType] || lesson.lessonType || '<@spring.message code="calendar.lesson.type.fallback"/>';
+                const fallbackTeacher = '<@spring.message code="calendar.lesson.noTeacher"/>';
+                const teacherName = lesson.teacherName || fallbackTeacher;
+                const fallbackCourse = '<@spring.message code="calendar.lesson.noCourse"/>';
+                const courseTitle = lesson.courseTitle || fallbackCourse;
 
                 lessonDiv.innerHTML =
                     '<div class="lesson-title">' +
@@ -365,27 +375,27 @@
                     '</div>' +
                     (lesson.durationHours ? '<div class="lesson-info-item">' +
                         '<i class="fas fa-hourglass-half"></i>' +
-                        '<span>' + lesson.durationHours + ' ч.</span>' +
+                        '<span>' + lesson.durationHours + ' ' + '<@spring.message code="calendar.lesson.durationHours.suffix"/>' + '</span>' +
                         '</div>' : '') +
                     '</div>' +
                     '<div class="lesson-info" style="margin-top: 10px;">' +
                     '<div class="lesson-info-item">' +
                     '<i class="fas fa-graduation-cap"></i>' +
-                    '<span><strong>Курс:</strong> ' + courseTitle + '</span>' +
+                    '<span><strong><@spring.message code="calendar.lesson.course.label"/></strong> ' + courseTitle + '</span>' +
                     '</div>' +
                     (lesson.courseInstanceTitle ? '<div class="lesson-info-item">' +
                         '<i class="fas fa-bookmark"></i>' +
-                        '<span><strong>Группа:</strong> ' + lesson.courseInstanceTitle + '</span>' +
+                        '<span><strong><@spring.message code="calendar.lesson.group.label"/></strong> ' + lesson.courseInstanceTitle + '</span>' +
                         '</div>' : '') +
                     '</div>' +
                     (lesson.lessonDescription ? '<div class="lesson-notes">' +
-                        '<strong>Описание:</strong><br>' + lesson.lessonDescription +
+                        '<strong><@spring.message code="calendar.lesson.description"/></strong><br>' + lesson.lessonDescription +
                         '</div>' : '') +
                     (lesson.notes ? '<div class="lesson-notes">' +
-                        '<strong>Заметки:</strong><br>' + lesson.notes +
+                        '<strong><@spring.message code="calendar.lesson.notes"/></strong><br>' + lesson.notes +
                         '</div>' : '') +
                     (lesson.meetingUrl ? '<div class="lesson-notes">' +
-                        '<strong>Ссылка на конференцию:</strong><br>' +
+                        '<strong><@spring.message code="calendar.lesson.meetingUrl"/></strong><br>' +
                         '<a href="' + lesson.meetingUrl + '" target="_blank" class="meeting-link">' + lesson.meetingUrl + '</a>' +
                         '</div>' : '');
 
@@ -407,32 +417,29 @@
         function openDayLessonsModal(dateStr, dayLessons) {
             try {
                 const date = new Date(dateStr);
-                const options = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
+                const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
 
                 document.getElementById('modalTitle').textContent =
-                    'Расписание на ' + date.toLocaleDateString('ru-RU', options);
+                    '<@spring.message code="calendar.lesson.onDate.prefix"/>' + ' ' + date.toLocaleDateString(undefined, options);
 
                 const modalBody = document.getElementById('modalBody');
                 modalBody.innerHTML = '';
 
                 if (!dayLessons || dayLessons.length === 0) {
-                    modalBody.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">На этот день занятий не запланировано</p>';
+                    modalBody.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;"><@spring.message code="calendar.lesson.noLessons"/></p>';
                 } else {
-                    dayLessons.forEach(function(lesson) {
+                    dayLessons.forEach(function (lesson) {
                         const lessonDiv = document.createElement('div');
                         lessonDiv.className = 'lesson-detail clickable-lesson';
-                        lessonDiv.onclick = function() {
+                        lessonDiv.onclick = function () {
                             openSingleLessonModal(lesson);
                         };
 
-                        const typeText = lessonTypeNames[lesson.lessonType] || lesson.lessonType || 'Занятие';
-                        const lessonTitle = lesson.lessonTitle || 'Без названия';
-                        const teacherName = lesson.teacherName || 'Преподаватель не указан';
+                        const typeText = lessonTypeNames[lesson.lessonType] || lesson.lessonType || '<@spring.message code="calendar.lesson.type.fallback"/>';
+                        const fallbackTitle = '<@spring.message code="calendar.lesson.noTitle"/>';
+                        const lessonTitle = lesson.lessonTitle || fallbackTitle;
+                        const fallbackTeacher = '<@spring.message code="calendar.lesson.noTeacher"/>';
+                        const teacherName = lesson.teacherName || fallbackTeacher;
 
                         lessonDiv.innerHTML =
                             '<div class="lesson-title">' +
@@ -447,7 +454,7 @@
                             '<span>' + teacherName + '</span>' +
                             '</div>' +
                             '</div>' +
-                            '<small style="color: #666; font-style: italic;">Нажмите для подробностей</small>';
+                            '<small style="color: #666; font-style: italic;"><@spring.message code="calendar.lesson.clickForDetails"/></small>';
 
                         modalBody.appendChild(lessonDiv);
                     });
@@ -463,12 +470,12 @@
 
         function editLesson() {
             if (!currentLesson) {
-                alert('Не удалось определить урок для редактирования');
+                alert('<@spring.message code="calendar.lesson.error.noId"/>');
                 return;
             }
             const lessonId = currentLesson.lessonId || currentLesson.id || currentLesson.scheduleId;
             if (!lessonId) {
-                alert('Ошибка: у урока нет идентификатора для редактирования');
+                alert('<@spring.message code="calendar.lesson.error.noId"/>');
                 console.error('Текущий урок (нет ID):', currentLesson);
                 return;
             }
@@ -477,15 +484,15 @@
 
         async function deleteLesson() {
             if (!currentLesson) {
-                alert('Не удалось определить урок для удаления');
+                alert('<@spring.message code="calendar.lesson.error.noId"/>');
                 return;
             }
-            if (!confirm('Вы уверены, что хотите удалить этот урок из расписания?')) {
+            if (!confirm('<@spring.message code="calendar.lesson.delete.confirm"/>')) {
                 return;
             }
             const scheduleId = currentLesson.id || currentLesson.lessonId || currentLesson.scheduleId;
             if (!scheduleId) {
-                alert('Не удалось определить ID расписания для удаления');
+                alert('<@spring.message code="calendar.lesson.error.noId"/>');
                 console.error('currentLesson:', currentLesson);
                 return;
             }
@@ -500,20 +507,20 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
-                        ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {})
+                        ...(csrfToken ? {'X-CSRF-TOKEN': csrfToken} : {})
                     },
                 });
                 const result = await response.json();
                 if (response.ok && result.success) {
-                    alert('Расписание успешно удалено');
+                    alert('<@spring.message code="calendar.lesson.delete.success"/>');
                     closeModal();
                     location.reload();
                 } else {
-                    throw new Error(result.message || 'Ошибка при удалении расписания');
+                    throw new Error(result.message || '');
                 }
             } catch (error) {
                 console.error('Ошибка при удалении расписания:', error);
-                alert('Произошла ошибка при удалении расписания: ' + error.message);
+                alert('<@spring.message code="calendar.lesson.delete.error.prefix"/>' + ' ' + (error.message || ''));
             }
         }
 
@@ -531,20 +538,18 @@
             generateCalendar();
         }
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('lessonModal');
             if (event.target === modal) {
                 closeModal();
             }
         };
 
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Инициализация календаря с данными:', schedulesData);
-            console.log('Права пользователя - может редактировать:', canEditLessons);
+        document.addEventListener('DOMContentLoaded', function () {
             generateCalendar();
         });
 
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
             console.error('JavaScript ошибка:', msg, 'в строке', lineNo);
             return false;
         };
@@ -580,7 +585,7 @@
             margin: 2rem auto;
             background: var(--white);
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
             overflow: hidden;
         }
 
@@ -593,7 +598,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            box-shadow: 0 2px 10px rgba(0,102,204,0.3);
+            box-shadow: 0 2px 10px rgba(0, 102, 204, 0.3);
             min-height: 80px;
         }
 
@@ -626,8 +631,8 @@
         }
 
         .nav-btn {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             color: var(--white);
             padding: 0.8rem 1.2rem;
             border-radius: 25px;
@@ -639,9 +644,9 @@
         }
 
         .nav-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
 
         .today-btn {
@@ -764,7 +769,7 @@
         .filters-panel {
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             border-bottom: 1px solid var(--border-light);
-            box-shadow: 0 2px 10px rgba(0,102,204,0.05);
+            box-shadow: 0 2px 10px rgba(0, 102, 204, 0.05);
         }
 
         .filters-header {
@@ -777,7 +782,7 @@
         }
 
         .filters-header:hover {
-            background: rgba(0,102,204,0.05);
+            background: rgba(0, 102, 204, 0.05);
         }
 
         .filters-header h3 {
@@ -801,7 +806,7 @@
         }
 
         .toggle-filters-btn:hover {
-            background: rgba(0,102,204,0.1);
+            background: rgba(0, 102, 204, 0.1);
             transform: scale(1.1);
         }
 
@@ -825,8 +830,8 @@
             background: var(--white);
             border-radius: 15px;
             padding: 2rem;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.08);
-            border: 1px solid rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.08);
+            border: 1px solid rgba(0, 102, 204, 0.1);
         }
 
         .filter-row {
@@ -874,7 +879,7 @@
         .filter-group select:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
             transform: translateY(-2px);
         }
 
@@ -905,12 +910,12 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 15px rgba(253,126,20,0.3);
+            box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
         }
 
         .reset-filters-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(253,126,20,0.4);
+            box-shadow: 0 6px 20px rgba(253, 126, 20, 0.4);
         }
 
         .filter-status {
@@ -921,9 +926,9 @@
             color: var(--success-green);
             font-weight: 500;
             padding: 0.5rem 1rem;
-            background: rgba(40,167,69,0.1);
+            background: rgba(40, 167, 69, 0.1);
             border-radius: 15px;
-            border: 1px solid rgba(40,167,69,0.2);
+            border: 1px solid rgba(40, 167, 69, 0.2);
         }
 
         .filter-status i {
@@ -961,7 +966,7 @@
         .day-cell:hover {
             background: rgba(135, 206, 235, 0.1);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
 
         .day-cell.other-month {
@@ -974,9 +979,9 @@
         }
 
         .day-cell.today {
-            background: linear-gradient(135deg, rgba(0,102,204,0.1), rgba(135,206,235,0.1));
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.1), rgba(135, 206, 235, 0.1));
             border: 2px solid var(--primary-blue);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.2);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.2);
         }
 
         .day-number {
@@ -1005,18 +1010,21 @@
 
         .lesson-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         .lesson-item.lecture {
             background: linear-gradient(135deg, var(--primary-blue));
         }
+
         .lesson-item.practical {
             background: linear-gradient(135deg, #28a745, #28a745);
         }
+
         .lesson-item.exam {
             background: linear-gradient(135deg, #dc3545, #dc3545);
         }
+
         .lesson-item.consultation {
             background: linear-gradient(135deg, #fd7e14, #fd7e14);
         }
@@ -1035,7 +1043,7 @@
 
         .more-lessons:hover {
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .modal {
@@ -1046,7 +1054,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
         }
 
@@ -1061,7 +1069,7 @@
             max-width: 600px;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 4px 25px rgba(0,102,204,0.2);
+            box-shadow: 0 4px 25px rgba(0, 102, 204, 0.2);
         }
 
         .modal-header {
@@ -1072,7 +1080,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,102,204,0.3);
+            box-shadow: 0 2px 10px rgba(0, 102, 204, 0.3);
         }
 
         .modal-title {
@@ -1083,7 +1091,7 @@
         }
 
         .close {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: var(--white);
             font-size: 1.5rem;
@@ -1099,7 +1107,7 @@
         }
 
         .close:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
             transform: scale(1.1);
         }
 
@@ -1136,23 +1144,23 @@
         .edit-btn {
             background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         .edit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,102,204,0.4);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
         }
 
         .delete-btn {
             background: linear-gradient(135deg, var(--danger-red), #c82333);
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(220,53,69,0.3);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
         }
 
         .delete-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(220,53,69,0.4);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
         }
 
         .lesson-detail {
@@ -1170,7 +1178,7 @@
 
         .lesson-detail:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
 
         .lesson-title {
@@ -1219,12 +1227,15 @@
         .lesson-type-badge.lecture {
             background: linear-gradient(135deg, var(--primary-blue));
         }
+
         .lesson-type-badge.practical {
             background: linear-gradient(135deg, #28a745, #28a745);
         }
+
         .lesson-type-badge.exam {
             background: linear-gradient(135deg, #dc3545, #dc3545);
         }
+
         .lesson-type-badge.consultation {
             background: linear-gradient(135deg, #fd7e14, #fd7e14);
         }
@@ -1299,7 +1310,7 @@
 
             .lesson-item {
                 font-size: 0.7rem;
-                padding: 0.2rem 0.4rem;
+                padding: 0.2rem 0.4рем;
             }
 
             .modal-content {

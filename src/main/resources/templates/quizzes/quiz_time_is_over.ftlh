@@ -2,37 +2,50 @@
 <#include "../layout.ftlh">
 <#import "../RoadMap.ftlh" as roadmap>
 <@page>
+    <#assign bcHome><@spring.message code='quiz.timeout.breadcrumb.home'/></#assign>
+    <#assign bcMyCourses><@spring.message code='quiz.timeout.student.myCourses.title'/></#assign>
+    <#assign bcLessonPrefix><@spring.message code='quiz.timeout.lesson.prefix'/></#assign>
+    <#assign bcQuizPrefix><@spring.message code='quiz.timeout.quiz.prefix'/></#assign>
+    <#assign bcTimeExpired><@spring.message code='quiz.timeExpired.breadcrumb'/></#assign>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Мои курсы", "url": "/student/my-courses"},
+    {"label": bcHome, "url": "/"},
+    {"label": bcMyCourses, "url": "/student/my-courses"},
     {"label": "${lesson.courseModule.courseInstance.title}", "url": "/student/course/${lesson.courseModule.courseInstance.id}"},
-    {"label": "Урок #${lesson.title}", "url": "/lessons/${lesson.id}"},
-    {"label": "Тест: ${quiz.title}", "url": "/quiz/${quiz.id}/passing"},
-    {"label": "Время истекло", "url": ""}
+    {"label": bcLessonPrefix + " ${lesson.title}", "url": "/lessons/${lesson.id}"},
+    {"label": bcQuizPrefix + " ${quiz.title}", "url": "/quiz/${quiz.id}/passing"},
+    {"label": bcTimeExpired, "url": ""}
     ] />
+
     <div class="hero-section">
-        <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Тест по результатам урока "${quiz.lesson.title}"</h1>
+        <h1 class="hero-title">
+            <i class="fa-solid fa-list-check"></i>
+            <@spring.message code="quiz.timeExpired.pageTitlePrefix"/> "${quiz.lesson.title}"
+        </h1>
     </div>
+
     <div class="card mx-auto">
         <div class="card-header bg-primary text-white">
-            <h1 class="mb-0">Время истекло</h1>
+            <h1 class="mb-0"><@spring.message code="quiz.timeExpired.header"/></h1>
         </div>
         <div class="card-body">
             <div class="mb-5">
-                <h2 class="h4 fw-bold mb-2">У Вас закончилось время</h2>
-                <p class="text-muted mb-0">К сожалению, время на прохождение теста истекло. Вы можете вернуться к уроку
-                    или попробовать пройти тест еще раз.</p>
+                <h2 class="h4 fw-bold mb-2"><@spring.message code="quiz.timeExpired.lead"/></h2>
+                <p class="text-muted mb-0">
+                    <@spring.message code="quiz.timeExpired.message"/>
+                </p>
             </div>
             <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
                 <a href="/lessons/${quiz.lessonId}" class="btn btn-primary rounded-pill">
-                    <i class="fa-solid fa-arrow-left"></i> Вернуться к уроку
+                    <i class="fa-solid fa-arrow-left"></i> <@spring.message code="quiz.timeExpired.backToLesson"/>
                 </a>
                 <a href="/quiz/${quiz.id}/passing" class="btn btn-primary rounded-pill">
-                    <i class="fa-solid fa-list-check"></i> Пройти тест еще раз
+                    <i class="fa-solid fa-list-check"></i> <@spring.message code="quiz.timeExpired.tryAgain"/>
                 </a>
             </div>
         </div>
     </div>
+
     <style>
         .card {
             border: none;

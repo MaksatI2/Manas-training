@@ -1,36 +1,43 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
 <#setting datetime_format="dd.MM.yyyy HH:mm">
 <#setting date_format="dd.MM.yyyy">
-<@layout.page title="Заявки на курсы">
+
+<#assign bcHome><@spring.message code='application.admin.list.breadcrumb.home'/></#assign>
+<#assign bcCurrent><@spring.message code='application.admin.list.breadcrumb.current'/></#assign>
+
+<@layout.page title="<@spring.message code='application.admin.list.title'/>">
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Заявки на курсы", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcCurrent, "url": ""}
     ] />
+
     <div class="card shadow mb-4">
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h5 class="m-0 font-weight-bold text-white mb-2 mb-md-0">
-                    <i class="fas fa-file-alt me-2"></i> Заявки на курсы
+                    <i class="fas fa-file-alt me-2"></i> <@spring.message code="application.admin.list.title"/>
                 </h5>
             </div>
         </div>
 
         <div class="table-responsive p-3">
             <#if applications?size == 0>
-                <div class="alert alert-info mb-0">Нет активных заявок.</div>
+                <div class="alert alert-info mb-0"><@spring.message code="application.admin.list.noApplications"/></div>
             <#else>
-                <table id="adminApplicationsTable" class="table table-hover table-bordered align-middle display nowrap" width="100%">
-                    <thead >
+                <table id="adminApplicationsTable" class="table table-hover table-bordered align-middle display nowrap"
+                       width="100%">
+                    <thead>
                     <tr>
-                        <th>№</th>
-                        <th>Компания</th>
-                        <th>Курс</th>
-                        <th>Код</th>
-                        <th>Преподаватель</th>
-                        <th class="wrap-date">Желаемая дата начала</th>
-                        <th class="wrap-date">Желаемая дата окончания</th>
-                        <th>Статус</th>
+                        <th><@spring.message code="application.admin.list.table.number"/></th>
+                        <th><@spring.message code="application.admin.list.table.company"/></th>
+                        <th><@spring.message code="application.admin.list.table.course"/></th>
+                        <th><@spring.message code="application.admin.list.table.code"/></th>
+                        <th><@spring.message code="application.admin.list.table.teacher"/></th>
+                        <th class="wrap-date"><@spring.message code="application.admin.list.table.preferredStart"/></th>
+                        <th class="wrap-date"><@spring.message code="application.admin.list.table.preferredEnd"/></th>
+                        <th><@spring.message code="application.admin.list.table.status"/></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -50,15 +57,14 @@
                             <td>${app.formattedPreferredStartDate!"—"}</td>
                             <td>${app.formattedPreferredEndDate!"—"}</td>
                             <td>
-            <span class="badge
-                <#if app.status == "PENDING">bg-warning
-                <#elseif app.status == "APPROVED">bg-success
-                <#elseif app.status == "REJECTED">bg-danger
-                <#else>bg-secondary</#if>">
-                ${app.localizedStatus!"—"}
-            </span>
+                               <span class="badge
+                                 <#if app.status == "PENDING">bg-warning
+                                 <#elseif app.status == "APPROVED">bg-success
+                                 <#elseif app.status == "REJECTED">bg-danger
+                                 <#else>bg-secondary</#if>">
+                                 <@spring.message code="application.admin.status.${app.status}"/>
+                               </span>
                             </td>
-
                         </tr>
                     </#list>
                     </tbody>
@@ -78,31 +84,30 @@
         $(document).ready(function () {
             $('#adminApplicationsTable').DataTable({
                 language: {
-                    url: '/js/datatables/ru.json',
+                    url: '/js/datatables/${(springMacroRequestContext.locale?lower_case?starts_with("ru"))?then("ru",(springMacroRequestContext.locale?lower_case?starts_with("ky"))?then("ky","en"))}.json',
                     paginate: {previous: '‹', next: '›'}
                 },
                 responsive: true,
                 order: [[0, 'desc']],
                 pageLength: 10,
-                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Все"]],
                 dom: '<"row mb-3 px-3 pt-2"<"col-md-6"l><"col-md-6 text-end"f>>rt<"row mt-3 px-3 pb-2"<"col-md-6"i><"col-md-6"p>>',
                 info: false,
                 columnDefs: [
-                    { responsivePriority: 4, targets: 0 },
-                    { responsivePriority: 1, targets: 1 },
-                    { responsivePriority: 5, targets: 2 },
-                    { responsivePriority: 6, orderable: false, targets: 3 },
-                    { responsivePriority: 7, orderable: false, targets: 4 },
-                    { responsivePriority: 2, targets: 5 },
-                    { responsivePriority: 8, targets: 6 },
-                    { responsivePriority: 3, orderable: false, targets: 7 }
+                    {responsivePriority: 4, targets: 0},
+                    {responsivePriority: 1, targets: 1},
+                    {responsivePriority: 5, targets: 2},
+                    {responsivePriority: 6, orderable: false, targets: 3},
+                    {responsivePriority: 7, orderable: false, targets: 4},
+                    {responsivePriority: 2, targets: 5},
+                    {responsivePriority: 8, targets: 6},
+                    {responsivePriority: 3, orderable: false, targets: 7}
                 ]
             });
         });
+
         $('.clickable-row').on('click', function () {
             window.location = $(this).data('href');
         });
-
     </script>
 
     <style>
@@ -114,13 +119,13 @@
         .card-header {
             border-bottom: none;
         }
+
         .wrap-date {
             white-space: normal !important;
             word-break: break-word;
             min-width: 90px;
             max-width: 120px;
         }
-
 
         .badge {
             display: inline-block;
@@ -132,12 +137,7 @@
             white-space: nowrap;
             vertical-align: baseline;
             border-radius: 0.375rem;
-        }
-        .badge {
             min-width: 100px;
-            text-align: center;
-            display: inline-block;
-            white-space: nowrap;
         }
 
         .bg-warning {
@@ -166,6 +166,7 @@
             background-color: #0066cc;
             color: white;
         }
+
         .btn-view {
             background-color: #0aa7c6;
             border: 1px solid #0aa7c6;
@@ -190,7 +191,6 @@
         .btn-view i {
             font-size: 1rem;
         }
-
 
         table th {
             background: linear-gradient(135deg, #0066cc, #003d7a);
@@ -218,7 +218,6 @@
             background-color: #f2f8ff;
         }
 
-
         @media (max-width: 768px) {
             .card-header h5 {
                 font-size: 1.25rem;
@@ -229,17 +228,15 @@
         table.dataTable thead th {
             color: white !important;
         }
-
     </style>
+
     <script>
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
         fetch('/api/notifications/mark-all-as-read?targetType=COURSE_APPLICATION', {
             method: 'POST',
-            headers: {
-                [csrfHeader]: csrfToken
-            }
+            headers: {[csrfHeader]: csrfToken}
         }).then(() => {
             updateNotificationCount();
         });

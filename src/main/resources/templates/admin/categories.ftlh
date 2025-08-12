@@ -1,10 +1,16 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
-<@layout.page>
+<#import "/spring.ftl" as spring>
+
+<@layout.page title="<@spring.message code='categories.admin.list.title'/>">
+    <#assign bcHome><@spring.message code='categories.admin.list.breadcrumb.home'/></#assign>
+    <#assign bcCurrent><@spring.message code='categories.admin.list.breadcrumb.current'/></#assign>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Управление категориями", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcCurrent, "url": ""}
     ] />
+
     <div class="card shadow mb-4">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -16,12 +22,13 @@
         <div class="card-header d-flex filter-panel">
             <h5 class="m-0 font-weight-bold text-white">
                 <i class="fas fa-folder me-2"></i>
-                Управление категориями
+                <@spring.message code="categories.admin.list.title"/>
             </h5>
             <div class="filter-controls">
                 <a href="/admin/categories/add" class="btn btn-light"
                    style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-plus me-1" style="color:#0066cc;"></i>Добавить категорию
+                    <i class="fas fa-plus me-1"
+                       style="color:#0066cc;"></i><@spring.message code="categories.admin.list.addCategory"/>
                 </a>
             </div>
         </div>
@@ -31,22 +38,24 @@
                 <table class="table table-bordered table-hover" id="categoriesTable" width="100%">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white !important;">
                     <tr>
-                        <th>Название</th>
-                        <th>Описание</th>
-                        <th class="actions-col">Действия</th>
+                        <th><@spring.message code="categories.admin.list.table.name"/></th>
+                        <th><@spring.message code="categories.admin.list.table.description"/></th>
+                        <th class="actions-col"><@spring.message code="categories.admin.list.table.actions"/></th>
                     </tr>
                     </thead>
                     <tbody>
                     <#list categories as category>
-                        <tr style="cursor: pointer;" onclick="window.location.href='/admin/categories/edit/${category.id}'">
+                        <tr style="cursor: pointer;"
+                            onclick="window.location.href='/admin/categories/edit/${category.id}'">
                             <td>
-                                <span class="badge" style="background: #003d7a; color: white; font-size: 1.15rem">${category.name}</span>
+                                <span class="badge"
+                                      style="background: #003d7a; color: white; font-size: 1.15rem">${category.name}</span>
                             </td>
                             <td style="color: #2c3e50;">${category.description!''}</td>
                             <td onclick="event.stopPropagation();" class="actions-col">
                                 <button type="button"
                                         class="btn btn-sm btn-danger"
-                                        title="Удалить"
+                                        title="<@spring.message code='categories.admin.list.delete.tooltip'/>"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteCategoryModal"
                                         data-category-id="${category.id}"
@@ -71,7 +80,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -79,11 +89,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Вы уверены, что хотите удалить категорию "<span id="categoryName"></span>"?</p>
+                    <p><@spring.message code="categories.admin.list.delete.confirm"/></p>
                     <p>Курсы, связанные с этой категорией:</p>
                     <ul id="courseList" class="list-group"></ul>
-                    <p id="noCoursesMessage" class="text-success mt-2" style="display: none;">Нет связанных курсов. Категорию можно удалить.</p>
-                    <p id="hasCoursesMessage" class="text-danger mt-2" style="display: none;">Невозможно удалить категорию, так как она связана с курсами.</p>
+                    <p id="noCoursesMessage" class="text-success mt-2" style="display: none;">Нет связанных курсов.
+                        Категорию можно удалить.</p>
+                    <p id="hasCoursesMessage" class="text-danger mt-2" style="display: none;">Невозможно удалить
+                        категорию, так как она связана с курсами.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
@@ -110,20 +122,19 @@
         $(document).ready(function () {
             var table = $('#categoriesTable').DataTable({
                 language: {
-                    url: '/js/datatables/ru.json',
-                    paginate: { previous: '‹', next: '›' }
+                    url: '/js/datatables/${(springMacroRequestContext.locale?lower_case?starts_with("ru"))?then("ru",(springMacroRequestContext.locale?lower_case?starts_with("ky"))?then("ky","en"))}.json',
+                    paginate: {previous: '‹', next: '›'}
                 },
                 responsive: true,
                 pageLength: 10,
                 lengthChange: true,
-                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
                 searching: true,
                 info: false,
                 paging: true,
                 autoWidth: false,
                 stateSave: true,
                 columnDefs: [
-                    { targets: 2, orderable: false }
+                    {targets: 2, orderable: false}
                 ]
             });
 
@@ -149,17 +160,13 @@
                             $('#deleteCategoryButton').prop('disabled', false);
                         } else {
                             courses.forEach(function (course) {
-                                $('#courseList').append(
-                                    '<li class="list-group-item">' + course.title + '</li>'
-                                );
+                                $('#courseList').append('<li class="list-group-item">' + course.title + '</li>');
                             });
                             $('#hasCoursesMessage').show();
                         }
                     },
                     error: function () {
-                        $('#courseList').append(
-                            '<li class="list-group-item text-danger">Ошибка при загрузке курсов.</li>'
-                        );
+                        $('#courseList').append('<li class="list-group-item text-danger">Ошибка при загрузке курсов.</li>');
                     }
                 });
             });
@@ -176,7 +183,7 @@
 
         .card {
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
 
         .filter-panel {
@@ -246,7 +253,7 @@
         }
 
         #categoriesTable tr:hover {
-            background-color: rgba(0,102,204,0.05);
+            background-color: rgba(0, 102, 204, 0.05);
             transition: all 0.3s ease;
         }
 
@@ -266,8 +273,7 @@
             padding-right: 0;
         }
 
-        div.dataTables_wrapper .dataTables_length,
-        div.dataTables_wrapper .dataTables_filter {
+        div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
             display: flex;
             align-items: center;
             gap: 1.5rem;
@@ -276,8 +282,7 @@
         }
 
         @media (max-width: 569px) {
-            div.dataTables_wrapper .dataTables_length,
-            div.dataTables_wrapper .dataTables_filter {
+            div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
                 flex-direction: column;
                 align-items: flex-start;
                 width: 100%;
@@ -290,8 +295,7 @@
         }
 
         @media (min-width: 570px) and (max-width: 770px) {
-            div.dataTables_wrapper .dataTables_length,
-            div.dataTables_wrapper .dataTables_filter {
+            div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
                 flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
@@ -299,8 +303,7 @@
                 gap: 1rem;
             }
 
-            div.dataTables_wrapper .dataTables_filter input,
-            div.dataTables_wrapper .dataTables_length select {
+            div.dataTables_wrapper .dataTables_filter input, div.dataTables_wrapper .dataTables_length select {
                 height: 38px;
                 line-height: 1.5;
             }

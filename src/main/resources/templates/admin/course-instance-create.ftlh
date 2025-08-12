@@ -2,23 +2,30 @@
 <#import "/spring.ftl" as spring />
 <#import "../RoadMap.ftlh" as roadmap>
 
-<@layout.page>
+<#assign bcHome><@spring.message code='courseInstances.admin.add.breadcrumb.home'/></#assign>
+<#assign bcList><@spring.message code='courseInstances.admin.add.breadcrumb.list'/></#assign>
+<#assign bcCurrent><@spring.message code='courseInstances.admin.add.breadcrumb.current'/></#assign>
+
+<@layout.page title="<@spring.message code='courseInstances.admin.add.header'/>">
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Потоки курсов", "url": "/admin/course-instances"},
-    {"label": "Добавить поток", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcList, "url": "/admin/course-instances"},
+    {"label": bcCurrent, "url": ""}
     ] />
 
     <div class="container">
         <div class="card" style="border-radius: 10px; box-shadow: 0 4px 15px rgba(0,102,204,0.1);">
-            <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a); border-top-left-radius: 10px; border-top-right-radius: 10px;">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                 style="background: linear-gradient(135deg, #0066cc, #003d7a); border-top-left-radius: 10px; border-top-right-radius: 10px;">
                 <h5 class="m-0 font-weight-bold text-white">
                     <i class="fas fa-plus-circle me-2"></i>
-                    Добавить поток
+                    <@spring.message code="courseInstances.admin.add.header"/>
                 </h5>
                 <div>
-                    <a href="/admin/course-instances" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                        <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                    <a href="/admin/course-instances" class="btn btn-light btn-sm"
+                       style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                        <i class="fas fa-arrow-left me-1"
+                           style="color: #0066cc;"></i> <@spring.message code="courseInstances.admin.add.breadcrumb.list"/>
                     </a>
                 </div>
             </div>
@@ -29,14 +36,13 @@
 
                     <div class="mb-3">
                         <#assign errors = Request["org.springframework.validation.BindingResult.courseInstanceDto"] />
-
                         <label for="courseId" class="form-label">
-                            Курс *
+                            <@spring.message code="courseInstances.admin.add.field.course"/> *
                         </label>
-
                         <select class="form-select" id="courseId" name="courseId">
                             <#list courses as course>
-                                <option value="${course.id}" <#if (courseInstanceDto.courseId)?? && courseInstanceDto.courseId = course.id> selected </#if>>${course.title}</option>
+                                <option value="${course.id}"
+                                        <#if (courseInstanceDto.courseId)?? && (courseInstanceDto.courseId == course.id)>selected</#if>>${course.title}</option>
                             </#list>
                         </select>
                         <div class="error-block text-danger">
@@ -52,7 +58,7 @@
 
                     <div class="mb-3">
                         <label for="title" class="form-label">
-                            Название *
+                            <@spring.message code="courseInstances.admin.add.field.title"/> *
                         </label>
                         <@spring.formInput "courseInstanceDto.title", "class='form-control' id='title'" />
                         <div class="error-block text-danger">
@@ -62,7 +68,7 @@
 
                     <div class="mb-3">
                         <label for="startDate" class="form-label">
-                            Дата начала *
+                            <@spring.message code="courseInstances.admin.add.field.startDate"/> *
                         </label>
                         <@spring.formInput "courseInstanceDto.startDate", "class='form-control' id='startDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
@@ -72,7 +78,7 @@
 
                     <div class="mb-3">
                         <label for="endDate" class="form-label">
-                            Дата окончания *
+                            <@spring.message code="courseInstances.admin.add.field.endDate"/> *
                         </label>
                         <@spring.formInput "courseInstanceDto.endDate", "class='form-control' id='endDate' type='text' autocomplete='off'" />
                         <div class="error-block text-danger">
@@ -83,9 +89,8 @@
                     <div class="mb-3">
                         <div class="form-check form-switch">
                             <@spring.formCheckbox "courseInstanceDto.isActive", "class='form-check-input' id='isActive', name='isActive'"/>
-
                             <label class="form-check-label" for="isActive">
-                                Активный курс
+                                <@spring.message code="courseInstances.admin.add.field.isActive"/>
                             </label>
                             <div class="error-block text-danger">
                                 <@spring.showErrors "isActive", "error-message" />
@@ -94,7 +99,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary-custom">
-                        <i class="fas fa-plus me-2"></i>Создать поток курса
+                        <i class="fas fa-plus me-2"></i><@spring.message code="courseInstances.admin.add.button.submit"/>
                     </button>
                 </form>
             </div>
@@ -134,7 +139,7 @@
         .btn-primary-custom:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         .form-check-input:checked {
@@ -148,16 +153,9 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            flatpickr("#startDate", {
-                dateFormat: "Y-m-d",
-                minDate: "today",
-            });
-
-            flatpickr("#endDate", {
-                dateFormat: "Y-m-d",
-                minDate: "today",
-            });
+        document.addEventListener('DOMContentLoaded', function () {
+            flatpickr("#startDate", {dateFormat: "Y-m-d", minDate: "today"});
+            flatpickr("#endDate", {dateFormat: "Y-m-d", minDate: "today"});
         });
     </script>
 

@@ -1,9 +1,14 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring/>
+
+<#assign bcHome><@spring.message code='list.teacher.breadcrumb.home'/></#assign>
+<#assign bcTeachers><@spring.message code='list.teacher.breadcrumb.teachers'/></#assign>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Преподаватели", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcTeachers, "url": ""}
     ] />
     <style>
         :root {
@@ -23,7 +28,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.6rem;
+            gap: .6rem;
         }
 
         .page-title i {
@@ -61,25 +66,25 @@
             background: var(--white);
             border-left: 4px solid var(--primary-blue);
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.08);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, .08);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
+            transition: all .3s ease;
             height: 100%;
             width: 100%;
         }
 
         .teacher-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 18px rgba(0, 102, 204, 0.15);
+            box-shadow: 0 8px 18px rgba(0, 102, 204, .15);
         }
 
         .teacher-img {
             width: 100%;
             height: 220px;
             object-fit: contain;
-            background-color: #f8f9fa;
+            background: #f8f9fa;
             padding: 10px;
             border-bottom: 1px solid #eee;
             border-radius: 10px 10px 0 0;
@@ -87,7 +92,7 @@
 
         .teacher-info {
             padding: 1rem;
-            font-size: 0.9rem;
+            font-size: .9rem;
             color: var(--text-dark);
             flex-grow: 1;
             display: flex;
@@ -97,7 +102,7 @@
         .teacher-name {
             font-weight: 600;
             font-size: 1rem;
-            margin-bottom: 0.4rem;
+            margin-bottom: .4rem;
         }
 
         .teacher-name a {
@@ -111,12 +116,12 @@
 
         .teacher-department {
             color: #555;
-            font-size: 0.85rem;
-            margin-bottom: 0.4rem;
+            font-size: .85rem;
+            margin-bottom: .4rem;
         }
 
         .teacher-contact {
-            font-size: 0.85rem;
+            font-size: .85rem;
             color: #333;
         }
 
@@ -132,7 +137,7 @@
 
     <div class="container">
         <h1 class="page-title">
-            <i class="fas fa-users"></i> Наши преподаватели
+            <i class="fas fa-users"></i> <@spring.message code='list.teacher.page.title'/>
         </h1>
 
         <div class="search-box">
@@ -141,7 +146,7 @@
                     <i class="fas fa-search text-muted"></i>
                 </span>
                 <input type="text" id="searchInput" class="form-control border-start-0"
-                       placeholder="Поиск по имени или списку преподаваемых дисциплин">
+                       placeholder="<@spring.message code='list.teacher.search.placeholder'/>">
             </div>
         </div>
 
@@ -161,7 +166,7 @@
                                 <a href="/teacher/${teacher.id}">${teacher.fullName}</a>
                             </div>
                             <div class="teacher-department">
-                                Перечень преподаваемых дисциплин: ${teacher.department}
+                                ${springMacroRequestContext.getMessage("list.teacher.department.label", [teacher.department], "Перечень преподаваемых дисциплин: " + (teacher.department!""))}
                             </div>
                             <div class="teacher-contact mt-auto flex gap-4">
                                 <div><i class="fas fa-envelope"></i>${teacher.email}</div>

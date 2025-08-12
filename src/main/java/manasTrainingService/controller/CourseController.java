@@ -76,7 +76,7 @@ public class CourseController {
         CourseInstanceDTO courseInstanceDTO = courseInstanceService.getCourseInstanceById(id);
         CourseDto courseDto = courseService.getById(courseInstanceDTO.getCourseId());
         if (!lessonAccessService.canAccessCourseTests()){
-            throw new NoAccessException("У вас нет досупа к этой странице");
+            throw new NoAccessException("У вас нет доступа к этой странице");
         }
         model.addAttribute("tests", testService.getAllTestsByCourseId(courseDto.getId()));
         model.addAttribute("course", courseDto);

@@ -1,11 +1,16 @@
 <#import "/spring.ftl" as spring />
-<#include "../layout.ftlh">
+<#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
-<@page>
+
+<#assign bcHome><@spring.message code='lesson.material.breadcrumb.home'/></#assign>
+<#assign bcLesson>${springMacroRequestContext.getMessage('lesson.material.breadcrumb.lesson')?replace('{0}', lesson.id?string)}</#assign>
+<#assign bcAdd><@spring.message code='lesson.material.breadcrumb.add'/></#assign>
+
+<@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Урок #${lesson.id}", "url": "/lessons/${lesson.id}"},
-    {"label": "Добавить материал", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcLesson, "url": "/lessons/${lesson.id}"},
+    {"label": bcAdd, "url": ""}
     ] />
     <style>
         .upload-container {
@@ -202,13 +207,32 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
         }
+
+        .btn-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 450px) {
+            .btn-container {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+        }
+
+        .cancel-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
     </style>
 
     <div class="upload-container">
         <div class="upload-card">
             <h1 class="upload-title">
                 <i class="fas fa-file-upload" style="margin-right: 0.5rem; color: #007bff;"></i>
-                Добавить материал к уроку: ${lesson.title}
+                ${springMacroRequestContext.getMessage('lesson.material.title.add')?replace('{0}', lesson.title!)}
             </h1>
 
             <#if successMessage??>
@@ -226,10 +250,12 @@
             </#if>
 
             <div class="requirements">
-                <h6><i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>Требования к файлу:</h6>
+                <h6><i class="fas fa-info-circle"
+                       style="margin-right: 0.5rem;"></i><@spring.message code="lesson.material.requirements.title"/>
+                </h6>
                 <ul>
-                    <li>Формат: PDF, DOCX, PPTX, ZIP, RAR, JPG, JPEG, XLS, XLSX</li>
-                    <li>Максимальный размер: 50 МБ</li>
+                    <li><@spring.message code="lesson.material.requirements.format"/></li>
+                    <li><@spring.message code="lesson.material.requirements.maxsize"/></li>
                 </ul>
             </div>
 
@@ -238,7 +264,8 @@
                 <@spring.formHiddenInput "material.lessonId" 'value="${lesson.id}"'/>
 
                 <div class="mb-3">
-                    <label for="materialTitle" class="form-label">Название *</label>
+                    <label for="materialTitle"
+                           class="form-label"><@spring.message code="lesson.material.form.title"/></label>
                     <@spring.formInput "material.title" 'class="form-control" id="materialTitle" maxlength="200" required' />
                     <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
                 </div>
@@ -252,8 +279,8 @@
                                 <i class="fas fa-cloud-upload-alt"></i>
                             </div>
                             <div>
-                                <strong>Нажмите для выбора файла</strong><br>
-                                или перетащите файл сюда
+                                <strong><@spring.message code="lesson.material.form.selectfile"/></strong><br>
+                                <@spring.message code="lesson.material.form.or.drag"/>
                             </div>
                         </div>
                     </label>
@@ -265,39 +292,17 @@
                 <div class="btn-container">
                     <button type="submit" class="submit-btn" id="submitBtn" disabled>
                         <i class="fas fa-upload" style="margin-right: 0.5rem;"></i>
-                        Сохранить
+                        <@spring.message code="lesson.material.form.save"/>
                     </button>
                     <a href="<@spring.url '/lessons/${lesson.id}'/>" class="cancel-btn">
                         <i class="fas fa-times" style="margin-right: 0.5rem;"></i>
-                        Отмена
+                        <@spring.message code="lesson.material.form.cancel"/>
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <style>
-        .btn-container {
-            display: flex;
-            gap: 0.5rem;
-        }
-        @media (max-width: 450px) {
-            .btn-container {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-        }
-
-        .cancel-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-    </style>
-    <script src="/static/js/lesson-material.js">
-
-    </script>
-
+    <script src="/static/js/lesson-material.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</@page>
+</@layout.page>

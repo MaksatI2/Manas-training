@@ -166,7 +166,7 @@
         <div class="upload-card">
             <h1 class="upload-title">
                 <i class="fas fa-camera" style="margin-right: 0.5rem; color: #007bff;"></i>
-                Загрузка изображения профиля
+                <@spring.message code='profile.image.upload.title'/>
             </h1>
 
             <#if successMessage??>
@@ -184,25 +184,28 @@
             </#if>
 
             <div class="requirements">
-                <h6><i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>Требования к изображению:</h6>
+                <h6><i class="fas fa-info-circle"
+                       style="margin-right: 0.5rem;"></i><@spring.message code='profile.image.upload.requirementsTitle'/>
+                </h6>
                 <ul>
-                    <li>Формат: JPEG или JPG</li>
-                    <li>Максимальный размер: 5 МБ</li>
-                    <li>Рекомендуемые размеры: 400x400 пикселей</li>
+                    <li><@spring.message code='profile.image.upload.requirements.format'/></li>
+                    <li><@spring.message code='profile.image.upload.requirements.maxSize'/></li>
+                    <li><@spring.message code='profile.image.upload.requirements.recommended'/></li>
                 </ul>
             </div>
 
             <form method="post" action="/image/upload" enctype="multipart/form-data" id="uploadForm">
                 <div class="file-input-wrapper">
-                    <input type="file" id="image" name="image" class="file-input" accept="image/jpeg,image/jpg" required>
+                    <input type="file" id="image" name="image" class="file-input" accept="image/jpeg,image/jpg"
+                           required>
                     <label for="image" class="file-input-label" id="fileLabel">
                         <div>
                             <div class="file-input-icon">
                                 <i class="fas fa-cloud-upload-alt"></i>
                             </div>
                             <div>
-                                <strong>Нажмите для выбора изображения</strong><br>
-                                или перетащите файл сюда
+                                <strong><@spring.message code='profile.image.upload.selectPrompt'/></strong><br>
+                                <@spring.message code='profile.image.upload.dragPrompt'/>
                             </div>
                         </div>
                     </label>
@@ -219,14 +222,14 @@
 
                 <button type="submit" class="submit-btn" id="submitBtn" disabled>
                     <i class="fas fa-upload" style="margin-right: 0.5rem;"></i>
-                    Загрузить изображение
+                    <@spring.message code='profile.image.upload.uploadButton'/>
                 </button>
             </form>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('image');
             const fileLabel = document.getElementById('fileLabel');
             const filePreview = document.getElementById('filePreview');
@@ -234,21 +237,21 @@
             const submitBtn = document.getElementById('submitBtn');
             const form = document.getElementById('uploadForm');
 
-            fileInput.addEventListener('change', function(e) {
+            fileInput.addEventListener('change', function (e) {
                 handleFileSelect(e.target.files[0]);
             });
 
-            fileLabel.addEventListener('dragover', function(e) {
+            fileLabel.addEventListener('dragover', function (e) {
                 e.preventDefault();
                 fileLabel.classList.add('drag-over');
             });
 
-            fileLabel.addEventListener('dragleave', function(e) {
+            fileLabel.addEventListener('dragleave', function (e) {
                 e.preventDefault();
                 fileLabel.classList.remove('drag-over');
             });
 
-            fileLabel.addEventListener('drop', function(e) {
+            fileLabel.addEventListener('drop', function (e) {
                 e.preventDefault();
                 fileLabel.classList.remove('drag-over');
                 const files = e.dataTransfer.files;
@@ -272,8 +275,8 @@
                     <i class="fas fa-check-circle" style="color: #28a745;"></i>
                 </div>
                 <div>
-                    <strong>Файл выбран</strong><br>
-                    Нажмите для выбора другого файла
+                    <strong><@spring.message code='profile.image.upload.fileSelected'/></strong><br>
+                    <@spring.message code='profile.image.upload.selectAnother'/>
                 </div>
             </div>
         `;
@@ -284,12 +287,12 @@
                 const allowedTypes = ['image/jpeg', 'image/jpg'];
 
                 if (!allowedTypes.includes(file.type)) {
-                    showError('Поддерживаются только изображения в формате JPEG/JPG');
+                    showError("<@spring.message code='profile.image.upload.error.invalidType'/>");
                     return false;
                 }
 
                 if (file.size > maxSize) {
-                    showError('Размер файла не должен превышать 5 МБ');
+                    showError("<@spring.message code='profile.image.upload.error.maxSize'/>");
                     return false;
                 }
 
@@ -300,11 +303,11 @@
                 const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
                 fileInfo.innerHTML = `
             <div>
-                <strong>Выбранный файл:</strong><br>
+                <strong><@spring.message code='profile.image.upload.selectedFile'/></strong><br>
                 <i class="fas fa-file-image" style="margin-right: 0.5rem; color: #007bff;"></i>
                 ` + file.name + `<br>
                 <i class="fas fa-weight" style="margin-right: 0.5rem; color: #6c757d;"></i>
-                Размер: ` + sizeInMB + ` МБ
+                <@spring.message code='profile.image.upload.size'/>: ` + sizeInMB + ` МБ
             </div>
         `;
                 fileInfo.style.display = 'block';
@@ -312,8 +315,8 @@
 
             function showFilePreview(file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    filePreview.innerHTML = '<img src="' + e.target.result + '" alt="Превью изображения" style="max-width: 200px; max-height: 200px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">';
+                reader.onload = function (e) {
+                    filePreview.innerHTML = '<img src="' + e.target.result + '" alt="<@spring.message code="profile.image.upload.previewAlt"/>" style="max-width: 200px; max-height: 200px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">';
                     filePreview.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
@@ -340,24 +343,23 @@
                     <i class="fas fa-cloud-upload-alt"></i>
                 </div>
                 <div>
-                    <strong>Нажмите для выбора изображения</strong><br>
-                    или перетащите файл сюда
+                    <strong><@spring.message code='profile.image.upload.selectPrompt'/></strong><br>
+                    <@spring.message code='profile.image.upload.dragPrompt'/>
                 </div>
             </div>
         `;
             }
 
-                if (!fileInput.files[0]) {
-                    e.preventDefault();
-                    showError('Пожалуйста, выберите изображение для загрузки');
-                    return;
-                }
+            if (!fileInput.files[0]) {
+                e.preventDefault();
+                showError("<@spring.message code='profile.image.upload.error.noFile'/>");
+                return;
+            }
 
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>Загружаю...';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i><@spring.message code="profile.image.upload.uploading"/>';
         });
     </script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
 </@page>

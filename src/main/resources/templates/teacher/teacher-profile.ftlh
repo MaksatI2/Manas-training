@@ -1,9 +1,14 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring/>
+
+<#assign bcHome><@spring.message code='teacher.profile.public.breadcrumb.home'/></#assign>
+<#assign bcTeachers><@spring.message code='teacher.profile.public.breadcrumb.teachers'/></#assign>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Преподаватели", "url": "/teacher"},
+    {"label": bcHome, "url": "/"},
+    {"label": bcTeachers, "url": "/teacher"},
     {"label": "${teacher.teacher.name} ${teacher.teacher.lastName}", "url": ""}
     ] />
     <style>
@@ -30,7 +35,7 @@
 
         .page-title i {
             color: var(--primary-blue);
-            margin-right: 0.5rem;
+            margin-right: .5rem;
         }
 
         .teacher-profile-container {
@@ -38,7 +43,7 @@
             margin: 0 auto 2rem;
             padding: 0 1rem;
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns:280px 1fr;
             gap: 2rem;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -47,7 +52,7 @@
             width: 100%;
             height: auto;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, .15);
             object-fit: cover;
         }
 
@@ -58,11 +63,11 @@
         }
 
         .info-section {
-            background-color: var(--white);
+            background: var(--white);
             border-left: 4px solid var(--primary-blue);
             padding: 1.2rem 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, .1);
             box-sizing: border-box;
             min-height: 80px;
         }
@@ -71,7 +76,7 @@
             font-weight: 600;
             font-size: 1rem;
             color: var(--text-dark);
-            margin-bottom: 0.5rem;
+            margin-bottom: .5rem;
         }
 
         .section-content {
@@ -87,7 +92,7 @@
         .contact-line {
             display: flex;
             align-items: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: .5rem;
             color: #444;
             cursor: pointer;
             word-wrap: break-word;
@@ -121,18 +126,18 @@
             background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
             border-color: var(--primary-blue);
             font-weight: 500;
-            transition: all 0.2s ease-in-out;
+            transition: .2s;
         }
 
         .btn-primary:hover {
             background: linear-gradient(135deg, var(--dark-blue), #002a5a);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, .3);
         }
 
         @media (max-width: 992px) {
             .teacher-profile-container {
-                grid-template-columns: 1fr;
+                grid-template-columns:1fr;
                 text-align: center;
             }
 
@@ -153,22 +158,14 @@
             }
 
             .section-title {
-                font-size: 0.95rem;
+                font-size: .95rem;
             }
 
             .section-content {
-                font-size: 0.95rem;
+                font-size: .95rem;
             }
         }
     </style>
-
-    <#assign known = Session.SPRING_SECURITY_CONTEXT??>
-    <#if known>
-        <#assign user = Session.SPRING_SECURITY_CONTEXT.authentication.principal>
-        <#assign name = user.getFullName()>
-        <#assign roles = user.getAuthorities()?join(",")>
-        <#assign isAdmin = roles?contains("ADMIN")>
-    </#if>
 
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -179,7 +176,7 @@
 
     <div class="page-title-block">
         <h1 class="page-title">
-            <i class="fas fa-user-graduate"></i>Информация о преподавателе
+            <i class="fas fa-user-graduate"></i><@spring.message code='teacher.profile.public.pageTitle'/>
         </h1>
     </div>
 
@@ -187,11 +184,10 @@
         <div class="teacher-photo">
             <img src="<#if teacher.teacher.avatarUrl??>/data/images/${teacher.teacher.avatarUrl}<#else>/static/images/default_avatar.jpg</#if>"
                  alt="${teacher.teacher.name} ${teacher.teacher.lastName}">
-            <#if isAdmin>
+            <#if Session.SPRING_SECURITY_CONTEXT?? && (Session.SPRING_SECURITY_CONTEXT.authentication.principal.getAuthorities()?join(",")?contains("ADMIN"))>
                 <div style="margin-top: 1rem; text-align: center;" class="w-100">
-                    <a href="/admin/teachers/${teacher.teacher.id}/manage-courses"
-                       class="btn btn-primary w-100">
-                        Управлять курсами
+                    <a href="/admin/teachers/${teacher.teacher.id}/manage-courses" class="btn btn-primary w-100">
+                        <@spring.message code='teacher.profile.public.manageCourses'/>
                     </a>
                 </div>
             </#if>
@@ -199,27 +195,29 @@
 
         <div class="teacher-info-block">
             <div class="info-section">
-                <div class="section-title">ФИО преподавателя</div>
+                <div class="section-title"><@spring.message code='teacher.profile.public.fullName'/></div>
                 <div class="section-content">${teacher.teacher.name} ${teacher.teacher.lastName}</div>
             </div>
 
             <div class="info-section">
-                <div class="section-title">Перечень преподаваемых дисциплин</div>
+                <div class="section-title"><@spring.message code='teacher.profile.public.subjects'/></div>
                 <div class="section-content">${teacher.department}</div>
             </div>
 
             <div class="info-section">
-                <div class="section-title">Контактная информация</div>
+                <div class="section-title"><@spring.message code='teacher.profile.public.contactInfo'/></div>
                 <div class="section-content">
                     <div class="contact-line" onclick="copyToClipboard('${teacher.teacher.email}')">
                         <i class="fas fa-envelope"></i>
-                        <a href="mailto:${teacher.teacher.email}" title="Нажмите, чтобы скопировать">
+                        <a href="mailto:${teacher.teacher.email}"
+                           title="<@spring.message code='teacher.profile.public.emailTooltip'/>">
                             ${teacher.teacher.email}
                         </a>
                     </div>
                     <#if teacher.teacher.phone??>
                         <div class="contact-line">
-                            <i class="fas fa-phone"></i> ${teacher.teacher.phone}
+                            <i class="fas fa-phone"></i> <@spring.message code='teacher.profile.public.phone'/>
+                            : ${teacher.teacher.phone}
                         </div>
                     </#if>
                 </div>
@@ -227,14 +225,14 @@
 
             <#if teacher.qualifications?has_content>
                 <div class="info-section">
-                    <div class="section-title">Квалификация</div>
+                    <div class="section-title"><@spring.message code='teacher.profile.public.qualification'/></div>
                     <div class="section-content">${teacher.qualifications}</div>
                 </div>
             </#if>
 
             <#if teacher.bio?has_content>
                 <div class="info-section">
-                    <div class="section-title">О преподавателе</div>
+                    <div class="section-title"><@spring.message code='teacher.profile.public.about'/></div>
                     <div class="section-content">${teacher.bio}</div>
                 </div>
             </#if>
@@ -244,7 +242,7 @@
     <script>
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert("Email скопирован в буфер обмена: " + text);
+                alert("${springMacroRequestContext.getMessage('teacher.profile.public.emailCopied', [], 'Email скопирован в буфер обмена:')} " + text);
             });
         }
     </script>

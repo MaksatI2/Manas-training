@@ -1,12 +1,14 @@
+<#import "/spring.ftl" as spring />
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
 
-<@layout.page>
+<@layout.page title="${springMacroRequestContext.getMessage('categories.admin.add.title')}">
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Управление категориями", "url": "/admin/categories"},
-    {"label": "Добавить категорию", "url": ""}
+    {"label": "${springMacroRequestContext.getMessage('categories.admin.add.breadcrumb.home')}", "url": "/"},
+    {"label": "${springMacroRequestContext.getMessage('categories.admin.add.breadcrumb.list')}", "url": "/admin/categories"},
+    {"label": "${springMacroRequestContext.getMessage('categories.admin.add.breadcrumb.current')}", "url": ""}
     ] />
+
     <div class="card shadow mb-4">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -14,14 +16,18 @@
         <#if errorMessage??>
             <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
-        <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
+
+        <div class="card-header py-3 d-flex justify-content-between align-items-center"
+             style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <h5 class="m-0 font-weight-bold text-white">
                 <i class="fas fa-plus-circle me-2"></i>
-                Добавить категорию
+                <@spring.message code="categories.admin.add.title"/>
             </h5>
             <div>
-                <a href="/admin/categories" class="btn btn-light btn-sm" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                <a href="/admin/categories" class="btn btn-light btn-sm"
+                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                    <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i>
+                    <@spring.message code="categories.admin.add.backToList"/>
                 </a>
             </div>
         </div>
@@ -35,14 +41,16 @@
                 <div class="row">
                     <div class="col-md-8">
                         <div class="mb-3">
-                            <label for="name" class="form-label required">Название категории</label>
+                            <label for="name" class="form-label required">
+                                <@spring.message code="categories.admin.add.nameLabel"/>
+                            </label>
                             <input type="text"
                                    class="form-control <#if .globals['org.springframework.validation.BindingResult.categoryDto']?? && .globals['org.springframework.validation.BindingResult.categoryDto'].hasFieldErrors('name')>is-invalid</#if>"
                                    id="name"
                                    name="name"
                                    value="${categoryDto.name!''}"
                                    maxlength="100"
-                                   placeholder="Введите название категории"
+                                   placeholder="${springMacroRequestContext.getMessage('categories.admin.add.namePlaceholder')}"
                                    required>
                             <#if .globals['org.springframework.validation.BindingResult.categoryDto']?? && .globals['org.springframework.validation.BindingResult.categoryDto'].hasFieldErrors('name')>
                                 <div class="invalid-feedback">
@@ -51,19 +59,24 @@
                                     </#list>
                                 </div>
                             </#if>
-                            <div class="form-text">Уникальное название категории курсов</div>
+                            <div class="form-text">
+                                <@spring.message code="categories.admin.add.nameHelp"/>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="description" class="form-label">Описание</label>
-                    <textarea class="form-control <#if .globals['org.springframework.validation.BindingResult.categoryDto']?? && .globals['org.springframework.validation.BindingResult.categoryDto'].hasFieldErrors('description')>is-invalid</#if>"
-                              id="description"
-                              name="description"
-                              rows="3"
-                              maxlength="500"
-                              placeholder="Краткое описание категории (необязательно)">${categoryDto.description!''}</textarea>
+                    <label for="description" class="form-label">
+                        <@spring.message code="categories.admin.add.descriptionLabel"/>
+                    </label>
+                    <textarea
+                            class="form-control <#if .globals['org.springframework.validation.BindingResult.categoryDto']?? && .globals['org.springframework.validation.BindingResult.categoryDto'].hasFieldErrors('description')>is-invalid</#if>"
+                            id="description"
+                            name="description"
+                            rows="3"
+                            maxlength="500"
+                            placeholder="${springMacroRequestContext.getMessage('categories.admin.add.descriptionPlaceholder')}">${categoryDto.description!''}</textarea>
                     <#if .globals['org.springframework.validation.BindingResult.categoryDto']?? && .globals['org.springframework.validation.BindingResult.categoryDto'].hasFieldErrors('description')>
                         <div class="invalid-feedback">
                             <#list .globals['org.springframework.validation.BindingResult.categoryDto'].getFieldErrors('description') as error>
@@ -71,15 +84,19 @@
                             </#list>
                         </div>
                     </#if>
-                    <div class="form-text">Максимум 500 символов</div>
+                    <div class="form-text">
+                        <@spring.message code="categories.admin.add.descriptionHelp"/>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2">
                     <a href="/admin/categories" class="btn btn-secondary">
-                        <i class="fas fa-times me-1"></i> Отмена
+                        <i class="fas fa-times me-1"></i>
+                        <@spring.message code="categories.admin.add.cancel"/>
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Создать категорию
+                        <i class="fas fa-save me-1"></i>
+                        <@spring.message code="categories.admin.add.create"/>
                     </button>
                 </div>
             </form>
@@ -94,7 +111,7 @@
 
         .card {
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
 
         .form-control, .form-select {
@@ -123,7 +140,7 @@
         .btn-primary:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         .btn-secondary {
