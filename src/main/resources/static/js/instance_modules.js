@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const t = (k, params = {}) => {
+        const s = (window.APP_MESSAGES && window.APP_MESSAGES[k]) || k;
+        return s.replace(/{(\w+)}/g, (_, p) => (params[p] != null ? params[p] : ''));
+    };
+
     const addModuleBtn = document.getElementById('add-module-btn');
     const newModulesContainer = document.getElementById('new-modules-container');
     const moduleForm = document.getElementById('module-form');
@@ -26,19 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateHoursStatus = () => {
         const total = calculateTotalHours();
         const remaining = MAX_TOTAL_HOURS - total;
-
-        if (hoursInfo) {
-            hoursInfo.textContent = Math.max(0, remaining);
-        }
-
+        if (hoursInfo) hoursInfo.textContent = Math.max(0, remaining);
         updateButtonState(addModuleBtn, remaining < 0, 'btn-primary-custom', 'btn-secondary');
-
         const overLimit = total > MAX_TOTAL_HOURS;
         updateButtonState(saveButton, overLimit, 'btn-primary-custom', 'btn-danger');
-
-        if (limitInfo) {
-            limitInfo.style.display = remaining < 0 ? 'block' : 'none';
-        }
+        if (limitInfo) limitInfo.style.display = remaining < 0 ? 'block' : 'none';
     };
 
     newModulesContainer.addEventListener('click', (event) => {
@@ -53,38 +50,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const addNewModuleForm = () => {
         const moduleDiv = document.createElement('div');
         moduleDiv.className = 'new-module-section mb-3 p-3 border rounded';
-
         moduleDiv.innerHTML = `
             <div class="row">
                 <div class="col-md-3">
-                    <label class="form-label">Название</label>
+                    <label class="form-label">${t('js.instance_module.field.title')}</label>
                     <input type="text" class="form-control" name="modules[${moduleCount}].title" maxlength="200">
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Часы</label>
+                    <label class="form-label">${t('js.instance_module.field.hours')}</label>
                     <input type="number" class="form-control" name="modules[${moduleCount}].durationHours" min="1">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Описание</label>
+                    <label class="form-label">${t('js.instance_module.field.description')}</label>
                     <textarea class="form-control" name="modules[${moduleCount}].description"></textarea>
                 </div>
             </div>
-            <button type="button" class="btn btn-danger btn-sm mt-2 remove-module-btn">Удалить</button>
+            <button type="button" class="btn btn-danger btn-sm mt-2 remove-module-btn">${t('js.instance_module.btn.remove')}</button>
         `;
-
         newModulesContainer.appendChild(moduleDiv);
-
-
-        moduleDiv.querySelector('input[name$=".durationHours"]')
-            .addEventListener('input', updateHoursStatus);
-
+        moduleDiv.querySelector('input[name$=".durationHours"]').addEventListener('input', updateHoursStatus);
         moduleCount++;
         updateHoursStatus();
     };
 
     const removeSection = (sectionElement, sectionClass) => {
         sectionElement.remove();
-
         if (sectionElement.classList.contains(sectionClass)) {
             renumberModules();
             updateHoursStatus();
@@ -101,21 +91,18 @@ document.addEventListener('DOMContentLoaded', () => {
         moduleCount = modules.length;
     };
 
-
     const handleFormSubmit = () => {
         moduleForm.addEventListener('submit', e => {
             const newModules = newModulesContainer.querySelectorAll('.new-module-section');
             const total = calculateTotalHours();
-
             if (newModules.length === 0) {
                 e.preventDefault();
-                alert('Должен быть добавлен хотя бы один модуль');
+                alert(t('js.instance_module.alert.needOne'));
                 return;
             }
-
             if (total > MAX_TOTAL_HOURS) {
                 e.preventDefault();
-                alert(`Общее количество часов (${total}) превышает допустимый лимит: ${MAX_TOTAL_HOURS}`);
+                alert(t('js.instance_module.alert.overLimit', {total, limit: MAX_TOTAL_HOURS}));
             }
         });
     };
@@ -124,11 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
     handleFormSubmit();
     updateHoursStatus();
 
-
     const moduleTable = document.getElementById('existing-modules');
 
     moduleTable?.addEventListener('click', (event) => {
-
         const deleteBtn = event.target.closest('.delete-module-btn');
         if (!deleteBtn) return;
 
@@ -139,15 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalBody = document.getElementById('deleteModuleModalBody');
 
         if (lessonsCount > 0) {
-            modalBody.innerHTML = `
-            <p>Этот модуль содержит <strong>${lessonsCount}</strong> уроков и не может быть удалён.</p>
-        `;
+            modalBody.innerHTML = `<p>${t('js.instance_module.modal.blocked', {count: lessonsCount})}</p>`;
             confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Удаление невозможно';
+            confirmBtn.textContent = t('js.instance_module.modal.deleteImpossible');
         } else {
-            modalBody.innerHTML = `<p>Вы уверены, что хотите удалить модуль?</p>`;
+            modalBody.innerHTML = `<p>${t('js.instance_module.modal.deleteQuestion')}</p>`;
             confirmBtn.disabled = false;
-            confirmBtn.textContent = 'Удалить модуль';
+            confirmBtn.textContent = t('js.instance_module.modal.deleteAction');
 
             const csrfToken = $('meta[name="_csrf"]').attr('content');
             const form = document.getElementById('deleteModuleForm');
@@ -161,12 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     form.submit();
                 }
             };
-
-
         }
 
         const modal = new bootstrap.Modal(document.getElementById('deleteModuleModal'));
         modal.show();
     });
-
 });

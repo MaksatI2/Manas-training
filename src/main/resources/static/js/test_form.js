@@ -1,10 +1,9 @@
-let createQuestionButtonContainer = document.getElementById("createQuestionContainer")
+let createQuestionButtonContainer = document.getElementById("createQuestionContainer");
 
 function createQuestionBlock(count, testId) {
-    let all = document.querySelectorAll('[id^="questionId-"]')
-    let questions = Array.from(all)
-        .filter(el => /^questionId-\d+$/.test(el.id))
-    let index = questions.length
+    let all = document.querySelectorAll('[id^="questionId-"]');
+    let questions = Array.from(all).filter(el => /^questionId-\d+$/.test(el.id));
+    let index = questions.length;
     for (let i = 0; i < count; i++) {
         let questionIndex = index + i;
         let question = `
@@ -17,8 +16,7 @@ function createQuestionBlock(count, testId) {
                              </button>
                         </div>
                         <div class="mb-3">
-                            <label for="questions[${questionIndex}].question" class="form-label fw-bold">Введите текст
-                                вопроса <span class="text-danger">*</span>
+                            <label for="questions[${questionIndex}].question" class="form-label fw-bold">${window.APP_MESSAGES['test_form.label.enterQuestion']} <span class="text-danger">*</span>
                             </label>
                             <input type="text" 
                                    name="questions[${questionIndex}].question"
@@ -40,7 +38,7 @@ function createQuestionBlock(count, testId) {
                                     <input type="text"
                                            name="questions[${questionIndex}].options[0].optionText"
                                            id="questions[${questionIndex}].options[0].optionText"
-                                           placeholder="Вариант ответа *"
+                                           placeholder="${window.APP_MESSAGES['test_form.placeholder.answerOption']}"
                                            aria-describedby="button-addon2"
                                            class="form-control me-3">
                                 </div>
@@ -58,7 +56,7 @@ function createQuestionBlock(count, testId) {
                                     <input type="text"
                                            name="questions[${questionIndex}].options[1].optionText"
                                            id="questions[${questionIndex}].options[1].optionText"
-                                           placeholder="Вариант ответа *"
+                                           placeholder="${window.APP_MESSAGES['test_form.placeholder.answerOption']}"
                                            aria-describedby="button-addon2"
                                            class="form-control me-3">
                                 </div>
@@ -76,7 +74,7 @@ function createQuestionBlock(count, testId) {
                                     <input type="text"
                                            name="questions[${questionIndex}].options[2].optionText"
                                            id="questions[${questionIndex}].options[2].optionText"
-                                           placeholder="Вариант ответа *"
+                                           placeholder="${window.APP_MESSAGES['test_form.placeholder.answerOption']}"
                                            aria-describedby="button-addon2"
                                            class="form-control me-3">
                                     <button class="btn btn-outline-danger"
@@ -100,7 +98,7 @@ function createQuestionBlock(count, testId) {
                                     <input type="text"
                                            name="questions[${questionIndex}].options[3].optionText" 
                                            id="questions[${questionIndex}].options[3].optionText"
-                                           placeholder="Вариант ответа *"
+                                           placeholder="${window.APP_MESSAGES['test_form.placeholder.answerOption']}"
                                            aria-describedby="button-addon2"
                                            class="form-control me-3">
                                     <button class="btn btn-outline-danger"
@@ -114,28 +112,28 @@ function createQuestionBlock(count, testId) {
                         </div>
                         <div class="mb-3" id="createOption">
                             <button type="button" class="btn btn-primary-custom" onclick="createOption(${questionIndex})" id="add-options-button-question-${questionIndex}" disabled>
-                                Добавить вариант ответа
+                                ${window.APP_MESSAGES['test_form.button.addOption']}
                             </button>
                         </div>
                         <div class="mb-3">
                             <input type="checkbox" name="questions[${questionIndex}].isRequired" class="form-check-input fs-4" value="true" checked>
                             <label for="questions[${questionIndex}].isRequired"
-                                   class="form-label fw-bold mx-2">Активный?</label>
+                                   class="form-label fw-bold mx-2">${window.APP_MESSAGES['test_form.label.active']}</label>
                         </div>
                     </div>
                 </div>
     `;
-        createQuestionButtonContainer.insertAdjacentHTML("beforebegin", question)
+        createQuestionButtonContainer.insertAdjacentHTML("beforebegin", question);
         if (testId) {
-            let hiddenInput = `<input type="hidden" name="questions[${questionIndex}].testId" value="${testId}">`
-            document.getElementById(`questionId-${questionIndex}`).insertAdjacentHTML("beforeend", hiddenInput)
+            let hiddenInput = `<input type="hidden" name="questions[${questionIndex}].testId" value="${testId}">`;
+            document.getElementById(`questionId-${questionIndex}`).insertAdjacentHTML("beforeend", hiddenInput);
         }
     }
 
 }
 
 function createOption(questionIndex, questionId) {
-    let optionsContainer = document.getElementById('options-questionId-'+questionIndex)
+    let optionsContainer = document.getElementById('options-questionId-' + questionIndex);
     let allOptions = optionsContainer.querySelectorAll(`[id^="questionId-${questionIndex}-optionId-"]`);
     let index = allOptions.length > 0
         ? Math.max(...Array.from(allOptions)
@@ -156,7 +154,7 @@ function createOption(questionIndex, questionId) {
                   <input type="text"
                          name="questions[${questionIndex}].options[${index}].optionText" 
                          id="questions[${questionIndex}].options[${index}].optionText"
-                         placeholder="Вариант ответа *"
+                         placeholder="${window.APP_MESSAGES['test_form.placeholder.answerOption']}"
                          aria-describedby="button-addon2"
                          class="form-control me-3">
                   <button class="btn btn-outline-danger"
@@ -167,7 +165,7 @@ function createOption(questionIndex, questionId) {
                   </button>
              </div>
         </div>
-    `
+    `;
     optionsContainer.insertAdjacentHTML("beforeend", option);
 
     if(questionId){
@@ -182,11 +180,9 @@ function createOption(questionIndex, questionId) {
 }
 
 function checkOptionsCount(questionIndex) {
-    let question = document.getElementById("questionId-" + questionIndex)
+    let question = document.getElementById("questionId-" + questionIndex);
     let all = question.querySelectorAll('[id^="questionId-' + questionIndex + '-optionId-"]');
-    let options = Array.from(all)
-        .filter(el => /^questionId-\d+-optionId-\d+$/.test(el.id))
-        .filter(el => el.getAttribute("deleted") !== 'true')
+    let options = Array.from(all).filter(el => /^questionId-\d+-optionId-\d+$/.test(el.id)).filter(el => el.getAttribute("deleted") !== 'true');
     return options.length;
 }
 
@@ -200,23 +196,22 @@ function deleteQuestion(id) {
 
 function deleteOption(id, errorId, questionId) {
     let button = document.getElementById(id);
-    let optionId = id.split('-').at(-1)
-    console.log(optionId)
+    let optionId = id.split('-').at(-1);
     let div = document.getElementById(id);
     let err;
     if (errorId) {
-        err = document.querySelectorAll("." + errorId)
-        err.forEach(e => e.remove())
+        err = document.querySelectorAll("." + errorId);
+        err.forEach(e => e.remove());
     }
-    let errorMessage = document.getElementById("invalid-" + id)
+    let errorMessage = document.getElementById("invalid-" + id);
     if (errorMessage) {
         errorMessage.remove();
     }
     button.addEventListener('click', () => {
-        const deletedRadio = document.getElementById("questions["+questionId+"].options["+optionId+"]")
-        if(deletedRadio && deletedRadio.checked){
-            let radio = document.getElementById("questions["+questionId+"].options["+0+"]")
-            if(radio){
+        const deletedRadio = document.getElementById("questions[" + questionId + "].options[" + optionId + "]");
+        if (deletedRadio && deletedRadio.checked) {
+            let radio = document.getElementById("questions[" + questionId + "].options[" + 0 + "]");
+            if (radio) {
                 radio.checked = true;
             }
         }
@@ -371,8 +366,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const filtredElements = Array.from(questions).filter(e => pattern.test(e.id));
     for (let question of filtredElements) {
         let index = question.id.split('-')[1];
-        if (getOptionsCount(index) === 4 || getOptionsCount(index) > 4) {
+        if (getOptionsCount(index) >= 4) {
             document.getElementById("add-options-button-question-" + index).disabled = true;
         }
     }
-})
+});

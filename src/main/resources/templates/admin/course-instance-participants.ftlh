@@ -3,35 +3,44 @@
 <#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page>
+    <#assign bcHome = springMacroRequestContext.getMessage("course.participants.breadcrumb.home")>
+    <#assign bcInstances = springMacroRequestContext.getMessage("course.participants.breadcrumb.instances")>
+    <#assign bcInstance = springMacroRequestContext.getMessage("course.participants.breadcrumb.instance", [courseInstance.id?string])>
+    <#assign bcParticipants = springMacroRequestContext.getMessage("course.participants.breadcrumb.participants")>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Потоки курсов", "url": "/admin/course-instances"},
-    {"label": "Поток #${courseInstance.id}", "url": "/admin/course-instances/${courseInstance.id}"},
-    {"label": "Участники", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcInstances, "url": "/admin/course-instances"},
+    {"label": bcInstance, "url": "/admin/course-instances/${courseInstance.id}"},
+    {"label": bcParticipants, "url": ""}
     ] />
     <div class="container py-4">
         <div class="hero-section mb-4 text-center">
-            <h2 class="hero-title mb-2">Управление участниками курса: <strong>${courseInstance.title}</strong></h2>
+            <h2 class="hero-title mb-2">
+                ${springMacroRequestContext.getMessage("course.participants.title", [courseInstance.title!""])}
+            </h2>
             <p class="hero-subtitle fs-5 text-muted">
-                Текущий поток: <span class="fw-semibold">${courseInstance.title}</span>
+                ${springMacroRequestContext.getMessage("course.participants.currentStream", [courseInstance.title!""])}
             </p>
         </div>
 
         <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+            <div class="alert alert-danger mt-3 mx-auto" style="max-width: 600px;">
+                ${errorMessage}
+            </div>
         </#if>
 
         <div class="feature-card mb-5 p-4 bg-white shadow-sm rounded">
-            <h3 class="mb-3">Текущие участники</h3>
+            <h3 class="mb-3"><@spring.message code="course.participants.current.title"/></h3>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                     <tr>
-                        <th scope="col" style="width: 30%;">Имя участника</th>
-                        <th scope="col" style="width: 20%;">Дата зачисления</th>
-                        <th scope="col" style="width: 10%;">Оценка</th>
-                        <th scope="col" style="width: 20%;">Статус</th>
-                        <th scope="col" style="width: 20%;">Действие</th>
+                        <th scope="col" style="width: 30%;"><@spring.message code="course.participants.table.name"/></th>
+                        <th scope="col" style="width: 20%;"><@spring.message code="course.participants.table.enrollmentDate"/></th>
+                        <th scope="col" style="width: 10%;"><@spring.message code="course.participants.table.grade"/></th>
+                        <th scope="col" style="width: 20%;"><@spring.message code="course.participants.table.status"/></th>
+                        <th scope="col" style="width: 20%;"><@spring.message code="course.participants.table.action"/></th>
                     </tr>
                     </thead>
                     <tbody id="current-participants">
@@ -43,7 +52,11 @@
                             <td>
                 <span class="badge
                     <#if enrollment.status == 'ENROLLED'>bg-success<#else>bg-secondary</#if>">
-                    <#if enrollment.status == 'ENROLLED'>Зачислен<#else>Отчислен</#if>
+                    <#if enrollment.status == 'ENROLLED'>
+                        <@spring.message code="course.participants.status.enrolled"/>
+                    <#else>
+                        <@spring.message code="course.participants.status.expelled"/>
+                    </#if>
                 </span>
                             </td>
                             <td>
@@ -53,7 +66,11 @@
                                     <button type="submit"
                                             class="btn btn-sm
                             <#if enrollment.status == 'ENROLLED'>btn-outline-danger<#else>btn-outline-success</#if>">
-                                        <#if enrollment.status == 'ENROLLED'>Отчислить<#else>Восстановить</#if>
+                                        <#if enrollment.status == 'ENROLLED'>
+                                            <@spring.message code="course.participants.action.expel"/>
+                                        <#else>
+                                            <@spring.message code="course.participants.action.restore"/>
+                                        </#if>
                                     </button>
                                 </form>
                             </td>
@@ -67,7 +84,7 @@
         </div>
 
         <div class="feature-card p-4 bg-white shadow-sm rounded">
-            <h3 class="mb-3">Добавить участников из заявок</h3>
+            <h3 class="mb-3"><@spring.message code="course.participants.addFromApplications"/></h3>
             <form id="participant-form" action="/admin/course-instances/${courseInstance.id}/participants/add" method="post" novalidate>
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 <div id="new-participants-container" class="mb-4">
@@ -83,7 +100,7 @@
                                             <span>${employee.employeeName!''}</span>
                                         </div>
                                         <div class="col-md-5">
-                                            <span>Заявка #${employee.applicationId}</span>
+                                            <span>${springMacroRequestContext.getMessage("course.participants.applicationNumber", [employee.applicationId?string])}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -101,7 +118,7 @@
                                         <span>${employee.employeeName!''}</span>
                                     </div>
                                     <div class="col-md-5">
-                                        <span>Заявка #${employee.applicationId}</span>
+                                        <span>${springMacroRequestContext.getMessage("course.participants.applicationNumber", [employee.applicationId?string])}</span>
                                     </div>
                                 </div>
                             </div>
@@ -111,7 +128,7 @@
 
                 <div class="d-flex gap-2 flex-wrap">
                     <button type="submit" class="btn btn-primary">
-                        Добавить участников
+                        <@spring.message code="course.participants.addButton"/>
                     </button>
                 </div>
             </form>

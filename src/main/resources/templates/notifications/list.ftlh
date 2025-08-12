@@ -1,24 +1,25 @@
 <#import "../layout.ftlh" as layout>
 
-<@layout.page title="Мои уведомления">
+<@layout.page title="${springMacroRequestContext.getMessage('notifications.page.title')}">
     <div class="container mt-4">
         <h2 class="mb-4" style="color: var(--primary-blue); font-weight: 600; font-size: 2.5rem;">
-            <i class="fas fa-bell me-2"></i>Мои уведомления
+            <i class="fas fa-bell me-2"></i>${springMacroRequestContext.getMessage('notifications.page.title')}
         </h2>
 
         <div class="mb-4 d-flex gap-3">
             <button id="markAllBtn" class="btn btn-outline-success btn-sm">
-                <i class="fas fa-check-double me-1"></i> Прочитать все
+                <i class="fas fa-check-double me-1"></i> ${springMacroRequestContext.getMessage('notifications.button.markAll')}
             </button>
             <button id="clearAllBtn" class="btn btn-outline-danger btn-sm">
-                <i class="fas fa-trash me-1"></i> Очистить все
+                <i class="fas fa-trash me-1"></i> ${springMacroRequestContext.getMessage('notifications.button.clearAll')}
             </button>
         </div>
 
         <#if notifications?size == 0>
             <div class="text-center my-5">
                 <i class="fas fa-inbox fa-3x mb-3" style="color: var(--light-blue);"></i>
-                <p class="text-muted" style="font-size: 1.1rem;">Уведомлений пока нет.</p>
+                <p class="text-muted"
+                   style="font-size: 1.1rem;">${springMacroRequestContext.getMessage('notifications.empty')}</p>
             </div>
         <#else>
             <div class="d-flex flex-column gap-3">
@@ -77,7 +78,7 @@
                                "
                                onmouseover="this.style.transform='translateY(-2px)'"
                                onmouseout="this.style.transform='none'">
-                                Открыть
+                                ${springMacroRequestContext.getMessage('notifications.button.open')}
                             </a>
                         </#if>
                     </div>
@@ -104,7 +105,7 @@
 
             if (clearBtn) {
                 clearBtn.addEventListener('click', () => {
-                    if (confirm('Вы уверены, что хотите удалить все уведомления?')) {
+                    if (confirm('${springMacroRequestContext.getMessage("notifications.confirm.clearAll")}')) {
                         fetch('/api/notifications/clear', {
                             method: 'DELETE',
                             headers: {

@@ -1,4 +1,5 @@
 <#import "../layout.ftlh" as layout>
+<#import "/spring.ftl" as spring>
 
 <@layout.page>
     <div class="card shadow mb-4">
@@ -8,14 +9,17 @@
         <#if errorMessage??>
             <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
         </#if>
-        <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center"
+             style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <h5 class="m-0 font-weight-bold text-white">
                 <i class="fas fa-user-edit me-2"></i>
-                Редактировать пользователя
+                <@spring.message code="admin.user.edit.title"/>
             </h5>
             <div>
-                <a href="/admin/users" class="btn btn-light btn-sm me-2" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                <a href="/admin/users" class="btn btn-light btn-sm me-2"
+                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                    <i class="fas fa-arrow-left me-1"
+                       style="color: #0066cc;"></i> <@spring.message code="admin.user.edit.backToList"/>
                 </a>
             </div>
         </div>
@@ -28,9 +32,9 @@
 
                 <input type="hidden" name="id" value="${userEditDto.id!''}">
 
-
                 <div class="mb-3">
-                    <label for="email" class="form-label required">Email</label>
+                    <label for="email"
+                           class="form-label required"><@spring.message code="admin.user.edit.label.email"/></label>
                     <input type="email"
                            class="form-control <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('email')>is-invalid</#if>"
                            id="email"
@@ -41,16 +45,16 @@
                     <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('email')>
                         <div class="invalid-feedback">
                             <#list .globals['org.springframework.validation.BindingResult.userEditDto'].getFieldErrors('email') as error>
-                                ${error.defaultMessage}<#if error_has_next><br></#if>
+                                ${error.defaultMessage}
                             </#list>
                         </div>
                     </#if>
                 </div>
 
-
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="name" class="form-label required">Имя</label>
+                        <label for="name"
+                               class="form-label required"><@spring.message code="admin.user.edit.label.name"/></label>
                         <input type="text"
                                class="form-control <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('name')>is-invalid</#if>"
                                id="name"
@@ -61,15 +65,15 @@
                         <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('name')>
                             <div class="invalid-feedback">
                                 <#list .globals['org.springframework.validation.BindingResult.userEditDto'].getFieldErrors('name') as error>
-                                    ${error.defaultMessage}<#if error_has_next><br></#if>
+                                    ${error.defaultMessage}
                                 </#list>
                             </div>
                         </#if>
-
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="lastName" class="form-label required">Фамилия</label>
+                        <label for="lastName"
+                               class="form-label required"><@spring.message code="admin.user.edit.label.lastName"/></label>
                         <input type="text"
                                class="form-control <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('lastName')>is-invalid</#if>"
                                id="lastName"
@@ -77,10 +81,10 @@
                                value="${userEditDto.lastName!''}"
                                maxlength="50"
                                required>
-                        <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('phone')>
+                        <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('lastName')>
                             <div class="invalid-feedback">
                                 <#list .globals['org.springframework.validation.BindingResult.userEditDto'].getFieldErrors('lastName') as error>
-                                    ${error.defaultMessage}<#if error_has_next><br></#if>
+                                    ${error.defaultMessage}
                                 </#list>
                             </div>
                         </#if>
@@ -88,7 +92,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="phone" class="form-label">Телефон</label>
+                    <label for="phone" class="form-label"><@spring.message code="admin.user.edit.label.phone"/></label>
                     <input type="text"
                            class="form-control <#if .globals['org.springframework.validation.BindingResult.userEditDto']?? && .globals['org.springframework.validation.BindingResult.userEditDto'].hasFieldErrors('phone')>is-invalid</#if>"
                            id="phone"
@@ -106,10 +110,10 @@
 
                 <div class="d-flex justify-content-end gap-2">
                     <a href="/admin/users" class="btn btn-secondary">
-                        <i class="fas fa-times me-1"></i> Отмена
+                        <i class="fas fa-times me-1"></i> <@spring.message code="admin.user.edit.button.cancel"/>
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Сохранить пользователя
+                        <i class="fas fa-save me-1"></i> <@spring.message code="admin.user.edit.button.save"/>
                     </button>
                 </div>
             </form>
@@ -121,45 +125,55 @@
             content: " *";
             color: #dc3545;
         }
+
         .card {
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
+
         .form-control {
             border-radius: 8px;
             border: 1px solid #ced4da;
             transition: all 0.3s ease;
         }
+
         .form-control:focus {
             border-color: #0066cc;
             box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
         }
+
         .btn {
             border-radius: 8px;
             padding: 0.5rem 1rem;
             font-weight: 500;
             transition: all 0.3s ease;
         }
+
         .btn-primary {
             background: linear-gradient(135deg, #0066cc, #003d7a);
             border-color: #0066cc;
         }
+
         .btn-primary:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
+
         .btn-secondary {
             background-color: #6c757d;
             border-color: #6c757d;
         }
+
         .btn-secondary:hover {
             background-color: #545b62;
             transform: translateY(-1px);
         }
+
         .invalid-feedback {
             display: block;
         }
+
         .gap-2 {
             gap: 0.5rem;
         }

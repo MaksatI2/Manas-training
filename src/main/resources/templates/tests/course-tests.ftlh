@@ -1,32 +1,38 @@
+<#import "/spring.ftl" as spring>
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
 <@layout.page>
+    <#assign bcHome><@spring.message code='course.final.tests.list.breadcrumb.home'/></#assign>
+    <#assign bcMyCourses><@spring.message code='course.final.tests.list.breadcrumb.myCourses'/></#assign>
+    <#assign bcTestsForCourse = springMacroRequestContext.getMessage(
+    "course.final.tests.list.breadcrumb.testsForCourse", [course.title]
+    )>
+
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Мои курсы", "url": "/teacher/my-courses"},
+    {"label": bcHome, "url": "/"},
+    {"label": bcMyCourses, "url": "/teacher/my-courses"},
     {"label": "${instance.title}", "url": "/teacher/course/${instance.id}"},
-    {"label": "Тесты для курса: ${course.title}", "url": ""}
+    {"label": bcTestsForCourse, "url": ""}
     ] />
+
     <div class="card shadow mb-4">
-            <#if successMessage??>
-                <div id="successMessage" data-message="${successMessage?js_string}"></div>
-            </#if>
-            <#if errorMessage??>
-                <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-            </#if>
+        <#if successMessage??>
+            <div id="successMessage" data-message="${successMessage?js_string}"></div>
+        </#if>
+        <#if errorMessage??>
+            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+        </#if>
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="m-0 font-weight-bold text-white">
-                    <i class="fa-solid fa-list-check"></i> Управление тестами курса
+                    <i class="fa-solid fa-list-check"></i> <@spring.message code='course.final.tests.list.header.title'/>
                 </h5>
-
                 <div class="d-flex align-items-center flex-wrap gap-2">
                     <div id="usersTable_buttons"></div>
-
-
                     <a href="/test/create/${course.id}" class="btn btn-light btn-sm"
                        style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                        <i class="fas fa-plus me-1"></i> Создать новый тест
+                        <i class="fas fa-plus me-1"></i> <@spring.message code='course.final.tests.list.button.create'/>
                     </a>
                 </div>
             </div>
@@ -37,50 +43,62 @@
                 <table class="table table-bordered table-hover" id="testsTable" width="100%" cellspacing="0">
                     <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
                     <tr>
-                        <th>Тест</th>
-                        <th>Курс</th>
-                        <th>Проходной балл</th>
-                        <th>Количество вопросов</th>
-                        <th>Статус</th>
-                        <th class="text-center">Действия</th>
+                        <th><@spring.message code='course.final.tests.list.table.col.test'/></th>
+                        <th><@spring.message code='course.final.tests.list.table.col.course'/></th>
+                        <th><@spring.message code='course.final.tests.list.table.col.passingScore'/></th>
+                        <th><@spring.message code='course.final.tests.list.table.col.questionsCount'/></th>
+                        <th><@spring.message code='course.final.tests.list.table.col.status'/></th>
+                        <th class="text-center"><@spring.message code='course.final.tests.list.table.col.actions'/></th>
                     </tr>
                     </thead>
                     <tbody>
                     <#if tests?has_content>
                         <#list tests as test>
                             <tr style="cursor: pointer;" onclick="window.location.href='/test/${test.id}/details'">
-                                <td>${test.title}</td>
-                                <td>${test.course.title}</td>
+                                <td>
+                                    <#if (test.title?? && test.title?length > 10)>
+                                        ${test.title?substring(0, 8)}...
+                                    <#else>
+                                        ${test.title!""}
+                                    </#if>
+                                </td>
+                                <td>
+                                    <#if (test.course.title?? && test.course.title?length > 10)>
+                                        ${test.course.title?substring(0, 8)}...
+                                    <#else>
+                                        ${test.course.title!""}
+                                    </#if>
+                                </td>
                                 <td>${test.passingScore}</td>
                                 <td>${test.questions?size}</td>
                                 <td>
                                     <#if test.isActive>
-                                        <span class="badge bg-success">Активен</span>
+                                        <span class="badge bg-success"><@spring.message code='course.final.tests.list.status.active'/></span>
                                     <#else>
-                                        <span class="badge bg-warning">Неактивен</span>
+                                        <span class="badge bg-warning"><@spring.message code='course.final.tests.list.status.inactive'/></span>
                                     </#if>
                                 </td>
                                 <td class="text-center">
-                                        <#if !test.isActive>
-                                            <a href="/test/${test.id}/activate"
-                                               class="btn btn-sm btn-success"
-                                               title="Активировать">
-                                                <i class="fas fa-check"></i>
-                                            </a>
-                                        <#else>
-                                            <a href="/test/${test.id}/deactivate"
-                                               class="btn btn-sm btn-warning"
-                                               title="Деактивировать">
-                                                <i class="fas fa-ban"></i>
-                                            </a>
-                                        </#if>
-                                        <a href="/test/${test.id}/edit"
-                                           class="btn btn-sm btn-warning"
-                                           title="Редактировать">
-                                            <i class="fa-solid fa-pencil"></i>
+                                    <#if !test.isActive>
+                                        <a href="/test/${test.id}/activate"
+                                           class="btn btn-sm btn-success"
+                                           title="<@spring.message code='course.final.tests.list.action.activate'/>">
+                                            <i class="fas fa-check"></i>
                                         </a>
+                                    <#else>
+                                        <a href="/test/${test.id}/deactivate"
+                                           class="btn btn-sm btn-warning"
+                                           title="<@spring.message code='course.final.tests.list.action.deactivate'/>">
+                                            <i class="fas fa-ban"></i>
+                                        </a>
+                                    </#if>
+                                    <a href="/test/${test.id}/edit"
+                                       class="btn btn-sm btn-warning"
+                                       title="<@spring.message code='course.final.tests.list.action.edit'/>">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </a>
                                     <a href="/test/${test.id}/delete" class="btn btn-sm btn-danger delete-user-btn"
-                                            title="Удалить">
+                                       title="<@spring.message code='course.final.tests.list.action.delete'/>">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
@@ -90,7 +108,7 @@
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">
                                 <i class="fas fa-users fa-2x mb-2"></i>
-                                <p>Тестов по данному курсу не найдено</p>
+                                <p><@spring.message code='course.final.tests.list.empty.text'/></p>
                             </td>
                         </tr>
                     </#if>
@@ -108,7 +126,8 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
@@ -123,13 +142,24 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        $('#testsTable').DataTable({
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 5, orderable: false },
+                { responsivePriority: 2, targets: 0 },
+                { responsivePriority: 3, targets: 1 },
+                { responsivePriority: 4, targets: 3 },
+                { responsivePriority: 5, targets: 4 },
+                { responsivePriority: 6, targets: 2 }
+            ]
+        });
 
     </script>
 
     <style>
         .card {
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
         }
 
         .card-header {
@@ -166,7 +196,7 @@
         }
 
         #testsTable tr:hover {
-            background-color: rgba(0,102,204,0.05);
+            background-color: rgba(0, 102, 204, 0.05);
             transform: translateY(-1px);
             transition: all 0.3s ease;
         }
@@ -192,5 +222,4 @@
             color: #212529 !important;
         }
     </style>
-
 </@layout.page>

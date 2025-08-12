@@ -6,6 +6,11 @@ const locationData = {
 };
 
 function showOnMap() {
+    const t = (k, params = {}) => {
+        const s = (window.APP_MESSAGES && window.APP_MESSAGES[k]) || k;
+        return s.replace(/{(\w+)}/g, (_, p) => (params[p] != null ? params[p] : ''));
+    };
+
     const mapUrls = {
         google: `https://www.google.com/maps/place/${encodeURIComponent(locationData.address)}/@${locationData.latitude},${locationData.longitude},17z`,
         yandex: `https://yandex.ru/maps/?text=${encodeURIComponent(locationData.placeName + " " + locationData.address)}&z=17&ll=${locationData.longitude},${locationData.latitude}`,
@@ -21,10 +26,9 @@ function showOnMap() {
                 window.open(`maps://?q=${encodeURIComponent(locationData.address)}&ll=${locationData.latitude},${locationData.longitude}`);
                 return;
             } catch (e) {
-                console.log("Apple Maps not available");
+                console.log(t('js.map.log.appleUnavailable'));
             }
         }
-
         if (/Android/i.test(navigator.userAgent)) {
             try {
                 window.open(`geo:${locationData.latitude},${locationData.longitude}?q=${encodeURIComponent(locationData.address)}`);
@@ -33,19 +37,26 @@ function showOnMap() {
                 }, 500);
                 return;
             } catch (e) {
-                console.log("Google Maps app not available");
+                console.log(t('js.map.log.googleAppUnavailable'));
             }
         }
-
-        const useGoogle = confirm(`${locationData.placeName}\n\nОткрыть карту в:\n\nOK - Google Maps\nОтмена - Яндекс.Карты`);
+        const confirmText = t('js.map.confirm.mobile', {
+            place: locationData.placeName,
+            google: t('js.map.choice.google'),
+            yandex: t('js.map.choice.yandex')
+        });
+        const useGoogle = confirm(confirmText);
         window.open(useGoogle ? mapUrls.google : mapUrls.yandex, '_blank');
     } else {
-        const choice = prompt(
-            `${locationData.placeName}\n${locationData.address}\n\nВыберите картографический сервис:\n1 - Google Maps\n2 - Яндекс.Карты\n3 - OpenStreetMap`,
-            "1"
-        );
-
-        switch(choice) {
+        const promptText = t('js.map.prompt.desktop', {
+            place: locationData.placeName,
+            address: locationData.address,
+            google: t('js.map.choice.google'),
+            yandex: t('js.map.choice.yandex'),
+            osm: t('js.map.choice.osm')
+        });
+        const choice = prompt(promptText, "1");
+        switch (choice) {
             case "2":
                 window.open(mapUrls.yandex, '_blank');
                 break;
@@ -56,7 +67,6 @@ function showOnMap() {
                 window.open(mapUrls.google, '_blank');
         }
     }
-
     trackMapOpen();
 }
 
@@ -67,7 +77,6 @@ function trackMapOpen() {
             'event_label': 'address_click'
         });
     }
-
     if (typeof ym !== 'undefined') {
         ym(XXXXXX, 'reachGoal', 'MAP_OPEN');
     }

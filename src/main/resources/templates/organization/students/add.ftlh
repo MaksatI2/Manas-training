@@ -1,15 +1,15 @@
-<#import "../../layout.ftlh" as layout>
-<#import "../../RoadMap.ftlh" as roadmap>
+<#import "/layout.ftlh" as layout>
+<#import "/RoadMap.ftlh" as roadmap>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/css/intlTelInput.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/css/intlTelInput.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/intlTelInput.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/utils.js"></script>
 
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Студенты", "url": "/organization/students"},
-    {"label": "Добавить студента", "url": ""}
+    {"label": springMacroRequestContext.getMessage("organization.student.add.breadcrumb.home"), "url": "/"},
+    {"label": springMacroRequestContext.getMessage("organization.student.add.breadcrumb.students"), "url": "/organization/students"},
+    {"label": springMacroRequestContext.getMessage("organization.student.add.breadcrumb.add"), "url": ""}
     ] />
 
     <style>
@@ -88,7 +88,6 @@
             display: block;
         }
 
-        /* Стили для валидации телефона */
         .phone-error {
             border-color: #dc3545 !important;
         }
@@ -97,7 +96,6 @@
             border-color: #28a745 !important;
         }
 
-        /* Стили для intl-tel-input */
         .iti {
             width: 100%;
         }
@@ -168,20 +166,19 @@
         }
     </style>
 
-    <#if successMessage??>
-        <div id="successMessage" data-message="${successMessage?js_string}"></div>
-    </#if>
-    <#if errorMessage??>
-        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-    </#if>
-
     <h1 class="page-title">
         <i class="fas fa-user-graduate me-3"></i>
-        Добавление нового студента
+        ${springMacroRequestContext.getMessage("organization.student.add.title")}
     </h1>
 
     <div class="form-wrapper">
+        <#if errorMessage??>
+            <div class="alert alert-danger alert-compact text-center shadow-sm">${errorMessage}</div>
+        </#if>
 
+        <#if successMessage??>
+            <div class="alert alert-success alert-compact text-center shadow-sm">${successMessage}</div>
+        </#if>
 
         <form method="post" action="/organization/students/add" id="studentForm">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -189,38 +186,43 @@
             <div class="row">
                 <div class="col-md-6">
                     <label for="name" class="form-label">
-                        <i class="fas fa-user me-1"></i>Имя *
+                        <i class="fas fa-user me-1"></i>${springMacroRequestContext.getMessage("organization.student.add.form.name")}
                     </label>
                     <input type="text" class="form-control" id="name" name="name"
-                           value="${studentDto.name!}" placeholder="Введите имя">
+                           value="${studentDto.name!}"
+                           placeholder="${springMacroRequestContext.getMessage('organization.student.add.form.name.placeholder')}">
                     <div class="error-message"><#if validationErrors??>${validationErrors["name"]!}</#if></div>
                 </div>
 
                 <div class="col-md-6">
                     <label for="lastName" class="form-label">
-                        <i class="fas fa-user me-1"></i>Фамилия *
+                        <i class="fas fa-user me-1"></i>${springMacroRequestContext.getMessage("organization.student.add.form.lastname")}
                     </label>
                     <input type="text" class="form-control" id="lastName" name="lastName"
-                           value="${studentDto.lastName!}" placeholder="Введите фамилию">
+                           value="${studentDto.lastName!}"
+                           placeholder="${springMacroRequestContext.getMessage('organization.student.add.form.lastname.placeholder')}">
                     <div class="error-message"><#if validationErrors??>${validationErrors["lastName"]!}</#if></div>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="email" class="form-label">
-                    <i class="fas fa-envelope me-1"></i>Email *
+                    <i class="fas fa-envelope me-1"></i>${springMacroRequestContext.getMessage("organization.student.add.form.email")}
                 </label>
                 <input type="email" class="form-control" id="email" name="email"
-                       value="${studentDto.email!}" placeholder="example@email.com">
+                       value="${studentDto.email!}"
+                       placeholder="${springMacroRequestContext.getMessage('organization.student.add.form.email.placeholder')}">
                 <div class="error-message"><#if validationErrors??>${validationErrors["email"]!}</#if></div>
             </div>
 
             <div class="mb-4">
                 <label for="phone" class="form-label">
-                    <i class="fas fa-phone me-1"></i>Номер телефона *
+                    <i class="fas fa-phone me-1"></i>${springMacroRequestContext.getMessage("organization.student.add.form.phone")}
                 </label>
                 <input type="tel" class="form-control" id="phone" name="phone"
-                       value="${studentDto.phone!}" placeholder="+996xxxxxxxxx" autocomplete="off">
+                       value="${studentDto.phone!}"
+                       placeholder="${springMacroRequestContext.getMessage('organization.student.add.form.phone.placeholder')}"
+                       autocomplete="off">
                 <div class="error-message" id="phone-error">
                     <#if validationErrors??>${validationErrors["phone"]!}</#if>
                 </div>
@@ -228,24 +230,24 @@
 
             <div class="button-group">
                 <button type="submit" class="btn btn-gradient rounded-pill">
-                    <i class="fas fa-user-plus me-2"></i>Сохранить
+                    <i class="fas fa-user-plus me-2"></i>${springMacroRequestContext.getMessage("organization.student.add.button.save")}
                 </button>
                 <a href="/organization/students" class="btn btn-outline-primary rounded-pill">
-                    <i class="fas fa-arrow-left me-1"></i>Отмена
+                    <i class="fas fa-arrow-left me-1"></i>${springMacroRequestContext.getMessage("organization.student.add.button.cancel")}
                 </a>
             </div>
         </form>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const input = document.querySelector("#phone");
             const errorBlock = document.querySelector("#phone-error");
 
             const iti = window.intlTelInput(input, {
                 preferredCountries: ["kg", "ru", "kz", "uz"],
                 initialCountry: "kg",
-                geoIpLookup: function(callback) {
+                geoIpLookup: function (callback) {
                     fetch('https://ipinfo.io/json?token=ваш_токен')
                         .then(resp => resp.json())
                         .then(resp => callback(resp.country || "kg"))
@@ -255,9 +257,8 @@
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/utils.js"
             });
 
-            input.addEventListener("input", function() {
+            input.addEventListener("input", function () {
                 const phoneNumber = input.value.trim();
-
                 if (phoneNumber) {
                     if (iti.isValidNumber()) {
                         input.classList.remove("phone-error");
@@ -266,7 +267,7 @@
                     } else {
                         input.classList.remove("phone-success");
                         input.classList.add("phone-error");
-                        errorBlock.textContent = "Некорректный номер телефона";
+                        errorBlock.textContent = "${springMacroRequestContext.getMessage('organization.student.add.phone.invalid')}";
                     }
                 } else {
                     input.classList.remove("phone-error", "phone-success");
@@ -274,34 +275,31 @@
                 }
             });
 
-            input.addEventListener("blur", function() {
+            input.addEventListener("blur", function () {
                 const phoneNumber = input.value.trim();
-
                 if (phoneNumber && !iti.isValidNumber()) {
                     input.classList.remove("phone-success");
                     input.classList.add("phone-error");
-                    errorBlock.textContent = "Некорректный номер телефона";
+                    errorBlock.textContent = "${springMacroRequestContext.getMessage('organization.student.add.phone.invalid')}";
                 }
             });
 
-            document.getElementById("studentForm").addEventListener("submit", function(e) {
+            document.getElementById("studentForm").addEventListener("submit", function (e) {
                 const phoneNumber = input.value.trim();
-
                 if (phoneNumber && !iti.isValidNumber()) {
                     e.preventDefault();
                     input.classList.add("phone-error");
-                    errorBlock.textContent = "Пожалуйста, введите корректный номер телефона";
+                    errorBlock.textContent = "${springMacroRequestContext.getMessage('organization.student.add.phone.invalid.full')}";
                     input.focus();
                     return false;
                 }
-
                 if (phoneNumber && iti.isValidNumber()) {
                     const formattedNumber = iti.getNumber();
                     input.value = formattedNumber;
                 }
             });
 
-            input.addEventListener("focus", function() {
+            input.addEventListener("focus", function () {
                 if (input.classList.contains("phone-error")) {
                     errorBlock.textContent = "";
                 }

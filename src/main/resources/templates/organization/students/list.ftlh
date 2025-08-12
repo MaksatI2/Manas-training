@@ -1,10 +1,16 @@
 <#import "../../layout.ftlh" as layout>
 <#import "../../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
+<#assign bcHome><@spring.message code='organization.student.list.breadcrumb.home'/></#assign>
+<#assign bcStudents><@spring.message code='organization.student.list.breadcrumb.students'/></#assign>
+
 <@layout.page>
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Студенты", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcStudents, "url": ""}
     ] />
+
     <div class="card shadow mb-4">
         <#if successMessage??>
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -17,16 +23,18 @@
              style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <h5 class="m-0 font-weight-bold text-white">
                 <i class="fas fa-users me-2"></i>
-                Студенты организации
+                <@spring.message code="organization.student.list.title"/>
             </h5>
             <div class="d-flex gap-2">
                 <a href="/organization/students/unassigned" class="btn btn-light btn-sm"
                    style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-user-check me-1" style="color: #0066cc;"></i> Присоединить студента
+                    <i class="fas fa-user-check me-1" style="color: #0066cc;"></i>
+                    <@spring.message code="organization.student.list.button.unassigned"/>
                 </a>
                 <a href="/organization/students/add" class="btn btn-light btn-sm"
                    style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fa fa-user-plus me-1" style="color: #0066cc;"></i> Добавить студента
+                    <i class="fa fa-user-plus me-1" style="color: #0066cc;"></i>
+                    <@spring.message code="organization.student.list.button.add"/>
                 </a>
             </div>
         </div>
@@ -36,11 +44,11 @@
                 <table class="table table-bordered table-hover" id="studentsTable" width="100%" cellspacing="0">
                     <thead>
                     <tr>
-                        <th>ФИО</th>
-                        <th>Email</th>
-                        <th>Телефон</th>
-                        <th>Курсы</th>
-                        <th>Действия</th>
+                        <th><@spring.message code="organization.student.list.table.fullName"/></th>
+                        <th><@spring.message code="organization.student.list.table.email"/></th>
+                        <th><@spring.message code="organization.student.list.table.phone"/></th>
+                        <th><@spring.message code="organization.student.list.table.courses"/></th>
+                        <th><@spring.message code="organization.student.list.table.actions"/></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -54,15 +62,27 @@
                         <#assign courseList = grouped[sid]>
                         <#assign first = courseList[0]>
                         <tr>
-                            <td class="field-value">${first.fullName}</td>
-                            <td class="field-value">${first.email}</td>
+                            <td class="field-value">
+                                <#if first.fullName?? && first.fullName?length > 20>
+                                    ${first.fullName?substring(0, 20)}...
+                                <#else>
+                                    ${first.fullName!""}
+                                </#if>
+                            </td>
+                            <td class="field-value">
+                                <#if first.email?? && first.email?length > 15>
+                                    ${first.email?substring(0, 15)}...
+                                <#else>
+                                    ${first.email!""}
+                                </#if>
+                            </td>
                             <td>${first.phone}</td>
                             <td class="field-value">
                                 <ul class="mb-0 ps-3 small">
                                     <#list courseList as c>
                                         <li>
                                             <strong>${c.courseTitle}</strong> — ${c.localizedStatus}, ${c.progress}%
-                                            <#if c.finalGrade??>, оценка: ${c.finalGrade}</#if>
+                                            <#if c.finalGrade??>, <@spring.message code="organization.student.list.course.grade"/>: ${c.finalGrade}</#if>
                                             <#if c.enrollmentId??>
                                                 <form action="/organization/students/enrollment/${c.enrollmentId}/remove"
                                                       method="post" class="d-inline">
@@ -87,12 +107,16 @@
                                         data-bs-target="#deleteModal${sid}" title="Удалить">
                                     <i class="fa fa-trash"></i>
                                 </button>
-                                <div class="modal fade" id="deleteModal${sid}" tabindex="-1" aria-labelledby="deleteModalLabel${sid}" aria-hidden="true">
+                                <div class="modal fade" id="deleteModal${sid}" tabindex="-1"
+                                     aria-labelledby="deleteModalLabel${sid}" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title" id="deleteModalLabel${sid}">Подтверждение удаления</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                <h5 class="modal-title" id="deleteModalLabel${sid}">
+                                                    <@spring.message code="organization.student.list.confirm.delete"/>
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal" aria-label="Закрыть"></button>
                                             </div>
                                             <div class="modal-body text-break">
                                                 <p class="mb-0">
@@ -103,8 +127,11 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <form action="/organization/students/${sid}/delete" method="post">
-                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                                    <input type="hidden" name="${_csrf.parameterName}"
+                                                           value="${_csrf.token}">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Отмена
+                                                    </button>
                                                     <button type="submit" class="btn btn-danger">Удалить</button>
                                                 </form>
                                             </div>
@@ -131,7 +158,7 @@
         $(document).ready(function () {
             $('#studentsTable').DataTable({
                 language: {
-                    url: '/js/datatables/ru.json',
+                    url: '/js/datatables/${(springMacroRequestContext.locale?string?lower_case?starts_with("ru"))?then("ru",(springMacroRequestContext.locale?string?lower_case?starts_with("ky"))?then("ky","en"))}.json',
                     paginate: {previous: '‹', next: '›'}
                 },
                 responsive: true,
@@ -140,11 +167,11 @@
                 autoWidth: false,
                 info: false,
                 columnDefs: [
-                    { responsivePriority: 1, targets: 0 },
-                    { responsivePriority: 4, targets: 1 },
-                    { responsivePriority: 5, targets: 2 },
-                    { responsivePriority: 3, targets: 3 },
-                    { responsivePriority: 2, orderable: false, targets: 4 }
+                    {responsivePriority: 1, targets: 0},
+                    {responsivePriority: 4, targets: 1},
+                    {responsivePriority: 5, targets: 2},
+                    {responsivePriority: 3, targets: 3},
+                    {responsivePriority: 2, orderable: false, targets: 4}
                 ]
             });
         });
@@ -159,7 +186,7 @@
         }
 
         .modal-dialog {
-            max-width: 600px; /* или увеличить */
+            max-width: 600px;
             width: 100%;
         }
 
@@ -168,7 +195,6 @@
                 max-width: 90vw;
             }
         }
-
 
         thead {
             background: linear-gradient(135deg, #0066cc, #003d7a);

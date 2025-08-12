@@ -1,9 +1,23 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
 <@layout.page>
+    <#assign bcHome><@spring.message code='student.profile.view.breadcrumb.home'/></#assign>
+    <#assign bcProfile><@spring.message code='student.profile.view.breadcrumb.profile'/></#assign>
+    <#assign pageTitle><@spring.message code='student.profile.view.title'/></#assign>
+    <#assign avatarEdit><@spring.message code='student.profile.view.avatar.edit'/></#assign>
+    <#assign editProfileBtn><@spring.message code='student.profile.view.button.editProfile'/></#assign>
+    <#assign myStatsBtn><@spring.message code='student.profile.view.button.statistics'/></#assign>
+    <#assign phoneLbl><@spring.message code='student.profile.view.phone'/></#assign>
+    <#assign specializationLbl><@spring.message code='student.profile.view.specialization'/></#assign>
+    <#assign organizationLbl><@spring.message code='student.profile.view.organization'/></#assign>
+    <#assign statusLbl><@spring.message code='student.profile.view.status'/></#assign>
+    <#assign statusActive><@spring.message code='student.profile.view.status.active'/></#assign>
+    <#assign statusInactive><@spring.message code='student.profile.view.status.inactive'/></#assign>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Профиль", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcProfile, "url": ""}
     ] />
     <style>
         .profile-container {
@@ -20,7 +34,7 @@
 
         .avatar-image:hover {
             transform: scale(1.03);
-            box-shadow: 0 6px 20px rgba(0,102,204,0.3);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
         }
 
         .avatar-edit-overlay {
@@ -52,14 +66,14 @@
         .profile-card {
             background: var(--white);
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
             padding: 2rem;
             transition: all 0.3s ease;
         }
 
         .profile-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,102,204,0.15);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.15);
         }
 
         .profile-header {
@@ -82,7 +96,7 @@
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid var(--light-blue);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.2);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.2);
             transition: all 0.3s ease;
         }
 
@@ -152,7 +166,7 @@
 
         .edit-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
             color: var(--white);
         }
 
@@ -163,8 +177,6 @@
             gap: 0.5rem;
             flex-wrap: wrap;
         }
-
-
 
         @media (max-width: 768px) {
             .page-title {
@@ -193,6 +205,7 @@
             .profile-details {
                 grid-template-columns: 1fr;
             }
+
             .user-role-and-edit {
                 flex-direction: column;
                 align-items: stretch;
@@ -209,7 +222,7 @@
         </#if>
         <h1 class="page-title">
             <i class="fas fa-user-circle" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
-            Личный кабинет
+            ${pageTitle}
         </h1>
 
         <div class="profile-card">
@@ -227,7 +240,7 @@
                     <div class="avatar-edit-overlay">
                         <div class="avatar-edit-text">
                             <i class="fa-solid fa-pencil"></i><br>
-                            Изменить фото
+                            ${avatarEdit}
                         </div>
                     </div>
                 </div>
@@ -241,15 +254,13 @@
                     <div class="user-role-and-edit">
                         <a href="/student/profile/edit" class="edit-button">
                             <i class="fas fa-edit"></i>
-                            Редактировать профиль
+                            ${editProfileBtn}
                         </a>
                         <a href="/student/statistics" class="edit-button">
                             <i class="fas fa-chart-bar"></i>
-                            Моя статистика
+                            ${myStatsBtn}
                         </a>
-
                     </div>
-
                 </div>
             </div>
 
@@ -258,7 +269,7 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-phone" style="margin-right: 0.5rem;"></i>
-                            Телефон
+                            ${phoneLbl}
                         </div>
                         <div class="detail-value">${student.student.phone}</div>
                     </div>
@@ -268,7 +279,7 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-laptop-code" style="margin-right: 0.5rem;"></i>
-                            Специализация
+                            ${specializationLbl}
                         </div>
                         <div class="detail-value">${student.specialization}</div>
                     </div>
@@ -278,7 +289,7 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
-                            Организация
+                            ${organizationLbl}
                         </div>
                         <div class="detail-value">${student.organizationName}</div>
                     </div>
@@ -287,16 +298,16 @@
                 <div class="detail-item">
                     <div class="detail-label">
                         <i class="fas fa-calendar-check" style="margin-right: 0.5rem;"></i>
-                        Статус
+                        ${statusLbl}
                     </div>
                     <div class="detail-value">
                         <#if student.student.isActive>
                             <span style="color: #28a745;">
-                                <i class="fas fa-check-circle"></i> Активный
+                                <i class="fas fa-check-circle"></i> ${statusActive}
                             </span>
                         <#else>
                             <span style="color: #dc3545;">
-                                <i class="fas fa-times-circle"></i> Неактивный
+                                <i class="fas fa-times-circle"></i> ${statusInactive}
                             </span>
                         </#if>
                     </div>

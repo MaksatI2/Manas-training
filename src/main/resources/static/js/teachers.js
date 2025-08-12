@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', function (event) {
         if (!Array.from(checkboxes).some(checkbox => checkbox.checked)) {
             event.preventDefault();
-            alert('Пожалуйста, выберите хотя бы одного преподавателя.');
+            alert(window.APP_MESSAGES['teachers.alert.selectOne']);
         }
     });
 });

@@ -1,4 +1,5 @@
 <#import "layout.ftlh" as layout>
+<#import "/spring.ftl" as spring>
 
 <@layout.page>
     <div class="hero-section-enhanced parallax">
@@ -10,16 +11,15 @@
         </#if>
         <div class="hero-content">
             <h1 class="hero-title-enhanced fade-in">
-                Добро пожаловать в <br>
+                ${springMacroRequestContext.getMessage('home.hero.title')} <br>
                 <span style="color: var(--light-blue);">Манас Тренинг Центр</span>
             </h1>
             <p class="hero-subtitle-enhanced fade-in">
-                Профессиональная подготовка специалистов в сфере гражданской авиации
-                и наземного обслуживания воздушных судов с использованием современных технологий
+                ${springMacroRequestContext.getMessage('home.hero.subtitle')}
             </p>
             <div class="hero-buttons-group fade-in">
                 <a href="https://manastraining.kg/courses" class="btn btn-hero primary">
-                    <i class="fas fa-rocket me-2"></i>Начать обучение
+                    <i class="fas fa-rocket me-2"></i>${springMacroRequestContext.getMessage('home.hero.button')}
                 </a>
             </div>
         </div>
@@ -30,44 +30,43 @@
             <div class="col-lg-3 col-md-6">
                 <div class="stat-item">
                     <span class="stat-number counter" data-count="500">0</span><span class="stat-number">+</span>
-                    <span class="stat-label">Выпускников</span>
+                    <span class="stat-label">${springMacroRequestContext.getMessage('home.stats.graduates')}</span>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="stat-item">
                     <span class="stat-number counter" data-count="25">0</span><span class="stat-number">+</span>
-                    <span class="stat-label">Курсов</span>
+                    <span class="stat-label">${springMacroRequestContext.getMessage('home.stats.courses')}</span>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="stat-item">
                     <span class="stat-number counter" data-count="15">0</span><span class="stat-number">+</span>
-                    <span class="stat-label">Преподавателей</span>
+                    <span class="stat-label">${springMacroRequestContext.getMessage('home.stats.teachers')}</span>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="stat-item">
                     <span class="stat-number counter" data-count="98">0</span><span class="stat-number">%</span>
-                    <span class="stat-label">Успешность</span>
+                    <span class="stat-label">${springMacroRequestContext.getMessage('home.stats.success')}</span>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="features-section">
-        <h2 class="section-title">Наши возможности</h2>
+        <h2 class="section-title">${springMacroRequestContext.getMessage('home.features.title')}</h2>
         <p class="section-subtitle">
-            Современная образовательная платформа с широким спектром инструментов для эффективного обучения
+            ${springMacroRequestContext.getMessage('home.features.subtitle')}
         </p>
 
         <div class="row">
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
                     <i class="fas fa-laptop-code feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Интерактивное обучение</h4>
+                    <h4 class="feature-title">${springMacroRequestContext.getMessage('home.features.1.title')}</h4>
                     <p class="feature-description">
-                        Современные мультимедийные материалы, виртуальные симуляторы
-                        и интерактивные презентации для глубокого понимания материала
+                        ${springMacroRequestContext.getMessage('home.features.1.desc')}
                     </p>
                 </div>
             </div>
@@ -75,9 +74,9 @@
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
                     <i class="fas fa-video feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Вебинары и эфиры</h4>
+                    <h4 class="feature-title">${springMacroRequestContext.getMessage('home.features.2.title')}</h4>
                     <p class="feature-description">
-                        Живое общение с преподавателями и экспертами: разбирайте темы в прямом эфире
+                        ${springMacroRequestContext.getMessage('home.features.2.desc')}
                     </p>
                 </div>
             </div>
@@ -85,10 +84,9 @@
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
                     <i class="fas fa-award feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Цифровые сертификаты</h4>
+                    <h4 class="feature-title">${springMacroRequestContext.getMessage('home.features.3.title')}</h4>
                     <p class="feature-description">
-                        Получение верифицированных цифровых сертификатов с блокчейн-защитой
-                        после успешного завершения курсов
+                        ${springMacroRequestContext.getMessage('home.features.3.desc')}
                     </p>
                 </div>
             </div>
@@ -96,10 +94,9 @@
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
                     <i class="fas fa-user-graduate feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Экспертное наставничество</h4>
+                    <h4 class="feature-title">${springMacroRequestContext.getMessage('home.features.4.title')}</h4>
                     <p class="feature-description">
-                        Персональное сопровождение от ведущих специалистов авиационной индустрии
-                        с многолетним практическим опытом
+                        ${springMacroRequestContext.getMessage('home.features.4.desc')}
                     </p>
                 </div>
             </div>
@@ -107,9 +104,9 @@
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
                     <i class="fas fa-folder-open feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Портфолио достижений</h4>
+                    <h4 class="feature-title">${springMacroRequestContext.getMessage('home.features.5.title')}</h4>
                     <p class="feature-description">
-                        Собирайте все свои курсы, сертификаты и проекты в одном месте — делитесь портфолио с работодателями
+                        ${springMacroRequestContext.getMessage('home.features.5.desc')}
                     </p>
                 </div>
             </div>
@@ -117,10 +114,9 @@
             <div class="col-lg-4 col-md-6">
                 <div class="feature-card-enhanced text-center fade-in interactive-bg">
                     <i class="fas fa-chart-line feature-icon-enhanced"></i>
-                    <h4 class="feature-title">Аналитика успеваемости</h4>
+                    <h4 class="feature-title">${springMacroRequestContext.getMessage('home.features.6.title')}</h4>
                     <p class="feature-description">
-                        Детальная аналитика прогресса обучения с персональными рекомендациями
-                        и планами развития компетенций
+                        ${springMacroRequestContext.getMessage('home.features.6.desc')}
                     </p>
                 </div>
             </div>
@@ -128,23 +124,23 @@
     </div>
 
     <div class="testimonials-section">
-        <h2 class="section-title">Отзывы наших студентов</h2>
+        <h2 class="section-title">${springMacroRequestContext.getMessage('home.testimonials.title')}</h2>
         <div class="testimonials-slider">
             <div class="testimonial-card active">
                 <div class="testimonial-content">
-                    <p>"Отличная подготовка к работе в авиации. Преподаватели - настоящие профессионалы!"</p>
+                    <p>${springMacroRequestContext.getMessage('home.testimonial.1.text')}</p>
                     <div class="testimonial-author">
-                        <strong>Айбек Мамытов</strong>
-                        <span>Техник по обслуживанию ВС</span>
+                        <strong>${springMacroRequestContext.getMessage('home.testimonial.1.name')}</strong>
+                        <span>${springMacroRequestContext.getMessage('home.testimonial.1.role')}</span>
                     </div>
                 </div>
             </div>
             <div class="testimonial-card">
                 <div class="testimonial-content">
-                    <p>"Современные методы обучения и актуальная программа. Рекомендую всем!"</p>
+                    <p>${springMacroRequestContext.getMessage('home.testimonial.2.text')}</p>
                     <div class="testimonial-author">
-                        <strong>Гульнара Асанова</strong>
-                        <span>Диспетчер наземного обслуживания</span>
+                        <strong>${springMacroRequestContext.getMessage('home.testimonial.2.name')}</strong>
+                        <span>${springMacroRequestContext.getMessage('home.testimonial.2.role')}</span>
                     </div>
                 </div>
             </div>
@@ -152,7 +148,7 @@
     </div>
 
     <div class="courses-preview-section">
-        <h2 class="section-title">Популярные курсы</h2>
+        <h2 class="section-title">${springMacroRequestContext.getMessage('home.courses.title')}</h2>
         <div class="row">
             <div class="col-lg-4 col-md-6">
                 <div class="course-card">
@@ -160,13 +156,15 @@
                         <i class="fas fa-plane course-icon"></i>
                     </div>
                     <div class="course-content">
-                        <h4>Техническое обслуживание ВС</h4>
-                        <p>Полный курс по техническому обслуживанию воздушных судов</p>
+                        <h4>${springMacroRequestContext.getMessage('home.courses.1.title')}</h4>
+                        <p>${springMacroRequestContext.getMessage('home.courses.1.desc')}</p>
                         <div class="course-meta">
-                            <span class="duration"><i class="fas fa-clock"></i> 120 часов</span>
+                            <span class="duration"><i
+                                        class="fas fa-clock"></i> ${springMacroRequestContext.getMessage('home.courses.1.duration')}</span>
                         </div>
-                        <a href="https://manastraining.kg/courses/aircraft-maintenance" class="btn btn-outline-primary btn-sm mt-2">
-                            Подробнее
+                        <a href="https://manastraining.kg/courses/aircraft-maintenance"
+                           class="btn btn-outline-primary btn-sm mt-2">
+                            ${springMacroRequestContext.getMessage('home.courses.more')}
                         </a>
                     </div>
                 </div>
@@ -177,13 +175,15 @@
                         <i class="fas fa-broadcast-tower course-icon"></i>
                     </div>
                     <div class="course-content">
-                        <h4>Радиосвязь в авиации</h4>
-                        <p>Изучение принципов радиосвязи и управления полетами</p>
+                        <h4>${springMacroRequestContext.getMessage('home.courses.2.title')}</h4>
+                        <p>${springMacroRequestContext.getMessage('home.courses.2.desc')}</p>
                         <div class="course-meta">
-                            <span class="duration"><i class="fas fa-clock"></i> 80 часов</span>
+                            <span class="duration"><i
+                                        class="fas fa-clock"></i> ${springMacroRequestContext.getMessage('home.courses.2.duration')}</span>
                         </div>
-                        <a href="https://manastraining.kg/courses/radio-communication" class="btn btn-outline-primary btn-sm mt-2">
-                            Подробнее
+                        <a href="https://manastraining.kg/courses/radio-communication"
+                           class="btn btn-outline-primary btn-sm mt-2">
+                            ${springMacroRequestContext.getMessage('home.courses.more')}
                         </a>
                     </div>
                 </div>
@@ -194,13 +194,15 @@
                         <i class="fas fa-shield-alt course-icon"></i>
                     </div>
                     <div class="course-content">
-                        <h4>Авиационная безопасность</h4>
-                        <p>Курс по обеспечению безопасности в гражданской авиации</p>
+                        <h4>${springMacroRequestContext.getMessage('home.courses.3.title')}</h4>
+                        <p>${springMacroRequestContext.getMessage('home.courses.3.desc')}</p>
                         <div class="course-meta">
-                            <span class="duration"><i class="fas fa-clock"></i> 60 часов</span>
+                            <span class="duration"><i
+                                        class="fas fa-clock"></i> ${springMacroRequestContext.getMessage('home.courses.3.duration')}</span>
                         </div>
-                        <a href="https://manastraining.kg/courses/aviation-security" class="btn btn-outline-primary btn-sm mt-2">
-                            Подробнее
+                        <a href="https://manastraining.kg/courses/aviation-security"
+                           class="btn btn-outline-primary btn-sm mt-2">
+                            ${springMacroRequestContext.getMessage('home.courses.more')}
                         </a>
                     </div>
                 </div>
@@ -209,38 +211,37 @@
     </div>
 
     <div class="faq-section">
-        <h2 class="section-title">Часто задаваемые вопросы</h2>
+        <h2 class="section-title">${springMacroRequestContext.getMessage('home.faq.title')}</h2>
         <div class="faq-container">
             <div class="faq-item">
                 <div class="faq-question">
-                    <h4>Какие документы нужны для поступления?</h4>
+                    <h4>${springMacroRequestContext.getMessage('home.faq.1.q')}</h4>
                     <i class="fas fa-plus"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>Для поступления необходимы: паспорт, документ об образовании, медицинская справка, 2 фотографии 3x4.</p>
+                    <p>${springMacroRequestContext.getMessage('home.faq.1.a')}</p>
                 </div>
             </div>
             <div class="faq-item">
                 <div class="faq-question">
-                    <h4>Помогаете ли с трудоустройством?</h4>
+                    <h4>${springMacroRequestContext.getMessage('home.faq.2.q')}</h4>
                     <i class="fas fa-plus"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>Да, у нас есть отдел карьеры, который помогает выпускникам найти работу в авиационных компаниях.</p>
+                    <p>${springMacroRequestContext.getMessage('home.faq.2.a')}</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="cta-section">
-        <h3 class="cta-title">Готовы начать свой путь в авиации?</h3>
+        <h3 class="cta-title">${springMacroRequestContext.getMessage('home.cta.title')}</h3>
         <p class="cta-description">
-            Присоединяйтесь к нашему сообществу профессионалов и получите качественное образование
-            в сфере гражданской авиации
+            ${springMacroRequestContext.getMessage('home.cta.desc')}
         </p>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
             <a href="https://manastraining.kg/courses" class="btn btn-primary-custom btn-lg">
-                <i class="fas fa-play me-2"></i>Просмотреть курсы
+                <i class="fas fa-play me-2"></i>${springMacroRequestContext.getMessage('home.cta.button.courses')}
             </a>
         </div>
     </div>
@@ -250,18 +251,20 @@
             <div class="row align-items-center">
                 <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
                     <div class="contact-item">
-                        <a href="tel:+996312123456" class="contact-link">
+                        <a href="tel:${springMacroRequestContext.getMessage('home.contact.phone')?replace(' ', '')?replace('-', '')}"
+                           class="contact-link">
                             <i class="fas fa-phone contact-icon"></i>
-                            <span class="contact-text">+996 557 87-83-00</span>
+                            <span class="contact-text">${springMacroRequestContext.getMessage('home.contact.phone')}</span>
                         </a>
                     </div>
                 </div>
 
                 <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
                     <div class="contact-item">
-                        <a href="mailto:info@manastraining.kg" class="contact-link">
+                        <a href="mailto:${springMacroRequestContext.getMessage('home.contact.email')}"
+                           class="contact-link">
                             <i class="fas fa-envelope contact-icon"></i>
-                            <span class="contact-text">manas.training25@gmail.com</span>
+                            <span class="contact-text">${springMacroRequestContext.getMessage('home.contact.email')}</span>
                         </a>
                     </div>
                 </div>
@@ -270,19 +273,22 @@
                     <div class="contact-item">
                         <div class="contact-link" onclick="showOnMap()" style="cursor: pointer;">
                             <i class="fas fa-map-marker-alt contact-icon"></i>
-                            <span class="contact-text">г. Бишкек, ул. Анарбека Бакаева 132Б</span>
+                            <span class="contact-text">${springMacroRequestContext.getMessage('home.contact.address')}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="social-links d-flex justify-content-center justify-content-lg-end">
-                        <a href="https://wa.me/996557878300" target="_blank" class="social-link whatsapp" aria-label="WhatsApp">
+                        <a href="https://wa.me/996557878300" target="_blank" class="social-link whatsapp"
+                           aria-label="WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                         </a>
-                        <a href="https://t.me/0557878300" target="_blank" class="social-link telegram" aria-label="Telegram">
+                        <a href="https://t.me/0557878300" target="_blank" class="social-link telegram"
+                           aria-label="Telegram">
                             <i class="fab fa-telegram"></i>
                         </a>
-                        <a href="https://instagram.com/manas.training" target="_blank" class="social-link instagram" aria-label="Instagram">
+                        <a href="https://instagram.com/manas.training" target="_blank" class="social-link instagram"
+                           aria-label="Instagram">
                             <i class="fab fa-instagram"></i>
                         </a>
                     </div>
@@ -314,27 +320,22 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver(function(entries) {
+        document.addEventListener('DOMContentLoaded', function () {
+            const observerOptions = {threshold: 0.1, rootMargin: '0px 0px -50px 0px'};
+            const observer = new IntersectionObserver(function (entries) {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.style.animationPlayState = 'running';
                     }
                 });
             }, observerOptions);
-
             document.querySelectorAll('.fade-in').forEach(el => {
                 el.style.animationPlayState = 'paused';
                 observer.observe(el);
             });
 
             const counters = document.querySelectorAll('.counter');
-            const counterObserver = new IntersectionObserver(function(entries) {
+            const counterObserver = new IntersectionObserver(function (entries) {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const counter = entry.target;
@@ -353,19 +354,16 @@
                     }
                 });
             });
-
             counters.forEach(counter => {
                 counterObserver.observe(counter);
             });
 
-            document.querySelectorAll('.faq-question').forEach(question => {
-                question.addEventListener('click', function() {
+            document.querySelectorAll('.faq-question').forEach(q => {
+                q.addEventListener('click', function () {
                     const faqItem = this.parentElement;
                     const answer = faqItem.querySelector('.faq-answer');
                     const icon = this.querySelector('i');
-
                     faqItem.classList.toggle('active');
-
                     if (faqItem.classList.contains('active')) {
                         answer.style.maxHeight = answer.scrollHeight + 'px';
                         icon.classList.remove('fa-plus');
@@ -381,9 +379,9 @@
             let currentTestimonial = 0;
             const testimonials = document.querySelectorAll('.testimonial-card');
 
-            function showTestimonial(index) {
-                testimonials.forEach(testimonial => testimonial.classList.remove('active'));
-                testimonials[index].classList.add('active');
+            function showTestimonial(i) {
+                testimonials.forEach(t => t.classList.remove('active'));
+                testimonials[i].classList.add('active');
             }
 
             setInterval(() => {
@@ -403,12 +401,7 @@
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
                     const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
+                    if (target) target.scrollIntoView({behavior: 'smooth', block: 'start'});
                 });
             });
         });
@@ -416,12 +409,11 @@
 
     <style>
         .hero-section-enhanced {
-            background:
-                    linear-gradient(135deg,
-                    rgba(0, 102, 204, 0.7) 0%,
-                    rgba(135, 206, 235, 0.6) 50%,
-                    rgba(0, 102, 204, 0.8) 100%),
-                    url('static/images/main_fon.jpg');
+            background: linear-gradient(135deg,
+            rgba(0, 102, 204, 0.7) 0%,
+            rgba(135, 206, 235, 0.6) 50%,
+            rgba(0, 102, 204, 0.8) 100%),
+            url('static/images/main_fon.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -504,15 +496,21 @@
             font-size: 1.2rem;
         }
 
-        .social-link.whatsapp { background: #25D366; }
-        .social-link.telegram { background: #0088cc; }
+        .social-link.whatsapp {
+            background: #25D366;
+        }
+
+        .social-link.telegram {
+            background: #0088cc;
+        }
+
         .social-link.instagram {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
         }
 
         .social-link:hover {
             transform: translateY(-3px) scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         @media (max-width: 1199px) {
@@ -802,8 +800,12 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
         }
 
         .hero-content {
@@ -1030,12 +1032,29 @@
             }
         }
 
-        .feature-card-enhanced:nth-child(1) { animation-delay: 0.1s; }
-        .feature-card-enhanced:nth-child(2) { animation-delay: 0.2s; }
-        .feature-card-enhanced:nth-child(3) { animation-delay: 0.3s; }
-        .feature-card-enhanced:nth-child(4) { animation-delay: 0.4s; }
-        .feature-card-enhanced:nth-child(5) { animation-delay: 0.5s; }
-        .feature-card-enhanced:nth-child(6) { animation-delay: 0.6s; }
+        .feature-card-enhanced:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .feature-card-enhanced:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .feature-card-enhanced:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .feature-card-enhanced:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .feature-card-enhanced:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .feature-card-enhanced:nth-child(6) {
+            animation-delay: 0.6s;
+        }
 
         .interactive-bg {
             position: relative;
@@ -1148,9 +1167,15 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         .btn-hero.loading {
@@ -1192,8 +1217,12 @@
         <i class="fas fa-chevron-up"></i>
     </button>
 
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
     <script>
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             const scrollToTop = document.getElementById('scrollToTop');
             if (window.pageYOffset > 300) {
                 scrollToTop.classList.add('visible');
@@ -1201,22 +1230,16 @@
                 scrollToTop.classList.remove('visible');
             }
         });
-
-        document.getElementById('scrollToTop').addEventListener('click', function() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+        document.getElementById('scrollToTop').addEventListener('click', function () {
+            window.scrollTo({top: 0, behavior: 'smooth'});
         });
-
         document.querySelectorAll('a[href^="tel:"], a[href^="mailto:"]').forEach(link => {
-            link.addEventListener('click', function() {
+            link.addEventListener('click', function () {
                 console.log('Contact clicked:', this.href);
             });
         });
-
         if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
+            const imageObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
@@ -1226,7 +1249,6 @@
                     }
                 });
             });
-
             document.querySelectorAll('img[data-src]').forEach(img => {
                 imageObserver.observe(img);
             });

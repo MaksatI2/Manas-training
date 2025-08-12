@@ -1,56 +1,66 @@
-<#import "/spring.ftl" as spring />
+<#import "/spring.ftl" as spring>
 <#include "../layout.ftlh">
 <#import "../RoadMap.ftlh" as roadmap>
+
 <@page>
+    <#assign bcHome = springMacroRequestContext.getMessage("admin.test.resultDetails.breadcrumb.home")>
+    <#assign bcAll = springMacroRequestContext.getMessage("admin.test.resultDetails.breadcrumb.all")>
+    <#assign bcDetails = springMacroRequestContext.getMessage("admin.test.resultDetails.breadcrumb.details", [test.title])>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Все результаты тестирований", "url": "/admin/test-results"},
-    {"label": "Результаты тестирования: ${test.title}", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcAll, "url": "/admin/test-results"},
+    {"label": bcDetails, "url": ""}
     ] />
+
     <div class="hero-section">
         <h1 class="hero-title">
             <i class="fa-solid fa-list-check"></i>
-            Результаты прохождения итогового теста "${test.title}"
+            ${springMacroRequestContext.getMessage("admin.test.resultDetails.heroTitle", [test.title])}
         </h1>
         <p class="hero-subtitle fs-4">
-            Студент: <span class="fw-bold">${result.student.name} ${result.student.lastName}</span>
+            <@spring.message code="admin.test.resultDetails.student"/> <span
+                    class="fw-bold">${result.student.name} ${result.student.lastName}</span>
         </p>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-8">
-            <div class="mb-3 text-end">
-            </div>
+            <div class="mb-3 text-end"></div>
             <div class="feature-card">
                 <div class="card-body">
                     <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3"><span
-                                class="fw-bold">${test.title}</h5>
+                                class="fw-bold">${test.title}</span></h5>
                     <p class="card-text fs-4 border-bottom border-primary-subtle pb-3">${test.description}</p>
-                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3"><span class="fw-bold">Количество вопросов:</span> ${test.questions?size}
-                    </p>
-                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3"><span class="fw-bold">Набрал баллов: </span>${result.score}
-                        из ${test.passingScore}
+                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.questionsCount"/></span> ${test.questions?size}
                     </p>
                     <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
-                        <span class="fw-bold">Затратил времени на прохождения (В минутах): </span>${result.timeSpentMinutes} минут
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.gotPoints"/></span> ${result.score} <@spring.message code="admin.test.resultDetails.of"/> ${test.passingScore}
+                    </p>
+                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.timeSpentLabel"/></span> ${result.timeSpentMinutes} <@spring.message code="admin.test.resultDetails.minutes"/>
                     </p>
                     <p class="card-text fs-5 fw-bold">
-                        Итоговый результат:
+                        <@spring.message code="admin.test.resultDetails.finalResult"/>
                         <#if result.isPassed>
-                            <span class="text-success">Успешно прошёл тестирование</span>
+                            <span class="text-success"><@spring.message code="admin.test.resultDetails.passed"/></span>
                         <#else>
-                            <span class="text-danger">Не набрал нужного колличества баллов</span>
+                            <span class="text-danger"><@spring.message code="admin.test.resultDetails.failed"/></span>
                         </#if>
                     </p>
                 </div>
             </div>
-            <h3 class="text-center mb-4">Ответы студента</h3>
+
+            <h3 class="text-center mb-4"><@spring.message code="admin.test.resultDetails.answersTitle"/></h3>
+
             <#list test.questions as question>
                 <#if question?? && question.isRequired>
                     <#assign userAnswer = answers?filter(a -> a.questionId == question.id)?first>
                     <div class="feature-card">
-                        <h4 class="card-title mb-3 border-bottom border-primary-subtle pb-3">Вопрос
-                            №${question?index+1}</h4>
+                        <h4 class="card-title mb-3 border-bottom border-primary-subtle pb-3">
+                            <@spring.message code="admin.test.resultDetails.questionPrefix"/> №${question?index + 1}
+                        </h4>
                         <h5 class="card-title mb-3 fs-4">${question.question}</h5>
                         <ul class="list-group">
                             <#list question.options as option>
@@ -64,7 +74,7 @@
                                         ${option.optionText}
                                         <#if userAnswer?? && option.id == userAnswer.answerId>
                                             <span class="fw-bold <#if option.isCorrect>text-success<#else>text-danger</#if>">
-                                                Выбрано (Баллов: ${userAnswer.points})
+                                                ${springMacroRequestContext.getMessage("admin.test.resultDetails.chosenWithPoints", [userAnswer.points])}
                                             </span>
                                         </#if>
                                     </li>

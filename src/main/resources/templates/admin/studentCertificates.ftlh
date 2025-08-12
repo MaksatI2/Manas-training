@@ -1,11 +1,30 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
 
-<@layout.page title="Сертификаты ${data.student.name} ${data.student.lastName}">
+<#assign pageTitle = springMacroRequestContext.getMessage("certificates.student.pageTitle", [data.student.name, data.student.lastName])>
+<#assign bcHome = springMacroRequestContext.getMessage("certificates.student.breadcrumb.home")>
+<#assign bcList = springMacroRequestContext.getMessage("certificates.student.breadcrumb.list")>
+<#assign bcCurrent = springMacroRequestContext.getMessage("certificates.student.breadcrumb.current", [data.student.name, data.student.lastName])>
+<#assign emptyTitle = springMacroRequestContext.getMessage("certificates.student.empty.title")>
+<#assign emptyText = springMacroRequestContext.getMessage("certificates.student.empty.text")>
+<#assign metaStream = springMacroRequestContext.getMessage("certificates.student.meta.stream")>
+<#assign detailsTitle = springMacroRequestContext.getMessage("certificates.student.details.title")>
+<#assign detailsNumber = springMacroRequestContext.getMessage("certificates.student.details.number")>
+<#assign detailsIssued = springMacroRequestContext.getMessage("certificates.student.details.issued")>
+<#assign detailsValidUntil = springMacroRequestContext.getMessage("certificates.student.details.validUntil")>
+<#assign actionView = springMacroRequestContext.getMessage("certificates.student.actions.view")>
+<#assign actionViewTip = springMacroRequestContext.getMessage("certificates.student.actions.view.tooltip")>
+<#assign actionEdit = springMacroRequestContext.getMessage("certificates.student.actions.edit")>
+<#assign actionEditTip = springMacroRequestContext.getMessage("certificates.student.actions.edit.tooltip")>
+<#assign actionCreate = springMacroRequestContext.getMessage("certificates.student.actions.create")>
+<#assign actionCreateTip = springMacroRequestContext.getMessage("certificates.student.actions.create.tooltip")>
+
+<@layout.page title=pageTitle>
     <@roadmap.breadcrumbs items=[
-    {"label":"Главная","url":"/"},
-    {"label":"Сертификаты","url":"/admin/certificate"},
-    {"label": data.student.name + " " + data.student.lastName,"url":""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcList, "url": "/admin/certificate"},
+    {"label": bcCurrent, "url": ""}
     ]/>
     <div class="student-header mb-4">
         <div class="row align-items-center">
@@ -29,51 +48,47 @@
                 <div class="empty-icon">
                     <i class="fas fa-clipboard-list"></i>
                 </div>
-                <h4 class="empty-title">Нет завершенных курсов</h4>
-                <p class="empty-text">Этот студент ещё не завершил ни одного курса</p>
+                <h4 class="empty-title">${emptyTitle}</h4>
+                <p class="empty-text">${emptyText}</p>
             </div>
         </div>
     <#else>
         <div class="certificates-grid">
             <#list data.statusList as stat>
                 <div class="certificate-card">
-
-
                     <div class="card-body">
                         <h3 class="course-title">${stat.courseTitle}</h3>
-
                         <div class="course-meta">
                             <#if stat.courseInstanceTitle??>
                                 <div class="meta-item">
                                     <i class="fas fa-users"></i>
-                                    <span class="meta-label">Поток:</span>
+                                    <span class="meta-label">${metaStream}</span>
                                     <span class="meta-value">${stat.courseInstanceTitle}</span>
                                 </div>
                             </#if>
                         </div>
-
                         <#if stat.certificateCreated>
                             <div class="certificate-details">
                                 <div class="details-header">
                                     <i class="fas fa-certificate"></i>
-                                    <span>Детали сертификата</span>
+                                    <span>${detailsTitle}</span>
                                 </div>
                                 <div class="details-grid">
                                     <#if stat.certificateNumber??>
                                         <div class="detail-item">
-                                            <span class="detail-label">Номер:</span>
+                                            <span class="detail-label">${detailsNumber}</span>
                                             <span class="detail-value cert-number">#${stat.certificateNumber}</span>
                                         </div>
                                     </#if>
                                     <#if stat.certificateIssueDate??>
                                         <div class="detail-item">
-                                            <span class="detail-label">Выдан:</span>
+                                            <span class="detail-label">${detailsIssued}</span>
                                             <span class="detail-value">${stat.certificateIssueDate}</span>
                                         </div>
                                     </#if>
                                     <#if stat.certificateExpiryDate??>
                                         <div class="detail-item">
-                                            <span class="detail-label">Действителен до:</span>
+                                            <span class="detail-label">${detailsValidUntil}</span>
                                             <span class="detail-value">${stat.certificateExpiryDate}</span>
                                         </div>
                                     </#if>
@@ -87,23 +102,23 @@
                             <#list stat.certificateId as cid>
                                 <button class="action-button btn-primary"
                                         onclick="window.location.href='/admin/certificate/view/${cid}'"
-                                        title="Подробный просмотр">
+                                        title="${actionViewTip}">
                                     <i class="fas fa-eye"></i>
-                                    <span>Просмотр</span>
+                                    <span>${actionView}</span>
                                 </button>
                                 <button class="action-button btn-secondary"
                                         onclick="window.location.href='/admin/certificate/edit/${cid}'"
-                                        title="Редактировать">
+                                        title="${actionEditTip}">
                                     <i class="fas fa-edit"></i>
-                                    <span>Изменить</span>
+                                    <span>${actionEdit}</span>
                                 </button>
                             </#list>
                         <#else>
                             <button class="action-button btn-create"
                                     onclick="window.location.href='/admin/certificate/create?studentId=${data.student.id}&courseInstanceId=${stat.courseInstanceId}'"
-                                    title="Создать сертификат">
+                                    title="${actionCreateTip}">
                                 <i class="fas fa-plus-circle"></i>
-                                <span>Создать сертификат</span>
+                                <span>${actionCreate}</span>
                             </button>
                         </#if>
                     </div>
@@ -498,9 +513,14 @@
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
         }
+
         .certificate-card {
             animation: fadeInUp 0.6s ease forwards;
             opacity: 0;
@@ -514,39 +534,52 @@
             }
         }
 
-        .certificate-card:nth-child(1) { animation-delay: 0.1s; }
-        .certificate-card:nth-child(2) { animation-delay: 0.2s; }
-        .certificate-card:nth-child(3) { animation-delay: 0.3s; }
-        .certificate-card:nth-child(4) { animation-delay: 0.4s; }
-        .certificate-card:nth-child(5) { animation-delay: 0.5s; }
-        .certificate-card:nth-child(6) { animation-delay: 0.6s; }
+        .certificate-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .certificate-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .certificate-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .certificate-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .certificate-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .certificate-card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
             tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
-
             document.querySelectorAll('.action-button').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     if (!this.classList.contains('loading')) {
                         this.classList.add('loading');
-
                         setTimeout(() => {
                             this.classList.remove('loading');
                         }, 1500);
                     }
                 });
             });
-
             document.querySelectorAll('.certificate-card').forEach(card => {
-                card.addEventListener('mouseenter', function() {
+                card.addEventListener('mouseenter', function () {
                     this.style.borderColor = 'var(--admin-accent)';
                 });
-
-                card.addEventListener('mouseleave', function() {
+                card.addEventListener('mouseleave', function () {
                     this.style.borderColor = 'var(--admin-border)';
                 });
             });

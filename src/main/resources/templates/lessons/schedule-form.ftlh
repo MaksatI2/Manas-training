@@ -3,10 +3,25 @@
 <#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page>
+    <#assign bcHome = springMacroRequestContext.getMessage("schedule.breadcrumb.home")>
+    <#assign bcLesson = springMacroRequestContext.getMessage("schedule.breadcrumb.lesson")?replace("{0}", lesson.id?string)>
+    <#assign bcSchedule = springMacroRequestContext.getMessage("schedule.breadcrumb.schedule")>
+    <#assign titleCreate = springMacroRequestContext.getMessage("schedule.title.create")?replace("{0}", lesson.title?string)>
+    <#assign titleEdit = springMacroRequestContext.getMessage("schedule.title.edit")?replace("{0}", lesson.title?string)>
+    <#assign lblLessonDate = springMacroRequestContext.getMessage("schedule.form.lessonDate")>
+    <#assign lblDuration = springMacroRequestContext.getMessage("schedule.form.durationHours")>
+    <#assign lblTeacher = springMacroRequestContext.getMessage("schedule.form.teacher")>
+    <#assign lblName = springMacroRequestContext.getMessage("schedule.form.name")>
+    <#assign lblType = springMacroRequestContext.getMessage("schedule.form.type")>
+    <#assign lblMeeting = springMacroRequestContext.getMessage("schedule.form.meetingUrl")>
+    <#assign lblNotes = springMacroRequestContext.getMessage("schedule.form.notes")>
+    <#assign btnSave = springMacroRequestContext.getMessage("schedule.save")>
+    <#assign btnCancel = springMacroRequestContext.getMessage("schedule.cancel")>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Урок #${lesson.id}", "url": "/lessons/${lesson.id}"},
-    {"label": "Расписание", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcLesson, "url": "/lessons/${lesson.id}"},
+    {"label": bcSchedule, "url": ""}
     ] />
     <#if successMessage??>
         <div id="successMessage" data-message="${successMessage?js_string}"></div>
@@ -16,7 +31,7 @@
     </#if>
     <div class="hero-section">
         <h1 class="hero-title">
-            ${schedule.id???string("Редактировать", "Создать")} расписание для урока: ${lesson.title}
+            <#if schedule.id??>${titleEdit}<#else>${titleCreate}</#if>
         </h1>
     </div>
 
@@ -29,44 +44,44 @@
                 <@spring.formHiddenInput "schedule.id"/>
             </#if>
             <div class="mb-3">
-                <label for="lessonDate" class="form-label">Дата урока *</label>
+                <label for="lessonDate" class="form-label">${lblLessonDate}</label>
                 <@spring.formInput "schedule.lessonDate" 'class="form-control" id="lessonDate" type="date"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="mb-3">
-                <label for="durationHours" class="form-label">Длительность (ч.) *</label>
+                <label for="durationHours" class="form-label">${lblDuration}</label>
                 <@spring.formInput "schedule.durationHours" 'class="form-control" id="durationHours" type="number" min="1"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="mb-3">
-                <label for="teacherId" class="form-label">Преподаватель *</label>
+                <label for="teacherId" class="form-label">${lblTeacher}</label>
                 <@spring.formSingleSelect "schedule.teacherId" teachers 'class="form-control" id="teacherId"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
 
             <div class="mb-3">
-                <label for="title" class="form-label">Название</label>
+                <label for="title" class="form-label">${lblName}</label>
                 <@spring.formInput "schedule.title" 'class="form-control" id="title" maxlength="200"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="mb-3">
-                <label for="lessonType" class="form-label">Тип урока *</label>
+                <label for="lessonType" class="form-label">${lblType}</label>
                 <@spring.formSingleSelect "schedule.lessonType" lessonTypes 'class="form-control" id="lessonType"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="mb-3">
-                <label for="meetingUrl" class="form-label">Ссылка на встречу</label>
+                <label for="meetingUrl" class="form-label">${lblMeeting}</label>
                 <@spring.formInput "schedule.meetingUrl" 'class="form-control" id="meetingUrl" maxlength="500"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="mb-3">
-                <label for="notes" class="form-label">Примечания</label>
+                <label for="notes" class="form-label">${lblNotes}</label>
                 <@spring.formTextarea "schedule.notes" 'rows="4" class="form-control" id="notes"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Сохранить</button>
-                <a href="<@spring.url '/lessons/${lesson.id}'/>" class="btn btn-secondary">Отмена</a>
+                <button type="submit" class="btn btn-primary">${btnSave}</button>
+                <a href="<@spring.url '/lessons/${lesson.id}'/>" class="btn btn-secondary">${btnCancel}</a>
             </div>
         </form>
     </div>
@@ -114,17 +129,21 @@
             background: linear-gradient(135deg, #0066cc, #003d7a);
             border-color: #0066cc;
         }
+
         .btn-primary:hover {
             background: linear-gradient(135deg, #003d7a, #002a5a);
             transform: translateY(-1px);
             box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
+
         .form-label {
             font-weight: 500;
         }
+
         .error-block {
             font-size: 0.875rem;
         }
+
         .flatpickr-input {
             width: 100%;
             padding: 0.375rem 0.75rem;

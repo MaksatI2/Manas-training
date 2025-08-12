@@ -20,7 +20,7 @@
                     <div class="card-header bg-primary text-white text-center py-4">
                         <h2 class="mb-0 fw-bold">
                             <i class="fas fa-video me-2"></i>
-                            Начать видеоурок
+                            <@spring.message code="meeting.start.title"/>
                         </h2>
                     </div>
                     <div class="card-body p-5">
@@ -28,17 +28,17 @@
                             <div class="meeting-icon mb-3">
                                 <i class="fas fa-chalkboard-teacher display-1 text-primary"></i>
                             </div>
-                            <h4 class="fw-semibold text-dark mb-3">Готовы начать урок?</h4>
-                            <p class="text-muted">Убедитесь, что ваша камера и микрофон работают правильно</p>
+                            <h4 class="fw-semibold text-dark mb-3"><@spring.message code="meeting.start.ready"/></h4>
+                            <p class="text-muted"><@spring.message code="meeting.start.checkDevices"/></p>
                         </div>
 
                         <div class="pre-meeting-checks mb-4">
-                            <h6 class="fw-semibold mb-3">Проверка оборудования:</h6>
+                            <h6 class="fw-semibold mb-3"><@spring.message code="meeting.start.equipmentCheck"/></h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="check-item p-3 border rounded-3 bg-light">
                                         <i class="fas fa-video text-primary me-2"></i>
-                                        <span>Камера</span>
+                                        <span><@spring.message code="meeting.start.camera"/></span>
                                         <div class="form-check form-switch float-end">
                                             <input class="form-check-input" type="checkbox" id="cameraCheck" checked>
                                         </div>
@@ -47,7 +47,7 @@
                                 <div class="col-md-6">
                                     <div class="check-item p-3 border rounded-3 bg-light">
                                         <i class="fas fa-microphone text-primary me-2"></i>
-                                        <span>Микрофон</span>
+                                        <span><@spring.message code="meeting.start.microphone"/></span>
                                         <div class="form-check form-switch float-end">
                                             <input class="form-check-input" type="checkbox" id="micCheck" checked>
                                         </div>
@@ -57,15 +57,15 @@
                         </div>
 
                         <div class="meeting-info mb-4">
-                            <h6 class="fw-semibold mb-3">Информация о встрече:</h6>
+                            <h6 class="fw-semibold mb-3"><@spring.message code="meeting.start.meetingInfo"/></h6>
                             <div class="info-box p-3 bg-light rounded-3">
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <small class="text-muted">ID расписания:</small>
+                                        <small class="text-muted"><@spring.message code="meeting.start.scheduleId"/></small>
                                         <div class="fw-semibold">${scheduleId}</div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <small class="text-muted">Преподаватель:</small>
+                                        <small class="text-muted"><@spring.message code="meeting.start.teacher"/></small>
                                         <div class="fw-semibold">${name}</div>
                                     </div>
                                 </div>
@@ -75,11 +75,11 @@
                         <div class="d-grid gap-2">
                             <button id="startMeetingBtn" class="btn btn-success btn-lg rounded-pill py-3">
                                 <i class="fas fa-play me-2"></i>
-                                Начать урок
+                                <@spring.message code="meeting.start.startButton"/>
                             </button>
                             <a href="<@spring.url '/schedules'/>" class="btn btn-outline-secondary rounded-pill">
                                 <i class="fas fa-arrow-left me-2"></i>
-                                Вернуться к расписанию
+                                <@spring.message code="meeting.start.backToSchedule"/>
                             </a>
                         </div>
                     </div>
@@ -161,10 +161,10 @@
     </style>
 
     <script>
-        document.getElementById('startMeetingBtn').addEventListener('click', function() {
+        document.getElementById('startMeetingBtn').addEventListener('click', function () {
             const btn = this;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Создание встречи...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i><@spring.message code="meeting.start.creatingMeeting"/>';
 
             fetch('/api/jitsi/meetings/start', {
                 method: 'POST',
@@ -183,19 +183,19 @@
                     if (data.meetingId) {
                         window.location.href = `/jitsi/meeting/` + data.meetingId + `/join?userId=${teacherId}&userRole=TEACHER`;
                     } else {
-                        throw new Error('Не удалось создать встречу');
+                        throw new Error('<@spring.message code="meeting.start.error.create"/>');
                     }
                 })
                 .catch(error => {
                     console.error('Ошибка:', error);
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-play me-2"></i>Начать урок';
-                    alert('Произошла ошибка при создании встречи. Попробуйте еще раз.');
+                    btn.innerHTML = '<i class="fas fa-play me-2"></i><@spring.message code="meeting.start.startButton"/>';
+                    alert('<@spring.message code="meeting.start.error.general"/>');
                 });
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        document.addEventListener('DOMContentLoaded', function () {
+            navigator.mediaDevices.getUserMedia({video: true, audio: true})
                 .then(stream => {
                     stream.getTracks().forEach(track => track.stop());
                     console.log('Камера и микрофон доступны');
@@ -207,7 +207,7 @@
 
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-warning mt-3';
-                    alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Не удается получить доступ к камере или микрофону. Проверьте разрешения в браузере.';
+                    alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i><@spring.message code="meeting.start.deviceError"/>';
                     document.querySelector('.pre-meeting-checks').appendChild(alertDiv);
                 });
         });

@@ -1,4 +1,6 @@
 <#import "../layout.ftlh" as layout>
+<#import "/spring.ftl" as spring>
+
 <@layout.page>
     <div class="card shadow mb-4">
         <#if successMessage??>
@@ -9,12 +11,14 @@
         </#if>
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex flex-wrap justify-content-between align-items-center">
-                <a href="/teacher/${teacherId}" class="btn btn-light btn-sm me-2" style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад к списку
+                <a href="/teacher/${teacherId}" class="btn btn-light btn-sm me-2"
+                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                    <i class="fas fa-arrow-left me-1"
+                       style="color: #0066cc;"></i> ${springMacroRequestContext.getMessage("teacher.manageCourses.back")}
                 </a>
                 <h5 class="m-0 font-weight-bold text-white mb-2 mb-md-0">
                     <i class="fas fa-book me-2"></i>
-                    Управление курсами преподавателя: ${teacher.teacher.name} ${teacher.teacher.lastName}
+                    ${springMacroRequestContext.getMessage("teacher.manageCourses.title", [teacher.teacher.name, teacher.teacher.lastName])}
                 </h5>
             </div>
         </div>
@@ -28,14 +32,15 @@
                             <div class="course-section mb-3 p-3 border rounded" data-course-id="${course.id}">
                                 <div class="row align-items-center">
                                     <div class="col-1">
-                                        <input type="checkbox" class="form-check-input" name="courseIds" value="${course.id}"
+                                        <input type="checkbox" class="form-check-input" name="courseIds"
+                                               value="${course.id}"
                                                <#if assignedCourses?seq_contains(course.id)>checked</#if>>
                                     </div>
                                     <div class="col-6">
                                         <span>${course.title}</span>
                                     </div>
                                     <div class="col-5">
-                                        <span>Код курса: ${course.code}</span>
+                                        <span>${springMacroRequestContext.getMessage("teacher.manageCourses.courseCode", [course.code])}</span>
                                     </div>
                                 </div>
                             </div>
@@ -43,13 +48,13 @@
                     <#else>
                         <div class="text-center text-muted py-4">
                             <i class="fas fa-book fa-2x mb-2"></i>
-                            <p>Курсы не найдены</p>
+                            <p>${springMacroRequestContext.getMessage("teacher.manageCourses.noCourses")}</p>
                         </div>
                     </#if>
                 </div>
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary btn-sm" style="border-radius: 25px;">
-                        <i class="fas fa-save me-1"></i> Сохранить изменения
+                        <i class="fas fa-save me-1"></i> ${springMacroRequestContext.getMessage("teacher.manageCourses.saveChanges")}
                     </button>
                 </div>
             </form>
@@ -57,7 +62,6 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 
     <style>
         .card {

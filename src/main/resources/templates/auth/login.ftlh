@@ -1,12 +1,13 @@
 <#include "../layout.ftlh">
+<#import "/spring.ftl" as spring>
 
 <@page>
     <div class="hero-section">
         <h1 class="hero-title">
             <i class="fas fa-sign-in-alt me-3"></i>
-            Вход в систему
+            <@spring.message code="login.title"/>
         </h1>
-        <p class="hero-subtitle">Войдите в свой аккаунт для доступа к курсам</p>
+        <p class="hero-subtitle"><@spring.message code="login.subtitle"/></p>
     </div>
 
     <div class="row justify-content-center">
@@ -18,14 +19,14 @@
                             <i class="fas fa-user-circle fa-3x"></i>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h5 class="mb-1">Добро пожаловать обратно!</h5>
+                            <h5 class="mb-1"><@spring.message code="login.quick.welcome"/></h5>
                             <p class="mb-0 user-name">${quickLoginName}</p>
                             <small class="user-email">${quickLoginEmail}</small>
                         </div>
                     </div>
                     <p class="small mb-3">
                         <i class="fas fa-clock me-1"></i>
-                        Прошлый раз Вы заходили с этого устройства. Хотите войти снова?
+                        <@spring.message code="login.quick.last.time"/>
                     </p>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <form action="/auth/quick-login" method="post" class="me-md-2">
@@ -33,7 +34,7 @@
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                             </#if>
                             <button type="submit" class="btn btn-quick-login">
-                                <i class="fas fa-sign-in-alt me-1"></i>Быстрый вход
+                                <i class="fas fa-sign-in-alt me-1"></i><@spring.message code="login.quick.button"/>
                             </button>
                         </form>
                         <form action="/auth/dismiss-quick-login" method="post">
@@ -41,7 +42,7 @@
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                             </#if>
                             <button type="submit" class="btn btn-dismiss">
-                                <i class="fas fa-times me-1"></i>Не я
+                                <i class="fas fa-times me-1"></i><@spring.message code="login.quick.not.me"/>
                             </button>
                         </form>
                     </div>
@@ -72,19 +73,20 @@
 
                     <div class="mb-3">
                         <label for="email" class="form-label">
-                            <i class="fas fa-envelope me-1"></i>Email
+                            <i class="fas fa-envelope me-1"></i><@spring.message code="login.email"/>
                         </label>
                         <input type="email" class="form-control" id="login" name="login"
-                               placeholder="Введите ваш email" <#if quickLoginEmail??>value="${quickLoginEmail}"</#if>>
+                               placeholder="<@spring.message code='login.email.placeholder'/>"
+                               <#if quickLoginEmail??>value="${quickLoginEmail}"</#if>>
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">
-                            <i class="fas fa-lock me-1"></i>Пароль
+                            <i class="fas fa-lock me-1"></i><@spring.message code="login.password"/>
                         </label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="password" name="password"
-                                   placeholder="Введите ваш пароль">
+                                   placeholder="<@spring.message code='login.password.placeholder'/>">
                             <button type="button" class="btn btn-outline-secondary" id="togglePassword">
                                 <i class="fas fa-eye" id="eyeIcon"></i>
                             </button>
@@ -96,20 +98,20 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
                                 <label class="form-check-label" for="rememberMe">
-                                    <i class="fas fa-bookmark me-1"></i>Запомнить меня
+                                    <i class="fas fa-bookmark me-1"></i><@spring.message code="login.remember"/>
                                 </label>
                             </div>
                         </div>
                         <div class="col-md-6 text-end">
                             <a href="/auth/forgot-password" style="color: var(--primary-blue);" class="small">
-                                <i class="fas fa-key me-1"></i>Забыли пароль?
+                                <i class="fas fa-key me-1"></i><@spring.message code="login.forgot.password"/>
                             </a>
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 mb-3">
                         <button type="submit" class="btn btn-primary-custom">
-                            <i class="fas fa-sign-in-alt me-2"></i>Войти
+                            <i class="fas fa-sign-in-alt me-2"></i><@spring.message code="login.button"/>
                         </button>
                     </div>
                 </form>
@@ -117,14 +119,14 @@
 
             <div class="text-center mt-4">
                 <p class="text-muted mb-3">
-                    Нет аккаунта? Зарегистрируйтесь:
+                    <@spring.message code="login.no.account"/>
                 </p>
                 <div class="d-grid gap-2 d-md-block">
                     <a href="/auth/register/student" class="btn btn-outline-primary me-md-2">
-                        <i class="fas fa-user-graduate me-1"></i>Как студент
+                        <i class="fas fa-user-graduate me-1"></i><@spring.message code="login.register.student"/>
                     </a>
                     <a href="/auth/register/company" class="btn btn-outline-primary">
-                        <i class="fas fa-building me-1"></i>Как компания
+                        <i class="fas fa-building me-1"></i><@spring.message code="login.register.company"/>
                     </a>
                 </div>
             </div>
@@ -137,14 +139,14 @@
             color: var(--white);
             border-radius: 10px;
             border-left: 4px solid var(--light-blue);
-            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
             padding: 2rem;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .quick-login-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,102,204,0.3);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.3);
         }
 
         .quick-login-card h5 {
@@ -193,7 +195,7 @@
             background: var(--light-blue);
             color: var(--white);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
         }
 
         .btn-dismiss {
@@ -211,7 +213,7 @@
             background: var(--white);
             color: var(--primary-blue);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -230,10 +232,9 @@
     </style>
 
     <script>
-        document.getElementById('togglePassword').addEventListener('click', function() {
+        document.getElementById('togglePassword').addEventListener('click', function () {
             const passwordField = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
-
             if (passwordField.type === 'password') {
                 passwordField.type = 'text';
                 eyeIcon.classList.remove('fa-eye');
@@ -251,7 +252,7 @@
         document.getElementById('login').focus();
         </#if>
 
-        document.getElementById('rememberMe').addEventListener('change', function() {
+        document.getElementById('rememberMe').addEventListener('change', function () {
             const label = document.querySelector('label[for="rememberMe"]');
             if (this.checked) {
                 label.title = 'Мы запомним вас на этом устройстве на год';

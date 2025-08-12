@@ -2,38 +2,48 @@
 <#include "../layout.ftlh">
 <#import "../RoadMap.ftlh" as roadmap>
 <@page>
+    <#assign bcHome><@spring.message code='test.final.edit.breadcrumb.home'/></#assign>
+    <#assign bcMyCourses><@spring.message code='test.final.edit.breadcrumb.myCourses'/></#assign>
+    <#assign bcEdit><@spring.message code='test.final.edit.breadcrumb.edit'/></#assign>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Мои курсы", "url": "/teacher/my-courses"},
-    {"label": "Редактировать тест", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcMyCourses, "url": "/teacher/my-courses"},
+    {"label": bcEdit, "url": ""}
     ] />
+
     <div class="hero-section">
-        <h1 class="hero-title"><i class="fa-solid fa-list-check"></i> Редактирование итогового теста</h1>
+        <h1 class="hero-title"><i
+                    class="fa-solid fa-list-check"></i> <@spring.message code="test.final.edit.pageTitle"/></h1>
     </div>
     <form method="post" action="/test/edit" id="edit-test">
-
-
         <div class="row justify-content-center" id="test">
             <div class="col-lg-8 col-md-8">
                 <div class="feature-card">
                     <div class="mb-3">
-                        <label for="test.title" class="form-label fw-bold">Название теста <span class="text-danger">*</span></label>
+                        <label for="test.title"
+                               class="form-label fw-bold"><@spring.message code="test.final.edit.form.title.label"/>
+                            <span class="text-danger"><@spring.message code="test.final.edit.form.title.required"/></span></label>
                         <@spring.formInput "test.title" 'class="form-control" id="test.title"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="test.description" class="form-label fw-bold">Описание теста <span class="text-danger">*</span></label>
+                        <label for="test.description"
+                               class="form-label fw-bold"><@spring.message code="test.final.edit.form.description.label"/>
+                            <span class="text-danger"><@spring.message code="test.final.edit.form.description.required"/></span></label>
                         <@spring.formTextarea "test.description" 'class="form-control" rows="3" id="test.description"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="test.passingScore" class="form-label fw-bold">Проходной балл <span class="text-danger">*</span></label>
+                        <label for="test.passingScore"
+                               class="form-label fw-bold"><@spring.message code="test.final.edit.form.passingScore.label"/>
+                            <span class="text-danger"><@spring.message code="test.final.edit.form.passingScore.required"/></span></label>
                         <@spring.formInput "test.passingScore" 'class="form-control points" id="test.passingScore"' />
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                 </div>
             </div>
-            <h3 class="text-center mb-4">Список вопросов</h3>
+            <h3 class="text-center mb-4"><@spring.message code="test.final.edit.questions.listTitle"/></h3>
             <#if 0 < test.questions?size>
                 <#list (test.questions)![] as question>
                     <div class="col-lg-8 col-md-8" id="questionId-${question?index}">
@@ -42,14 +52,16 @@
                                 <div class="text-end" id="question-${question?index}-btnDiv">
                                     <button type="button" class="btn btn-outline-danger"
                                             onclick="deleteQuestionFromEdit('questionId-${question?index}', ${question?index})"
-                                            id="delete-question-${question?index}">
+                                            id="delete-question-${question?index}"
+                                            title="<@spring.message code='test.final.edit.question.delete.title'/>">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
                             </#if>
                             <div class="mb-3">
-                                <label for="questions[${question?index}].question" class="form-label fw-bold">Введите
-                                    текст вопроса <span class="text-danger">*</span></label>
+                                <label for="questions[${question?index}].question"
+                                       class="form-label fw-bold"><@spring.message code="test.final.edit.question.text.label"/>
+                                    <span class="text-danger"><@spring.message code="test.final.edit.question.text.required"/></span></label>
                                 <@spring.formInput "test.questions[${question?index}].question" 'class="form-control" id="questions[${question?index}].question"' />
                                 <@spring.showErrors "<br>" "error text-danger" />
                             </div>
@@ -84,24 +96,19 @@
                                             <#if 1 < option?index>
                                                 <div class="d-flex flex-grow-1 align-items-center"
                                                      id="question-${question?index}-option-${option?index}-inputBlock">
-                                                    <@spring.formInput "test.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3"
-                                                placeholder="Вариант ответа"
-                                                aria-describedby="delete-question-${question?index}-option-${option?index}"
-                                                id="questions[${question?index}].options[${option?index}].optionText"' />
+                                                    <@spring.formInput "test.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3" placeholder="' + springMacroRequestContext.getMessage("test.final.edit.option.placeholder") + '" aria-describedby="delete-question-${question?index}-option-${option?index}" id="questions[${question?index}].options[${option?index}].optionText"' />
                                                     <button class="btn btn-outline-danger"
                                                             type="button"
                                                             id="delete-question-${question?index}-option-${option?index}"
-                                                            onclick="deleteOptionFromEdit('questionId-${question?index}-optionId-${option?index}', ${question?index}, ${option?index}, 'option-${option?index}-error')">
+                                                            onclick="deleteOptionFromEdit('questionId-${question?index}-optionId-${option?index}', ${question?index}, ${option?index}, 'option-${option?index}-error')"
+                                                            title="<@spring.message code='test.final.edit.option.delete.title'/>">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </div>
                                             <#else>
                                                 <div class="flex-grow-1 me-0"
                                                      id="question-${question?index}-option-${option?index}-inputBlock">
-                                                    <@spring.formInput "test.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3"
-                                                placeholder="Вариант ответа *"
-                                                aria-describedby="delete-question-${question?index}-option-${option?index}"
-                                                id="questions[${question?index}].options[${option?index}].optionText"' />
+                                                    <@spring.formInput "test.questions[${question?index}].options[${option?index}].optionText" 'class="form-control me-3" placeholder="' + springMacroRequestContext.getMessage("test.final.edit.option.placeholder.required") + '" aria-describedby="delete-question-${question?index}-option-${option?index}" id="questions[${question?index}].options[${option?index}].optionText"' />
                                                 </div>
                                             </#if>
                                         </div>
@@ -112,20 +119,20 @@
                                         <input type="hidden"
                                                name="questions[${question?index}].options[${option?index}].questionId"
                                                value="${option.questionId!}">
-
                                     </#list>
                                 </div>
                                 <div class="mb-3" id="createOption-questionId-${question?index}">
                                     <button type="button" class="btn btn-primary-custom"
                                             onclick="createOption(${question?index}, ${question.id})"
                                             id="add-options-button-question-${question?index}">
-                                        Добавить вариант ответа
+                                        <@spring.message code="test.final.edit.option.add"/>
                                     </button>
                                 </div>
                             </#if>
                             <div class="mb-3">
                                 <@spring.formCheckbox "test.questions[${question?index}].isRequired" 'class="form-check-input fs-4"'/>
-                                <label for="questions[${question?index}].isRequired" class="form-label fw-bold mx-2">Активный?</label>
+                                <label for="questions[${question?index}].isRequired"
+                                       class="form-label fw-bold mx-2"><@spring.message code="test.final.edit.question.required.label"/></label>
                             </div>
                         </div>
                     </div>
@@ -138,22 +145,30 @@
                 <div class="row">
                     <div class="col-12 col-md-6 col-lg-3 mb-3 d-flex align-items-center">
                         <@spring.formCheckbox "test.isActive" 'class="form-check-input fs-4 ms-3"'/>
-                        <label class="form-check-label fw-bold" for="test.isActive">Активный?</label>
+                        <label class="form-check-label fw-bold"
+                               for="test.isActive"><@spring.message code="test.final.edit.test.active.label"/></label>
                     </div>
                     <div class="col-12 col-md-6 col-lg-9 mb-3 d-flex justify-content-end flex-wrap gap-2">
                         <button type="button" class="btn btn-primary-custom dropdown-toggle me-3" id="createQuestion"
                                 data-bs-toggle="dropdown">
-                            Добавить вопросы
+                            <@spring.message code="test.final.edit.button.addQuestions"/>
                         </button>
                         <ul class="dropdown-menu">
-                            <li class="dropdown-item" onclick="createQuestionBlock(1, ${test.id})">1</li>
-                            <li class="dropdown-item" onclick="createQuestionBlock(3, ${test.id})">3</li>
-                            <li class="dropdown-item" onclick="createQuestionBlock(5, ${test.id})">5</li>
-                            <li class="dropdown-item" onclick="createQuestionBlock(10, ${test.id})">10</li>
-                            <li class="dropdown-item" onclick="createQuestionBlock(15, ${test.id})">15</li>
-                            <li class="dropdown-item" onclick="createQuestionBlock(20, ${test.id})">20</li>
+                            <li class="dropdown-item"
+                                onclick="createQuestionBlock(1, ${test.id})"><@spring.message code="test.final.edit.add.count.1"/></li>
+                            <li class="dropdown-item"
+                                onclick="createQuestionBlock(3, ${test.id})"><@spring.message code="test.final.edit.add.count.3"/></li>
+                            <li class="dropdown-item"
+                                onclick="createQuestionBlock(5, ${test.id})"><@spring.message code="test.final.edit.add.count.5"/></li>
+                            <li class="dropdown-item"
+                                onclick="createQuestionBlock(10, ${test.id})"><@spring.message code="test.final.edit.add.count.10"/></li>
+                            <li class="dropdown-item"
+                                onclick="createQuestionBlock(15, ${test.id})"><@spring.message code="test.final.edit.add.count.15"/></li>
+                            <li class="dropdown-item"
+                                onclick="createQuestionBlock(20, ${test.id})"><@spring.message code="test.final.edit.add.count.20"/></li>
                         </ul>
-                        <button type="submit" class="btn btn-primary-custom me-3">Сохранить изменения</button>
+                        <button type="submit"
+                                class="btn btn-primary-custom me-3"><@spring.message code="test.final.edit.button.save"/></button>
                     </div>
                 </div>
             </div>

@@ -1,15 +1,31 @@
 <#import "../layout.ftlh" as layout>
 <#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
-<@layout.page title="Подача заявки на курс">
+<@layout.page title="<@spring.message code='student.applications.create.title'/>">
+    <#assign bcHome><@spring.message code='student.applications.create.breadcrumb.home'/></#assign>
+    <#assign bcMyApps><@spring.message code='student.applications.create.breadcrumb.myApplications'/></#assign>
+    <#assign bcCreate><@spring.message code='student.applications.create.breadcrumb.create'/></#assign>
+    <#assign header><@spring.message code='student.applications.create.header'/></#assign>
+    <#assign back><@spring.message code='student.applications.create.back'/></#assign>
+    <#assign fieldCourse><@spring.message code='student.applications.create.field.course'/></#assign>
+    <#assign placeholderCourse><@spring.message code='student.applications.create.field.course.placeholder'/></#assign>
+    <#assign fieldTeacher><@spring.message code='student.applications.create.field.preferredTeacher'/></#assign>
+    <#assign placeholderTeacher = springMacroRequestContext.getMessage("student.applications.create.field.preferredTeacher.placeholder")>
+    <#assign fieldStart><@spring.message code='student.applications.create.field.preferredStartDate'/></#assign>
+    <#assign fieldEnd><@spring.message code='student.applications.create.field.preferredEndDate'/></#assign>
+    <#assign btnSubmit><@spring.message code='student.applications.create.button.submit'/></#assign>
+    <#assign errLoadTeachers = springMacroRequestContext.getMessage("student.applications.create.error.loadTeachers")>
+
     <@roadmap.breadcrumbs items=[
-    {"label": "Главная", "url": "/"},
-    {"label": "Мои заявки", "url": "/applications/student/applications"},
-    {"label": "Подача заявки", "url": ""}
+    {"label": bcHome, "url": "/"},
+    {"label": bcMyApps, "url": "/applications/student/applications"},
+    {"label": bcCreate, "url": ""}
     ] />
     <style>
         :root {
@@ -65,11 +81,11 @@
     <div class="card-custom mb-4">
         <div class="card-header-custom">
             <h5 class="m-0">
-                <i class="fas fa-user-edit me-2"></i> Подача заявки на курс
+                <i class="fas fa-user-edit me-2"></i> ${header}
             </h5>
             <a href="/applications/student/applications" class="btn btn-light btn-sm"
                style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> Назад
+                <i class="fas fa-arrow-left me-1" style="color: #0066cc;"></i> ${back}
             </a>
         </div>
 
@@ -87,9 +103,10 @@
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="courseId" class="form-label fw-bold">Курс <span class="text-danger">*</span></label>
+                        <label for="courseId" class="form-label fw-bold">${fieldCourse} <span
+                                    class="text-danger">*</span></label>
                         <select id="courseId" name="courseId" class="form-select" required>
-                            <option value="">Выберите курс</option>
+                            <option value="">${placeholderCourse}</option>
                             <#list courses as course>
                                 <option value="${course.id}"
                                         <#if application?? && application.courseId?? && application.courseId?number == course.id>selected</#if>>
@@ -102,9 +119,9 @@
                         </#if>
                     </div>
                     <div class="col-md-6">
-                        <label for="preferredTeacherId" class="form-label fw-bold">Предпочтительный преподаватель</label>
+                        <label for="preferredTeacherId" class="form-label fw-bold">${fieldTeacher}</label>
                         <select id="preferredTeacherId" name="preferredTeacherId" class="form-select">
-                            <option value="">Не выбрано</option>
+                            <option value="">${placeholderTeacher}</option>
                             <#if teachers??>
                                 <#list teachers as teacher>
                                     <option value="${teacher.id}"
@@ -118,7 +135,7 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="preferredStartDate" class="form-label fw-bold">Желаемая дата начала</label>
+                        <label for="preferredStartDate" class="form-label fw-bold">${fieldStart}</label>
                         <input type="date" id="preferredStartDate" name="preferredStartDate" class="form-control"
                                value="${(application.preferredStartDate)!}">
                         <#if errors?? && errors.hasFieldErrors("preferredStartDate")>
@@ -126,7 +143,7 @@
                         </#if>
                     </div>
                     <div class="col-md-6">
-                        <label for="preferredEndDate" class="form-label fw-bold">Желаемая дата окончания</label>
+                        <label for="preferredEndDate" class="form-label fw-bold">${fieldEnd}</label>
                         <input type="date" id="preferredEndDate" name="preferredEndDate" class="form-control"
                                value="${(application.preferredEndDate)!}">
                         <#if errors?? && errors.hasFieldErrors("preferredEndDate")>
@@ -137,7 +154,7 @@
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary shadow-sm">
-                        <i class="fas fa-paper-plane me-1"></i> Отправить заявку
+                        <i class="fas fa-paper-plane me-1"></i> ${btnSubmit}
                     </button>
                 </div>
             </form>
@@ -145,10 +162,13 @@
     </div>
 
     <script>
+        const placeholderTeacher = "${placeholderTeacher?js_string}";
+        const errLoadTeachers = "${errLoadTeachers?js_string}";
+
         document.getElementById('courseId').addEventListener('change', function () {
             const courseId = this.value;
             const teacherSelect = document.getElementById('preferredTeacherId');
-            teacherSelect.innerHTML = '<option value="">Не выбрано</option>';
+            teacherSelect.innerHTML = '<option value="">' + placeholderTeacher + '</option>';
 
             if (courseId) {
                 fetch('/api/courses/' + courseId + '/teachers')
@@ -162,7 +182,7 @@
                         });
                     })
                     .catch(error => {
-                        console.error('Ошибка при загрузке преподавателей:', error);
+                        console.error(errLoadTeachers + ':', error);
                     });
             }
         });
