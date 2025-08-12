@@ -62,8 +62,20 @@
                         <#assign courseList = grouped[sid]>
                         <#assign first = courseList[0]>
                         <tr>
-                            <td class="field-value">${first.fullName}</td>
-                            <td class="field-value">${first.email}</td>
+                            <td class="field-value">
+                                <#if first.fullName?? && first.fullName?length > 20>
+                                    ${first.fullName?substring(0, 20)}...
+                                <#else>
+                                    ${first.fullName!""}
+                                </#if>
+                            </td>
+                            <td class="field-value">
+                                <#if first.email?? && first.email?length > 15>
+                                    ${first.email?substring(0, 15)}...
+                                <#else>
+                                    ${first.email!""}
+                                </#if>
+                            </td>
                             <td>${first.phone}</td>
                             <td class="field-value">
                                 <ul class="mb-0 ps-3 small">

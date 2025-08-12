@@ -56,12 +56,23 @@
                     <#list applications as app>
                         <tr class="clickable-row" data-href="/applications/organization/${app.id}">
                             <td>${app?index + 1}</td>
-                            <td>${app.courseTitle}</td>
+                            <td>
+                                <#if (app.courseTitle?? && app.courseTitle?length > 10)>
+                                    ${app.courseTitle?substring(0, 10)}...
+                                <#else>
+                                    ${app.courseTitle!""}
+                                </#if>
+                            </td>
                             <td>
                                 <#if app.preferredTeacher??>
-                                    ${app.preferredTeacher.name} ${app.preferredTeacher.lastName}
+                                    <#assign fullName = app.preferredTeacher.name + " " + app.preferredTeacher.lastName>
+                                    <#if (fullName?length > 20)>
+                                        ${fullName?substring(0, 20)}...
+                                    <#else>
+                                        ${fullName}
+                                    </#if>
                                 <#else>
-                                    <span class="text-muted"><@spring.message code="organization.applications.list.teacher.none"/></span>
+                                    <span class="text-muted">—</span>
                                 </#if>
                             </td>
                             <td>

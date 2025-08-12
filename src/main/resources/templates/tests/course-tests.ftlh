@@ -55,8 +55,20 @@
                     <#if tests?has_content>
                         <#list tests as test>
                             <tr style="cursor: pointer;" onclick="window.location.href='/test/${test.id}/details'">
-                                <td>${test.title}</td>
-                                <td>${test.course.title}</td>
+                                <td>
+                                    <#if (test.title?? && test.title?length > 10)>
+                                        ${test.title?substring(0, 8)}...
+                                    <#else>
+                                        ${test.title!""}
+                                    </#if>
+                                </td>
+                                <td>
+                                    <#if (test.course.title?? && test.course.title?length > 10)>
+                                        ${test.course.title?substring(0, 8)}...
+                                    <#else>
+                                        ${test.course.title!""}
+                                    </#if>
+                                </td>
                                 <td>${test.passingScore}</td>
                                 <td>${test.questions?size}</td>
                                 <td>
@@ -128,6 +140,21 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $('#testsTable').DataTable({
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 5, orderable: false },
+                { responsivePriority: 2, targets: 0 },
+                { responsivePriority: 3, targets: 1 },
+                { responsivePriority: 4, targets: 3 },
+                { responsivePriority: 5, targets: 4 },
+                { responsivePriority: 6, targets: 2 }
+            ]
+        });
+
+    </script>
 
     <style>
         .card {

@@ -6,204 +6,497 @@
 <#assign bcList    = springMacroRequestContext.getMessage("courseInstances.admin.detail.breadcrumb.list")>
 <#assign bcCurrent = springMacroRequestContext.getMessage("courseInstances.admin.detail.breadcrumb.current", [courseInstance.id])>
 
-
 <@layout.page>
-    <@roadmap.breadcrumbs items=[
-    {"label": bcHome, "url": "/"},
-    {"label": bcList, "url": "/admin/course-instances"},
-    {"label": bcCurrent, "url": ""}
-    ] />
-    <#if successMessage??>
-        <div id="successMessage" data-message="${successMessage?js_string}"></div>
-    </#if>
-    <#if errorMessage??>
-        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-    </#if>
+    <div class="page-wrapper">
+        <@roadmap.breadcrumbs items=[
+        {"label": bcHome, "url": "/"},
+        {"label": bcList, "url": "/admin/course-instances"},
+        {"label": bcCurrent, "url": ""}
+        ] />
 
-    <div class="hero-section">
-        <h1 class="hero-title"><i class="fas fa-book me-2"></i>${courseInstance.title}</h1>
-        <p class="hero-subtitle">
-            <@spring.message code="courseInstances.admin.detail.course"/>:
-            <strong>${courseInstance.courseTitle!'-'}</strong> |
-            <@spring.message code="courseInstances.admin.detail.category"/>:
-            <strong>${courseInstance.category!'-'}</strong>
-        </p>
-        <p class="hero-subtitle">
-            <@spring.message code="courseInstances.admin.detail.startDate"/>:
-            <strong>${courseInstance.formattedStartDate}</strong> |
-            <@spring.message code="courseInstances.admin.detail.endDate"/>:
-            <strong>${courseInstance.formattedEndDate}</strong> |
-            <@spring.message code="courseInstances.admin.detail.status"/>:
-            <strong>
-                <#if courseInstance.isActive>
-                    <@spring.message code="courseInstances.admin.detail.status.active"/>
-                <#else>
-                    <@spring.message code="courseInstances.admin.detail.status.completed"/>
-                </#if>
-            </strong>
-        </p>
-    </div>
+        <div class="container main-layout">
+            <main class="main-content">
 
-    <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary">
-            <@spring.message code="courseInstances.admin.detail.button.modules"/>
-        </a>
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary">
-            <@spring.message code="courseInstances.admin.detail.button.participants"/>
-        </a>
-        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary">
-            <@spring.message code="courseInstances.admin.detail.button.teachers"/>
-        </a>
-        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary">
-            <@spring.message code="courseInstances.admin.detail.button.statistics"/>
-        </a>
-    </div>
-
-    <div class="container">
-        <h2><@spring.message code="courseInstances.admin.detail.modules.header"/></h2>
-        <#if courseInstance.modules?has_content>
-            <div class="accordion" id="modulesAccordion">
-                <#list courseInstance.modules as module>
-                    <div class="feature-card mb-3">
-                        <div class="accordion-item">
-                            <div class="d-flex justify-content-between align-items-center px-3 py-2 bg-light rounded-top">
-                                <button class="accordion-button collapsed flex-grow-1 text-start" type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#collapse${module.id}" aria-expanded="false"
-                                        aria-controls="collapse${module.id}">
-                                    ${module.title} (${module.durationHours} ч.)
-                                </button>
-                                <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
-                                   class="btn btn-primary btn-sm ms-3 lesson-btn d-none d-sm-block">
-                                    <@spring.message code="courseInstances.admin.detail.modules.addLesson"/>
-                                </a>
-                            </div>
-                            <div id="collapse${module.id}" class="accordion-collapse collapse"
-                                 aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
-                                <div class="accordion-body">
-                                    <#if module.description?has_content>
-                                        <p class="card-text text-muted small text-break">
-                                            ${module.description}
-                                        </p>
-                                    </#if>
-                                    <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
-                                       class="btn btn-primary btn-sm lesson-btn d-sm-none mb-3">
-                                        <@spring.message code="courseInstances.admin.detail.modules.addLesson"/>
-                                    </a>
-                                    <h5><@spring.message code="courseInstances.admin.detail.modules.lessons"/></h5>
-                                    <#if module.lessons?has_content>
-                                        <div class="row row-cols-1 row-cols-md-2 g-3">
-                                            <#list module.lessons as lesson>
-                                                <div class="col">
-                                                    <a href="<@spring.url '/lessons/${lesson.id}'/>"
-                                                       class="text-decoration-none">
-                                                        <div class="card h-100 shadow-sm">
-                                                            <div class="card-body">
-                                                                <h6 class="card-title">${lesson.title}</h6>
-                                                                <p class="card-text text-muted small text-break">
-                                                                    ${module.description!''}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </#list>
-                                        </div>
-                                    <#else>
-                                        <p><@spring.message code="courseInstances.admin.detail.modules.lessons.empty"/></p>
-                                    </#if>
-                                </div>
-                            </div>
+                <header class="hero-section">
+                    <h1 class="hero-title">${courseInstance.title}</h1>
+                    <div class="hero-info">
+                        <div class="hero-info-item">
+                            <span class="hero-label"><@spring.message code="courseInstances.admin.detail.course"/>:</span>
+                            <span class="hero-value">${courseInstance.courseTitle!'-'}</span>
+                        </div>
+                        <div class="hero-info-item">
+                            <span class="hero-label"><@spring.message code="courseInstances.admin.detail.category"/>:</span>
+                            <span class="hero-value">${courseInstance.category!'-'}</span>
+                        </div>
+                        <div class="hero-info-item">
+                            <span class="hero-label"><@spring.message code="courseInstances.admin.detail.startDate"/>:</span>
+                            <span class="hero-value">${courseInstance.formattedStartDate}</span>
+                        </div>
+                        <div class="hero-info-item">
+                            <span class="hero-label"><@spring.message code="courseInstances.admin.detail.endDate"/>:</span>
+                            <span class="hero-value">${courseInstance.formattedEndDate}</span>
                         </div>
                     </div>
-                </#list>
-            </div>
-        <#else>
-            <p><@spring.message code="courseInstances.admin.detail.modules.empty"/></p>
-        </#if>
+                    <div class="course-controls">
+                        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/modules'/>" class="btn btn-primary btn-icon">
+                            <i class="fas fa-th-large"></i> <@spring.message code="courseInstances.admin.detail.button.modules"/>
+                        </a>
+                        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/participants'/>" class="btn btn-primary btn-icon">
+                            <i class="fas fa-users"></i> <@spring.message code="courseInstances.admin.detail.button.participants"/>
+                        </a>
+                        <a href="<@spring.url '/admin/course-instances/${courseInstance.id}/teachers'/>" class="btn btn-primary btn-icon">
+                            <i class="fas fa-chalkboard-teacher"></i> <@spring.message code="courseInstances.admin.detail.button.teachers"/>
+                        </a>
+                        <a href="<@spring.url '/teacher/course/${courseInstance.id}/statistics'/>" class="btn btn-primary btn-icon">
+                            <i class="fas fa-chart-bar"></i> <@spring.message code="courseInstances.admin.detail.button.statistics"/>
+                        </a>
+                    </div>
+                </header>
 
-        <h2>Тестирование</h2>
-        <div class="feature-card mb-3">
-            <#if testInstance?has_content>
-                <p>Тест назначенный на данный поток: <span class="fw-bold">${testInstance.test.title}</span></p>
-                <p>
-                    <@spring.message code="courseInstances.admin.detail.startDate"/>:
-                    <span class="fw-bold">${startDate} ${testInstance.startTime}</span> |
-                    <@spring.message code="courseInstances.admin.detail.endDate"/>:
-                    <span class="fw-bold">${endDate} ${testInstance.endTime}</span>
-                </p>
-                <a href="/instance/${courseInstance.id}/change-time" class="btn btn-warning mb-2">Изменить время доступа
-                    к тесту</a>
-            <#else>
-                <p>На данный поток пока не был назначен тест.</p>
-            </#if>
+                <section class="modules-section">
+                    <h2 class="section-title"><@spring.message code="courseInstances.admin.detail.modules.header"/></h2>
+                    <#if courseInstance.modules?has_content>
+                        <div class="accordion" id="modulesAccordion">
+                            <#list courseInstance.modules as module>
+                                <div class="accordion-item glass-effect">
+                                    <div class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapse${module.id}"
+                                                aria-expanded="false"
+                                                aria-controls="collapse${module.id}">
+                                            <span class="module-title">${module.title}</span>
+                                            <span class="module-duration">(${module.durationHours} ч.)</span>
+                                        </button>
+                                        <a href="<@spring.url '/course-instances/${courseInstance.id}/modules/${module.id}/lessons/new'/>"
+                                           class="btn btn-primary btn-icon lesson-btn">
+                                            <@spring.message code="courseInstances.admin.detail.modules.addLesson"/>
+                                        </a>
+                                    </div>
+                                    <div id="collapse${module.id}" class="accordion-collapse collapse"
+                                         aria-labelledby="heading${module.id}" data-bs-parent="#modulesAccordion">
+                                        <div class="accordion-body">
+                                            <#if module.description?has_content>
+                                                <p class="module-description">${module.description}</p>
+                                            </#if>
+                                            <h5 class="lessons-title"><@spring.message code="courseInstances.admin.detail.modules.lessons"/></h5>
+                                            <#if module.lessons?has_content>
+                                                <div class="lessons-grid">
+                                                    <#list module.lessons as lesson>
+                                                        <a href="<@spring.url '/lessons/${lesson.id}'/>"
+                                                           class="lesson-card glass-effect">
+                                                            <h6 class="lesson-title">${lesson.title}</h6>
+                                                            <p class="lesson-description">${module.description!''}</p>
+                                                        </a>
+                                                    </#list>
+                                                </div>
+                                            <#else>
+                                                <div class="empty-state"><@spring.message code="courseInstances.admin.detail.modules.lessons.empty"/></div>
+                                            </#if>
+                                        </div>
+                                    </div>
+                                </div>
+                            </#list>
+                        </div>
+                    <#else>
+                        <div class="empty-state glass-effect"><@spring.message code="courseInstances.admin.detail.modules.empty"/></div>
+                    </#if>
+                </section>
+
+                <section class="test-section">
+                    <h2 class="section-title">Тестирование</h2>
+                    <div class="test-card glass-effect">
+                        <#if testInstance?has_content>
+                            <h3 class="test-title">Тест: ${testInstance.test.title}</h3>
+                            <p class="test-info">
+                                <@spring.message code="courseInstances.admin.detail.startDate"/>:
+                                <strong>${startDate} ${testInstance.startTime}</strong>
+                            </p>
+                            <p class="test-info">
+                                <@spring.message code="courseInstances.admin.detail.endDate"/>:
+                                <strong>${endDate} ${testInstance.endTime}</strong>
+                            </p>
+                            <a href="/instance/${courseInstance.id}/change-time" class="btn btn-warning btn-icon">
+                                <i class="fas fa-clock"></i> Изменить время
+                            </a>
+                        <#else>
+                            <div class="empty-state">На данный поток пока не был назначен тест.</div>
+                        </#if>
+                    </div>
+                </section>
+            </main>
         </div>
     </div>
 
     <style>
-        .btn-primary {
-            background: linear-gradient(135deg, #0066cc, #003d7a);
-            border-color: #0066cc;
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #003d7a;
+            --secondary: #6b7280;
+            --background: #f9fafb;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text: #111827;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #003d7a, #002a5a);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        body {
+            background: var(--background);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
         }
 
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
 
-        .feature-card {
-            background-color: #fff;
-            border-radius: 0.375rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 1.5rem 0;
+        }
+
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .hero-section {
+            background: linear-gradient(145deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin: 0 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .hero-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 0 1rem;
+        }
+
+        .hero-info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .hero-label {
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .hero-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .course-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .glass-effect {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-effect:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .accordion-item {
+            border: none;
+            margin-bottom: 1rem;
+        }
+
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 1rem;
         }
 
         .accordion-button {
+            background: none;
+            border: none;
+            font-size: 1.15rem;
             font-weight: 500;
+            color: var(--text);
+            flex-grow: 1;
+            text-align: left;
+            padding: 0;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            cursor: pointer;
         }
 
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.2s ease-in-out;
+        .accordion-button:not(.collapsed) {
+            color: var(--primary);
         }
 
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 500;
+        .module-title {
+            flex-grow: 1;
         }
 
-        .card-text {
-            font-size: 0.875rem;
+        .module-duration {
+            font-size: 0.95rem;
+            color: var(--secondary);
         }
 
-        .accordion-body, .card-text {
+        .accordion-body {
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 0 0 1rem 1rem;
             word-wrap: break-word;
             overflow-wrap: break-word;
-            white-space: normal;
         }
 
-        .hero-subtitle {
-            color: var(--text-dark);
-            font-size: 1.4rem;
-            margin-bottom: 2rem;
+        .module-description {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            margin-bottom: 1.25rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .lessons-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .lesson-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            transition: transform 0.2s ease;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .lesson-title {
+            font-size: 1.15rem;
+            font-weight: 500;
+            margin: 0 0 0.5rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .lesson-description {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            margin: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .test-card {
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .test-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin: 0 0 1rem;
+        }
+
+        .test-info {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            margin: 0.75rem 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .test-title,
+        .test-info,
+        .empty-state {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+            max-width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(145deg, var(--primary-dark), color-mix(in srgb, var(--primary-dark) 85%, black));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 102, 204, 0.3);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            border: none;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: color-mix(in srgb, var(--warning) 85%, black);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-icon {
+            padding: 0.6rem 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: rgba(var(--success), 0.2);
+            color: var(--success);
+        }
+
+        .alert-danger {
+            background: rgba(var(--danger), 0.2);
+            color: var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .hero-info {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .course-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .lessons-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 576px) {
+            .hero-title {
+                font-size: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            .accordion-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+
             .lesson-btn {
                 width: 100%;
                 text-align: center;
-                padding: 0.5rem;
-                font-size: 0.875rem;
             }
 
-            .accordion-body {
-                padding-top: 0.5rem;
+            .hero-info-item {
+                align-items: flex-start;
             }
         }
     </style>

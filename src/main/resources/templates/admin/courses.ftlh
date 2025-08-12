@@ -6,7 +6,6 @@
 <#assign _lang2 = (_locale?lower_case?starts_with("ru"))?then("ru",
 (_locale?lower_case?starts_with("ky"))?then("ky","en"))>
 
-
 <#assign bcHome = springMacroRequestContext.getMessage("admin.courses.breadcrumb.home")>
 <#assign bcCourses = springMacroRequestContext.getMessage("admin.courses.breadcrumb.courses")>
 
@@ -50,19 +49,27 @@
 <#assign i18nExportTopTpl = springMacroRequestContext.getMessage("admin.courses.export.messageTop", ["{0}"])>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcCourses, "url": ""}
     ] />
-    <div class="card shadow mb-4">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+    <div class="card shadow mb-4 glass-effect">
 
-        <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
+
+        <div class="card-header py-3">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="m-0 font-weight-bold text-white">
                     <i class="fas fa-graduation-cap me-2"></i>
@@ -73,12 +80,10 @@
                     <div id="customExportButtons"></div>
 
                     <div class="input-group input-group-sm" style="width: 180px;">
-                      <span class="input-group-text"
-                            style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
-                         <i class="fas fa-filter"></i>
-                      </span>
-                        <select class="form-select form-select-sm" id="categoryFilter"
-                                style="border: 1px solid #0066cc; border-left: 0; color: #0066cc;">
+                        <span class="input-group-text">
+                            <i class="fas fa-filter"></i>
+                        </span>
+                        <select class="form-select form-select-sm" id="categoryFilter">
                             <option hidden disabled selected value="">${i18nFilterCategory}</option>
                             <#list categories as category>
                                 <option value="${category.name}">${category.name}</option>
@@ -87,12 +92,10 @@
                     </div>
 
                     <div class="input-group input-group-sm" style="width: 180px;">
-                        <span class="input-group-text"
-                              style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
-                         <i class="fas fa-filter"></i>
+                        <span class="input-group-text">
+                            <i class="fas fa-filter"></i>
                         </span>
-                        <select class="form-select form-select-sm" id="typeFilter"
-                                style="border: 1px solid #0066cc; border-left: 0; color: #0066cc;">
+                        <select class="form-select form-select-sm" id="typeFilter">
                             <option hidden disabled selected value="">${i18nFilterType}</option>
                             <option value="${i18nTypeIndividual}">${i18nTypeIndividual}</option>
                             <option value="${i18nTypeGroup}">${i18nTypeGroup}</option>
@@ -100,38 +103,31 @@
                     </div>
 
                     <div class="input-group input-group-sm" style="width: 180px;">
-                         <span class="input-group-text"
-                               style="background-color: #fff; border: 1px solid #0066cc; color: #0066cc;">
-                          <i class="fas fa-filter"></i>
-                         </span>
-                        <select class="form-select form-select-sm" id="statusFilter"
-                                style="border: 1px solid #0066cc; border-left: 0; color: #0066cc;">
+                        <span class="input-group-text">
+                            <i class="fas fa-filter"></i>
+                        </span>
+                        <select class="form-select form-select-sm" id="statusFilter">
                             <option hidden disabled selected value="">${i18nFilterStatus}</option>
                             <option value="${i18nStatusActive}">${i18nStatusActive}</option>
                             <option value="${i18nStatusInactive}">${i18nStatusInactive}</option>
                         </select>
                     </div>
 
-                    <button id="resetFilters"
-                            class="btn btn-link text-white btn-sm px-2"
-                            title="${i18nResetFilters}"
-                            style="font-size: 1rem;">
+                    <button id="resetFilters" class="btn btn-link text-white btn-sm px-2" title="${i18nResetFilters}">
                         <i class="fas fa-times-circle"></i>
                     </button>
 
-                    <a href="/admin/courses/add" class="btn btn-light btn-sm"
-                       style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                        <i class="fas fa-plus me-1" style="color: #0066cc;"></i> ${i18nAddCourse}
+                    <a href="/admin/courses/add" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i> ${i18nAddCourse}
                     </a>
                 </div>
-
             </div>
         </div>
 
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="coursesTable" width="100%" cellspacing="0">
-                    <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white;">
+                    <thead>
                     <tr>
                         <th>${i18nThNum}</th>
                         <th>${i18nThName}</th>
@@ -148,16 +144,33 @@
                         <#list courses as course>
                             <tr onclick="window.location.href='/admin/courses/${course.id}'" style="cursor: pointer;">
                                 <td>${course.id}</td>
-                                <td>${course.title}</td>
                                 <td>
-                                    <span class="badge"
-                                          style="background: #87ceeb; color: #2c3e50; border: 1px solid #c6d9ec;">${course.code}</span>
+                                    <#if (course.title?? && course.title?length > 15)>
+                                        ${course.title?substring(0, 15)}...
+                                    <#else>
+                                        ${course.title!""}
+                                    </#if>
                                 </td>
                                 <td>
-                                    <span class="badge bg-primary">${course.category.name}</span>
+                                    <span class="badge bg-info">
+                                        <#if (course.code?? && course.code?length > 15)>
+                                            ${course.code?substring(0, 15)}...
+                                        <#else>
+                                            ${course.code!""}
+                                        </#if>
+                                    </span>
                                 </td>
                                 <td>
-                                    <i class="fas fa-clock me-1" style="color: #0066cc;"></i>${course.duration}ч
+                                    <span class="badge bg-primary">
+                                        <#if (course.category.name?? && course.category.name?length > 15)>
+                                            ${course.category.name?substring(0, 15)}...
+                                        <#else>
+                                            ${course.category.name!""}
+                                        </#if>
+                                    </span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-clock me-1"></i>${course.duration}ч
                                 </td>
                                 <td>
                                     <#if course.active>
@@ -182,24 +195,20 @@
                                     </#if>
                                 </td>
                                 <td onclick="event.stopPropagation()">
-                                    <a href="/admin/courses/edit/${course.id}" class="btn btn-sm btn-primary"
-                                       title="<@spring.message code='action.edit'/>">
+                                    <a href="/admin/courses/edit/${course.id}" class="btn btn-sm btn-primary" title="<@spring.message code='action.edit'/>">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button"
-                                            class="btn btn-danger btn-sm js-delete-course-btn"
-                                            data-course-id="${course.id}">
+                                    <button type="button" class="btn btn-danger btn-sm js-delete-course-btn" data-course-id="${course.id}">
                                         <i class="fas fa-trash"></i>
                                     </button>
-
                                 </td>
                             </tr>
                         </#list>
                     <#else>
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">
-                                <i class="fas fa-graduation-cap fa-2x mb-2" style="color: #0066cc;"></i>
-                                <p style="color: #2c3e50;">${i18nNoCourses}</p>
+                                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                                <p>${i18nNoCourses}</p>
                             </td>
                         </tr>
                     </#if>
@@ -217,15 +226,12 @@
                                 <div id="depList"></div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">${i18nDelCancel}</button>
-                                <button type="button" id="confirmDeleteCourse"
-                                        class="btn btn-danger">${i18nDelConfirm}</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18nDelCancel}</button>
+                                <button type="button" id="confirmDeleteCourse" class="btn btn-danger">${i18nDelConfirm}</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="row mt-3">
                 <div class="col-md-6">
@@ -349,6 +355,7 @@
         });
 
         $(document).ready(function () {
+            console.log('Initializing DataTables...');
             const lengthMenuMap = {
                 ru: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
                 en: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]],
@@ -357,9 +364,16 @@
             var table = $('#coursesTable').DataTable({
                 language: {
                     url: '/js/datatables/${_lang2}.json',
-                    paginate: {previous: '‹', next: '›'}
+                    paginate: { previous: '‹', next: '›' }
                 },
-                responsive: true,
+                responsive: {
+                    details: {
+                        type: 'inline', // Collapses hidden columns into expandable child rows
+                        renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+                            tableClass: 'table'
+                        })
+                    }
+                },
                 pageLength: 10,
                 lengthChange: true,
                 lengthMenu: lengthMenuMap['${_lang2}'],
@@ -380,7 +394,7 @@
                                 extend: 'copy',
                                 text: '<i class="fas fa-copy me-1"></i> ' + I18N.exportCopy,
                                 className: 'dropdown-item',
-                                exportOptions: {columns: ':visible'},
+                                exportOptions: { columns: ':visible' },
                                 title: I18N.exportTitle,
                                 messageTop: I18N.exportTopTpl.replace('{0}', new Date().toLocaleDateString())
                             },
@@ -388,7 +402,7 @@
                                 extend: 'excel',
                                 text: '<i class="fas fa-file-excel me-1"></i> ' + I18N.exportExcel,
                                 className: 'dropdown-item',
-                                exportOptions: {columns: ':visible'},
+                                exportOptions: { columns: ':visible' },
                                 title: I18N.exportTitle,
                                 messageTop: I18N.exportTopTpl.replace('{0}', new Date().toLocaleDateString()),
                                 autoFilter: true,
@@ -401,19 +415,12 @@
                                 extend: 'pdf',
                                 text: '<i class="fas fa-file-pdf me-1"></i> ' + I18N.exportPDF,
                                 className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
+                                exportOptions: { columns: ':visible' },
                                 title: I18N.exportTitle + ' - ' + new Date().toLocaleDateString(),
                                 customize: function (doc) {
                                     if (!doc.content || doc.content.length < 2 || !doc.content[1].table) return;
-                                    doc.defaultStyle = {
-                                        fontSize: 8, color: '#2c3e50'
-                                    };
-                                    doc.styles.title = {
-                                        color: '#0066cc',
-                                        fontSize: 14, alignment: 'center', margin: [0, 0, 0, 15]
-                                    };
+                                    doc.defaultStyle = { fontSize: 8, color: '#2c3e50' };
+                                    doc.styles.title = { color: '#0066cc', fontSize: 14, alignment: 'center', margin: [0, 0, 0, 15] };
                                     const table = doc.content[1].table;
                                     table.widths = Array(table.body[0].length).fill('*');
                                     table.body[0].forEach(function (cell) {
@@ -435,7 +442,7 @@
                                 extend: 'print',
                                 text: '<i class="fas fa-print me-1"></i> ' + I18N.exportPrint,
                                 className: 'dropdown-item',
-                                exportOptions: {columns: ':visible'},
+                                exportOptions: { columns: ':visible' },
                                 title: I18N.exportTitle,
                                 messageTop: '<h3 class="text-center">' + I18N.exportTitle + '</h3><p class="text-center">' + I18N.exportTopTpl.replace('{0}', new Date().toLocaleDateString()) + '</p>',
                                 customize: function (win) {
@@ -450,10 +457,15 @@
                     }
                 ],
                 columnDefs: [
-                    {targets: [3, 5, 6], orderable: true, searchable: true},
-                    {targets: [7], orderable: false, searchable: false}
+                    { targets: [3, 5, 6], orderable: true, searchable: true },
+                    { targets: [7], orderable: false, searchable: false },
+                    { targets: 1, responsivePriority: 1 }, // Name
+                    { targets: 7, responsivePriority: 2 }, // Actions
+                    { targets: 4, responsivePriority: 3 }  // Duration
+                    // Other columns will have default priority
                 ],
                 initComplete: function () {
+                    console.log('DataTables initialized successfully');
                     this.api().page.len(10).draw();
                     table.buttons().container().appendTo('#customExportButtons');
                 }
@@ -483,35 +495,64 @@
     </script>
 
     <style>
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #003d7a;
+            --secondary: #6b7280;
+            --background: #f9fafb;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text: #111827;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+
+        body {
+            background: var(--background);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
         .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
+            border-radius: 1rem;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
         }
 
         .card-header {
             border-bottom: none;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 1rem 1rem 0 0;
+            padding: 1.5rem;
         }
 
         .table-responsive {
             overflow-x: auto;
-            border-radius: 10px;
+            border-radius: 0 0 1rem 1rem;
+            width: 100%;
         }
 
         #coursesTable {
-            width: 100%;
+            width: 100% !important;
             margin-bottom: 1rem;
-            color: #2c3e50;
-            border-collapse: separate;
-            border-spacing: 0;
+            color: var(--text);
+            border-collapse: collapse;
+            table-layout: auto;
         }
 
         #coursesTable th {
-            background: linear-gradient(135deg, #0066cc, #003d7a);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             padding: 0.75rem;
             vertical-align: middle;
             border: none;
             font-weight: 600;
+            text-align: center;
         }
 
         #coursesTable td {
@@ -519,6 +560,8 @@
             vertical-align: middle;
             border-top: 1px solid #e3e6f0;
             border-bottom: 1px solid #e3e6f0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         #coursesTable tr:hover {
@@ -539,26 +582,11 @@
             border-radius: 0.375rem;
         }
 
-        .bg-primary {
-            background-color: #0066cc !important;
-        }
-
-        .bg-success {
-            background-color: #28a745 !important;
-        }
-
-        .bg-warning {
-            background-color: #ffc107 !important;
-            color: #212529 !important;
-        }
-
-        .bg-info {
-            background-color: #17a2b8 !important;
-        }
-
-        .bg-secondary {
-            background-color: #6c757d !important;
-        }
+        .bg-primary { background-color: var(--primary) !important; }
+        .bg-success { background-color: var(--success) !important; }
+        .bg-warning { background-color: var(--warning) !important; color: #212529 !important; }
+        .bg-info { background-color: var(--info) !important; }
+        .bg-secondary { background-color: var(--secondary) !important; }
 
         .btn-group .btn {
             transition: all 0.2s ease;
@@ -569,7 +597,7 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .custom-pagination .pagination {
+        .dataTables_wrapper .dataTables_paginate .pagination {
             display: flex;
             gap: 5px;
             padding-left: 0;
@@ -579,43 +607,59 @@
 
         .dataTables_wrapper .dataTables_paginate .pagination .page-item .page-link {
             border-radius: 0 !important;
+            color: var(--primary);
+            background: white;
+            border: 1px solid #e3e6f0;
+            padding: 0.5rem 0.75rem;
         }
 
         .dataTables_wrapper .dataTables_paginate .pagination .page-item:first-child .page-link {
-            border-top-left-radius: 12px !important;
-            border-bottom-left-radius: 12px !important;
+            border-top-left-radius: 0.75rem !important;
+            border-bottom-left-radius: 0.75rem !important;
         }
 
         .dataTables_wrapper .dataTables_paginate .pagination .page-item:last-child .page-link {
-            border-top-right-radius: 12px !important;
-            border-bottom-right-radius: 12px !important;
+            border-top-right-radius: 0.75rem !important;
+            border-bottom-right-radius: 0.75rem !important;
         }
 
         .dataTables_wrapper .dataTables_paginate .pagination .page-item.active .page-link {
-            background-color: var(--primary-blue) !important;
+            background-color: var(--primary) !important;
             color: white !important;
             font-weight: bold;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary-blue) !important;
+            border-color: var(--primary) !important;
         }
 
         .dataTables_wrapper .dataTables_paginate .pagination .page-item .page-link:hover {
-            background-color: #005bb5 !important;
+            background-color: var(--primary-dark) !important;
             color: white !important;
         }
 
-        .btn-light {
-            transition: all 0.3s ease;
+        .btn-primary {
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
         }
 
-        .btn-light:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        .btn-primary:hover {
+            background: linear-gradient(145deg, var(--primary-dark), color-mix(in srgb, var(--primary-dark) 85%, black));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 102, 204, 0.3);
         }
 
-        .dt-buttons {
-            margin-bottom: 0;
-            margin-left: 15px;
+        .btn-secondary {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn-info {
+            background-color: var(--info);
+            border-color: var(--info);
         }
 
         .btn-sm {
@@ -631,55 +675,62 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-info {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
-        }
-
-        .btn-primary {
-            background-color: #0066cc;
-            border-color: #0066cc;
-        }
-
         .card-header .form-select-sm {
             padding: 0.25rem 2rem 0.25rem 0.5rem;
             font-size: 0.875rem;
             border-radius: 0.375rem;
-            border: 1px solid #ced4da;
+            border: 1px solid var(--primary);
             background-color: white;
-            color: #0066cc;
+            color: var(--primary);
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
             background-size: 14px;
             appearance: none;
         }
 
+        .card-header .input-group-text {
+            background-color: white;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
 
         .card-header .form-select-sm:focus {
-            border-color: #0066cc;
+            border-color: var(--primary-dark);
             outline: 0;
             box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
         }
 
-        .form-label {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
+        .alert {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: rgba(var(--success), 0.2);
+            color: var(--success);
+        }
+
+        .alert-danger {
+            background: rgba(var(--danger), 0.2);
+            color: var(--danger);
+        }
+
+        .glass-effect {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-effect:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
 
         .dropdown-menu {
@@ -691,12 +742,12 @@
         .dropdown-item {
             padding: 0.25rem 1rem;
             font-size: 0.875rem;
-            color: #212529;
+            color: var(--text);
         }
 
         .dropdown-item:hover {
             background-color: #f8f9fa;
-            color: #0066cc;
+            color: var(--primary);
         }
 
         .dropdown-item i {
@@ -709,8 +760,6 @@
             padding-right: 2rem;
             background-position: right 0.5rem center;
             background-size: 12px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
             appearance: none;
         }
 
@@ -748,6 +797,11 @@
                 justify-content: flex-start !important;
                 margin-top: 1rem;
                 flex-direction: column;
+            }
+
+            .input-group {
+                width: 100% !important;
+                margin-bottom: 0.5rem;
             }
         }
     </style>

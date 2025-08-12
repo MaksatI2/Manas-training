@@ -28,7 +28,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             case "STUDENT" -> {
                 if (user.getStudentProfile() != null) {
                     var student = user.getStudentProfile();
-                    builder.organizationName(student.getOrganization().getUser().getName());
+                    builder.organizationName(student.getOrganization() != null ? student.getOrganization().getUser().getName() : "Нет организации");
                     builder.specialization(student.getSpecialization());
                 }
             }

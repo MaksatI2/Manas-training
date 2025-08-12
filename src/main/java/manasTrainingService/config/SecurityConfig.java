@@ -22,6 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/courses/{id}/tests").authenticated()
                         .requestMatchers(
                                 "/",
                                 "/auth/**",
@@ -32,7 +33,9 @@ public class SecurityConfig {
                                 "/courses/**",
                                 "/teachers/**",
                                 "/data/images/**",
-                                "/ws/**"
+                                "/ws/**",
+                                "/teacher",
+                                "/teacher/{id}"
                         ).permitAll()
                         .requestMatchers("/applications/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/applications/organization/**").hasAuthority("ORGANIZATION")

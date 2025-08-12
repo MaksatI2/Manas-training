@@ -5,6 +5,13 @@
     <#assign bcHome><@spring.message code='admin.test.results.breadcrumb.home'/></#assign>
     <#assign bcAll><@spring.message code='admin.test.results.breadcrumb.all'/></#assign>
 
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcAll, "url": ""}
@@ -87,9 +94,28 @@
                         <#list results as result>
                             <tr onclick="window.location.href='/admin/test-results/${result.id}'"
                                 style="cursor: pointer;">
-                                <td>${result.testInstance.test.course.title}</td>
-                                <td>${result.courseInstance.title}</td>
-                                <td>${result.student.name} ${result.student.lastName}</td>
+                                <td>
+                                    <#if (result.testInstance.test.course.title?? && result.testInstance.test.course.title?length > 10)>
+                                        ${result.testInstance.test.course.title?substring(0, 10)}...
+                                    <#else>
+                                        ${result.testInstance.test.course.title!""}
+                                    </#if>
+                                </td>
+                                <td>
+                                    <#if (result.courseInstance.title?? && result.courseInstance.title?length > 20)>
+                                        ${result.courseInstance.title?substring(0, 20)}...
+                                    <#else>
+                                        ${result.courseInstance.title!""}
+                                    </#if>
+                                </td>
+                                <td>
+                                    <#assign fullName = (result.student.name!"" + " " + result.student.lastName! "")?trim>
+                                    <#if (fullName?length > 25)>
+                                        ${fullName?substring(0, 25)}...
+                                    <#else>
+                                        ${fullName}
+                                    </#if>
+                                </td>
                                 <td>
                                     <#if result.isPassed>
                                         <span class="badge bg-success">
@@ -154,7 +180,14 @@
                 language: {
                     url: '/js/datatables/' + dtLocale + '.json',
                     paginate: {previous: '‹', next: '›'}
-                }
+                },
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: 1 },
+                    { responsivePriority: 3, targets: 2 },
+                    { responsivePriority: 4, targets: 3 }
+                ],
+                responsive: true
             });
 
             $('#courseFilter').on('change', function () {

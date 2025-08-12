@@ -16,22 +16,18 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <div class="max-w-6xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <#if successMessage??>
+            <div id="successMessage" data-message="${successMessage?js_string}"></div>
+        </#if>
+        <#if errorMessage??>
+            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+        </#if>
+
         <@roadmap.breadcrumbs items=[
         {"label": bcHome, "url": "/"},
         {"label": bcUsers, "url": "/admin/users"},
         {"label": bcProfile, "url": ""}
         ] />
-
-        <#if successMessage??>
-            <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-lg">
-                <i class="fas fa-check-circle mr-2"></i>${successMessage}
-            </div>
-        </#if>
-        <#if errorMessage??>
-            <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
-                <i class="fas fa-exclamation-circle mr-2"></i>${errorMessage}
-            </div>
-        </#if>
 
         <h1 class="text-3xl font-bold text-gray-900 text-center mb-8">
             <i class="fas fa-user-circle mr-2 text-blue-600"></i><@spring.message code='page.user.profile'/>
@@ -48,9 +44,9 @@
                     </div>
                 </div>
                 <div class="flex-1 text-left md:text-left">
-                    <h2 class="text-2xl font-semibold text-gray-900 break-words">${profile.user.name} ${(profile.user.lastName?has_content && profile.user.lastName != "null")?then(profile.user.lastName, "")}
+                    <h2 class="text-2xl font-semibold text-gray-900 break-all overflow-wrap-anywhere">${profile.user.name} ${(profile.user.lastName?has_content && profile.user.lastName != "null")?then(profile.user.lastName, "")}
                     </h2>
-                    <p class="text-lg text-blue-600 mt-1 break-words">
+                    <p class="text-lg text-blue-600 mt-1 break-all overflow-wrap-anywhere">
                         <i class="fas fa-envelope mr-2"></i>${profile.user.email}
                     </p>
                     <div class="mt-2 flex flex-col gap-2 items-start">

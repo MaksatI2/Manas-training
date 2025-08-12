@@ -6,18 +6,19 @@
 <#assign bcList = springMacroRequestContext.getMessage("breadcrumbs.course.instances")>
 
 <@layout.page title="<@spring.message code='course.instance.list.title'/>">
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcList, "url": ""}
     ] />
 
     <div class="card shadow mb-4">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+
 
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex flex-wrap justify-content-between align-items-center">
@@ -56,9 +57,27 @@
                     <#list courseInstances as instance>
                         <tr style="cursor: pointer;" data-id="${instance.id}">
                             <td>${instance.id}</td>
-                            <td>${instance.courseTitle!"-"}</td>
-                            <td>${instance.title}</td>
-                            <td>${instance.category}</td>
+                            <td>
+                                <#if (instance.courseTitle?? && instance.courseTitle?length > 20)>
+                                    ${instance.courseTitle?substring(0, 20)}...
+                                <#else>
+                                    ${instance.courseTitle!"-"}
+                                </#if>
+                            </td>
+                            <td>
+                                <#if (instance.title?? && instance.title?length > 20)>
+                                    ${instance.title?substring(0, 20)}...
+                                <#else>
+                                    ${instance.title!""}
+                                </#if>
+                            </td>
+                            <td>
+                                <#if (instance.category?? && instance.category?length > 12)>
+                                    ${instance.category?substring(0, 12)}...
+                                <#else>
+                                    ${instance.category!""}
+                                </#if>
+                            </td>
                             <td data-order="${instance.startDate}">${instance.formattedStartDate}</td>
                             <td data-order="${instance.endDate}">${instance.formattedEndDate}</td>
                             <td>
