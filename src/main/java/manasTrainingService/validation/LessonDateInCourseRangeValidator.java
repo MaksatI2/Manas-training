@@ -6,9 +6,12 @@ import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.service.course.CourseInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
+@Component
 public class LessonDateInCourseRangeValidator implements ConstraintValidator<LessonDateInCourseRange, ScheduleDTO> {
 
     @Autowired
@@ -26,15 +29,18 @@ public class LessonDateInCourseRangeValidator implements ConstraintValidator<Les
         }
 
         LocalDate lessonDate = dto.getLessonDate();
-        if (lessonDate.isBefore(course.getStartDate()) || lessonDate.isAfter(course.getEndDate())) {
+        LocalDate courseStart = course.getStartDate();
+        LocalDate courseEnd = course.getEndDate();
+
+        if (lessonDate.isBefore(courseStart) || lessonDate.isAfter(courseEnd)) {
             context.disableDefaultConstraintViolation();
+
             context.buildConstraintViolationWithTemplate(
-                            String.format("Дата урока (%s) должна быть в пределах курса: %s — %s",
-                                    lessonDate,
-                                    course.getStartDate(),
-                                    course.getEndDate()))
-                    .addPropertyNode("lessonDate")
-                    .addConstraintViolation();
+                    context.getDefaultConstraintMessageTemplate()
+                            .replace("{startDate}", courseStart.format(DateTimeFormatter.ISO_DATE))
+                            .replace("{endDate}", courseEnd.format(DateTimeFormatter.ISO_DATE))
+            ).addPropertyNode("lessonDate").addConstraintViolation();
+
             return false;
         }
 

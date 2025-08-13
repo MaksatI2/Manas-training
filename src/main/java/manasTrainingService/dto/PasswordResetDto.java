@@ -7,7 +7,7 @@ import lombok.Data;
 import manasTrainingService.validation.PasswordMatch;
 
 @Data
-@PasswordMatch(password = "password", confirmPassword = "confirmPassword", message = "{PasswordResetDto.PasswordMatch}")
+@PasswordMatch(password = "password", confirmPassword = "confirmPassword")
 public class PasswordResetDto {
 
     @NotBlank(message = "{PasswordResetDto.token.NotBlank}")

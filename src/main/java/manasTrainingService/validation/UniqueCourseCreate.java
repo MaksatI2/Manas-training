@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueCourseCreate {
-    String message() default "Код или название курса уже используется";
+    String message() default "{UniqueCourseCodeOrName.message}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

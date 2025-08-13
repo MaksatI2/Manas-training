@@ -20,14 +20,14 @@ public class UniqueCourseUpdateValidator implements ConstraintValidator<UniqueCo
         context.disableDefaultConstraintViolation();
 
         if (dto.getCode() != null && courseService.existsByCodeAndIdNot(dto.getCode().strip(), dto.getId())) {
-            context.buildConstraintViolationWithTemplate("Код курса уже используется")
-                .addPropertyNode("code").addConstraintViolation();
+            context.buildConstraintViolationWithTemplate("{UniqueCourseCode.message}")
+                    .addPropertyNode("code").addConstraintViolation();
             valid = false;
         }
 
         if (dto.getTitle() != null && courseService.existsByTitleAndIdNot(dto.getTitle().strip(), dto.getId())) {
-            context.buildConstraintViolationWithTemplate("Название курса уже используется")
-                .addPropertyNode("title").addConstraintViolation();
+            context.buildConstraintViolationWithTemplate("{UniqueCourseTitle.message}")
+                    .addPropertyNode("title").addConstraintViolation();
             valid = false;
         }
 

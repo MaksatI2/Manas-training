@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EndDateAfterStartDate {
-    String message() default "Дата конца должна быть позже начала";
+    String message() default "{EndDateAfterStartDate.message}";
 
     Class<?>[] groups() default {};
 
