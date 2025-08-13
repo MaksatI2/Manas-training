@@ -24,6 +24,7 @@ import manasTrainingService.service.user.*;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -369,6 +370,17 @@ public class UserServiceImpl implements UserService {
         return new UserStatisticsDto(students, teachers, organizations, inactiveUsers);
     }
 
+    public User getCurrentUser(Authentication authentication) {
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + email));
+    }
 
+    @Override
+    public void updateLanguage(Authentication authentication, String lang) {
+        User user = getCurrentUser(authentication);
+        user.setLanguagePreference(lang);
+        userRepository.save(user);
+    }
 
 }

@@ -12,6 +12,7 @@ import manasTrainingService.dto.statistics.UserStatisticsDto;
 import manasTrainingService.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -71,4 +72,6 @@ public interface UserService {
     void updateUser(UserEditDto userEditDto);
 
     UserStatisticsDto getUserStatistics();
+
+    void updateLanguage(Authentication authentication, String lang);
 }
