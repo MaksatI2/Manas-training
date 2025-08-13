@@ -11,6 +11,8 @@ import manasTrainingService.entity.Status;
 import manasTrainingService.service.course.CourseApplicationEmployeeService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.EnrollmentService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,6 +33,7 @@ public class CourseInstanceParticipantsController {
     private final CourseInstanceService courseInstanceService;
     private final EnrollmentService enrollmentService;
     private final CourseApplicationEmployeeService applicationEmployeeService;
+    private final MessageSource messageSource;
 
     @GetMapping
     public String showParticipants(@PathVariable Integer id, Model model) {
@@ -55,7 +58,11 @@ public class CourseInstanceParticipantsController {
             model.addAttribute("courseInstance", courseInstance);
             model.addAttribute("enrollments", enrollments);
             model.addAttribute("pendingEmployees", pendingEmployees);
-            model.addAttribute("errorMessage", "Выберите хотя бы одного участника");
+            model.addAttribute("errorMessage", messageSource.getMessage(
+                    "participants.add.error.empty",
+                    null,
+                    LocaleContextHolder.getLocale()
+            ));
             return "admin/course-instance-participants";
         }
 
@@ -78,7 +85,11 @@ public class CourseInstanceParticipantsController {
 
         enrollmentService.changeEnrollmentStatus(enrollmentId, newStatus);
 
-        redirectAttributes.addFlashAttribute("successMessage", "Статус ученика изменен");
+        redirectAttributes.addFlashAttribute("successMessage", messageSource.getMessage(
+                "participants.toggle.success",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
         return "redirect:/admin/course-instances/" + id + "/participants";
     }
 

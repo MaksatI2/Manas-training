@@ -9,6 +9,8 @@ import manasTrainingService.entity.Certificate;
 import manasTrainingService.entity.CourseEnrollment;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.certificate.CertificateService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/student/certificates")
@@ -27,6 +30,7 @@ public class StudentCertificateController {
 
     private final CertificateService cas;
     private final EnrollmentService enrollmentService;
+    private final MessageSource messageSource;
 
     @GetMapping
     public String list(Model model, @AuthenticationPrincipal CustomUserDetails user) {
@@ -43,7 +47,10 @@ public class StudentCertificateController {
                                      Model model) {
         Certificate cert = cas.getCertificateWithModules(id);
         if (!cert.getStudent().getId().equals(user.getUser().getId())) {
-            throw new AccessDeniedException("Это не ваш сертификат");
+            Locale locale = LocaleContextHolder.getLocale();
+            throw new AccessDeniedException(
+                    messageSource.getMessage("certificate.not.yours", null, locale)
+            );
         }
         model.addAttribute("certificate", cert);
 

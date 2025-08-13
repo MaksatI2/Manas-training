@@ -26,6 +26,8 @@ import manasTrainingService.service.user.RoleService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.TeacherService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +56,7 @@ public class TeacherController {
     private final LessonAccessService lessonAccessService;
     private final TestResultService testResultService;
     private final StudentStatisticsService studentStatisticsService;
+    private final MessageSource messageSource;
 
     @GetMapping("/profile")
     public String viewProfile(Model model) {
@@ -82,7 +85,10 @@ public class TeacherController {
 
         try {
             userService.editTeacherInformation(teacherProfileEditDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Профиль успешно обновлен!");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("profile.updated.success", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/teacher/profile";
         } catch (PhoneAlreadyExistsException e) {
             bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
@@ -123,7 +129,9 @@ public class TeacherController {
     public String viewCourseInstanceStatistics(@PathVariable("id") Integer id, Model model) {
         CourseInstance courseInstance = courseInstanceService.getCourseInstanceModelById(id);
         if (!lessonAccessService.canAccessInstanceStatistics(courseInstance)) {
-            throw new NoAccessException("У вас нет доступа к потоку курса");
+            throw new NoAccessException(
+                    messageSource.getMessage("course.stream.access.denied", null, LocaleContextHolder.getLocale())
+            );
         }
 
         List<AttendanceStatsDTO> attendanceStats = courseInstanceStatisticsService.getAttendanceStatsByCourseInstance(courseInstance);

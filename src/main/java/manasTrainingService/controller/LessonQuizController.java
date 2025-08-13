@@ -13,6 +13,8 @@ import manasTrainingService.service.LessonService;
 import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("quiz")
@@ -32,6 +35,7 @@ public class LessonQuizController {
     private final LessonService lessonService;
     private final LessonAccessService lessonAccessService;
     private final LessonQuizQuestionService lessonQuizQuestionService;
+    private final MessageSource messageSource;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -40,11 +44,13 @@ public class LessonQuizController {
 
     @GetMapping("create/{lessonId}")
     public String createQuizPage(@PathVariable Integer lessonId, Model model) {
-        if(!lessonAccessService.canAccessLessonQuizCreate(lessonService.getLessonModelById(lessonId))){
-            throw new NoAccessException("У вас нет доступа к созданию теста");
+        Locale locale = LocaleContextHolder.getLocale();
+
+        if (!lessonAccessService.canAccessLessonQuizCreate(lessonService.getLessonModelById(lessonId))) {
+            throw new NoAccessException(messageSource.getMessage("quiz.create.no_access", null, locale));
         }
-        if(lessonService.getLessonModelById(lessonId).getLessonQuiz() != null) {
-            throw new LessonQuizAlreadyCreatedException("Тест к данному уроку уже был создан");
+        if (lessonService.getLessonModelById(lessonId).getLessonQuiz() != null) {
+            throw new LessonQuizAlreadyCreatedException(messageSource.getMessage("quiz.create.already_exists", null, locale));
         }
         LessonQuizDto lessonQuizDto = new LessonQuizDto();
 
@@ -65,14 +71,17 @@ public class LessonQuizController {
         }
         request.getSession().removeAttribute("redirectAfterCreate");
         lessonQuizService.createQuiz(lessonQuizDto);
-        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно создан");
+        redirectAttributes.addFlashAttribute("successMessage",
+                messageSource.getMessage("quiz.create.success", null, LocaleContextHolder.getLocale()));
         return "redirect:/lessons/" + lessonQuizDto.getLessonId();
     }
 
     @GetMapping("{id}/edit")
     public String editQuizPage(@PathVariable Integer id, Model model) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         if(!lessonAccessService.canAccessLessonQuizEdit(lessonQuizService.getQuizEntityById(id))){
-            throw new NoAccessException("У вас нет доступа к редактированию теста");
+            throw new NoAccessException(messageSource.getMessage("quiz.edit.no_access", null, locale));
         }
 
         LessonQuizDto lessonQuizDto = lessonQuizService.getQuizById(id);
@@ -88,6 +97,8 @@ public class LessonQuizController {
                            Model model,
                            HttpServletRequest request,
                            HttpSession session){
+        Locale locale = LocaleContextHolder.getLocale();
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("lessonQuiz", lessonQuizDto);
             model.addAttribute("lesson", lessonService.getLessonById(lessonQuizDto.getLessonId()));
@@ -99,7 +110,8 @@ public class LessonQuizController {
             session.removeAttribute("timer");
             session.removeAttribute("startTime");
         }
-        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно изменен");
+        redirectAttributes.addFlashAttribute("successMessage",
+                messageSource.getMessage("quiz.edit.success", null, locale));
         return "redirect:/lessons/" + lessonQuizDto.getLessonId();
     }
 
@@ -107,12 +119,16 @@ public class LessonQuizController {
     public String getQuizPassingPage(@PathVariable int id,
                                      Model model,
                                      HttpSession session) {
-        if(!lessonAccessService.canAccessLessonQuizPassing(lessonQuizService.getQuizEntityById(id))){
-            throw new NoAccessException("У вас нет доступа к прохождению тестов");
+        Locale locale = LocaleContextHolder.getLocale();
+
+        if (!lessonAccessService.canAccessLessonQuizPassing(lessonQuizService.getQuizEntityById(id))) {
+            throw new NoAccessException(messageSource.getMessage("quiz.pass.no_access", null, locale));
         }
-        if(!lessonQuizService.getQuizById(id).getIsActive()){
-            throw new NoAccessException("Тестирование сейчас не доступно");
+
+        if (!lessonQuizService.getQuizById(id).getIsActive()) {
+            throw new NoAccessException(messageSource.getMessage("quiz.pass.not_active", null, locale));
         }
+
         QuizAnswerDto quizAnswerDto = new QuizAnswerDto();
         quizAnswerDto.setPassingStart(LocalTime.now());
         quizAnswerDto.setQuizId(id);
@@ -148,16 +164,20 @@ public class LessonQuizController {
 
     @GetMapping("{id}/delete")
     public String deleteQuiz(@PathVariable Integer id, RedirectAttributes redirectAttributes, HttpServletRequest httpServletRequest, HttpSession session) {
-        if(!lessonAccessService.canAccessLessonQuizDelete(lessonQuizService.getQuizEntityById(id))){
-            throw new NoAccessException("У вас нет доступа к удалению теста");
+        Locale locale = LocaleContextHolder.getLocale();
+
+        if (!lessonAccessService.canAccessLessonQuizDelete(lessonQuizService.getQuizEntityById(id))) {
+            throw new NoAccessException(messageSource.getMessage("quiz.delete.no_access", null, locale));
         }
+
         String url = httpServletRequest.getHeader("Referer");
         lessonQuizService.deleteQuiz(id);
         if(session.getAttribute("timer") != null && session.getAttribute("startTime") != null){
             session.removeAttribute("timer");
             session.removeAttribute("startTime");
         }
-        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно удален");
+        redirectAttributes.addFlashAttribute("successMessage",
+                messageSource.getMessage("quiz.delete.success", null, locale));
         if(url == null){
             return "redirect:/";
         }

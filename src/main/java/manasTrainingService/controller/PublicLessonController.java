@@ -17,6 +17,8 @@ import manasTrainingService.service.ScheduleService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseModuleService;
 import manasTrainingService.service.jitsi.MeetingService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Locale;
 
 @Controller
 @RequiredArgsConstructor
@@ -41,11 +45,14 @@ public class PublicLessonController {
     private final CourseModuleService courseModuleService;
     private final CourseInstanceService courseInstanceService;
     private final MeetingService meetingService;
+    private final MessageSource messageSource;
 
     @GetMapping("/lessons/{lessonId}")
     public String showLessonDetails(@PathVariable Integer lessonId, Model model, Authentication authentication) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         if (!lessonAccessService.canAccessLesson(lessonService.getLessonModelById(lessonId))) {
-            throw new NoAccessException("У вас нет доступа к данному уроку");
+            throw new NoAccessException(messageSource.getMessage("lesson.access.no_access", null, locale));
         }
 
         LessonDTO lesson = lessonService.getLessonById(lessonId);
@@ -75,9 +82,12 @@ public class PublicLessonController {
 
     @GetMapping("/lessons/{lessonId}/materials/new")
     public String showMaterialForm(@PathVariable Integer lessonId, Model model) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         if (!lessonAccessService.canAccessLessonStaff(lessonService.getLessonModelById(lessonId))) {
-            throw new NoAccessException("У вас нет доступа к данному уроку");
-        }        LessonDTO lesson = lessonService.getLessonById(lessonId);
+            throw new NoAccessException(messageSource.getMessage("lesson.access.no_access", null, locale));
+        }
+        LessonDTO lesson = lessonService.getLessonById(lessonId);
         model.addAttribute("lesson", lesson);
         model.addAttribute("material", LessonMaterialDTO.builder().lessonId(lessonId).build());
         return "lessons/lesson-material";
@@ -90,15 +100,19 @@ public class PublicLessonController {
             BindingResult bindingResult,
             Model model,
             RedirectAttributes redirectAttributes) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("lesson", lessonService.getLessonById(lessonId));
-            model.addAttribute("errorMessage", "Пожалуйста, исправьте ошибки в форме");
+            model.addAttribute("errorMessage",
+                    messageSource.getMessage("lesson.material.form_error", null, locale));
             return "lessons/lesson-material";
         }
 
         try {
             lessonMaterialService.addMaterial(material);
-            redirectAttributes.addFlashAttribute("successMessage", "Материал добавлен");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    messageSource.getMessage("lesson.material.add_success", null, locale));
             return "redirect:/lessons/" + lessonId;
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -113,7 +127,8 @@ public class PublicLessonController {
             RedirectAttributes redirectAttributes) {
         try {
             lessonMaterialService.deleteMaterial(materialId);
-            redirectAttributes.addFlashAttribute("successMessage", "Материал удален");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    messageSource.getMessage("lesson.material.delete_success", null, LocaleContextHolder.getLocale()));
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
@@ -124,17 +139,28 @@ public class PublicLessonController {
     public String showCreateLessonForm(@PathVariable Integer instanceId,
                                        @PathVariable Integer moduleId,
                                        Model model) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         if (!lessonAccessService.canAccessModuleCreation(courseModuleService.getCourseModuleById(moduleId))) {
-            throw new NoAccessException("У вас нет доступа к созданию уроков");
+            throw new NoAccessException(
+                    messageSource.getMessage("lesson.access.module_creation_no_access", null, locale));
         }
+
         if (!model.containsAttribute("lessonCreateRequest")) {
             model.addAttribute("lessonCreateRequest", new LessonCreateRequest());
         }
-        if (!courseModuleService.getCourseModuleById(moduleId).getCourseInstance().getId().equals(instanceId)) {
-            throw new IllegalStateException("Данный модуль не относится к этому курсу");
+
+        if (!courseModuleService.getCourseModuleById(moduleId)
+                .getCourseInstance()
+                .getId()
+                .equals(instanceId)) {
+            throw new IllegalStateException(
+                    messageSource.getMessage("lesson.module.invalid_instance", null, locale));
         }
+
         model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(instanceId));
         model.addAttribute("module", courseModuleService.getCourseModuleById(moduleId));
+
         return "admin/lesson-create";
     }
 
@@ -161,7 +187,8 @@ public class PublicLessonController {
 
         try {
             Integer courseInstanceId = lessonService.createLesson(request, courseModuleService.getCourseModuleById(moduleId));
-            redirectAttributes.addFlashAttribute("successMessage", "Урок успешно создан");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    messageSource.getMessage("lesson.create_success", null, LocaleContextHolder.getLocale()));
             if (isAdmin) {
                 return "redirect:/admin/course-instances/" + courseInstanceId;
             } else if (isTeacher) {
@@ -183,7 +210,7 @@ public class PublicLessonController {
         Lesson lesson = lessonService.getLessonModelById(lessonId);
 
         if (!lessonAccessService.canAccessLesson(lesson)) {
-            throw new NoAccessException("У вас нет доступа к содержимому урока");
+            throw new NoAccessException(messageSource.getMessage("lesson.access.no_access", null, LocaleContextHolder.getLocale()));
         }
 
         model.addAttribute("lesson", lesson);

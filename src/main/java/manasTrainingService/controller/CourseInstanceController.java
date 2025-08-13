@@ -19,6 +19,8 @@ import manasTrainingService.service.course.CourseTeacherService;
 import manasTrainingService.service.ScheduleService;
 import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestResultService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,6 +48,7 @@ public class CourseInstanceController {
     private final ScheduleService scheduleService;
     private final TestInstanceService testInstanceService;
     private final TestResultService testResultService;
+    private final MessageSource messageSource;
 
     @GetMapping
     public String listCourseInstances(Model model) {
@@ -84,10 +87,18 @@ public class CourseInstanceController {
                                        Model model,
                                        RedirectAttributes redirectAttributes) {
         if (scheduleService.hasSchedulesBeforeDateRange(id, courseInstanceDto.getStartDate())) {
-            result.rejectValue("startDate", "lesson.date.conflict.start", "Существуют уроки до новой даты начала");
+            result.rejectValue(
+                    "startDate",
+                    "lesson.date.conflict.start",
+                    messageSource.getMessage("lesson.date.conflict.start", null, LocaleContextHolder.getLocale())
+            );
         }
         if (scheduleService.hasSchedulesAfterDateRange(id, courseInstanceDto.getEndDate())) {
-            result.rejectValue("endDate", "lesson.date.conflict.end", "Существуют уроки после новой даты окончания");
+            result.rejectValue(
+                    "endDate",
+                    "lesson.date.conflict.end",
+                    messageSource.getMessage("lesson.date.conflict.end", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (result.hasErrors()) {
@@ -96,7 +107,10 @@ public class CourseInstanceController {
         }
 
         courseInstanceService.updateCourseInstance(id, courseInstanceDto);
-        redirectAttributes.addFlashAttribute("successMessage", "Поток курса успешно обновлён");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("course.instance.update.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/admin/course-instances";
     }
 
@@ -151,13 +165,19 @@ public class CourseInstanceController {
 
         try {
             courseModuleService.createCourseModules(id, moduleListDto.getModules());
-            model.addAttribute("successMessage", "Модули были добавлены");
+            model.addAttribute(
+                    "successMessage",
+                    messageSource.getMessage("course.modules.added.success", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/admin/course-instances/" + id;
         } catch (IllegalStateException e) {
             model.addAttribute("courseInstance", courseInstanceDto);
             model.addAttribute("modules", modules);
             model.addAttribute("remainingHours", remainingHours);
-            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("course.modules.added.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
             return "admin/course-instance-modules";
         }
     }
@@ -183,16 +203,25 @@ public class CourseInstanceController {
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(id));
             model.addAttribute("instanceTeachers", courseInstanceTeacherService.getTeachersByCourseInstanceId(id));
             model.addAttribute("eligibleTeachers", courseTeacherService.getEligibleTeachersForCourseInstance(id));
-            model.addAttribute("errorMessage", "Пожалуйста, выберите хотя бы одного преподавателя");
+            model.addAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("course.teachers.select.required", null, LocaleContextHolder.getLocale())
+            );
             return "admin/manage-teachers";
         }
 
         try {
             courseInstanceTeacherService.addTeachers(id, teacherForm.getTeacherIds());
-            redirectAttributes.addFlashAttribute("successMessage", "Преподаватели добавлены");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("course.teachers.added.success", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/admin/course-instances/" + id + "/teachers";
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("course.teachers.added.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
             return "redirect:/admin/course-instances/" + id + "/teachers";
         }
     }
@@ -203,9 +232,15 @@ public class CourseInstanceController {
                                        RedirectAttributes redirectAttributes) {
         try {
             courseInstanceTeacherService.togglePrimary(courseInstanceId, teacherId);
-            redirectAttributes.addFlashAttribute("successMessage", "Статус преподавателя обновлён");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("course.teacher.status.updated", null, LocaleContextHolder.getLocale())
+            );
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("course.teacher.status.update.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
         }
         return "redirect:/admin/course-instances/" + courseInstanceId + "/teachers";
     }
@@ -214,9 +249,15 @@ public class CourseInstanceController {
     public String deleteCourseInstance(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
             courseInstanceService.deleteCourseInstance(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Поток курса успешно удалён");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("course.instance.deleted.success", null, LocaleContextHolder.getLocale())
+            );
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении потока курса: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("course.instance.deleted.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
         }
         return "redirect:/admin/course-instances";
     }
@@ -230,11 +271,20 @@ public class CourseInstanceController {
     ) {
         try {
             courseModuleService.deleteByIdIfNoLessons(moduleId);
-            redirectAttributes.addFlashAttribute("successMessage", "Модуль успешно удалён");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("module.deleted.success", null, LocaleContextHolder.getLocale())
+            );
         } catch (IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Модуль содержит уроки и не может быть удалён");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("module.delete.error.lessons", null, LocaleContextHolder.getLocale())
+            );
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении модуля");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("module.delete.error.generic", null, LocaleContextHolder.getLocale())
+            );
         }
 
         return "redirect:/admin/course-instances/" + id + "/modules";
@@ -270,16 +320,24 @@ public class CourseInstanceController {
 
         try {
             courseModuleService.updateModule(moduleId, dto);
-            redirectAttributes.addFlashAttribute("successMessage", "Модуль успешно обновлён");
-
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("module.updated.success", null, LocaleContextHolder.getLocale())
+            );
         } catch (IllegalStateException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("module.update.error.state", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
             model.addAttribute("courseInstanceId", id);
             model.addAttribute("moduleId", moduleId);
             return "admin/course-module-edit";
         }
         catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при обновлении модуля");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("module.update.error.generic", null, LocaleContextHolder.getLocale())
+            );
         }
 
         return "redirect:/admin/course-instances/" + id + "/modules";

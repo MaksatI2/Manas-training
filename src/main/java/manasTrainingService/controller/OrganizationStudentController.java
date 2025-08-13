@@ -9,6 +9,8 @@ import manasTrainingService.entity.User;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.user.OrganizationService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -28,6 +31,7 @@ public class OrganizationStudentController {
     private final OrganizationService organizationService;
     private final UserService userService;
     private final CourseService courseService;
+    private final MessageSource messageSource;
 
     @GetMapping
     public String listStudentsWithCourses(Model model) {
@@ -102,9 +106,12 @@ public class OrganizationStudentController {
 
     @PostMapping("/{studentId}/delete")
     public String deleteStudent(@PathVariable Integer studentId, RedirectAttributes redirectAttributes) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         try {
             organizationService.deleteStudentFromOrganization(studentId, userService.getAuthorizedUser());
-            redirectAttributes.addFlashAttribute("successMessage", "Студент удалён из организации");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    messageSource.getMessage("student.delete.success", null, locale));
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }

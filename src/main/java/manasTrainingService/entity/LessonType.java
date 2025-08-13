@@ -1,15 +1,15 @@
 package manasTrainingService.entity;
 
 public enum LessonType {
-    LECTURE("Лекция"),
-    PRACTICAL("Практическое занятие"),
-    EXAM("Экзамен"),
-    CONSULTATION("Консультация");
+    LECTURE("lesson.type.lecture"),
+    PRACTICAL("lesson.type.practical"),
+    EXAM("lesson.type.exam"),
+    CONSULTATION("lesson.type.consultation");
 
     private final String value;
 
-    LessonType(String value) {
-        this.value = value;
+    LessonType(String messageKey) {
+        this.value = messageKey;
     }
 
     public String getValue() {
