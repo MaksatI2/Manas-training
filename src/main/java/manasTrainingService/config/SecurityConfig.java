@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -17,6 +18,7 @@ public class SecurityConfig {
 
     private final RememberMeService rememberMeService;
     private final RememberMeAuthenticationFilter rememberMeAuthenticationFilter;
+    private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -54,20 +56,10 @@ public class SecurityConfig {
                 .addFilterBefore(rememberMeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/auth/login")
+                        .successHandler(customAuthenticationSuccessHandler)
                         .loginProcessingUrl("/login")
                         .usernameParameter("login")
                         .passwordParameter("password")
-                        .successHandler((request, response, authentication) -> {
-                            String rememberMe = request.getParameter("rememberMe");
-                            if ("on".equals(rememberMe) || "true".equals(rememberMe)) {
-                                String email = authentication.getName();
-                                String token = rememberMeService.createRememberMeToken(email, request);
-                                if (token != null) {
-                                    rememberMeService.addRememberMeCookie(response, token);
-                                }
-                            }
-                            response.sendRedirect("/");
-                        })
                         .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )
