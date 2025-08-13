@@ -18,6 +18,8 @@ import manasTrainingService.service.LessonService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import manasTrainingService.service.user.UserService;
 import org.hibernate.Hibernate;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class LessonServiceImpl implements LessonService {
     private final LessonRepository lessonRepository;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     @Override
     public Integer createLesson(LessonCreateRequest request, CourseModule module) {
@@ -55,7 +58,10 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public LessonDTO getLessonById(Integer lessonId) {
-        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new LessonNotFoundException("Урок не был найден"));
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new LessonNotFoundException(
+                        messageSource.getMessage("lesson.not.found", null, LocaleContextHolder.getLocale())
+                ));
         LessonQuizDto quizDto = null;
         if (lesson.getLessonQuiz() != null) {
             quizDto = LessonQuizDto.builder()
@@ -85,7 +91,10 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public Lesson getLessonModelById(Integer lessonId) {
-        return lessonRepository.findById(lessonId).orElseThrow(() -> new LessonNotFoundException("Урок не был найден"));
+        return lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new LessonNotFoundException(
+                        messageSource.getMessage("lesson.not.found", null, LocaleContextHolder.getLocale())
+                ));
     }
 
 
@@ -93,8 +102,9 @@ public class LessonServiceImpl implements LessonService {
     @Transactional
     public void deleteById(Integer lessonId) {
         Lesson lesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new LessonNotFoundException("Урок не найден"));
-
+                .orElseThrow(() -> new LessonNotFoundException(
+                        messageSource.getMessage("lesson.not.found", null, LocaleContextHolder.getLocale())
+                ));
         Hibernate.initialize(lesson.getSchedules());
         Hibernate.initialize(lesson.getMaterials());
         Hibernate.initialize(lesson.getLessonQuiz());

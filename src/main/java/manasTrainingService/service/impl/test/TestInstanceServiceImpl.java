@@ -13,9 +13,12 @@ import manasTrainingService.service.NotificationService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     private final CourseInstanceService courseInstanceService;
     private final TestService testService;
     private final NotificationService notificationService;
+    private final MessageSource messageSource;
 
     @Transactional
     @Override
@@ -37,18 +41,27 @@ public class TestInstanceServiceImpl implements TestInstanceService {
         LocalDateTime scheduledStart = parseDateRange(testInstanceDto).get(0);
         LocalDateTime scheduledEnd = parseDateRange(testInstanceDto).get(1);
         if (LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата не может быть в прошлом");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("date.in.past", null, LocaleContextHolder.getLocale())
+            );
         }
         if (scheduledStart.isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата открытия доступа не может быть после даты закрытия доступа");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("access.start.after.end", null, LocaleContextHolder.getLocale())
+            );
         }
         if (scheduledStart.equals(scheduledEnd)) {
-            throw new IncorrectDateException("Дата и время не могут быть равны");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("date.start.equals.end", null, LocaleContextHolder.getLocale())
+            );
         }
-        if (courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate().isBefore(scheduledStart.toLocalDate())
-                || courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate().isBefore(scheduledEnd.toLocalDate())) {
-            throw new IncorrectDateException("Дата начала тестирования не может быть позднее даты окончания курса");
+        LocalDate courseEndDate = courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate();
+        if (courseEndDate.isBefore(scheduledStart.toLocalDate()) || courseEndDate.isBefore(scheduledEnd.toLocalDate())) {
+            throw new IncorrectDateException(
+                    messageSource.getMessage("test.start.after.course.end", null, LocaleContextHolder.getLocale())
+            );
         }
+
 
         testInstance.setInstance(courseInstanceService.getCourseInstanceModelById(testInstanceDto.getCourseInstanceId()));
         testInstance.setTest(testService.getTestEntityById(testInstanceDto.getTestId()));
@@ -64,22 +77,33 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Override
     public void changeTestToCourseInstance(TestInstanceDto testInstanceDto){
         TestInstance testInstance = testInstanceRepository.findByInstanceId(testInstanceDto.getCourseInstanceId())
-                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+                .orElseThrow(() -> new TestInstanceNotFoundException(
+                        messageSource.getMessage("test-instance.not.found", null, LocaleContextHolder.getLocale())
+                ));
         LocalDateTime scheduledStart = parseDateRange(testInstanceDto).get(0);
         LocalDateTime scheduledEnd = parseDateRange(testInstanceDto).get(1);
         if (LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата не может быть в прошлом");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("date.in.past", null, LocaleContextHolder.getLocale())
+            );
         }
         if (scheduledStart.isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата открытия доступа не может быть после даты закрытия доступа");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("access.start.after.end", null, LocaleContextHolder.getLocale())
+            );
         }
         if (scheduledStart.equals(scheduledEnd)) {
-            throw new IncorrectDateException("Дата и время не могут быть равны");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("date.start.equals.end", null, LocaleContextHolder.getLocale())
+            );
         }
-        if (courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate().isBefore(scheduledStart.toLocalDate())
-                || courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate().isBefore(scheduledEnd.toLocalDate())) {
-            throw new IncorrectDateException("Дата начала тестирования не может быть позднее даты окончания курса");
+        LocalDate courseEndDate = courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate();
+        if (courseEndDate.isBefore(scheduledStart.toLocalDate()) || courseEndDate.isBefore(scheduledEnd.toLocalDate())) {
+            throw new IncorrectDateException(
+                    messageSource.getMessage("test.start.after.course.end", null, LocaleContextHolder.getLocale())
+            );
         }
+
 
         testInstance.setInstance(courseInstanceService.getCourseInstanceModelById(testInstanceDto.getCourseInstanceId()));
         testInstance.setTest(testService.getTestEntityById(testInstanceDto.getTestId()));
@@ -103,7 +127,14 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Override
     public TestInstanceDto getTestInstanceByCourseInstanceId(int courseInstanceId){
         TestInstance testInstance = testInstanceRepository.findByInstanceId(courseInstanceId)
-                .orElseThrow(() -> new TestInstanceNotFoundException("Для этого потока еще не был назначен тест"));
+                .orElseThrow(() -> new TestInstanceNotFoundException(
+                        messageSource.getMessage(
+                                "test.instance.not.assigned",
+                                null,
+                                "Для этого потока еще не был назначен тест",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return TestInstanceDto.builder()
                 .id(testInstance.getId())
                 .test(TestDto.builder()
@@ -128,7 +159,14 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Override
     public TestInstanceDto getTestInstanceById(int id){
         TestInstance testInstance = testInstanceRepository.findById(id)
-                .orElseThrow(() -> new TestInstanceNotFoundException("Для этого потока еще не был назначен тест"));
+                .orElseThrow(() -> new TestInstanceNotFoundException(
+                        messageSource.getMessage(
+                                "test.instance.not.assigned",
+                                null,
+                                "Для этого потока еще не был назначен тест",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return TestInstanceDto.builder()
                 .id(testInstance.getId())
                 .test(TestDto.builder()
@@ -153,7 +191,14 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Override
     public TestInstance getTestInstanceEntityById(int id){
         return testInstanceRepository.findById(id)
-                .orElseThrow(() -> new TestInstanceNotFoundException("Для этого потока еще не был назначен тест"));
+                .orElseThrow(() -> new TestInstanceNotFoundException(
+                        messageSource.getMessage(
+                                "test.instance.not.assigned",
+                                null,
+                                "Для этого потока еще не был назначен тест",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
 
@@ -161,7 +206,9 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Override
     public void deleteTestFromTestInstance(int courseInstanceId){
         TestInstance testInstance = testInstanceRepository.findByInstanceId(courseInstanceId)
-                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+                .orElseThrow(() -> new TestInstanceNotFoundException(
+                        messageSource.getMessage("test-instance.not.found", null, LocaleContextHolder.getLocale())
+                ));
         CourseInstance courseInstance = testInstance.getInstance();
         courseInstance.setTestInstance(null);
         testInstanceRepository.delete(testInstance);
@@ -170,7 +217,9 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Override
     public Boolean isValidAccessTime(int id){
         TestInstance testInstance = testInstanceRepository.findById(id)
-                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+                .orElseThrow(() -> new TestInstanceNotFoundException(
+                        messageSource.getMessage("test-instance.not.found", null, LocaleContextHolder.getLocale())
+                ));
         return testInstance.getScheduledStart().isBefore(LocalDateTime.now()) && testInstance.getScheduledEnd().isAfter(LocalDateTime.now());
     }
 
@@ -182,7 +231,9 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Override
     public Boolean isAvailableTime(int courseInstanceId){
         TestInstance testInstance = testInstanceRepository.findByInstanceId(courseInstanceId)
-                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+                .orElseThrow(() -> new TestInstanceNotFoundException(
+                        messageSource.getMessage("test-instance.not.found", null, LocaleContextHolder.getLocale())
+                ));
         return testInstance.getScheduledStart().isBefore(LocalDateTime.now()) && testInstance.getScheduledEnd().isAfter(LocalDateTime.now());
     }
 
@@ -195,21 +246,31 @@ public class TestInstanceServiceImpl implements TestInstanceService {
     @Override
     public void changeTestInstanceTime(TestInstanceDto testInstanceDto){
         TestInstance testInstance = testInstanceRepository.findByInstanceId(testInstanceDto.getCourseInstanceId())
-                .orElseThrow(() -> new TestInstanceNotFoundException("Тест к потоку не найден"));
+                .orElseThrow(() -> new TestInstanceNotFoundException(
+                        messageSource.getMessage("test-instance.not.found", null, LocaleContextHolder.getLocale())
+                ));
         LocalDateTime scheduledStart = parseDateRange(testInstanceDto).get(0);
         LocalDateTime scheduledEnd = parseDateRange(testInstanceDto).get(1);
         if (LocalDateTime.now().isAfter(scheduledStart) && LocalDateTime.now().isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата не может быть в прошлом");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("date.in.past", null, LocaleContextHolder.getLocale())
+            );
         }
         if (scheduledStart.isAfter(scheduledEnd)) {
-            throw new IncorrectDateException("Дата открытия доступа не может быть после даты закрытия доступа");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("access.start.after.end", null, LocaleContextHolder.getLocale())
+            );
         }
         if (scheduledStart.equals(scheduledEnd)) {
-            throw new IncorrectDateException("Дата и время не могут быть равны");
+            throw new IncorrectDateException(
+                    messageSource.getMessage("date.start.equals.end", null, LocaleContextHolder.getLocale())
+            );
         }
-        if (courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate().isBefore(scheduledStart.toLocalDate())
-                || courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate().isBefore(scheduledEnd.toLocalDate())) {
-            throw new IncorrectDateException("Дата начала тестирования не может быть позднее даты окончания курса");
+        LocalDate courseEndDate = courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstanceId()).getEndDate();
+        if (courseEndDate.isBefore(scheduledStart.toLocalDate()) || courseEndDate.isBefore(scheduledEnd.toLocalDate())) {
+            throw new IncorrectDateException(
+                    messageSource.getMessage("test.start.after.course.end", null, LocaleContextHolder.getLocale())
+            );
         }
         testInstance.setScheduledStart(scheduledStart);
         testInstance.setScheduledEnd(scheduledEnd);

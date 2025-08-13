@@ -15,6 +15,8 @@ import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.DateUtil;
 import manasTrainingService.util.StatusUtil;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,6 +34,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final ActivityLogService activityLogService;
     private final CourseEnrollmentRepository courseEnrollmentRepository;
     private final NotificationService notificationService;
+    private final MessageSource messageSource;
 
     @Override
     public void enrollEmployees(Integer courseInstanceId, List<Integer> employeeIds) {
@@ -139,7 +142,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         User user = userService.getAuthorizedUser();
         if (!enrollmentRepository.existsByCourseInstanceIdAndStudentIdAndStatus(courseInstanceId, user.getId(), Status.ENROLLED)
                 && !enrollmentRepository.existsByCourseInstanceIdAndStudentIdAndStatus(courseInstanceId, user.getId(), Status.COMPLETED)) {
-            throw new NoAccessException("У вас нет доступа к курсу");
+            throw new NoAccessException(messageSource.getMessage("course.no.access", null, LocaleContextHolder.getLocale()));
         }
 
     }
@@ -152,8 +155,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public void changeEnrollmentStatus(Integer enrollmentId, Status newStatus) {
         CourseEnrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Запись на курс не была найдена"));
-
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage("course.registration.not.found", null, LocaleContextHolder.getLocale())
+                ));
         enrollment.setStatus(newStatus);
         CourseEnrollment saved = enrollmentRepository.save(enrollment);
         activityLogService.log(
@@ -180,7 +184,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public void courseComplete(TestResult testResult){
         User user = userService.getAuthorizedUser();
         CourseEnrollment courseEnrollment = courseEnrollmentRepository.findByCourseInstanceIdAndStudentId(testResult.getTestInstance().getInstance().getId(), user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Заись на курс не была найдена"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage("course.registration.not.found", null, LocaleContextHolder.getLocale())
+                ));
         courseEnrollment.setStatus(Status.COMPLETED);
         courseEnrollment.setCompletionDate(LocalDateTime.now());
         courseEnrollment.setFinalGrade(testResult.getScore());

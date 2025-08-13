@@ -18,6 +18,8 @@ import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.DateUtil;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,6 +36,7 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     private final ActivityLogService activityLogService;
     private final UserService userService;
     private final LessonQuizService lessonQuizService;
+    private final MessageSource messageSource;
 
     @Override
     public Integer createCourseInstance(CourseInstanceCreationDTO dto) {
@@ -81,15 +84,28 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     @Override
     public CourseInstanceDTO getCourseInstanceById(Integer id) {
         CourseInstance course = courseInstanceRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException("Поток курса не был найден"));
+                .orElseThrow(() -> new CourseNotFoundException(
+                        messageSource.getMessage(
+                                "course.instance.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return convertToDto(course);
     }
 
     @Override
     public CourseInstance getCourseInstanceModelById(Integer id) {
         return courseInstanceRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException("Поток курса не был найден"));
+                .orElseThrow(() -> new CourseNotFoundException(
+                        messageSource.getMessage(
+                                "course.instance.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
+
 
     private CourseInstanceDTO convertToDto(CourseInstance courseInstance) {
         var moduleDtos = courseInstance.getModules().stream()
@@ -138,7 +154,13 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     @Override
     public CourseInstanceUpdateDTO getUpdateDtoById(Integer id) {
         CourseInstance instance = courseInstanceRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException("Поток курса не найден"));
+                .orElseThrow(() -> new CourseNotFoundException(
+                        messageSource.getMessage(
+                                "course.instance.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         return CourseInstanceUpdateDTO.builder()
                 .id(instance.getId())
@@ -152,7 +174,13 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     @Override
     public void updateCourseInstance(Integer id, CourseInstanceUpdateDTO dto) {
         CourseInstance instance = courseInstanceRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException("Поток курса не найден"));
+                .orElseThrow(() -> new CourseNotFoundException(
+                        messageSource.getMessage(
+                                "course.instance.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         instance.setTitle(dto.getTitle());
         instance.setStartDate(dto.getStartDate().atStartOfDay());
@@ -172,10 +200,23 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
     @Override
     public void deleteCourseInstance(Integer id) {
         CourseInstance instance = courseInstanceRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException("Поток курса не найден"));
+                .orElseThrow(() -> new CourseNotFoundException(
+                        messageSource.getMessage(
+                                "course.instance.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         if (!instance.getModules().isEmpty()) {
-            throw new IllegalArgumentException("Невозможно удаление курса, у него есть модули");
+            throw new IllegalArgumentException(
+                    messageSource.getMessage(
+                            "course.has.modules",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
 
         courseInstanceRepository.deleteById(id);
         activityLogService.log(
@@ -196,7 +237,11 @@ public class CourseInstanceServiceImpl implements CourseInstanceService {
                         .category(instance.getCourse().getCategory().getName())
                         .startDate(instance.getStartDate().toLocalDate())
                         .endDate(instance.getEndDate().toLocalDate())
-                        .status(instance.getIsActive() ? "Активен" : "Неактивен")
+                        .status(
+                                instance.getIsActive()
+                                        ? messageSource.getMessage("course.status.active", null, LocaleContextHolder.getLocale())
+                                        : messageSource.getMessage("course.status.inactive", null, LocaleContextHolder.getLocale())
+                        )
                         .color("#3f51b5")
                         .courseId(instance.getCourse().getId())
                         .build())

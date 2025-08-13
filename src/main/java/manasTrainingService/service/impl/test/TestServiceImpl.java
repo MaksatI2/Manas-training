@@ -22,7 +22,9 @@ import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -43,6 +45,7 @@ public class TestServiceImpl implements TestService {
     private TestInstanceService testInstanceService;
     private final EnrollmentService enrollmentService;
     private final HttpSession session;
+    private final MessageSource messageSource;
 
     @Autowired
     public void testInstanceService(@Lazy TestInstanceService testInstanceService) {
@@ -86,7 +89,14 @@ public class TestServiceImpl implements TestService {
     @Override
     public void editTest(TestDto testDto) {
         Test test = testRepository.findById(testDto.getId())
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         test.setTitle(testDto.getTitle());
         test.setDescription(testDto.getDescription());
         test.setPassingScore(BigDecimal.valueOf(testDto.getPassingScore()));
@@ -105,7 +115,14 @@ public class TestServiceImpl implements TestService {
     @Override
     public TestDto getTestById(int id) {
         Test test = testRepository.findById(id)
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         return TestDto.builder()
                 .id(test.getId())
@@ -125,7 +142,14 @@ public class TestServiceImpl implements TestService {
     @Override
     public TestDto getTestForPassingById(int id) {
         Test test = testRepository.findById(id)
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         List<QuestionDto> questions = questionService.getQuestionsForPassingByTestId(test.getId());
         session.setAttribute("questionsCount", questions.size());
         return TestDto.builder()
@@ -168,19 +192,40 @@ public class TestServiceImpl implements TestService {
     @Override
     public Test getTestEntityByCourseId(int id) {
         return testRepository.findByCourseId(id)
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override
     public Test getTestEntityById(int id) {
         return testRepository.findById(id)
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override
     public TestResultDto checkTestResult(TestAnswerDto result) {
         Test test = testRepository.findById(result.getTestId())
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         int questionsCount = (Integer) session.getAttribute("questionsCount");
         session.removeAttribute("questionsCount");
         double basePoints = 100 / questionsCount;
@@ -229,7 +274,14 @@ public class TestServiceImpl implements TestService {
     @Override
     public void deactivateTest(int id){
         Test test = testRepository.findById(id)
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         List<TestInstance> testInstances = test.getTestInstances();
         if(testInstances.isEmpty()){
             test.setIsActive(false);
@@ -244,14 +296,28 @@ public class TestServiceImpl implements TestService {
             );
             testRepository.saveAndFlush(test);
         } else {
-            throw new IncorrectDateException("Тест нельзя деактивироанть если он прикреплен к активному потоку");
+            throw new IncorrectDateException(
+                    messageSource.getMessage(
+                            "test.deactivate.active.instance",
+                            null,
+                            "Тест нельзя деактивировать, если он прикреплен к активному потоку",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
     }
 
     @Override
     public void activateTest(int id){
         Test test = testRepository.findById(id)
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         test.setIsActive(true);
         activityLogService.log(
                 userService.getAuthorizedUser(),
@@ -302,7 +368,14 @@ public class TestServiceImpl implements TestService {
     @Override
     public void deleteTest(int id) {
         Test test = testRepository.findById(id)
-                        .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         List<TestInstance> testInstances = test.getTestInstances();
         if(testInstances.isEmpty()){
             testRepository.deleteById(id);
@@ -321,7 +394,14 @@ public class TestServiceImpl implements TestService {
                     id
             );
         } else {
-            throw new IncorrectDateException("Тест нельзя удалить если он привязван к активному потоку");
+            throw new IncorrectDateException(
+                    messageSource.getMessage(
+                            "test.delete.active.instance",
+                            null,
+                            "Тест нельзя удалить, если он привязан к активному потоку",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
     }
 
@@ -339,7 +419,14 @@ public class TestServiceImpl implements TestService {
     public TestDto getTestByIdForTestResult(int testInstanceId) {
         TestInstance testInstance = testInstanceService.getTestInstanceEntityById(testInstanceId);
         Test test = testRepository.findById(testInstance.getTest().getId())
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         List<QuestionAnswerDto> answers = testAnswerService.getAnswersByAttemtId(testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceId).getId());
         List<QuestionDto> questions = test.getQuestions()
                 .stream()
@@ -377,7 +464,14 @@ public class TestServiceImpl implements TestService {
     public TestDto getTestByIdForTestResult(int testInstanceId, int userId) {
         TestInstance testInstance = testInstanceService.getTestInstanceEntityById(testInstanceId);
         Test test = testRepository.findById(testInstance.getTest().getId())
-                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException(
+                        messageSource.getMessage(
+                                "test.not.found",
+                                null,
+                                "Тест не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         List<QuestionAnswerDto> answers = testAnswerService.getAnswersByAttemtId(testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceId, userId).getId());
         List<QuestionDto> questions = test.getQuestions()
                 .stream()

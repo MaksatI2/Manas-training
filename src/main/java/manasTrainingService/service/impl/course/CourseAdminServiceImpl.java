@@ -22,6 +22,8 @@ import manasTrainingService.service.course.CourseCategoryService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,7 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     private final CourseApplicationService courseApplicationService;
     private final CourseTeacherService courseTeacherService;
     private final CourseInstanceService courseInstanceService;
+    private final MessageSource messageSource;
 
     private final ActivityLogService activityLogService;
     private final UserService userService;
@@ -80,7 +83,13 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     @Override
     public CourseDto getById(Integer id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Курс с ID " + id + " не найден"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "course.not.found",
+                                new Object[]{id},
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return convertToDto(course);
     }
 
@@ -88,10 +97,23 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     @Override
     public CourseDto create(CreateCourseDto createCourseDto) {
         if (existsByCode(createCourseDto.getCode())) {
-            throw new ValidationException("Курс с кодом " + createCourseDto.getCode() + " уже существует");
+            throw new ValidationException(
+                    messageSource.getMessage(
+                            "course.code.exists",
+                            new Object[]{createCourseDto.getCode()},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
         if (existsByTitle(createCourseDto.getTitle())) {
-            throw new ValidationException("Курс с названием " + createCourseDto.getTitle() + " уже существует");
+            throw new ValidationException(
+                    messageSource.getMessage(
+                            "course.title.exists",
+                            new Object[]{createCourseDto.getTitle()},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
 
         CourseCategoryDto categoryDto = categoryService.getById(createCourseDto.getCategoryId());
@@ -126,14 +148,33 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     @Override
     public CourseDto update(CourseEditDto updateCourseDto) {
         Course existingCourse = courseRepository.findById(updateCourseDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Курс с ID " + updateCourseDto.getId() + " не найден"));
-
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "course.not.found",
+                                new Object[]{updateCourseDto.getId()},
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         if (existsByCodeAndIdNot(updateCourseDto.getCode(), updateCourseDto.getId())) {
-            throw new ValidationException("Курс с кодом " + updateCourseDto.getCode() + " уже существует");
+            throw new ValidationException(
+                    messageSource.getMessage(
+                            "course.code.exists",
+                            new Object[]{updateCourseDto.getCode()},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
         if (existsByTitleAndIdNot(updateCourseDto.getTitle(), updateCourseDto.getId())) {
-            throw new ValidationException("Курс с названием " + updateCourseDto.getTitle() + " уже существует");
+            throw new ValidationException(
+                    messageSource.getMessage(
+                            "course.title.exists",
+                            new Object[]{updateCourseDto.getTitle()},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
 
 
         CourseCategoryDto categoryDto = categoryService.getById(updateCourseDto.getCategoryId());
@@ -176,7 +217,13 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     @Override
     public CourseDeletionDependenciesDto getDeletionDependencies(Integer courseId) {
         if (!courseRepository.existsById(courseId))
-            throw new EntityNotFoundException("Курс с id=" + courseId + " не найден");
+            throw new EntityNotFoundException(
+                    messageSource.getMessage(
+                            "course.not.found",
+                            new Object[]{courseId},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
 
         List<ShortDto> applications = courseApplicationService.getByCourseId(courseId);
         List<ShortDto> instances = courseInstanceService.getByCourseId(courseId);
@@ -189,11 +236,23 @@ public class CourseAdminServiceImpl implements CourseAdminService {
     @Override
     public void deleteCourse(Integer courseId) {
         if (!courseRepository.existsById(courseId))
-            throw new EntityNotFoundException("Курс с id=" + courseId + " не найден");
+            throw new EntityNotFoundException(
+                    messageSource.getMessage(
+                            "course.not.found",
+                            new Object[]{courseId},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
 
         var deps = getDeletionDependencies(courseId);
         if (deps.hasAny())
-            throw new CourseDeletionException("Невозможно удалить курс: найдены связанные элементы");
+            throw new CourseDeletionException(
+                    messageSource.getMessage(
+                            "course.deletion.failed",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
 
         courseRepository.deleteById(courseId);
         activityLogService.log(

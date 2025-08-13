@@ -7,6 +7,8 @@ import manasTrainingService.entity.User;
 import manasTrainingService.service.user.OrganizationService;
 import manasTrainingService.service.user.UserProfileService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +17,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserService userService;
     private final OrganizationService organizationService;
+    private final MessageSource messageSource;
 
     @Override
     public UserProfileDetailsDto getProfileDetails(Integer userId) {
@@ -28,7 +31,16 @@ public class UserProfileServiceImpl implements UserProfileService {
             case "STUDENT" -> {
                 if (user.getStudentProfile() != null) {
                     var student = user.getStudentProfile();
-                    builder.organizationName(student.getOrganization() != null ? student.getOrganization().getUser().getName() : "Нет организации");
+                    builder.organizationName(
+                            student.getOrganization() != null
+                                    ? student.getOrganization().getUser().getName()
+                                    : messageSource.getMessage(
+                                    "no.organization",
+                                    null,
+                                    "Нет организации",
+                                    LocaleContextHolder.getLocale()
+                            )
+                    );
                     builder.specialization(student.getSpecialization());
                 }
             }

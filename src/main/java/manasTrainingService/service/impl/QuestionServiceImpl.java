@@ -17,7 +17,9 @@ import manasTrainingService.service.QuestionService;
 import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,6 +34,7 @@ public class QuestionServiceImpl implements QuestionService {
     private TestService testService;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     @Autowired
     public void setTestService(@Lazy TestService testService) {
@@ -148,15 +151,17 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public TestQuestion getQuestionById(int id) {
         return testQuestionRepository.findById(id)
-                .orElseThrow(() -> new TestQuestionNotFoundException("Вопрос не найден"));
-    }
+                .orElseThrow(() -> new TestQuestionNotFoundException(
+                        messageSource.getMessage("test.question.not.found", null, LocaleContextHolder.getLocale())
+                ));    }
 
     private void deleteQuestionsFromTest(List<QuestionDto> questions) {
         User user = userService.getAuthorizedUser();
         for (QuestionDto questionDto : questions) {
             TestQuestion testQuestion = testQuestionRepository.findById(questionDto.getId())
-                    .orElseThrow(() -> new TestQuestionNotFoundException("Вопрос не найден"));
-            testQuestionRepository.delete(testQuestion);
+                    .orElseThrow(() -> new TestQuestionNotFoundException(
+                            messageSource.getMessage("test.question.not.found", null, LocaleContextHolder.getLocale())
+                    ));            testQuestionRepository.delete(testQuestion);
             activityLogService.log(
                     user,
                     ActionType.DELETE,
@@ -187,7 +192,9 @@ public class QuestionServiceImpl implements QuestionService {
 
             if (q.getId() != null) {
                 testQuestion = testQuestionRepository.findById(q.getId())
-                        .orElseThrow(() -> new TestQuestionNotFoundException("Вопрос не найден"));
+                        .orElseThrow(() -> new TestQuestionNotFoundException(
+                                messageSource.getMessage("test.question.not.found", null, LocaleContextHolder.getLocale())
+                        ));
             } else {
                 testQuestion = new TestQuestion();
                 testQuestion.setTest(testService.getTestEntityById(q.getTestId()));

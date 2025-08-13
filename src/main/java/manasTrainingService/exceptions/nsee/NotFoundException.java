@@ -1,6 +1,8 @@
 package manasTrainingService.exceptions.nsee;
 
-public class NotFoundException extends RuntimeException {
+import java.util.NoSuchElementException;
+
+public class NotFoundException extends NoSuchElementException {
     public NotFoundException(String message) {
         super(message);
     }

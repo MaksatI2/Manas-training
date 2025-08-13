@@ -20,6 +20,8 @@ import manasTrainingService.service.quiz.LessonQuizOptionService;
 import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,7 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     private final ActivityLogService activityLogService;
     private final UserService userService;
     private final LessonQuizOptionRepository lessonQuizOptionRepository;
+    private final MessageSource messageSource;
 
     @Transactional
     @Override
@@ -67,7 +70,13 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     @Override
     public void editQuiz(LessonQuizDto lessonQuizDto){
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(lessonQuizDto.getId())
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         lessonQuiz.setTitle(lessonQuizDto.getTitle());
         lessonQuiz.setDescription(lessonQuizDto.getDescription());
@@ -92,7 +101,13 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     @Override
     public LessonQuizDto getQuizById(int id){
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         return LessonQuizDto.builder()
                 .id(lessonQuiz.getId())
@@ -121,7 +136,13 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     @Override
     public LessonQuizDto getQuizByIdForPassing(int id){
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         return LessonQuizDto.builder()
                 .id(lessonQuiz.getId())
@@ -168,20 +189,38 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     @Override
     public LessonQuiz getQuizEntityByLessonId(int id){
         return lessonQuizRepository.findByLessonId(id)
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override
     public LessonQuiz getQuizEntityById(int id){
         return  lessonQuizRepository.findById(id)
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override
     public QuizResultDto checkQuizResults(QuizAnswerDto quizAnswerDto){
         LocalTime endTime = LocalTime.now();
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(quizAnswerDto.getQuizId())
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return QuizResultDto.builder()
                 .correctAnswersCount((int) quizAnswerDto.getQuestionAnswers()
                         .stream()
@@ -227,7 +266,13 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     @Override
     public void deleteQuiz(int id){
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         Lesson lesson = lessonQuiz.getLesson();
         lesson.setLessonQuiz(null);
         lessonQuizRepository.delete(lessonQuiz);
@@ -236,7 +281,13 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     @Override
     public void deactivateQuiz(int id){
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         lessonQuiz.setIsActive(false);
         lessonQuizRepository.saveAndFlush(lessonQuiz);
     }
@@ -244,7 +295,13 @@ public class LessonQuizServiceImpl implements LessonQuizService {
     @Override
     public void activateQuiz(int id){
         LessonQuiz lessonQuiz = lessonQuizRepository.findById(id)
-                .orElseThrow(() -> new LessonQuizNotFoundException("Тест не найден"));
+                .orElseThrow(() -> new LessonQuizNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         lessonQuiz.setIsActive(true);
         lessonQuizRepository.saveAndFlush(lessonQuiz);
     }
