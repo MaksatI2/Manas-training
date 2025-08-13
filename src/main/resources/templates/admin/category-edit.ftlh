@@ -3,6 +3,12 @@
 <#import "../RoadMap.ftlh" as roadmap>
 
 <@layout.page title="${springMacroRequestContext.getMessage('categories.admin.edit.title')}">
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <@roadmap.breadcrumbs items=[
     {"label": "${springMacroRequestContext.getMessage('categories.admin.edit.breadcrumb.home')}", "url": "/"},
     {"label": "${springMacroRequestContext.getMessage('categories.admin.edit.breadcrumb.list')}", "url": "/admin/categories"},
@@ -10,12 +16,7 @@
     ] />
 
     <div class="card shadow mb-4">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+
 
         <div class="card-header py-3 d-flex justify-content-between align-items-center"
              style="background: linear-gradient(135deg, #0066cc, #003d7a);">

@@ -11,7 +11,13 @@
                     <div>
                         <h2 class="h5 fw-bold mb-1"
                             style="color: var(--text-dark);"><@spring.message code="error.403.title"/></h2>
-                        <p style="color: var(--text-dark); font-size: 1rem;"><@spring.message code="error.403.message"/></p>
+                        <p style="color: var(--text-dark); font-size: 1rem;">
+                            <#if message??>
+                                ${message}
+                            <#else>
+                                <@spring.message code="error.403.message"/>
+                            </#if>
+                        </p>
                     </div>
                 </div>
                 <div class="text-center">

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public String getCourseDetails(@PathVariable Integer id, Model model, Authentication authentication) {
+    public String getCourseDetails(@PathVariable Integer id, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
         try {
             CourseDto course = courseService.getById(id);
             model.addAttribute("course", course);
@@ -71,9 +72,9 @@ public class CourseController {
             model.addAttribute("canEnroll", canEnroll);
             return "courses/course-view";
         } catch (EntityNotFoundException e) {
-            model.addAttribute("errorMessage",
+            redirectAttributes.addFlashAttribute("errorMessage",
                     messageSource.getMessage("courses.not.found", null, LocaleContextHolder.getLocale()));
-            return "error/error";
+            return "redirect:/courses";
         }
     }
 

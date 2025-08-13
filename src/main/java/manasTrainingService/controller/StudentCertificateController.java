@@ -7,6 +7,7 @@ import manasTrainingService.dto.certificate.CertificateViewDto;
 import manasTrainingService.dto.certificate.StudentCertificateDetailDto;
 import manasTrainingService.entity.Certificate;
 import manasTrainingService.entity.CourseEnrollment;
+import manasTrainingService.exceptions.nsee.NoAccessException;
 import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.certificate.CertificateService;
 import org.springframework.context.MessageSource;
@@ -48,7 +49,7 @@ public class StudentCertificateController {
         Certificate cert = cas.getCertificateWithModules(id);
         if (!cert.getStudent().getId().equals(user.getUser().getId())) {
             Locale locale = LocaleContextHolder.getLocale();
-            throw new AccessDeniedException(
+            throw new NoAccessException(
                     messageSource.getMessage("certificate.not.yours", null, locale)
             );
         }

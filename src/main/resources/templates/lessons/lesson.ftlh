@@ -15,14 +15,10 @@
 
 <@layout.page>
     <#if successMessage??>
-        <div id="successMessage" class="alert alert-success rounded-3 mb-4">
-            <i class="fas fa-check-circle me-2"></i>${successMessage?js_string}
-        </div>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
     </#if>
     <#if errorMessage??>
-        <div id="errorMessage" class="alert alert-danger rounded-3 mb-4">
-            <i class="fas fa-exclamation-circle me-2"></i>${errorMessage?js_string}
-        </div>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
 
     <div class="container my-5">

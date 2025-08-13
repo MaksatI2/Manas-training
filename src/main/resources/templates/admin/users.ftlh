@@ -6,17 +6,18 @@
 <#assign bcUsers><@spring.message code='admin.user.list.breadcrumb.users'/></#assign>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcUsers, "url": ""}
     ] />
     <div class="card shadow mb-4">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="m-0 font-weight-bold text-white">

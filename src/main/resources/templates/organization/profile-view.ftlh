@@ -6,6 +6,12 @@
 <#assign bcProfile><@spring.message code='organization.profile.view.breadcrumb.profile'/></#assign>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcProfile, "url": ""}
@@ -198,12 +204,7 @@
         }
     </style>
     <div class="profile-container">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+
         <h1 class="page-title">
             <i class="fas fa-user-circle" style="color: var(--primary-blue); margin-right: 0.5rem;"></i>
             <@spring.message code="organization.profile.view.title"/>

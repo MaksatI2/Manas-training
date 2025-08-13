@@ -1,6 +1,12 @@
 <#import "/spring.ftl" as spring />
 <#include "../layout.ftlh">
 <@page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <style>
         .upload-container {
             max-width: 600px;
@@ -169,19 +175,6 @@
                 <@spring.message code='profile.image.upload.title'/>
             </h1>
 
-            <#if successMessage??>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
-                    ${successMessage}
-                </div>
-            </#if>
-
-            <#if errorMessage??>
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
-                    ${errorMessage}
-                </div>
-            </#if>
 
             <div class="requirements">
                 <h6><i class="fas fa-info-circle"

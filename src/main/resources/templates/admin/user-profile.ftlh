@@ -7,6 +7,13 @@
 <#assign bcProfile><@spring.message code='breadcrumb.profile'/></#assign>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -16,12 +23,7 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <div class="max-w-6xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+
 
         <@roadmap.breadcrumbs items=[
         {"label": bcHome, "url": "/"},

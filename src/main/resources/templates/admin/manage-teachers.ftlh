@@ -15,14 +15,12 @@
     {"label": bcTeachers, "url": ""}
     ] />
 
-    <div class="container mb-4">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
-    </div>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
 
     <div class="container py-4">
         <div class="hero-section mb-4 text-center">
