@@ -89,4 +89,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     List<RememberMeToken> rememberMeTokens;
+
+    @Column(name = "language_preference", length = 5, nullable = false)
+    String languagePreference = "ru";
 }
