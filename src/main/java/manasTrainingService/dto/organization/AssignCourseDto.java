@@ -10,9 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 public class AssignCourseDto {
 
-    @NotNull(message = "Выберите студента")
+    @NotNull(message = "{assignCourse.studentId.notNull}")
     private Long studentId;
 
-    @NotNull(message = "Выберите курс")
+    @NotNull(message = "{assignCourse.courseInstanceId.notNull}")
     private Integer courseInstanceId;
 }

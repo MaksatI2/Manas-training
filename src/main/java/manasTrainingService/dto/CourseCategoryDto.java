@@ -13,10 +13,10 @@ public class CourseCategoryDto {
 
     private Integer id;
 
-    @NotBlank(message = "Название категории обязательно")
-    @Size(max = 200, message = "Максимум 200 символов")
+    @NotBlank(message = "{CourseCategoryDto.name.NotBlank}")
+    @Size(max = 200, message = "{CourseCategoryDto.name.Size}")
     private String name;
 
-    @Size(max = 1000, message = "Максимум 1000 символов")
+    @Size(max = 1000, message = "{CourseCategoryDto.description.Size}")
     private String description;
 }

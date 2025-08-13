@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class LessonMaterialDTO {
     private Integer id;
     private Integer lessonId;
-    @NotBlank(message = "Название материала необходимо")
+    @NotBlank(message = "{lessonMaterial.title.notBlank}")
     private String title;
 
     private String url;

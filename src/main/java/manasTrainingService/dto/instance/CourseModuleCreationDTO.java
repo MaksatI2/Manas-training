@@ -9,14 +9,13 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CourseModuleCreationDTO {
-    @NotBlank(message = "Название модуля обязательно")
-    @Size(max = 200, message = "Название не должно превышать 200 символов")
+    @NotBlank(message = "{courseModule.title.notBlank}")
+    @Size(max = 200, message = "{courseModule.title.size}")
     private String title;
 
-    @NotNull(message = "Продолжительность обязательна")
-    @Min(value = 1, message = "Продолжительность должна быть больше 0")
+    @NotNull(message = "{courseModule.duration.notNull}")
+    @Min(value = 1, message = "{courseModule.duration.min}")
     private Integer durationHours;
 
     private String description;
-
 }

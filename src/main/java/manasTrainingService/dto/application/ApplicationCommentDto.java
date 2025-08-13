@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 public class ApplicationCommentDto {
     private Integer id;
 
-    @NotNull(message = "ID заявки обязателен")
+    @NotNull(message = "{applicationComment.applicationId.notnull}")
     private Integer applicationId;
 
-    @NotBlank(message = "Комментарий не может быть пустым")
+    @NotBlank(message = "{applicationComment.comment.notblank}")
     private String comment;
 
     private String authorName;

@@ -16,27 +16,27 @@ import manasTrainingService.validation.UniqueCourseUpdate;
 @UniqueCourseUpdate
 public class CourseEditDto {
 
-    @NotNull(message = "ID курса обязателен")
+    @NotNull(message = "{courseEdit.id.notnull}")
     private Integer id;
 
-    @NotBlank(message = "Название обязательно")
-    @Size(max = 200, message = "Максимум 200 символов")
+    @NotBlank(message = "{courseEdit.title.notblank}")
+    @Size(max = 200, message = "{courseEdit.title.size}")
     private String title;
 
-    @NotBlank(message = "Код курса обязателен")
-    @Size(max = 20, message = "Максимум 20 символов")
+    @NotBlank(message = "{courseEdit.code.notblank}")
+    @Size(max = 20, message = "{courseEdit.code.size}")
     private String code;
 
-    @Size(max = 1000, message = "Максимум 1000 символов")
+    @Size(max = 1000, message = "{courseEdit.description.size}")
     private String description;
 
-    @NotNull(message = "Продолжительность обязательна")
-    @Min(value = 1, message = "Должно быть положительным числом")
-    @Max(value = 10000, message = "Слишком большая продолжительность, максимальное значение 10000")
+    @NotNull(message = "{courseEdit.duration.notnull}")
+    @Min(value = 1, message = "{courseEdit.duration.min}")
+    @Max(value = 10000, message = "{courseEdit.duration.max}")
     private Integer duration;
 
     private Boolean active;
 
-    @NotNull(message = "Категория обязательна")
+    @NotNull(message = "{courseEdit.categoryId.notnull}")
     private Integer categoryId;
 }

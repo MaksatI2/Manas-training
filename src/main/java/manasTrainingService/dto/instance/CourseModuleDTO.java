@@ -1,6 +1,5 @@
 package manasTrainingService.dto.instance;
 
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,21 +18,21 @@ import java.util.List;
 public class CourseModuleDTO {
     private Integer id;
 
-    @NotNull
+    @NotNull(message = "{courseModule.courseInstanceId.notNull}")
     private Integer courseInstanceId;
     private CourseInstanceDTO courseInstance;
 
-    @NotBlank(message = "Название модуля необходимо")
+    @NotBlank(message = "{courseModule.title.notBlank}")
     private String title;
 
     private String description;
 
-    @NotNull(message = "Длительность модуля необходима")
-    @Min(value = 1, message = "Длительность должна быть больше 0")
+    @NotNull(message = "{courseModule.duration.notNull}")
+    @Min(value = 1, message = "{courseModule.duration.min}")
     private Integer durationHours;
 
-    @NotNull(message = "Порядок модуля необходим")
-    @Min(value = 1, message = "Порядок должен быть больше 0")
+    @NotNull(message = "{courseModule.orderIndex.notNull}")
+    @Min(value = 1, message = "{courseModule.orderIndex.min}")
     private Integer orderIndex;
 
     private List<LessonDTO> lessons;

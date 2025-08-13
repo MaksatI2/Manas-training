@@ -25,14 +25,17 @@ public class TestDto {
     private Integer id;
     private Integer courseInstanceId;
     private CourseDto course;
-    @NotBlank(message = "Название теста обязательно для заполнения")
+    @NotBlank(message = "{TestDto.title.NotBlank}")
     private String title;
-    @NotBlank(message = "Краткое описание теста обязательно для заполнения")
+
+    @NotBlank(message = "{TestDto.description.NotBlank}")
     private String description;
-    @NotNull(message = "Укажите минимальныйпроходной балл")
-    @Min(value = 0, message = "Проходной балл не может быть меньше нуля")
-    @Max(value = 100, message = "Проходной балл не может быть больше 100")
+
+    @NotNull(message = "{TestDto.passingScore.NotNull}")
+    @Min(value = 0, message = "{TestDto.passingScore.Min}")
+    @Max(value = 100, message = "{TestDto.passingScore.Max}")
     private Integer passingScore;
+
     private Boolean isActive;
     @Valid
     private List<QuestionDto> questions = new ArrayList<>();

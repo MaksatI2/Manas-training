@@ -13,18 +13,18 @@ import manasTrainingService.validation.ValidPhoneNumber;
 public class OrganizationProfileEditDto {
     Integer userId;
 
-    @NotBlank(message = "Имя обязательно для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
+    @NotBlank(message = "{organizationProfileEdit.name.notblank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "{organizationProfileEdit.name.pattern}")
     String name;
 
-    @NotBlank(message = "Фамилия обязательна для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
+    @NotBlank(message = "{organizationProfileEdit.surname.notblank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "{organizationProfileEdit.surname.pattern}")
     String surname;
 
-    @NotBlank(message = "Номер телефона не может быть пустым")
+    @NotBlank(message = "{organizationProfileEdit.phone.notblank}")
     @ValidPhoneNumber
     String phone;
 
-    @NotBlank(message = "Названия организации обязательно для заполнения")
+    @NotBlank(message = "{organizationProfileEdit.organizationName.notblank}")
     String organizationName;
 }

@@ -1,11 +1,7 @@
 package manasTrainingService.dto.teacher;
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Builder;
+import lombok.*;
 
 import java.util.List;
 
@@ -15,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeacherFormDTO {
-    @NotEmpty(message = "Выберите хотя бы одного преподавателя")
+    @NotEmpty(message = "{teacherFormDTO.teacherIds.notEmpty}")
     private List<Integer> teacherIds;
 }

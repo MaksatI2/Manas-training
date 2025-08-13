@@ -15,7 +15,7 @@ public class OptionDto {
     private Boolean isCorrect;
     private Boolean isRemoved;
 
-    @AssertTrue(message = "Вариант ответа обязателен для заполнения")
+    @AssertTrue(message = "{optionDto.optionText.notBlank}")
     public boolean isValidTextIfNotRemoved() {
         return Boolean.TRUE.equals(isRemoved) || (optionText != null && !optionText.trim().isEmpty());
     }

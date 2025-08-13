@@ -11,8 +11,8 @@ import jakarta.validation.constraints.Size;
 @Builder
 public class LessonContentDTO {
 
-    @NotBlank(message = "Название не должно быть пустым")
-    @Size(max = 200, message = "Название должно быть не длиннее 200 символов")
+    @NotBlank(message = "{lessonContent.title.notBlank}")
+    @Size(max = 200, message = "{lessonContent.title.size}")
     private String title;
 
     private String content;

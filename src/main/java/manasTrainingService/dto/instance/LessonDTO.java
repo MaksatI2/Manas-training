@@ -22,7 +22,7 @@ public class LessonDTO {
     private Integer moduleId;
     private CourseModuleDTO courseModule;
 
-    @NotBlank(message = "Название урока необходимо")
+    @NotBlank(message = "{lessonCreate.title.notBlank}")
     private String title;
 
     private String description;
