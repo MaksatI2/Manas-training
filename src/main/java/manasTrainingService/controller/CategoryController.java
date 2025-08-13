@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.dto.CourseCategoryDto;
 import manasTrainingService.service.course.CourseCategoryService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +19,7 @@ import java.util.List;
 public class CategoryController {
 
     private final CourseCategoryService categoryService;
+    private final MessageSource messageSource;
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
@@ -31,7 +34,14 @@ public class CategoryController {
             model.addAttribute("categoryDto", dto);
             return "admin/category-edit";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Категория не найдена");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage(
+                            "category.not.found",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
             return "redirect:/admin/categories";
         }
     }
@@ -53,10 +63,16 @@ public class CategoryController {
         try {
             if (dto.getId() != null) {
                 categoryService.update(dto.getId(), dto);
-                redirectAttributes.addFlashAttribute("successMessage", "Категория успешно обновлена");
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        messageSource.getMessage("category.updated.success", null, LocaleContextHolder.getLocale())
+                );
             } else {
                 categoryService.create(dto);
-                redirectAttributes.addFlashAttribute("successMessage", "Категория успешно создана");
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        messageSource.getMessage("category.created.success", null, LocaleContextHolder.getLocale())
+                );
             }
             return "redirect:/admin/categories";
 
@@ -70,7 +86,10 @@ public class CategoryController {
             }
 
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Произошла ошибка: " + e.getMessage());
+            model.addAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("category.save.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
 
             if (dto.getId() != null) {
                 return "admin/category-edit";
@@ -91,10 +110,17 @@ public class CategoryController {
     public String deleteCategory(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
             categoryService.delete(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Категория удалена");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("category.deleted.success", null, LocaleContextHolder.getLocale())
+            );
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Не удалось удалить категорию: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("category.delete.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
         }
         return "redirect:/admin/categories";
     }
+
 }

@@ -9,6 +9,8 @@ import manasTrainingService.dto.lesson.LessonEditDto;
 import manasTrainingService.service.*;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseModuleService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,6 +26,7 @@ public class AdminLessonController {
     private final LessonService lessonService;
     private final CourseModuleService courseModuleService;
     private final CourseInstanceService courseInstanceService;
+    private final MessageSource messageSource;
 
 //    @GetMapping("/course-instances/{instanceId}/modules/{moduleId}/lessons/new")
 //    public String showCreateLessonForm(@PathVariable Integer instanceId,
@@ -77,7 +80,10 @@ public class AdminLessonController {
         LessonDTO lesson = lessonService.getLessonById(id);
         CourseModuleDTO module = courseModuleService.getCourseModuleDTOById(lesson.getModuleId());
         lessonService.deleteById(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Урок удалён");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("admin.lesson.delete.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/admin/course-instances/" + module.getCourseInstanceId();
     }
 
@@ -109,7 +115,10 @@ public class AdminLessonController {
             return "admin/lesson-edit";
         }
 
-        redirectAttributes.addFlashAttribute("successMessage", "Урок обновлён");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("admin.lesson.update.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/lessons/" + id;
     }
 }
