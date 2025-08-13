@@ -54,7 +54,7 @@
                             <tr style="cursor: pointer;" onclick="window.location.href='/courses/${course.id}'">
                                 <td>${course.id}</td>
                                 <td class="title-column">
-                                    <#if course.title?? && course.title?length > 30>
+                                    <#if (course.title?? && course.title?length > 30)>
                                         ${course.title?substring(0, 30)}...
                                     <#else>
                                         ${course.title!""}
@@ -62,7 +62,7 @@
                                 </td>
                                 <td>
                                     <span class="badge" style="background: #87ceeb; color: #2c3e50;">
-                                        <#if course.code?? && course.code?length > 10>
+                                        <#if (course.code?? && course.code?length > 10)>
                                             ${course.code?substring(0, 10)}...
                                         <#else>
                                             ${course.code!""}
@@ -71,7 +71,7 @@
                                 </td>
                                 <td>
                                     <span class="badge" style="background: #003d7a; color: white; font-size: 0.7rem">
-                                        <#if course.category.name?? && course.category.name?length > 30>
+                                        <#if (course.category.name?? && course.category.name?length > 30)>
                                             ${course.category.name?substring(0, 30)}...
                                         <#else>
                                             ${course.category.name!""}

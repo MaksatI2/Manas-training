@@ -302,11 +302,11 @@
             </div>
             <div class="sidebar-profile <#if known>authorized</#if>">
                 <div class="custom-language-selector mt-4" id="languageSelector">
-                    <button class="selected-language">
-                        <span class="fi fi-ru"></span>
-                        <span class="language-text"><@spring.message code="language.russian" /></span>
+                    <button class="selected-language" id="selectedLanguageBtn">
+                        <span class="fi" id="selectedFlag"></span>
+                        <span class="language-text" id="selectedLanguageText"></span>
                     </button>
-                    <div class="language-options">
+                    <div class="language-options" id="languageOptions">
                         <div class="language-option" data-value="ru">
                             <span class="fi fi-ru"></span>
                             <span><@spring.message code="language.russian" /></span>
@@ -320,6 +320,12 @@
                             <span><@spring.message code="language.english" /></span>
                         </div>
                     </div>
+                    <#if known>
+                        <form id="languageForm" action="/api/users/language" method="post" style="display:none;">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            <input type="hidden" name="lang" id="languageInput" value="">
+                        </form>
+                    </#if>
                 </div>
 
                 <#if known>
@@ -537,21 +543,71 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             const languageSelector = document.querySelector('.custom-language-selector');
-            const selectedBtn = languageSelector.querySelector('.selected-language');
-            const optionsContainer = languageSelector.querySelector('.language-options');
+            const selectedBtn = languageSelector.querySelector('#selectedLanguageBtn');
+            const optionsContainer = languageSelector.querySelector('#languageOptions');
+            const selectedFlag = document.querySelector('#selectedFlag');
+            const selectedLanguageText = document.querySelector('#selectedLanguageText');
+
+            const languageMap = {
+                'ru': { name: '<@spring.message code="language.russian" />', flag: 'fi-ru' },
+                'ky': { name: '<@spring.message code="language.kyrgyz" />', flag: 'fi-kg' },
+                'en': { name: '<@spring.message code="language.english" />', flag: 'fi-gb' }
+            };
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentLang = 'ru';
+            fetch('/api/users/current-language')
+                .then(res => res.text())
+                .then(lang => {
+                    currentLang = lang;
+                    updateSelectedLanguage(currentLang);
+                });
+
+            function updateSelectedLanguage(lang) {
+                selectedFlag.className = 'fi ' + languageMap[lang].flag;
+                selectedLanguageText.textContent = languageMap[lang].name;
+            }
+
 
             selectedBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
-                const isOpen = optionsContainer.style.display === 'block';
-                optionsContainer.style.display = isOpen ? 'none' : 'block';
+                optionsContainer.style.display = optionsContainer.style.display === 'block' ? 'none' : 'block';
             });
 
             optionsContainer.querySelectorAll('.language-option').forEach(option => {
                 option.addEventListener('click', function () {
                     const lang = this.getAttribute('data-value');
+                    <#if known>
+                    const form = document.getElementById('languageForm');
+                    const input = document.getElementById('languageInput');
+                    const formData = new URLSearchParams();
+                    formData.append('lang', lang);
+                    formData.append('${_csrf.parameterName}', '${_csrf.token}');
+                    input.value = lang;
+
+                    fetch('/api/users/language', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: formData.toString()
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                updateSelectedLanguage(lang);
+                                const url = new URL(window.location.href);
+                                url.searchParams.set('lang', lang);
+                                window.history.pushState({}, '', url);
+                                window.location.reload();
+                            } else {
+                                console.error('Failed to update language');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    <#else>
                     const url = new URL(window.location.href);
                     url.searchParams.set('lang', lang);
                     window.location.href = url.toString();
+                    </#if>
                 });
             });
 

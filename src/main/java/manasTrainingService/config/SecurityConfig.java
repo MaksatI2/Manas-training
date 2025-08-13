@@ -37,7 +37,8 @@ public class SecurityConfig {
                                 "/data/images/**",
                                 "/ws/**",
                                 "/teacher",
-                                "/teacher/{id}"
+                                "/teacher/{id}",
+                                "/api/users/current-language"
                         ).permitAll()
                         .requestMatchers("/applications/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/applications/organization/**").hasAuthority("ORGANIZATION")
