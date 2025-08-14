@@ -330,10 +330,10 @@
     <div class="right-panel">
         <div class="header">
             <div class="company-info">
-                <h2>Manas Training Center</h2>
-                <p>ООО «Манас Тренинг Центр»</p>
-                <p>г. Бишкек, Кыргызская Республика</p>
-                <p>Центр профессионального обучения</p>
+                <h2 class="company-name">Manas Training Center</h2>
+                <p class="company-legal">ООО «Манас Тренинг Центр»</p>
+                <p class="company-location">г. Бишкек, Кыргызская Республика</p>
+                <p class="company-type">Центр профессионального обучения</p>
             </div>
 
             <div class="logo-container">
@@ -346,24 +346,24 @@
 
         <div class="presentation-text">Настоящим свидетельствуется о том что,</div>
 
-        <div class="recipient-name">Иван Иванов</div>
+        <div class="recipient-name">${certificate.student.name} ${certificate.student.lastName}</div>
 
         <div class="description-text">
             За успешное прохождение курса профессиональной переподготовки и освоение теоретических знаний и практических навыков. Слушатель продемонстрировал высокий уровень компетенции и успешно прошел итоговую аттестацию.
         </div>
 
-        <div class="course-title">${certificate.courseInstance.title}</div>
+        <div class="course-title">${certificate.courseInstance.course.title}</div>
 
         <div class="company-mention">в ООО «Манас Тренинг Центр»</div>
 
         <div class="details-grid">
             <div class="detail-item">
                 <span class="label">Дата выдачи</span>
-                <span class="value">${certificate.issueDate}</span>
+                <span class="value" id="issueDate">${certificate.issueDate}</span>
             </div>
             <div class="detail-item">
                 <span class="label">Действителен до</span>
-                <span class="value">${certificate.expiryDate}</span>
+                <span class="value" id="expiryDate">${certificate.expiryDate}</span>
             </div>
             <div class="detail-item">
                 <span class="label">Регистрационный номер</span>
@@ -379,19 +379,94 @@
             <div class="signature-section">
                 <div class="label">Генеральный директор</div>
                 <div class="signature-line"></div>
-                <div class="signature-name">Айылчиев Э.Р.</div>
+                <div class="signature-name director-name">Айылчиев Э.Р.</div>
             </div>
 
             <div class="signature-section">
                 <div class="label">Подпись</div>
                 <div class="signature-line"></div>
-                <div class="signature-name">Студент</div>
+                <div class="signature-name sgName">Студент</div>
             </div>
         </div>
     </div>
 </div>
 </body>
 <script>
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const s = dateString.trim();
+        if (/^\d{2}\.\d{2}\.\d{4}$/.test(s)) return s;
+        let m = s.match(/^(\d{2})-(\d{2})-(\d{4})/);
+        if (m) return [m[1], m[2], m[3]].join('.');
+        m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return [m[3], m[2], m[1]].join('.');
+        return s;
+    }
+
+    function transliterateToLatin(text) {
+        const translitMap = {
+            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh',
+            'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o',
+            'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts',
+            'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+            'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo', 'Ж': 'Zh',
+            'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O',
+            'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts',
+            'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya',
+
+            'ң': 'ng', 'ө': 'ö', 'ү': 'ü',
+            'Ң': 'Ng', 'Ө': 'Ö', 'Ү': 'Ü'
+        };
+
+        return text.replace(/[а-яёңөүА-ЯЁҢӨҮ]/g, match => translitMap[match] || match);
+    }
+
+
+    function transliterateToCyrillic(text) {
+        const translitMap = {
+            'a': 'а', 'b': 'б', 'v': 'в', 'g': 'г', 'd': 'д', 'e': 'е', 'yo': 'ё', 'zh': 'ж',
+            'z': 'з', 'i': 'и', 'y': 'й', 'k': 'к', 'l': 'л', 'm': 'м', 'n': 'н', 'o': 'о',
+            'p': 'п', 'r': 'р', 's': 'с', 't': 'т', 'u': 'у', 'f': 'ф', 'kh': 'х', 'ts': 'ц',
+            'ch': 'ч', 'sh': 'ш', 'shch': 'щ', 'yu': 'ю', 'ya': 'я',
+            'A': 'А', 'B': 'Б', 'V': 'В', 'G': 'Г', 'D': 'Д', 'E': 'Е', 'Yo': 'Ё', 'Zh': 'Ж',
+            'Z': 'З', 'I': 'И', 'Y': 'Й', 'K': 'К', 'L': 'Л', 'M': 'М', 'N': 'Н', 'O': 'О',
+            'P': 'П', 'R': 'Р', 'S': 'С', 'T': 'Т', 'U': 'У', 'F': 'Ф', 'Kh': 'Х', 'Ts': 'Ц',
+            'Ch': 'Ч', 'Sh': 'Ш', 'Shch': 'Щ', 'Yu': 'Ю', 'Ya': 'Я',
+            'ng': 'ң', 'Ng': 'Ң'
+        };
+
+        let result = text;
+        const sortedKeys = Object.keys(translitMap).sort((a, b) => b.length - a.length);
+
+        for (const key of sortedKeys) {
+            const regex = new RegExp(key.replace(/[.*+?^$()|[\]\\]/g, '\\$&'), 'g');
+            result = result.replace(regex, translitMap[key]);
+        }
+
+        return result;
+    }
+
+    function isCyrillic(text) {
+        return /[а-яёңөүА-ЯЁҢӨҮ]/.test(text);
+    }
+
+    function transformName(originalName, targetLanguage) {
+        if (!originalName) return '';
+
+        const isCyrillicName = isCyrillic(originalName);
+
+        switch (targetLanguage) {
+            case 'en':
+                return isCyrillicName ? transliterateToLatin(originalName) : originalName;
+
+            case 'ru':
+            case 'kg':
+                return !isCyrillicName ? transliterateToCyrillic(originalName) : originalName;
+
+            default:
+                return originalName;
+        }
+    }
 
     function setLanguage(lang) {
         const dict = {
@@ -406,45 +481,67 @@
                 number: "Регистрационный номер",
                 grade: "Итоговая оценка",
                 director: "Генеральный директор",
-                student: "Студент",
-                logo: "/static/images/manasRussianLogo.jpg"
+                signature: "Подпись",
+                logo: "/static/images/manasRussianLogo.jpg",
+                companyName: "Manas Training Center",
+                companyLegal: "ООО «Манас Тренинг Центр»",
+                companyLocation: "г. Бишкек, Кыргызская Республика",
+                directorName: "Айылчиев Э.Р.",
+                companyType: "Центр профессионального обучения"
             },
             en: {
                 certificate: "Certificate",
                 subtitle: "of Completion",
-                presentation: "This is to certify that",
-                description: "For successfully completing the professional retraining course and acquiring both theoretical knowledge and practical skills. The participant demonstrated a high level of competence and successfully passed the final assessment.",
+                presentation: "This certificate confirms that",
+                description: "has successfully completed the professional training course and acquired theoretical knowledge and practical skills. The learner demonstrated a high level of competence and successfully passed the final assessment.",
                 org: "at Manas Training Center LLC",
                 issued: "Issue Date",
                 valid: "Valid Until",
                 number: "Certificate Number",
                 grade: "Final Grade",
                 director: "General Director",
-                student: "Student",
-                logo: "/static/images/manasEnglishLogo.jpg"
+                signature: "Signature",
+                logo: "/static/images/manasEnglishLogo.jpg",
+                companyName: "Manas Training Center",
+                companyLegal: "Manas Training Center LLC",
+                companyLocation: "Bishkek, Kyrgyz Republic",
+                directorName: "E.R. Aiylchiev",
+                companyType: "Professional Training Center",
+                sgName: "Student"
             },
             kg: {
                 certificate: "СЕРТИФИКАТ",
-                subtitle: "аяктагандар жөнүндө",
-                presentation: "Тастыктайбыз, бул адам",
-                description: "Кесиптик кайра даярдоо курсун ийгиликтүү аяктап, теориялык билимдерди жана практикалык көндүмдөрдү өздөштүргөндүгү үчүн. Угуучу жогорку деңгээлдеги компетенттүүлүгүн көрсөтүп, акыркы аттестациядан ийгиликтүү өттү.",
+                subtitle: "аяктагандыгы жөнүндө",
+                presentation: "Бул сертификат тастыктайт",
+                description: "кесиптик даярдоо курсун ийгиликтүү аяктап, теориялык билимдерди жана практикалык көндүмдөрдү өздөштүргөн. Окуучу жогорку деңгээлдеги компетенттүүлүгүн көрсөтүп, акыркы аттестациядан ийгиликтүү өткөн.",
                 org: "«Манас Тренинг Центри» ЖЧКсында",
                 issued: "Берилген күнү",
                 valid: "Мөөнөтү",
                 number: "Каттоо номери",
                 grade: "Жыйынтык баа",
                 director: "Башкы директор",
-                student: "Угуучу",
-                logo: "/static/images/manasKyrgyzLogo.jpg"
+                signature: "Кол тамга",
+                directorName: "Айылчиев Э.Р.",
+                logo: "/static/images/manasKyrgyzLogo.jpg",
+                companyName: "Манас Тренинг Центри",
+                companyLegal: "«Манас Тренинг Центри» ЖЧК",
+                companyLocation: "Бишкек ш., Кыргыз Республикасы",
+                companyType: "Кесиптик окутуу борбору"
             }
         };
 
         const t = dict[lang];
+
         document.querySelector('.certificate-title').textContent = t.certificate;
         document.querySelector('.certificate-subtitle').textContent = t.subtitle;
         document.querySelector('.presentation-text').textContent = t.presentation;
         document.querySelector('.description-text').textContent = t.description;
         document.querySelector('.company-mention').textContent = t.org;
+        document.querySelector('.company-name').textContent = t.companyName;
+        document.querySelector('.company-legal').textContent = t.companyLegal;
+        document.querySelector('.company-location').textContent = t.companyLocation;
+        document.querySelector('.company-type').textContent = t.companyType;
+        document.querySelector('.sgName').textContent = t.sgName;
 
         const labels = document.querySelectorAll('.detail-item .label');
         labels[0].textContent = t.issued;
@@ -454,9 +551,21 @@
 
         const sigs = document.querySelectorAll('.signature-section .label');
         sigs[0].textContent = t.director;
-        sigs[1].textContent = t.student;
+        sigs[1].textContent = t.signature;
 
         document.querySelector('.logo-container img').src = t.logo;
+        document.querySelector('.director-name').textContent = t.directorName;
+
+        const nameElement = document.querySelector('.recipient-name');
+        if (nameElement) {
+            if (!nameElement.dataset.originalName) {
+                nameElement.dataset.originalName = nameElement.textContent.trim();
+            }
+
+            const originalName = nameElement.dataset.originalName;
+            const transformedName = transformName(originalName, lang);
+            nameElement.textContent = transformedName;
+        }
 
         document.getElementById('languageModal').style.display = 'none';
         setTimeout(() => window.print(), 200);
@@ -467,6 +576,25 @@
             await document.fonts.ready;
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const issueDateElement = document.getElementById('issueDate');
+        const expiryDateElement = document.getElementById('expiryDate');
+
+        if (issueDateElement) {
+            issueDateElement.textContent = formatDate(issueDateElement.textContent);
+        }
+
+        if (expiryDateElement) {
+            expiryDateElement.textContent = formatDate(expiryDateElement.textContent);
+        }
+
+        const nameElement = document.querySelector('.recipient-name');
+        if (nameElement && nameElement.textContent.trim()) {
+            nameElement.dataset.originalName = nameElement.textContent.trim();
+        }
+    });
+
     document.getElementById('printCert').addEventListener('click', () => {
         document.getElementById('languageModal').style.display = 'flex';
     });
