@@ -178,7 +178,13 @@
     </h1>
 
     <div class="form-wrapper">
+        <#if errorMessage??>
+            <div class="alert alert-danger alert-compact text-center shadow-sm">${errorMessage}</div>
+        </#if>
 
+        <#if successMessage??>
+            <div class="alert alert-success alert-compact text-center shadow-sm">${successMessage}</div>
+        </#if>
 
         <form method="post" action="/organization/students/add" id="studentForm">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

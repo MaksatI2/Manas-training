@@ -142,6 +142,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        $('#testsTable').DataTable({
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 5, orderable: false },
+                { responsivePriority: 2, targets: 0 },
+                { responsivePriority: 3, targets: 1 },
+                { responsivePriority: 4, targets: 3 },
+                { responsivePriority: 5, targets: 4 },
+                { responsivePriority: 6, targets: 2 }
+            ]
+        });
 
         <#if tests?has_content>
         $('#testsTable').DataTable({

@@ -129,6 +129,7 @@
                 responsive: true,
                 pageLength: 10,
                 lengthChange: true,
+                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
                 searching: true,
                 info: false,
                 paging: true,
