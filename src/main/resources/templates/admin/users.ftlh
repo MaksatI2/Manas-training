@@ -94,9 +94,31 @@
                         <#list users as user>
                             <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}'">
                                 <td>${user.id}</td>
-                                <td>${user.name}</td>
-                                <td>${(user.lastName?has_content && user.lastName != "null")?then(user.lastName, "-")}</td>
-                                <td>${user.email}</td>
+                                <td>
+                                    <#if (user.name?has_content && user.name?length > 11)>
+                                        ${user.name?substring(0, 11)}...
+                                    <#else>
+                                        ${user.name!""}
+                                    </#if>
+                                </td>
+
+                                <td>
+                                    <#assign lastNameValue = (user.lastName?has_content && user.lastName != "null")?then(user.lastName, "-")>
+                                    <#if (lastNameValue?length > 12)>
+                                        ${lastNameValue?substring(0, 12)}...
+                                    <#else>
+                                        ${lastNameValue}
+                                    </#if>
+                                </td>
+
+                                <td>
+                                    <#if (user.email?has_content && user.email?length > 11)>
+                                        ${user.email?substring(0, 11)}...
+                                    <#else>
+                                        ${user.email!""}
+                                    </#if>
+                                </td>
+
                                 <td>${user.phone}</td>
                                 <td>
                                     <span class="badge bg-primary">${user.role.name}</span>

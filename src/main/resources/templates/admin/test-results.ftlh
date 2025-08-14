@@ -131,7 +131,7 @@
                         </#list>
                     <#else>
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
+                            <td colspan="4" class="text-center text-muted py-4">
                                 <i class="fas fa-graduation-cap fa-2x mb-2" style="color: #0066cc;"></i>
                                 <p style="color: #2c3e50;"><@spring.message code="admin.test.results.empty.text"/></p>
                             </td>
@@ -172,6 +172,8 @@
         else if (dtLocale.indexOf('ky') === 0) dtLocale = 'ky';
         else dtLocale = 'en';
 
+        <#if results?has_content>
+
         $(function () {
             const table = $('#testResultsTable').DataTable({
                 paging: true,
@@ -182,13 +184,15 @@
                     paginate: {previous: '‹', next: '›'}
                 },
                 columnDefs: [
-                    { responsivePriority: 1, targets: 0 },
-                    { responsivePriority: 2, targets: 1 },
-                    { responsivePriority: 3, targets: 2 },
-                    { responsivePriority: 4, targets: 3 }
+                    {responsivePriority: 1, targets: 0},
+                    {responsivePriority: 2, targets: 1},
+                    {responsivePriority: 3, targets: 2},
+                    {responsivePriority: 4, targets: 3}
                 ],
                 responsive: true
             });
+            </#if>
+
 
             $('#courseFilter').on('change', function () {
                 table.column(0).search(this.value ? '^' + this.value + '$' : '', true, false).draw();

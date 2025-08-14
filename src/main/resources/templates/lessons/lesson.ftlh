@@ -226,7 +226,6 @@
     <style>
         body {
             background-color: #f8f9fa;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
 
         .container {
@@ -315,23 +314,6 @@
             color: #28a745 !important;
         }
 
-        .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .alert-success {
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-            border: 1px solid #28a745;
-        }
-
-        .alert-danger {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-            border: 1px solid #dc3545;
-        }
 
         .bg-light {
             background-color: #f1f3f5 !important;
@@ -384,7 +366,6 @@
             }
 
             .d-flex.justify-content-between {
-                flex-direction: column;
                 gap: 1rem;
             }
 

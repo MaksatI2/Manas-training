@@ -289,7 +289,6 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"><@spring.message code='table.fullname'/></th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"><@spring.message code='table.email'/></th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"><@spring.message code='table.phone'/></th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"><@spring.message code='table.courses'/></th>
                         </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -306,26 +305,11 @@
                                     <td class="px-4 py-3 text-sm text-gray-900 break-words">${first.fullName!'—'}</td>
                                     <td class="px-4 py-3 text-sm text-gray-600 break-words">${first.email!'—'}</td>
                                     <td class="px-4 py-3 text-sm text-gray-600 break-words">${first.phone!'—'}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">
-                                        <ul class="list-disc pl-4 mb-0">
-                                            <#list courseList as c>
-                                                <li>
-                                                    <#if c.courseTitle?length gt 15>
-                                                        ${c.courseTitle?substring(0, 15)}...
-                                                    <#else>
-                                                        ${c.courseTitle!'—'}
-                                                    </#if>
-                                                    — ${c.localizedStatus!'Неизвестно'}, ${c.progress!'0'}%
-                                                    <#if c.finalGrade??>, <@spring.message code='label.grade'/>: ${c.finalGrade}</#if>
-                                                </li>
-                                            </#list>
-                                        </ul>
-                                    </td>
                                 </tr>
                             </#list>
                         <#else>
                             <tr>
-                                <td colspan="4"
+                                <td colspan="3"
                                     class="px-4 py-3 text-center text-sm text-gray-500"><@spring.message code='organization.no.students'/></td>
                             </tr>
                         </#if>
@@ -334,10 +318,12 @@
                 </div>
 
                 <script>
+                     <#if grouped?size gt 0>
+
                     $(document).ready(function () {
-                        var dtLangUrl = "<#if springMacroRequestContext.locale?string?lower_case?starts_with('ru')>/js/datatables/ru_RU.json" +
-                            "<#elseif springMacroRequestContext.locale?string?lower_case?starts_with('ky')>/js/datatables/ky_KG.json" +
-                            "<#else>/js/datatables/en_US.json</#if>";
+                        var dtLangUrl = "<#if springMacroRequestContext.locale?string?lower_case?starts_with('ru')>/js/datatables/ru.json" +
+                            "<#elseif springMacroRequestContext.locale?string?lower_case?starts_with('ky')>/js/datatables/ky.json" +
+                            "<#else>/js/datatables/en.json</#if>";
                         $('#studentsTable').DataTable({
                             language: {url: dtLangUrl, paginate: {previous: '‹', next: '›'}},
                             responsive: true,
@@ -347,6 +333,7 @@
                             info: false
                         });
                     });
+                     </#if>
                 </script>
             </div>
         </#if>
