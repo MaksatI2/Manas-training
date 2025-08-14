@@ -18,6 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Optional;
 
@@ -36,6 +38,8 @@ class StudentServiceTest {
 
     @Mock
     private ActivityLogService activityLogService;
+    @Mock
+    private MessageSource messageSource;
 
     @InjectMocks
     private StudentServiceImpl studentService;
@@ -174,7 +178,13 @@ class StudentServiceTest {
 
             assertThatThrownBy(() -> studentService.editStudentInformation(testUserProfileEditDto))
                     .isInstanceOf(StudentProfileNotFoundException.class)
-                    .hasMessage("Профиль студента не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "student.profile.not.found",
+                            null,
+                            "Профиль студента не найден",
+                            LocaleContextHolder.getLocale()
+                    )
+                    );
 
             verify(studentProfileRepository).findByUserId(testUserProfileEditDto.getUserId());
             verify(userService, never()).existsByPhone(any());
@@ -283,7 +293,13 @@ class StudentServiceTest {
 
             assertThatThrownBy(() -> studentService.getAuthorizedStudentProfile(testUser))
                     .isInstanceOf(StudentProfileNotFoundException.class)
-                    .hasMessage("Профиль студента не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "student.profile.not.found",
+                            null,
+                            "Профиль студента не найден",
+                            LocaleContextHolder.getLocale()
+                    )
+                    );
 
             verify(studentProfileRepository).findByUserId(testUser.getId());
         }

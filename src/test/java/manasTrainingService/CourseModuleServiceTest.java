@@ -11,6 +11,7 @@ import manasTrainingService.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.MessageSource;
 
 import java.util.*;
 
@@ -23,6 +24,7 @@ class CourseModuleServiceTest {
     private CourseInstanceService courseInstanceService;
     private ActivityLogService activityLogService;
     private UserService userService;
+    private MessageSource messageSource;
 
     private CourseModuleServiceImpl service;
 
@@ -32,7 +34,8 @@ class CourseModuleServiceTest {
         courseInstanceService = mock(CourseInstanceService.class);
         activityLogService = mock(ActivityLogService.class);
         userService = mock(UserService.class);
-        service = new CourseModuleServiceImpl(courseModuleRepository, courseInstanceService, activityLogService, userService);
+        messageSource = mock(MessageSource.class);
+        service = new CourseModuleServiceImpl(courseModuleRepository, courseInstanceService, activityLogService, userService, messageSource);
     }
 
     @Test

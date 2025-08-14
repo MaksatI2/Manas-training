@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.context.MessageSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,7 @@ class LessonMaterialsServiceTest {
     private FileUtil fileUtil;
     private ActivityLogService activityLogService;
     private UserService userService;
+    private MessageSource messageSource;
 
     private LessonMaterialsServiceImpl lessonMaterialsService;
 
@@ -40,13 +42,16 @@ class LessonMaterialsServiceTest {
         fileUtil = Mockito.mock(FileUtil.class);
         activityLogService = Mockito.mock(ActivityLogService.class);
         userService = Mockito.mock(UserService.class);
+        messageSource = Mockito.mock(MessageSource.class);
+
 
         lessonMaterialsService = new LessonMaterialsServiceImpl(
                 materialRepository,
                 lessonService,
                 fileUtil,
                 activityLogService,
-                userService
+                userService,
+                messageSource
         );
     }
 
