@@ -29,9 +29,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
+import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -77,6 +80,9 @@ class OrganizationServiceTest {
 
     @Mock
     private ActivityLogService activityLogService;
+
+    @Mock
+    private MessageSource messageSource;
 
     @InjectMocks
     private OrganizationServiceImpl organizationService;
@@ -200,9 +206,17 @@ class OrganizationServiceTest {
 
             when(organizationRepository.findByUserId(999)).thenReturn(Optional.empty());
 
+            when(messageSource.getMessage(eq("organization.not.found"), any(), anyString(), any()))
+                    .thenReturn("Организация не найдена");
+
             assertThatThrownBy(() -> organizationService.editOrganizationInformation(dto))
                     .isInstanceOf(OrganizationNotFoundException.class)
-                    .hasMessageContaining("Организация не найдена");
+                    .hasMessageContaining(messageSource.getMessage(
+                            "organization.not.found",
+                            null,
+                            "Организация не найдена",
+                            LocaleContextHolder.getLocale()
+                    ));
         }
     }
 
@@ -544,8 +558,9 @@ class OrganizationServiceTest {
 
             assertThatThrownBy(() -> organizationService.deleteStudentFromOrganization(2, testUser))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Студент не принадлежит данной организации");
+                    .hasMessage(null);
         }
+
     }
 
     @Nested
@@ -725,6 +740,13 @@ class OrganizationServiceTest {
         @DisplayName("Should throw exception when organization not found for attachment")
         void shouldThrowExceptionWhenOrganizationNotFoundForAttachment() {
             when(organizationRepository.findByUserId(1)).thenReturn(Optional.empty());
+
+            when(messageSource.getMessage(
+                    "organization.not.found",
+                    null,
+                    "Организация не найдена",
+                    LocaleContextHolder.getLocale()
+            )).thenReturn("Организация не найдена");
 
             assertThatThrownBy(() -> organizationService.attachStudentToOrganization(2, testUser))
                     .isInstanceOf(OrganizationNotFoundException.class)

@@ -20,6 +20,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,8 +46,13 @@ class TeacherServiceTest {
     @Mock
     private ActivityLogService activityLogService;
 
+    @Mock
+    private MessageSource messageSource;
+
     @InjectMocks
     private TeacherServiceImpl teacherService;
+
+
 
     private User testUser;
     private Role teacherRole;
@@ -173,7 +180,12 @@ class TeacherServiceTest {
 
             assertThatThrownBy(() -> teacherService.getTeacherProfile(testUser))
                     .isInstanceOf(UserNotFoundException.class)
-                    .hasMessage("Профиль преподавателя не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "teacher.profile.not.found",
+                            null,
+                            "Профиль преподавателя не найден",
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(teacherProfileRepository).findByUser(testUser);
         }
@@ -249,7 +261,12 @@ class TeacherServiceTest {
 
             assertThatThrownBy(() -> teacherService.editTeacherProfile(teacherProfileEditDto))
                     .isInstanceOf(UserNotFoundException.class)
-                    .hasMessage("Профиль преподавателя не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "teacher.profile.not.found",
+                            null,
+                            "Профиль преподавателя не найден",
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(userService).saveUser(any());
             verify(teacherProfileRepository).findByUser(testUser);
@@ -289,7 +306,12 @@ class TeacherServiceTest {
 
             assertThatThrownBy(() -> teacherService.getTeacherInformationForEdit(testUser))
                     .isInstanceOf(UserNotFoundException.class)
-                    .hasMessage("Профиль преподавателя не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "teacher.profile.not.found",
+                            null,
+                            "Профиль преподавателя не найден",
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(teacherProfileRepository).findByUser(testUser);
         }
@@ -480,7 +502,12 @@ class TeacherServiceTest {
 
             assertThatThrownBy(() -> teacherService.getTeacherProfileById(userId))
                     .isInstanceOf(UserNotFoundException.class)
-                    .hasMessage("Пользователь не является преподавателем");
+                    .hasMessage(messageSource.getMessage(
+                            "user.not.teacher",
+                            null,
+                            "Пользователь не является преподавателем",
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(userService).getUserById(userId.intValue());
             verify(teacherProfileRepository, never()).findByUser(any());
@@ -495,7 +522,12 @@ class TeacherServiceTest {
 
             assertThatThrownBy(() -> teacherService.getTeacherProfileById(teacherId))
                     .isInstanceOf(UserNotFoundException.class)
-                    .hasMessage("Профиль преподавателя не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "teacher.profile.not.found",
+                            null,
+                            "Профиль преподавателя не найден",
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(userService).getUserById(teacherId.intValue());
             verify(teacherProfileRepository).findByUser(testUser);

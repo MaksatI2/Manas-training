@@ -14,24 +14,24 @@ import manasTrainingService.validation.ValidPhoneNumber;
 @NoArgsConstructor
 public class CreateStudentByOrganizationDto {
 
-    @NotBlank(message = "Имя обязательно для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
-    @Size(max = 100, message = "Имя не должно превышать 100 символов")
+    @NotBlank(message = "{createStudentByOrganizationDto.name.notBlank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "{createStudentByOrganizationDto.name.pattern}")
+    @Size(max = 100, message = "{createStudentByOrganizationDto.name.size}")
     private String name;
 
-    @NotBlank(message = "Фамилия обязательна для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
-    @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
+    @NotBlank(message = "{createStudentByOrganizationDto.lastName.notBlank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "{createStudentByOrganizationDto.lastName.pattern}")
+    @Size(max = 100, message = "{createStudentByOrganizationDto.lastName.size}")
     private String lastName;
 
-    @NotBlank(message = "Email обязателен")
-    @Email(message = "Некорректный формат email")
+    @NotBlank(message = "{createStudentByOrganizationDto.email.notBlank}")
+    @Email(message = "{createStudentByOrganizationDto.email.invalid}")
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            message = "Email должен содержать только английские символы")
-    @Size(max = 150, message = "Email не должен превышать 150 символов")
+            message = "{createStudentByOrganizationDto.email.pattern}")
+    @Size(max = 150, message = "{createStudentByOrganizationDto.email.size}")
     private String email;
 
-    @NotBlank(message = "Номер телефона не может быть пустым")
+    @NotBlank(message = "{createStudentByOrganizationDto.phone.notBlank}")
     @ValidPhoneNumber
     private String phone;
 }

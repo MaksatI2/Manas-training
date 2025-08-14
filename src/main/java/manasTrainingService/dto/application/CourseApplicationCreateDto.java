@@ -18,21 +18,21 @@ import java.util.List;
 @EndDateAfterStartDate
 public class CourseApplicationCreateDto {
 
-    @NotNull(message = "Курс обязателен для выбора")
+    @NotNull(message = "{courseApplicationCreate.courseId.notnull}")
     private Integer courseId;
 
-    @NotEmpty(message = "Выберите хотя бы одного сотрудника")
+    @NotEmpty(message = "{courseApplicationCreate.employeeIds.notempty}")
     private List<Integer> employeeIds;
 
-    @NotNull(message = "Исходящий код обязателен")
-    @Size(min = 3, max = 50, message = "Исходящий код должен быть от 3 до 50 символов")
+    @NotNull(message = "{courseApplicationCreate.outgoingCode.notnull}")
+    @Size(min = 3, max = 50, message = "{courseApplicationCreate.outgoingCode.size}")
     private String outgoingCode;
 
     private Integer preferredTeacherId;
 
-    @FutureOrPresent(message = "Желаемая дата начала должна быть сегодняшней или будущей")
+    @FutureOrPresent(message = "{courseApplicationCreate.preferredStartDate.futureOrPresent}")
     private LocalDate preferredStartDate;
 
-    @FutureOrPresent(message = "Желаемая дата окончания должна быть сегодняшней или будущей")
+    @FutureOrPresent(message = "{courseApplicationCreate.preferredEndDate.futureOrPresent}")
     private LocalDate preferredEndDate;
 }

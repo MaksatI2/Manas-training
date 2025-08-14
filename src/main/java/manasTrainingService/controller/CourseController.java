@@ -16,6 +16,8 @@ import manasTrainingService.service.impl.LessonAccessServiceImpl;
 import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -41,6 +44,8 @@ public class CourseController {
     private CourseInstanceService courseInstanceService;
     @Autowired
     private LessonAccessService lessonAccessService;
+    @Autowired
+    private MessageSource messageSource;
 
     @GetMapping
     public String getCourseList(Model model) {
@@ -51,13 +56,14 @@ public class CourseController {
             model.addAttribute("categories", categories);
             return "courses/course_list";
         } catch (EntityNotFoundException e) {
-            model.addAttribute("errorMessage", "Ошибка при загрузке курсов");
+            model.addAttribute("errorMessage",
+                    messageSource.getMessage("courses.load.error", null, LocaleContextHolder.getLocale()));
             return "error/error";
         }
     }
 
     @GetMapping("/{id}")
-    public String getCourseDetails(@PathVariable Integer id, Model model, Authentication authentication) {
+    public String getCourseDetails(@PathVariable Integer id, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
         try {
             CourseDto course = courseService.getById(id);
             model.addAttribute("course", course);
@@ -66,8 +72,9 @@ public class CourseController {
             model.addAttribute("canEnroll", canEnroll);
             return "courses/course-view";
         } catch (EntityNotFoundException e) {
-            model.addAttribute("errorMessage", "Курс не найден");
-            return "error/error";
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    messageSource.getMessage("courses.not.found", null, LocaleContextHolder.getLocale()));
+            return "redirect:/courses";
         }
     }
 

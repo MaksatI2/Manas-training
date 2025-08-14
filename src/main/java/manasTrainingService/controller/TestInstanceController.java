@@ -11,6 +11,8 @@ import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,9 +30,10 @@ public class TestInstanceController {
     private final CourseInstanceService courseInstanceService;
     private final TestInstanceService testInstanceService;
     private final TestResultService testResultService;
+    private final MessageSource messageSource;
 
     @GetMapping("{id}/test")
-    public String addTestToInstancePage(@PathVariable Integer id, Model model) {
+    public String addTestToInstancePage(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         if(testInstanceService.isTestInstanceExist(id)){
             throw new NoAccessException("Тест уже привязан к данному потоку");
         }
@@ -56,7 +59,14 @@ public class TestInstanceController {
         }
         try{
             testInstanceService.addTestToCourseInstance(testInstanceDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Тест привязан к потоку");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage(
+                            "test.assigned.to.stream",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
             return "redirect:/teacher/course/"+testInstanceDto.getCourseInstanceId();
         }catch (IncorrectDateException e){
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));
@@ -92,7 +102,14 @@ public class TestInstanceController {
         }
         try{
             testInstanceService.changeTestToCourseInstance(testInstanceDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Тест успешно переназначен");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage(
+                            "test.reassigned.success",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
             return "redirect:/teacher/course/"+testInstanceDto.getCourseInstanceId();
         } catch (IncorrectDateException e){
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));
@@ -107,10 +124,21 @@ public class TestInstanceController {
     @GetMapping("{id}/delete/test")
     public String deleteTestFromTestInstance(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         if(testResultService.hasResultsByTestInstanceId(testInstanceService.getTestInstanceByCourseInstanceId(id).getId())){
-            throw new NoAccessException("По данному тесту уже есть результаты");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage(
+                            "test.has.results",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
+            return "redirect:/teacher/course/" + id;
         }
         testInstanceService.deleteTestFromTestInstance(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно отвязан от данного потока");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("test.unlinked.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/teacher/course/"+id;
     }
 
@@ -134,7 +162,10 @@ public class TestInstanceController {
         }
         try{
             testInstanceService.changeTestInstanceTime(testInstanceDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Время доступа к тесту успешно изменено");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("test.access.time.updated", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/admin/course-instances/"+testInstanceDto.getCourseInstanceId();
         } catch (IncorrectDateException e){
             model.addAttribute("courseInstance", courseInstanceService.getCourseInstanceById(courseInstanceId));

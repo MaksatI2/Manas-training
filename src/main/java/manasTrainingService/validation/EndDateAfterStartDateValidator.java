@@ -52,7 +52,7 @@ public class EndDateAfterStartDateValidator implements ConstraintValidator<EndDa
 
         if (!isValid) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("Дата окончания должна быть после даты начала")
+            context.buildConstraintViolationWithTemplate("{enddatevalidator.text}")
                     .addPropertyNode(fieldName)
                     .addConstraintViolation();
         }

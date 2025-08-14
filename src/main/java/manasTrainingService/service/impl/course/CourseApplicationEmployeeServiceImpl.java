@@ -11,6 +11,8 @@ import manasTrainingService.repositories.course.CourseApplicationEmployeeReposit
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseApplicationEmployeeService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +25,7 @@ public class CourseApplicationEmployeeServiceImpl implements CourseApplicationEm
     private final CourseApplicationEmployeeRepository employeeRepository;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     @Override
     public List<CourseApplicationEmployeeDTO> getPendingEmployeesForCourseInstance(Integer courseInstanceId) {
@@ -45,7 +48,14 @@ public class CourseApplicationEmployeeServiceImpl implements CourseApplicationEm
 
     @Override
     public CourseApplicationEmployee getEmployeeById(Integer employeeId) {
-        return employeeRepository.findById(employeeId).orElseThrow(() -> new UserNotFoundException("Пользователь не был найден"));
+        return employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override

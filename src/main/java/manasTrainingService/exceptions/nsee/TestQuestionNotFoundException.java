@@ -1,6 +1,8 @@
 package manasTrainingService.exceptions.nsee;
 
-public class TestQuestionNotFoundException extends RuntimeException {
+import jakarta.persistence.EntityNotFoundException;
+
+public class TestQuestionNotFoundException extends EntityNotFoundException {
     public TestQuestionNotFoundException(String message) {
         super(message);
     }

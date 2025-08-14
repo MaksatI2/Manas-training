@@ -6,17 +6,18 @@
 <#assign bcUsers><@spring.message code='admin.user.list.breadcrumb.users'/></#assign>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcUsers, "url": ""}
     ] />
     <div class="card shadow mb-4">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+
         <div class="card-header py-3" style="background: linear-gradient(135deg, #0066cc, #003d7a);">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="m-0 font-weight-bold text-white">
@@ -93,9 +94,31 @@
                         <#list users as user>
                             <tr style="cursor: pointer;" onclick="window.location.href='/admin/users/${user.id}'">
                                 <td>${user.id}</td>
-                                <td>${user.name}</td>
-                                <td>${(user.lastName?has_content && user.lastName != "null")?then(user.lastName, "-")}</td>
-                                <td>${user.email}</td>
+                                <td>
+                                    <#if (user.name?has_content && user.name?length > 11)>
+                                        ${user.name?substring(0, 11)}...
+                                    <#else>
+                                        ${user.name!""}
+                                    </#if>
+                                </td>
+
+                                <td>
+                                    <#assign lastNameValue = (user.lastName?has_content && user.lastName != "null")?then(user.lastName, "-")>
+                                    <#if (lastNameValue?length > 12)>
+                                        ${lastNameValue?substring(0, 12)}...
+                                    <#else>
+                                        ${lastNameValue}
+                                    </#if>
+                                </td>
+
+                                <td>
+                                    <#if (user.email?has_content && user.email?length > 11)>
+                                        ${user.email?substring(0, 11)}...
+                                    <#else>
+                                        ${user.email!""}
+                                    </#if>
+                                </td>
+
                                 <td>${user.phone}</td>
                                 <td>
                                     <span class="badge bg-primary">${user.role.name}</span>

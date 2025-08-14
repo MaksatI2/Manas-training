@@ -6,6 +6,7 @@ import manasTrainingService.validation.EndDateAfterStartDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+
 @Getter
 @Setter
 @Builder
@@ -14,20 +15,19 @@ import java.time.LocalDate;
 @EndDateAfterStartDate
 public class CreateCertificateDto {
 
-    @NotNull
+    @NotNull(message = "{createCertificate.studentId.notnull}")
     private Integer studentId;
 
-    @NotNull
+    @NotNull(message = "{createCertificate.courseInstanceId.notnull}")
     private Integer courseInstanceId;
 
-    @NotNull
-    @FutureOrPresent(message="Дата окончания не может быть раньше сегодня")
+    @NotNull(message = "{createCertificate.expiryDate.notnull}")
+    @FutureOrPresent(message = "{createCertificate.expiryDate.futureOrPresent}")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate expiryDate;
 
-    @NotNull
-    @Min(value = 0,  message = "Оценка не может быть меньше 0")
-    @Max(value = 100, message = "Оценка не может быть больше 100")
+    @NotNull(message = "{createCertificate.mark.notnull}")
+    @Min(value = 0, message = "{createCertificate.mark.min}")
+    @Max(value = 100, message = "{createCertificate.mark.max}")
     private Integer mark;
-
 }

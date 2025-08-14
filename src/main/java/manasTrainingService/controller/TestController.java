@@ -20,6 +20,8 @@ import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.test.TestService;
 import org.aspectj.asm.IModelFilter;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -41,6 +43,7 @@ public class TestController {
     private final CourseInstanceService courseInstanceService;
     private final TestAnswerService testAnswerService;
     private final QuestionService questionService;
+    private final MessageSource messageSource;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -78,7 +81,10 @@ public class TestController {
         }
         String redirectUrl = request.getSession().getAttribute("redirectAfterCreate").toString();
         request.getSession().removeAttribute("redirectAfterCreate");
-        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно создан");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("test.create.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:" + redirectUrl;
     }
 
@@ -111,7 +117,10 @@ public class TestController {
         }
         String redirectUrl = request.getSession().getAttribute("redirectAfterEdit").toString();
         request.getSession().removeAttribute("redirectAfterEdit");
-        redirectAttributes.addFlashAttribute("successMessage", "Содержание теста успешно изменено");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("test.content.update.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:" + redirectUrl;
     }
 
@@ -123,8 +132,11 @@ public class TestController {
         }
         try {
             testService.deleteTest(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Тест успешно удален");
-                return "redirect:" + redirectUrl;
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("test.delete.success", null, LocaleContextHolder.getLocale())
+            );
+            return "redirect:" + redirectUrl;
         } catch (IncorrectDateException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:"+redirectUrl;
@@ -135,11 +147,16 @@ public class TestController {
     public String getTestById(@PathVariable int testInstanceId, Model model, RedirectAttributes redirectAttributes) {
         TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(testInstanceId);
         TestDto testDto = testService.getTestForPassingById(testInstanceDto.getTest().getId());
-        if (!testDto.getIsActive()){
-            throw new NoAccessException("Тестирование сейчас не доступно");
+        if (!testDto.getIsActive()) {
+            throw new NoAccessException(
+                    messageSource.getMessage("test.not.available", null, LocaleContextHolder.getLocale())
+            );
         }
+
         if (testResultService.userHasTestAttempt(testDto.getId())) {
-            throw new NoAccessException("Вы уже прошли данный тест");
+            throw new NoAccessException(
+                    messageSource.getMessage("test.already.passed", null, LocaleContextHolder.getLocale())
+            );
         }
         if(testInstanceService.isValidAccessTime(testInstanceId)){
             CourseInstanceDTO courseInstanceDTO = courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstance().getId());
@@ -151,7 +168,10 @@ public class TestController {
             model.addAttribute("courseTitle", courseService.getCourseById(testDto.getId()).getTitle());
             return "tests/test_passing";
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Прохождение тестирования доступно только в специально отведенное время");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("test.access.time.limited", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/student/course/" + courseInstanceService.getCourseInstanceById(testInstanceService.getTestInstanceById(testInstanceId).getCourseInstance().getId());
         }
     }
@@ -163,7 +183,10 @@ public class TestController {
             redirectUrl = "/";
         }
         testService.activateTest(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Тест успешно активирован!");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("test.activated.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:" + redirectUrl;
     }
 
@@ -175,7 +198,10 @@ public class TestController {
         }
         try {
             testService.deactivateTest(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Тест успешно деактивирован!");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("test.deactivated.success", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:" + redirectUrl;
         } catch (IncorrectDateException e){
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -185,6 +211,11 @@ public class TestController {
 
     @PostMapping("checking")
     public String checkTestResults(@Valid @ModelAttribute("result") TestAnswerDto result, BindingResult bindingResult, Model model) {
+        if (testResultService.userHasTestAttempt(result.getTestInstanceId())) {
+            throw new NoAccessException(
+                    messageSource.getMessage("test.already.passed", null, LocaleContextHolder.getLocale())
+            );
+        }
         TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(result.getTestInstanceId());
         TestDto test = testService.getTestById(result.getTestId());
         test.setQuestions(questionService.getQuestionsByAnswerQuestionId(result));
@@ -212,7 +243,9 @@ public class TestController {
     public String viewTestResults(@PathVariable int testInstanceId, Model model){
         TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(testInstanceId);
         if(!testService.testExistById(testInstanceDto.getTest().getId())){
-            throw new NoAccessException("Такого теста уже не существует");
+            throw new NoAccessException(
+                    messageSource.getMessage("error.test.not.exist", null, LocaleContextHolder.getLocale())
+            );
         }
         TestResultDto testResultDto = testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceId);
         model.addAttribute("test", testService.getTestByIdForTestResult(testInstanceDto.getId()));

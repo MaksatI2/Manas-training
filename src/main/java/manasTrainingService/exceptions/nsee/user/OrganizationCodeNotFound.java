@@ -1,6 +1,8 @@
 package manasTrainingService.exceptions.nsee.user;
 
-public class OrganizationCodeNotFound extends RuntimeException {
+import jakarta.persistence.EntityNotFoundException;
+
+public class OrganizationCodeNotFound extends EntityNotFoundException {
     public OrganizationCodeNotFound(String message) {
         super(message);
     }

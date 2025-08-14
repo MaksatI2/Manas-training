@@ -9,6 +9,8 @@ import manasTrainingService.service.LessonMaterialService;
 import manasTrainingService.service.LessonService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.FileUtil;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +27,7 @@ public class LessonMaterialsServiceImpl implements LessonMaterialService {
     private final FileUtil fileUtil;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     @Override
     public List<LessonMaterialDTO> getMaterialsByLessonId(Integer lessonId) {
@@ -66,7 +69,9 @@ public class LessonMaterialsServiceImpl implements LessonMaterialService {
     @Override
     public void deleteMaterial(Integer materialId) {
         LessonMaterial material = materialRepository.findById(materialId)
-                .orElseThrow(() -> new IllegalArgumentException("Material not found"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        messageSource.getMessage("material.not.found", null, LocaleContextHolder.getLocale())
+                ));
         materialRepository.delete(material);
 
         activityLogService.log(

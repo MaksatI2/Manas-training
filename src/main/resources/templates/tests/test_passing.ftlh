@@ -18,12 +18,12 @@
         </h1>
     </div>
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-8">
+        <div class="col-12 col-md-10 col-lg-8 mx-auto">
             <div class="feature-card">
                 <div class="card-body">
-                    <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3">${test.title}</h5>
-                    <p class="card-text fs-4 border-bottom border-primary-subtle pb-3">${test.description}</p>
-                    <p class="card-text fs-5"><span
+                    <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3 text-break">${test.title}</h5>
+                    <p class="card-text fs-4 border-bottom border-primary-subtle pb-3 text-break">${test.description}</p>
+                    <p class="card-text fs-5 text-break"><span
                                 class="fw-bold"><@spring.message code="test.passing.page.label.questionsCount"/></span> ${test.questions?size}
                     </p>
                 </div>
@@ -42,7 +42,7 @@
                                             </#list>
                                         </#if>
                                     </h4>
-                                    <h5 class="card-title mb-3 fs-4">${question.question}</h5>
+                                    <h5 class="card-title mb-3 fs-4 text-break">${question.question}</h5>
                                     <#if question.options??>
                                         <ul class="list-group">
                                             <#list question.options as option>
@@ -55,7 +55,7 @@
                                                            && (result.questionAnswers?filter(a -> a.questionId == question.id)?size > 0)
                                                            && ((result.questionAnswers?filter(a -> a.questionId == question.id)?first).answerId??)
                                                            && ((result.questionAnswers?filter(a -> a.questionId == question.id)?first).answerId == option.id)>checked</#if>>
-                                                    <label class="form-check-label fs-4"
+                                                    <label class="form-check-label fs-4 text-break"
                                                            for="question-${question?index}-option-${option?index}">
                                                         ${option.optionText}
                                                     </label>

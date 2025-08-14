@@ -18,19 +18,19 @@ public class CourseDto {
 
     private Integer id;
 
-    @NotBlank(message = "Название обязательно")
-    @Size(max = 200, message = "Максимум 200 символов")
+    @NotBlank(message = "{CourseDto.title.NotBlank}")
+    @Size(max = 200, message = "{CourseDto.title.Size}")
     private String title;
 
-    @NotBlank(message = "Код курса обязателен")
-    @Size(max = 20, message = "Максимум 20 символов")
+    @NotBlank(message = "{CourseDto.code.NotBlank}")
+    @Size(max = 20, message = "{CourseDto.code.Size}")
     private String code;
 
-    @Size(max = 1000, message = "Максимум 1000 символов")
+    @Size(max = 1000, message = "{CourseDto.description.Size}")
     private String description;
 
-    @NotNull(message = "Продолжительность обязательна")
-    @Min(value = 1, message = "Должно быть положительным числом")
+    @NotNull(message = "{CourseDto.duration.NotNull}")
+    @Min(value = 1, message = "{CourseDto.duration.Min}")
     private Integer duration;
 
     private Boolean individual;
@@ -46,7 +46,7 @@ public class CourseDto {
 
     private CourseCategoryDto category;
 
-    @NotNull(message = "Категория обязательна")
+    @NotNull(message = "{CourseDto.categoryId.NotNull}")
     private Integer categoryId;
 
     private String instanceTitle;
@@ -54,5 +54,4 @@ public class CourseDto {
     private LocalDate instanceStartDate;
 
     private LocalDate instanceEndDate;
-
 }

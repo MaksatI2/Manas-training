@@ -23,7 +23,7 @@ public class UniqueCourseInstanceTitleCreateValidator implements ConstraintValid
         context.disableDefaultConstraintViolation();
 
         if (courseInstanceService.existsByTitle(dto.getTitle())) {
-            context.buildConstraintViolationWithTemplate("Название экземпляра курса уже используется")
+            context.buildConstraintViolationWithTemplate("{UniqueCourseInstanceTitleCreate.message}")
                 .addPropertyNode("title")
                 .addConstraintViolation();
             valid = false;

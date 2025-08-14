@@ -19,14 +19,14 @@ public class UniqueCourseCreateValidator implements ConstraintValidator<UniqueCo
         context.disableDefaultConstraintViolation();
 
         if (dto.getCode() != null && courseService.existsByCode(dto.getCode().strip())) {
-            context.buildConstraintViolationWithTemplate("Код курса уже используется")
-                .addPropertyNode("code").addConstraintViolation();
+            context.buildConstraintViolationWithTemplate("{UniqueCourseCreate.code.message}")
+                    .addPropertyNode("code").addConstraintViolation();
             valid = false;
         }
 
         if (dto.getTitle() != null && courseService.existsByTitle(dto.getTitle().strip())) {
-            context.buildConstraintViolationWithTemplate("Название курса уже используется")
-                .addPropertyNode("title").addConstraintViolation();
+            context.buildConstraintViolationWithTemplate("{UniqueCourseCreate.title.message}")
+                    .addPropertyNode("title").addConstraintViolation();
             valid = false;
         }
 

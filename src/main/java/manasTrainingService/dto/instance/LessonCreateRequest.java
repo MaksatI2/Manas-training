@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 public class LessonCreateRequest {
 
-    @NotBlank(message = "Название урока обязательно")
+    @NotBlank(message = "{lessonCreate.title.notBlank}")
     private String title;
 
     private String description;

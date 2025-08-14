@@ -10,12 +10,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CourseModuleUpdateDTO {
-    @NotBlank(message = "Название модуля обязательно")
-    @Size(max = 200, message = "Название не должно превышать 200 символов")
+
+    @NotBlank(message = "{courseModuleUpdate.title.notBlank}")
+    @Size(max = 200, message = "{courseModuleUpdate.title.size}")
     private String title;
 
-    @NotNull(message = "Продолжительность обязательна")
-    @Min(value = 1, message = "Продолжительность должна быть больше 0")
+    @NotNull(message = "{courseModuleUpdate.duration.notNull}")
+    @Min(value = 1, message = "{courseModuleUpdate.duration.min}")
     private Integer durationHours;
 
     private String description;

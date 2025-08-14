@@ -12,6 +12,8 @@ import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseCategoryService;
 import manasTrainingService.service.user.UserService;
 import org.apache.coyote.BadRequestException;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
     private final CourseCategoryRepository categoryRepository;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     @Override
     public List<CourseCategoryDto> getAllCategories() {
@@ -89,13 +92,26 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
     @Transactional
     public void delete(Integer id) {
         if (!categoryRepository.existsById(id)) {
-            throw new EntityNotFoundException("Категория с ID " + id + " не найдена");
+            throw new EntityNotFoundException(
+                    messageSource.getMessage(
+                            "category.not.found.withId",
+                            new Object[]{id},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
 
         CourseCategory category = getCategoryById(id);
         if (!category.getCourses().isEmpty()) {
-            throw new IllegalStateException("У категории есть курсы. Удаление невозможно");
+            throw new IllegalStateException(
+                    messageSource.getMessage(
+                            "category.delete.hasCourses",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
 
         categoryRepository.deleteById(id);
         activityLogService.log(
@@ -126,13 +142,25 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
     @Override
     public CourseCategory getCategoryById(Integer id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Категория с ID " + id + " не найдена"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "category.not.found.withId",
+                                new Object[]{id},
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
-
 
     private void validateCategory(CourseCategoryDto dto) {
         if (categoryRepository.existsByName(dto.getName().strip())) {
-            throw new ValidationException("Категория с именем " + dto.getName() + " уже существует");
+            throw new ValidationException(
+                    messageSource.getMessage(
+                            "category.name.exists",
+                            new Object[]{dto.getName()},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
     }
+
 }

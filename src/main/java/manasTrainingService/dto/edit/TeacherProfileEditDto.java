@@ -3,6 +3,7 @@ package manasTrainingService.dto.edit;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import manasTrainingService.validation.ValidPhoneNumber;
 
 @Getter
 @Setter
@@ -12,22 +13,21 @@ import lombok.*;
 public class TeacherProfileEditDto {
     private Integer userId;
 
-    @NotBlank(message = "Имя обязательно для заполнения")
+    @NotBlank(message = "{teacherProfile.name.notBlank}")
     private String name;
 
-    @NotBlank(message = "Фамилия обязательна для заполнения")
+    @NotBlank(message = "{teacherProfile.surname.notBlank}")
     private String surname;
 
-    @NotBlank(message = "Номер телефона не может быть пустым")
-    @Pattern(regexp = "^\\+996\\d{9}$", message = "Номер телефона должен быть в формате +996XXXXXXXXX (12 цифр)")
+    @NotBlank(message = "{teacherProfile.phone.notBlank}")
+    @ValidPhoneNumber
     private String phone;
 
-    @NotBlank(message = "Отделение обязательна для заполнения")
+    @NotBlank(message = "{teacherProfile.department.notBlank}")
     private String department;
 
-    @NotBlank(message = "Квалификация обязательна для заполнения")
+    @NotBlank(message = "{teacherProfile.qualifications.notBlank}")
     private String qualifications;
 
     private String bio;
-
 }

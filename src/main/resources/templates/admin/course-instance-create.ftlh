@@ -7,6 +7,13 @@
 <#assign bcCurrent><@spring.message code='courseInstances.admin.add.breadcrumb.current'/></#assign>
 
 <@layout.page title="<@spring.message code='courseInstances.admin.add.header'/>">
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcList, "url": "/admin/course-instances"},

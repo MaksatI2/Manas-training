@@ -15,15 +15,14 @@ import java.time.LocalDate;
 @EndDateAfterStartDate
 public class StudentCourseApplicationCreateDto {
 
-    @NotNull(message = "Курс обязателен")
+    @NotNull(message = "{studentCourseApplicationCreate.courseId.notnull}")
     private Integer courseId;
 
     private Integer preferredTeacherId;
 
-    @FutureOrPresent(message = "Дата начала должна быть сегодня или позже")
+    @FutureOrPresent(message = "{studentCourseApplicationCreate.preferredStartDate.futureOrPresent}")
     private LocalDate preferredStartDate;
 
-    @FutureOrPresent(message = "Дата окончания должна быть сегодня или позже")
+    @FutureOrPresent(message = "{studentCourseApplicationCreate.preferredEndDate.futureOrPresent}")
     private LocalDate preferredEndDate;
-
 }

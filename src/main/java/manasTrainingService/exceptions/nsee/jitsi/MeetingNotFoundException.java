@@ -1,6 +1,8 @@
 package manasTrainingService.exceptions.nsee.jitsi;
 
-public class MeetingNotFoundException extends RuntimeException {
+import jakarta.persistence.EntityNotFoundException;
+
+public class MeetingNotFoundException extends EntityNotFoundException {
     public MeetingNotFoundException(String message) {
         super(message);
     }

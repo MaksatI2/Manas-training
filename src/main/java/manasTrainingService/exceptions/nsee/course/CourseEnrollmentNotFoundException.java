@@ -1,6 +1,8 @@
 package manasTrainingService.exceptions.nsee.course;
 
-public class CourseEnrollmentNotFoundException extends RuntimeException {
+import jakarta.persistence.EntityNotFoundException;
+
+public class CourseEnrollmentNotFoundException extends EntityNotFoundException {
     public CourseEnrollmentNotFoundException(String message) {
         super(message);
     }

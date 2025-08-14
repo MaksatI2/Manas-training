@@ -14,6 +14,8 @@ import manasTrainingService.service.LessonService;
 import manasTrainingService.service.ScheduleService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.DateUtil;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final UserService userService;
     private final EnrollmentService enrollmentService;
     private final ActivityLogService activityLogService;
+    private final MessageSource messageSource;
 
     @Override
     public ScheduleDTO getScheduleByLessonId(Integer lessonId) {
@@ -78,8 +81,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         if (totalAfterUpdate > moduleMaxHours) {
             throw new IllegalArgumentException(
-                    "Превышен лимит часов модуля. Установлено: " + totalAfterUpdate +
-                            " ч, допустимо: " + moduleMaxHours + " ч."
+                    messageSource.getMessage(
+                            "module.hours.limit.exceeded",
+                            new Object[]{totalAfterUpdate, moduleMaxHours},
+                            LocaleContextHolder.getLocale()
+                    )
             );
         }
 
@@ -87,7 +93,13 @@ public class ScheduleServiceImpl implements ScheduleService {
                 teacher.getId(), schedule.getLessonDate(), schedule.getId());
 
         if (teacherHours + schedule.getDurationHours() > 8) {
-            throw new IllegalArgumentException("У преподавателя превышен лимит 8 часов на день");
+            throw new IllegalArgumentException(
+                    messageSource.getMessage(
+                            "teacher.daily.hours.limit.exceeded",
+                            new Object[]{8},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
 
         List<CourseEnrollment> enrollments = enrollmentService.findAllEnrollmentsForCourseInstance(courseInstance.getId());
@@ -108,8 +120,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         if (!violatingStudents.isEmpty()) {
-            throw new IllegalArgumentException("У следующих студентов превышен лимит 8 часов на день: " +
-                    String.join(", ", violatingStudents));
+            throw new IllegalArgumentException(
+                    messageSource.getMessage(
+                            "students.daily.hours.limit.exceeded",
+                            new Object[]{String.join(", ", violatingStudents), 8},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
 
 
@@ -117,8 +134,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         Schedule entity = schedule.getId() != null
                 ? scheduleRepository.findById(schedule.getId())
-                .orElseThrow(() -> new ScheduleNotFouneException("Расписание не найдено"))
+                .orElseThrow(() -> new ScheduleNotFouneException(
+                        messageSource.getMessage("schedule.not.found", null, LocaleContextHolder.getLocale())
+                ))
                 : new Schedule();
+
 
         entity.setLesson(lesson);
         entity.setCourseInstance(courseInstance);
@@ -145,7 +165,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void deleteSchedule(Integer scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new ScheduleNotFouneException("Schedule not found"));
+                .orElseThrow(() -> new ScheduleNotFouneException(messageSource.getMessage("schedule.not.found", null, LocaleContextHolder.getLocale())));
         schedule.setIsActive(false);
         Schedule saved = scheduleRepository.save(schedule);
         activityLogService.log(

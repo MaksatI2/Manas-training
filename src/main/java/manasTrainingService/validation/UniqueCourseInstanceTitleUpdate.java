@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueCourseInstanceTitleUpdate {
-    String message() default "Название экземпляра курса уже используется";
+    String message() default "{UniqueCourseInstanceTitleUpdate.message}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

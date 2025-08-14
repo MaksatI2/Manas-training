@@ -13,6 +13,8 @@ import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseModuleService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     private final CourseInstanceService courseInstanceService;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     @Transactional
     @Override
@@ -79,7 +82,12 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     @Transactional
     public void deleteCourseModule(Integer moduleId) {
         if (!courseModuleRepository.existsById(moduleId)) {
-            throw new IllegalArgumentException("Модуль не был найден: " + moduleId);
+            String message = messageSource.getMessage(
+                    "module.not.found",
+                    new Object[]{moduleId},
+                    LocaleContextHolder.getLocale()
+            );
+            throw new IllegalArgumentException(message);
         }
         courseModuleRepository.deleteById(moduleId);
         activityLogService.log(
@@ -92,8 +100,17 @@ public class CourseModuleServiceImpl implements CourseModuleService {
 
     @Override
     public CourseModule getCourseModuleById(Integer moduleId) {
-        return courseModuleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException("Модуль не был найден"));
+        return courseModuleRepository.findById(moduleId)
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage(
+                            "module.not.found.simple",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    );
+                    return new ModuleNotFoundException(message);
+                });
     }
+
 
     private CourseModuleDTO convertToDto(CourseModule module) {
         return CourseModuleDTO.builder()
@@ -130,8 +147,14 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     public void deleteByIdIfNoLessons(Integer moduleId) {
         CourseModule module = getCourseModuleById(moduleId);
         if (!module.getLessons().isEmpty()) {
-            throw new IllegalStateException("У модуля есть уроки");
+            String message = messageSource.getMessage(
+                    "module.has.lessons",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            throw new IllegalStateException(message);
         }
+
         courseModuleRepository.deleteById(moduleId);
         activityLogService.log(
                 userService.getAuthorizedUser(),
@@ -166,11 +189,14 @@ public class CourseModuleServiceImpl implements CourseModuleService {
                 .sum();
 
         if (newModuleHours < totalScheduledHours) {
-            throw new IllegalStateException(
-                    "Невозможно установить продолжительность модуля (" + newModuleHours + " ч), " +
-                            "так как она меньше общей длительности всех расписаний (" + totalScheduledHours + " ч)."
+            String message = messageSource.getMessage(
+                    "module.duration.less.than.scheduled",
+                    new Object[]{newModuleHours, totalScheduledHours},
+                    LocaleContextHolder.getLocale()
             );
+            throw new IllegalStateException(message);
         }
+
 
         int totalOtherModulesHours = courseInstance.getModules().stream()
                 .filter(m -> !m.getId().equals(moduleId))
@@ -196,15 +222,22 @@ public class CourseModuleServiceImpl implements CourseModuleService {
     private void validateTotalDuration(CourseInstance courseInstance, Integer updatingModuleId, int totalNewDuration) {
         int maxAllowedHours = courseInstance.getCourse().getDurationHours();
         if (totalNewDuration > maxAllowedHours) {
-            throw new IllegalStateException(
-                    "Общее количество часов модулей (" + totalNewDuration + ") " +
-                            "превышает лимит курса (" + maxAllowedHours + ")."
+            String message = messageSource.getMessage(
+                    "module.total.duration.exceeds",
+                    new Object[]{totalNewDuration, maxAllowedHours},
+                    LocaleContextHolder.getLocale()
             );
+            throw new IllegalStateException(message);
         }
     }
 
+
     @Override
     public CourseModuleDTO getCourseModuleDTOById(Integer moduleId) {
-        return convertToDto(courseModuleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException("Модуль не был найден")));
+        return convertToDto(courseModuleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException(messageSource.getMessage(
+                "module.not.found.simple",
+                null,
+                LocaleContextHolder.getLocale()
+        ))));
     }
 }

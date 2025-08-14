@@ -14,7 +14,6 @@ import manasTrainingService.validation.UniqueCourseInstanceTitleCreate;
 
 import java.time.LocalDate;
 
-
 @Getter
 @Setter
 @Builder
@@ -25,19 +24,19 @@ import java.time.LocalDate;
 public class CourseInstanceCreationDTO {
     private Integer id;
 
-    @NotNull(message = "Курс должен быть выбран")
+    @NotNull(message = "{CourseInstanceCreationDTO.courseId.NotNull}")
     private Integer courseId;
 
-    @NotBlank(message = "Название необходимо")
-    @Size(max = 50, message = "Максимальная длина названия — 50 символов")
+    @NotBlank(message = "{CourseInstanceCreationDTO.title.NotBlank}")
+    @Size(max = 50, message = "{CourseInstanceCreationDTO.title.Size}")
     private String title;
 
-    @NotNull(message = "Дата начала курса необходима")
-    @Future(message = "Дата начала курса должна быть в будущем")
+    @NotNull(message = "{CourseInstanceCreationDTO.startDate.NotNull}")
+    @Future(message = "{CourseInstanceCreationDTO.startDate.Future}")
     private LocalDate startDate;
-    @NotNull(message = "Дата конца курса необходима")
-    @Future(message = "Дата конца курса должна быть в будущем")
 
+    @NotNull(message = "{CourseInstanceCreationDTO.endDate.NotNull}")
+    @Future(message = "{CourseInstanceCreationDTO.endDate.Future}")
     private LocalDate endDate;
 
     private Boolean isActive = true;

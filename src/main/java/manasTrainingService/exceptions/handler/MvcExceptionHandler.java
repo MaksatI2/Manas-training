@@ -7,6 +7,8 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import manasTrainingService.exceptions.nsee.NoAccessException;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,24 +28,39 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class MvcExceptionHandler {
+    private final MessageSource messageSource;
 
-    @ExceptionHandler(NoAccessException.class)
-    public String handleNoAccessException(Model model, HttpServletRequest request, NoAccessException e) {
+    @ExceptionHandler({AccessDeniedException.class, NoAccessException.class})
+
+    public String handleForbidden(Model model, HttpServletRequest request, Exception e) {
         log.error("Access denied: {}", e.getMessage());
         model.addAttribute("status", HttpStatus.FORBIDDEN.value());
         model.addAttribute("reason", HttpStatus.FORBIDDEN.getReasonPhrase());
-        model.addAttribute("message", e.getMessage() != null ? e.getMessage() : "У вас пока нет доступа к этому разделу. Дождитесь подтверждения или обратитесь к администратору.");
+        String defaultMessage = messageSource.getMessage(
+                "access.denied.default", null,
+                "У вас пока нет доступа к этому разделу. Дождитесь подтверждения или обратитесь к администратору.",
+                LocaleContextHolder.getLocale()
+        );
+
+        model.addAttribute("message", e.getMessage() != null ? e.getMessage() : defaultMessage);
         model.addAttribute("details", request);
         return "error/403";
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public String handleEntityNotFoundException(Model model, HttpServletRequest request, EntityNotFoundException e) {
+
+    @ExceptionHandler({EntityNotFoundException.class, NoSuchElementException.class})
+    public String handleEntityNotFoundException(Model model, HttpServletRequest request, Exception e) {
         log.error("Entity not found: {}", e.getMessage());
         model.addAttribute("status", HttpStatus.NOT_FOUND.value());
         model.addAttribute("reason", HttpStatus.NOT_FOUND.getReasonPhrase());
-        model.addAttribute("message", e.getMessage() != null ? e.getMessage() : "Мы не нашли такого пользователя или учебного материала. Проверьте данные или уточните в службе поддержки.");
-        model.addAttribute("details", request);
+        String defaultMessage = messageSource.getMessage(
+                "error.entity.notfound",
+                null,
+                "Мы не нашли нужной страницы. Проверьте данные.",
+                LocaleContextHolder.getLocale()
+        );
+
+        model.addAttribute("message", e.getMessage() != null ? e.getMessage() : defaultMessage);        model.addAttribute("details", request);
         return "error/404";
     }
 
@@ -87,15 +104,7 @@ public class MvcExceptionHandler {
         return "error/400";
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public String handleNSEE(Model model, HttpServletRequest request, NoSuchElementException e) {
-        log.error("Resource not found: {}", e.getMessage());
-        model.addAttribute("status", HttpStatus.NOT_FOUND.value());
-        model.addAttribute("reason", HttpStatus.NOT_FOUND.getReasonPhrase());
-        model.addAttribute("message", "Мы не нашли такого пользователя или учебного материала. Проверьте данные или уточните в службе поддержки.");
-        model.addAttribute("details", request);
-        return "error/404";
-    }
+
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public String handleDataIntegrityViolation(Model model, HttpServletRequest request, DataIntegrityViolationException e) {
@@ -107,15 +116,6 @@ public class MvcExceptionHandler {
         return "error/400";
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public String handleAccessDenied(Model model, HttpServletRequest request, AccessDeniedException e) {
-        log.error("Access denied: {}", e.getMessage());
-        model.addAttribute("status", HttpStatus.FORBIDDEN.value());
-        model.addAttribute("reason", HttpStatus.FORBIDDEN.getReasonPhrase());
-        model.addAttribute("message", "У вас пока нет доступа к этому разделу. Дождитесь подтверждения или обратитесь к администратору.");
-        model.addAttribute("details", request);
-        return "error/403";
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public String handleValidation(Model model, HttpServletRequest request, MethodArgumentNotValidException e) {

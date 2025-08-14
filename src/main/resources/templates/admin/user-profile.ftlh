@@ -7,6 +7,13 @@
 <#assign bcProfile><@spring.message code='breadcrumb.profile'/></#assign>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -16,12 +23,7 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <div class="max-w-6xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+
 
         <@roadmap.breadcrumbs items=[
         {"label": bcHome, "url": "/"},
@@ -153,7 +155,7 @@
                             <#list attendanceStatsList as stat>
                                 <tr class="${stat.courseInstance.isActive?string('', 'bg-red-50')}">
                                     <td class="px-4 py-3 text-center text-sm text-gray-900">
-                                        <#if stat.courseInstance.title?length gt 15>
+                                        <#if (stat.courseInstance.title?length gt 15)>
                                             ${stat.courseInstance.title?substring(0, 15)}...
                                         <#else>
                                             ${stat.courseInstance.title!'—'}
@@ -211,7 +213,7 @@
                             <#list testResults as result>
                                 <tr class="${result.isPassed?string('bg-green-50', 'bg-red-50')}">
                                     <td class="px-4 py-3 text-sm text-gray-900">
-                                        <#if result.courseTitle?length gt 15>
+                                        <#if (result.courseTitle?length gt 15)>
                                             ${result.courseTitle?substring(0, 15)}...
                                         <#else>
                                             ${result.courseTitle!'—'}
@@ -250,14 +252,14 @@
                                 <a href="/admin/course-instances/${course.courseInstanceId}"
                                    class="block text-decoration-none text-gray-900">
                                     <h5 class="text-lg font-semibold mb-2">
-                                        <#if course.courseTitle?length gt 15>
+                                        <#if (course.courseTitle?length gt 15)>
                                             ${course.courseTitle?substring(0, 15)}...
                                         <#else>
                                             ${course.courseTitle}
                                         </#if>
                                     </h5>
                                     <h6 class="text-sm text-blue-600 mb-3">
-                                        <#if course.instanceTitle?length gt 15>
+                                        <#if (course.instanceTitle?length gt 15)>
                                             ${course.instanceTitle?substring(0, 15)}...
                                         <#else>
                                             ${course.instanceTitle!'—'}
@@ -287,7 +289,6 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"><@spring.message code='table.fullname'/></th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"><@spring.message code='table.email'/></th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"><@spring.message code='table.phone'/></th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"><@spring.message code='table.courses'/></th>
                         </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -304,26 +305,11 @@
                                     <td class="px-4 py-3 text-sm text-gray-900 break-words">${first.fullName!'—'}</td>
                                     <td class="px-4 py-3 text-sm text-gray-600 break-words">${first.email!'—'}</td>
                                     <td class="px-4 py-3 text-sm text-gray-600 break-words">${first.phone!'—'}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">
-                                        <ul class="list-disc pl-4 mb-0">
-                                            <#list courseList as c>
-                                                <li>
-                                                    <#if c.courseTitle?length gt 15>
-                                                        ${c.courseTitle?substring(0, 15)}...
-                                                    <#else>
-                                                        ${c.courseTitle!'—'}
-                                                    </#if>
-                                                    — ${c.localizedStatus!'Неизвестно'}, ${c.progress!'0'}%
-                                                    <#if c.finalGrade??>, <@spring.message code='label.grade'/>: ${c.finalGrade}</#if>
-                                                </li>
-                                            </#list>
-                                        </ul>
-                                    </td>
                                 </tr>
                             </#list>
                         <#else>
                             <tr>
-                                <td colspan="4"
+                                <td colspan="3"
                                     class="px-4 py-3 text-center text-sm text-gray-500"><@spring.message code='organization.no.students'/></td>
                             </tr>
                         </#if>
@@ -332,10 +318,12 @@
                 </div>
 
                 <script>
+                     <#if grouped?size gt 0>
+
                     $(document).ready(function () {
-                        var dtLangUrl = "<#if springMacroRequestContext.locale?string?lower_case?starts_with('ru')>/js/datatables/ru_RU.json" +
-                            "<#elseif springMacroRequestContext.locale?string?lower_case?starts_with('ky')>/js/datatables/ky_KG.json" +
-                            "<#else>/js/datatables/en_US.json</#if>";
+                        var dtLangUrl = "<#if springMacroRequestContext.locale?string?lower_case?starts_with('ru')>/js/datatables/ru.json" +
+                            "<#elseif springMacroRequestContext.locale?string?lower_case?starts_with('ky')>/js/datatables/ky.json" +
+                            "<#else>/js/datatables/en.json</#if>";
                         $('#studentsTable').DataTable({
                             language: {url: dtLangUrl, paginate: {previous: '‹', next: '›'}},
                             responsive: true,
@@ -345,6 +333,7 @@
                             info: false
                         });
                     });
+                     </#if>
                 </script>
             </div>
         </#if>

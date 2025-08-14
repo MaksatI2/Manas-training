@@ -1,6 +1,8 @@
 package manasTrainingService.exceptions.nsee;
 
-public class LessonQuizOptionNotFoundException extends RuntimeException {
+import jakarta.persistence.EntityNotFoundException;
+
+public class LessonQuizOptionNotFoundException extends EntityNotFoundException {
     public LessonQuizOptionNotFoundException(String message) {
         super(message);
     }

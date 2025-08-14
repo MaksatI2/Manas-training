@@ -6,6 +6,12 @@
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17/build/js/utils.js"></script>
 
 <@layout.page>
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <@roadmap.breadcrumbs items=[
     {"label": springMacroRequestContext.getMessage("organization.student.add.breadcrumb.home"), "url": "/"},
     {"label": springMacroRequestContext.getMessage("organization.student.add.breadcrumb.students"), "url": "/organization/students"},

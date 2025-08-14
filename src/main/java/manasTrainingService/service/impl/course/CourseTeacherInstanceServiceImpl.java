@@ -14,6 +14,8 @@ import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.DateUtil;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     private final UserService userService;
     private final ActivityLogService activityLogService;
     private final NotificationService notificationService;
+    private final MessageSource messageSource;
 
     @Override
     public List<CourseInstanceTeacherDTO> getTeachersByCourseInstanceId(Integer courseInstanceId) {
@@ -52,7 +55,13 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
             User teacher = userService.getUserById(teacherId);
 
             if (repository.existsByCourseInstanceIdAndTeacherId(courseInstanceId, teacherId)) {
-                throw new IllegalArgumentException("Учитель уже был назначен на этот курс");
+                throw new IllegalArgumentException(
+                        messageSource.getMessage(
+                                "teacher.already.assigned",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                );
             }
 
             CourseInstanceTeacher entity = CourseInstanceTeacher.builder()
@@ -111,7 +120,13 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     public void hasAccess(Integer courseId) {
         User user = userService.getAuthorizedUser();
         if (!repository.existsByCourseInstanceIdAndTeacherIdAndIsPrimaryTrue(courseId, user.getId())) {
-            throw new NoAccessException("У вас нет доступа к курсу");
+            throw new NoAccessException(
+                    messageSource.getMessage(
+                            "course.access.denied",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         };
     }
 
@@ -120,7 +135,13 @@ public class CourseTeacherInstanceServiceImpl implements CourseTeacherInstanceSe
     public void togglePrimary(Integer courseInstanceId, Integer teacherId) {
         CourseInstanceTeacher instance = repository
                 .findByCourseInstanceIdAndTeacherId(courseInstanceId, teacherId)
-                .orElseThrow(() -> new UserNotFoundException("Преподаватель не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "teacher.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         boolean currentPrimary = Boolean.TRUE.equals(instance.getIsPrimary());
         instance.setIsPrimary(!currentPrimary);

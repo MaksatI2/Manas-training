@@ -24,6 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -71,6 +73,9 @@ class UserServiceTest {
     private UserDetails userDetails;
     @Mock
     private ActivityLogService activityLogService;
+
+    @Mock
+    private MessageSource messageSource;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -140,7 +145,12 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.registerOrganization(dto))
                 .isInstanceOf(EmailAlreadyExistsException.class)
-                .hasMessage("Организация с такой почтой уже существует");
+                .hasMessage(messageSource.getMessage(
+                        "organization.email.exists",
+                        null,
+                        "Организация с такой почтой уже существует",
+                        LocaleContextHolder.getLocale()
+                ));
     }
 
     @Test
@@ -157,7 +167,12 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.registerOrganization(dto))
                 .isInstanceOf(PhoneAlreadyExistsException.class)
-                .hasMessage("Пользователь с таким номером телефона уже существует");
+                .hasMessage(messageSource.getMessage(
+                        "user.phone.exists",
+                        null,
+                        "Пользователь с таким номером телефона уже существует",
+                        LocaleContextHolder.getLocale()
+                ));
     }
 
     @Test
@@ -175,7 +190,12 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.registerOrganization(dto))
                 .isInstanceOf(OrganizationNameAlreadyExistsException.class)
-                .hasMessage("Организация с таким названием уже существует");
+                .hasMessage(messageSource.getMessage(
+                        "organization.name.exists",
+                        null,
+                        "Организация с таким названием уже существует",
+                        LocaleContextHolder.getLocale()
+                ));
     }
 
     @Test
@@ -288,7 +308,12 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.editStudentInformation(dto))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("Пользователь с таким ID не найден");
+                .hasMessage(messageSource.getMessage(
+                        "user.id.not.found",
+                        null,
+                        "Пользователь с таким ID не найден",
+                        LocaleContextHolder.getLocale()
+                ));
     }
 
     @Test
@@ -344,7 +369,12 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.sendResetToken(email))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("Пользователь с таким email не найден");
+                .hasMessage(messageSource.getMessage(
+                        "user.email.not.found",
+                        null,
+                        "Пользователь с таким email не найден",
+                        LocaleContextHolder.getLocale()
+                ));
     }
 
     @Test
@@ -410,7 +440,12 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.getUserEntityByEmail(email))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("Пользователь с данным Email не найден");
+                .hasMessage(messageSource.getMessage(
+                        "user.email.not.found",
+                        null,
+                        "Пользователь с таким email не найден",
+                        LocaleContextHolder.getLocale()
+                ));
     }
 
     @Test
@@ -472,7 +507,13 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.addAvatarUrl(userId, filename))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("Пользователь не найден");
+                .hasMessage(messageSource.getMessage(
+                                "user.id.not.found",
+                                null,
+                                "Пользователь с таким ID не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                );
     }
 
     @Test
@@ -509,7 +550,11 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.getUserById(id))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("Пользователь с ID 999 не найден");
+                .hasMessage(messageSource.getMessage(
+                        "user.not.found",
+                        new Object[]{id},
+                        LocaleContextHolder.getLocale()
+                ));
     }
 
     @Test
@@ -542,7 +587,12 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.resendVerificationEmail(email))
                 .isInstanceOf(EmailAlreadyVerifiedException.class)
-                .hasMessage("Email уже подтвержден");
+                .hasMessage(messageSource.getMessage(
+                        "email.already.verified",
+                        null,
+                        "Email уже подтвержден",
+                        LocaleContextHolder.getLocale()
+                ));
     }
 
     @Test

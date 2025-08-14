@@ -18,6 +18,8 @@ import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,6 +33,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/student")
@@ -44,6 +47,7 @@ public class StudentController {
     private final TestResultService testResultService;
     private final TestService testService;
     private final StudentStatisticsService studentStatisticsService;
+    private final MessageSource messageSource;
 
     @GetMapping("/profile")
     public String profilePage(Model model){
@@ -62,16 +66,23 @@ public class StudentController {
                                      BindingResult bindingResult,
                                      RedirectAttributes redirectAttributes,
                                      Model model){
+        Locale locale = LocaleContextHolder.getLocale();
         if (bindingResult.hasErrors()) {
             return "student/profile-edit";
         }
 
         try {
             studentService.editStudentInformation(userProfileEditDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Профиль успешно обновлен!");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("profile.update.success", null, locale)
+            );
             return "redirect:/student/profile";
         } catch (PhoneAlreadyExistsException e) {
-            model.addAttribute("errorMessage", "Данный телефонный номер уже зарегистрирован");
+            model.addAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("phone.already.exists", null, locale)
+            );
             model.addAttribute("studentProfile", userProfileEditDto);
             return "student/profile-edit";
         }
@@ -103,7 +114,14 @@ public class StudentController {
             model.addAttribute("startDate", testInstanceDto.getStartDate().format(formatter));
             model.addAttribute("endDate", testInstanceDto.getEndDate().format(formatter));
         } catch (TestInstanceNotFoundException e) {
-            model.addAttribute("testInstanceNotFound", "Тестовое задание для курса " + courseInstanceDto.getCourseTitle() + " еще не было назначенно");
+            model.addAttribute(
+                    "testInstanceNotFound",
+                    messageSource.getMessage(
+                            "test.instance.not.found",
+                            new Object[]{courseInstanceDto.getCourseTitle()},
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
         return "student/course-detail";
     }

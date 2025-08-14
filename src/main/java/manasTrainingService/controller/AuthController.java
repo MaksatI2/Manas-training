@@ -11,6 +11,8 @@ import manasTrainingService.entity.RememberMeToken;
 import manasTrainingService.exceptions.nsee.user.*;
 import manasTrainingService.service.user.RememberMeService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.WebAttributes;
@@ -31,6 +33,7 @@ public class AuthController {
 
     private final UserService userService;
     private final RememberMeService rememberMeService;
+    private final MessageSource messageSource;
 
     @GetMapping("/register")
     public String showRegistrationChoice() {
@@ -67,10 +70,19 @@ public class AuthController {
                     .getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
 
             if (ex instanceof DisabledException) {
-                model.addAttribute("error", "Ваш email не подтвержден. Пожалуйста, проверьте почту.");
+                model.addAttribute("error", messageSource.getMessage(
+                        "auth.email.not.confirmed",
+                        null,
+                        LocaleContextHolder.getLocale()
+                ));
             } else {
-                model.addAttribute("error", "Неверный email или пароль");
+                model.addAttribute("error", messageSource.getMessage(
+                        "auth.invalid.credentials",
+                        null,
+                        LocaleContextHolder.getLocale()
+                ));
             }
+
         }
 
         Optional<String> tokenOpt = rememberMeService.getRememberMeTokenFromCookie(request);
@@ -99,7 +111,11 @@ public class AuthController {
             }
         }
 
-        redirectAttributes.addAttribute("error", "Сессия истекла. Пожалуйста, войдите снова.");
+        redirectAttributes.addAttribute("error", messageSource.getMessage(
+                "auth.session.expired",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
         rememberMeService.removeRememberMeCookie(response);
         return "redirect:/auth/login";
     }
@@ -128,8 +144,12 @@ public class AuthController {
 
         try {
             userService.registerStudent(studentRegisterDto);
-            redirectAttributes.addAttribute("message",
-                    "Регистрация прошла успешно! Войдите в свой аккаунт.");
+            String successMessage = messageSource.getMessage(
+                    "auth.registerStudent",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addAttribute("message", successMessage);
             return "redirect:/auth/verify-pending?email=" + studentRegisterDto.getEmail();
         } catch (EmailAlreadyExistsException e) {
             bindingResult.rejectValue("email", "email.exists", e.getMessage());
@@ -156,8 +176,12 @@ public class AuthController {
 
         try {
             userService.registerOrganization(organizationRegisterDto);
-            redirectAttributes.addAttribute("message",
-                    "Регистрация компании прошла успешно! Войдите в свой аккаунт.");
+            String successMessage = messageSource.getMessage(
+                    "auth.registerStudent",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addAttribute("message", successMessage);
             return "redirect:/auth/verify-pending?email=" + organizationRegisterDto.getEmail();
         } catch (EmailAlreadyExistsException e) {
             bindingResult.rejectValue("email", "email.exists", e.getMessage());
@@ -173,13 +197,26 @@ public class AuthController {
     @GetMapping("/verify-email")
     public String verifyEmail(@RequestParam("token") String token, RedirectAttributes redirectAttributes) {
         boolean success = userService.verifyEmailToken(token);
+
         if (success) {
-            redirectAttributes.addAttribute("message", "Email успешно подтверждён! Теперь Вы можете войти.");
+            String message = messageSource.getMessage(
+                    "auth.verifyEmail.success",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addAttribute("message", message);
         } else {
-            redirectAttributes.addAttribute("error", "Ссылка недействительна или истекла.");
+            String error = messageSource.getMessage(
+                    "auth.verifyEmail.error",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addAttribute("error", error);
         }
+
         return "redirect:/auth/login";
     }
+
 
     @GetMapping("/forgot-password")
     public String forgotPasswordPage() {
@@ -189,23 +226,45 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public String sendResetEmail(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
         if (email.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Почта не может быть пустой");
+            String error = messageSource.getMessage(
+                    "auth.forgotPassword.emptyEmail",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("errorMessage", error);
             return "redirect:/auth/forgot-password";
-
         }
+
         try {
             userService.sendResetToken(email);
-            redirectAttributes.addFlashAttribute("message", "Инструкция по сбросу пароля отправлена на указанный email.");
+            String message = messageSource.getMessage(
+                    "auth.forgotPassword.sent",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("message", message);
         } catch (UserNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", "Пользователь с таким email не найден.");
+            String error = messageSource.getMessage(
+                    "auth.forgotPassword.userNotFound",
+                    new Object[]{email},
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("error", error);
         }
+
         return "redirect:/auth/forgot-password";
     }
+
 
     @GetMapping("/reset-password")
     public String resetPasswordPage(@RequestParam("token") String token, Model model, RedirectAttributes redirectAttributes) {
         if (!userService.isValidResetToken(token)) {
-            redirectAttributes.addFlashAttribute("error", "Ссылка для сброса пароля недействительна или устарела.");
+            String error = messageSource.getMessage(
+                    "auth.resetPassword.invalidToken",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("error", error);
             return "redirect:/auth/forgot-password";
         }
 
@@ -224,7 +283,12 @@ public class AuthController {
             RedirectAttributes redirectAttributes
     ) {
         if (!userService.isValidResetToken(passwordResetDto.getToken())) {
-            redirectAttributes.addFlashAttribute("error", "Ссылка для сброса пароля недействительна или устарела.");
+            String error = messageSource.getMessage(
+                    "auth.resetPassword.invalidToken",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("error", error);
             return "redirect:/auth/forgot-password";
         }
 
@@ -235,10 +299,20 @@ public class AuthController {
 
         boolean success = userService.resetPassword(passwordResetDto.getToken(), passwordResetDto.getPassword());
         if (success) {
-            redirectAttributes.addFlashAttribute("message", "Пароль успешно изменён. Войдите в систему.");
+            String message = messageSource.getMessage(
+                    "auth.resetPassword.success",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("message", message);
             return "redirect:/auth/login";
         } else {
-            redirectAttributes.addFlashAttribute("error", "Произошла ошибка при сбросе пароля. Попробуйте еще раз.");
+            String error = messageSource.getMessage(
+                    "auth.resetPassword.failed",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            model.addAttribute("error", error);
             model.addAttribute("passwordResetDto", passwordResetDto);
             return "auth/reset-password";
         }
@@ -254,16 +328,37 @@ public class AuthController {
     public String resendVerificationEmail(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
         try {
             userService.resendVerificationEmail(email);
-            redirectAttributes.addFlashAttribute("message", "Письмо с подтверждением повторно отправлено на " + email);
+            String message = messageSource.getMessage(
+                    "auth.resendVerification.success",
+                    new Object[]{email},
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("message", message);
         } catch (UserNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", "Пользователь с таким email не найден.");
+            String error = messageSource.getMessage(
+                    "auth.resendVerification.userNotFound",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("error", error);
         } catch (EmailAlreadyVerifiedException e) {
-            redirectAttributes.addFlashAttribute("error", "Email уже подтвержден. Вы можете войти в систему.");
+            String error = messageSource.getMessage(
+                    "auth.resendVerification.alreadyVerified",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("error", error);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Произошла ошибка при отправке письма. Попробуйте позже.");
+            String error = messageSource.getMessage(
+                    "auth.resendVerification.failed",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("error", error);
         }
         return "redirect:/auth/verify-pending?email=" + email;
     }
+
 
     @GetMapping("/manage-devices")
     public String manageDevices(Model model, Authentication authentication) {
@@ -301,10 +396,22 @@ public class AuthController {
                 }
             }
 
-            redirectAttributes.addFlashAttribute("message", "Устройство успешно отключено.");
+            String message = messageSource.getMessage(
+                    "auth.device.disconnect.success",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("message", message);
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Ошибка при отключении устройства.");
+            String error = messageSource.getMessage(
+                    "auth.device.disconnect.error",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
+            redirectAttributes.addFlashAttribute("error", error);
         }
+
 
         return "redirect:/auth/manage-devices";
     }
@@ -320,7 +427,14 @@ public class AuthController {
             rememberMeService.removeRememberMeCookie(response);
             new SecurityContextLogoutHandler().logout(request, response, authentication);
 
-            redirectAttributes.addFlashAttribute("message", "Вы вышли из всех устройств.");
+            redirectAttributes.addFlashAttribute(
+                    "message",
+                    messageSource.getMessage(
+                            "auth.logout.allDevices",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
 
         return "redirect:/auth/login";

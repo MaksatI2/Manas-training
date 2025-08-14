@@ -17,7 +17,9 @@ import manasTrainingService.service.quiz.LessonQuizQuestionService;
 import manasTrainingService.service.quiz.LessonQuizService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
     private LessonQuizService lessonQuizService;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     @Autowired
     public void setLessonQuizService(@Lazy LessonQuizService lessonQuizService) {
@@ -121,14 +124,26 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
     @Override
     public LessonQuizQuestion getQuizQuestinEntityById(int id){
         return lessonQuizQuestionRepository.findById(id)
-                .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
+                .orElseThrow(() -> new LessonQuizQuestionNotFoundException(
+                        messageSource.getMessage(
+                                "lesson.quiz.question.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     private void deleteQuestionsFromEdit(List<LessonQuizQuestionDto> lessonQuizQuestions){
         User user = userService.getAuthorizedUser();
         for (LessonQuizQuestionDto question : lessonQuizQuestions){
             LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(question.getId())
-                    .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
+                    .orElseThrow(() -> new LessonQuizQuestionNotFoundException(
+                            messageSource.getMessage(
+                                    "lesson.quiz.question.not.found",
+                                    null,
+                                    LocaleContextHolder.getLocale()
+                            )
+                    ));
             activityLogService.log(
                     user,
                     ActionType.DELETE,
@@ -147,7 +162,13 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
         for(int i = 0; i < questions.size(); i++){
             if (questions.get(i).getId() != null){
                 LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(questions.get(i).getId())
-                        .orElseThrow(() -> new LessonQuizQuestionNotFoundException("Вопрос не найден"));
+                        .orElseThrow(() -> new LessonQuizQuestionNotFoundException(
+                                messageSource.getMessage(
+                                        "lesson.quiz.question.not.found",
+                                        null,
+                                        LocaleContextHolder.getLocale()
+                                )
+                        ));
                 lessonQuizQuestion.setQuestion(questions.get(i).getQuestion());
                 lessonQuizQuestion.setPoints(BigDecimal.valueOf(basePoints + (i < remainder ? 1 : 0)));
                 LessonQuizQuestion updated = lessonQuizQuestionRepository.saveAndFlush(lessonQuizQuestion);

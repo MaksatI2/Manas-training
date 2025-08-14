@@ -11,9 +11,9 @@ import manasTrainingService.entity.Status;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApplicationStatusUpdateDto {
-    @NotNull(message = "Новый статус обязателен")
+    @NotNull(message = "{applicationStatusUpdate.newStatus.notnull}")
     private Status newStatus;
 
-    @Size(max = 500, message = "Комментарий не должен превышать 500 символов")
+    @Size(max = 500, message = "{applicationStatusUpdate.comment.size}")
     private String comment;
 }

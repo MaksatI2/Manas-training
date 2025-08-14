@@ -63,7 +63,7 @@ function createQuestionBlock(count, lessonQuizId) {
                             <div id="questionId-${questionIndex}-optionId-2" class="d-flex align-items-center mt-3">
                                 <div class="form-check d-flex align-items-center mb-0">
                                     <input type="radio"
-                                           name="questions[${questionIndex}].correctOptionIndex}
+                                           name="questions[${questionIndex}].correctOptionIndex"
                                            value="2"
                                            id="questions[${questionIndex}].options[2]"
                                            class="form-check-input fs-4">

@@ -10,8 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class LessonEditDto {
-    
-    @NotBlank(message = "Название обязательно")
+
+    @NotBlank(message = "{lessonEdit.title.notBlank}")
     private String title;
 
     private String description;

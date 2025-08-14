@@ -19,14 +19,14 @@ import java.time.LocalDate;
 public class CourseInstanceUpdateDTO {
     private Integer id;
 
-    @NotBlank(message = "Название необходимо")
-    @Size(max = 50, message = "Максимальная длина названия — 50 символов")
+    @NotBlank(message = "{courseInstance.title.notBlank}")
+    @Size(max = 50, message = "{courseInstance.title.size}")
     private String title;
 
-    @NotNull(message = "Дата начала курса необходима")
+    @NotNull(message = "{courseInstance.startDate.notNull}")
     private LocalDate startDate;
 
-    @NotNull(message = "Дата конца курса необходима")
+    @NotNull(message = "{courseInstance.endDate.notNull}")
     private LocalDate endDate;
 
     @NotNull

@@ -14,24 +14,23 @@ import manasTrainingService.validation.ValidPhoneNumber;
 @NoArgsConstructor
 public class OrganizationRegisterDto {
 
-    @Email(message = "Неправильный формат email")
-    @NotBlank(message = "Email не может быть пустым")
+    @Email(message = "{organizationRegisterDto.email.invalid}")
+    @NotBlank(message = "{organizationRegisterDto.email.notBlank}")
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            message = "Email должен содержать только английские символы")
+            message = "{organizationRegisterDto.email.pattern}")
     private String email;
 
     @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).+$",
-            message = "Пароль должен содержать хотя бы одну заглавную букву и одну цифру")
-    @Size(min = 8, message = "Пароль должен быть не менее 8 символов")
+            message = "{organizationRegisterDto.password.pattern}")
+    @Size(min = 8, message = "{organizationRegisterDto.password.size}")
     private String password;
 
-    @NotBlank(message = "Название организации не может быть пустым")
-    @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
+    @NotBlank(message = "{organizationRegisterDto.companyName.notBlank}")
+    @Size(max = 100, message = "{organizationRegisterDto.companyName.size}")
     private String companyName;
 
-    @NotBlank(message = "Номер телефона не может быть пустым")
+    @NotBlank(message = "{organizationRegisterDto.phone.notBlank}")
     @ValidPhoneNumber
     private String phone;
     private Integer roleId;
-
 }

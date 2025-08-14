@@ -14,7 +14,9 @@ import manasTrainingService.service.OptionService;
 import manasTrainingService.service.QuestionService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +28,7 @@ public class OptionServiceImpl implements OptionService {
     private QuestionService questionService;
     private final ActivityLogService activityLogService;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     @Autowired
     public void setQuestionService(@Lazy QuestionService questionService) {
@@ -62,8 +65,9 @@ public class OptionServiceImpl implements OptionService {
 
             if (options.get(i).getId() != null){
                 QuestionOption questionOption = questionOptionRepository.findById(options.get(i).getId())
-                        .orElseThrow(() -> new QuestionOptionNotFoundException("Вариант ответа не найден"));
-                if(options.get(i).getIsRemoved() != null && options.get(i).getIsRemoved()){
+                        .orElseThrow(() -> new QuestionOptionNotFoundException(
+                                messageSource.getMessage("question.option.not.found", null, LocaleContextHolder.getLocale())
+                        ));                if(options.get(i).getIsRemoved() != null && options.get(i).getIsRemoved()){
                     questionOptionRepository.deleteById(options.get(i).getId());
                     activityLogService.log(
                             userService.getAuthorizedUser(),
@@ -125,6 +129,7 @@ public class OptionServiceImpl implements OptionService {
     @Override
     public QuestionOption getOptionById(int id){
         return questionOptionRepository.findById(id)
-                .orElseThrow(() -> new QuestionOptionNotFoundException("Вариант ответа не найден"));
-    }
+                .orElseThrow(() -> new QuestionOptionNotFoundException(
+                        messageSource.getMessage("question.option.not.found", null, LocaleContextHolder.getLocale())
+                ));    }
 }

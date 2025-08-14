@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LessonDateInCourseRange {
-    String message() default "Дата урока должна быть в пределах курса";
+    String message() default "{LessonDateInCourseRange.message}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

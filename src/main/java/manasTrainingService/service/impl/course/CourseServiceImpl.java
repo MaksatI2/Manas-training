@@ -15,6 +15,8 @@ import manasTrainingService.service.course.CourseCategoryService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,17 +44,26 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseTeacherRepository courseTeacherRepository;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @Override
     public List<CourseDto> getAllCourses() {
         return courseRepository.findAll().stream().map(this::toDto).toList();
     }
 
-    @Override
     public CourseDto getById(Integer id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Курс с ID " + id + " не найден"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "course.not.found.simple",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return convertToDto(course);
     }
+
 
     @Override
     public List<CourseCategoryDto> getCategories() {
@@ -98,7 +109,13 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course getCourseById(Integer id) {
-        return courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException("Курс не был найден"));
+        return courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException(messageSource.getMessage(
+                        "course.not.found.simple",
+                        null,
+                        LocaleContextHolder.getLocale()
+                )
+                )
+        );
     }
 
     @Override
@@ -125,7 +142,13 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<TeacherCardDto> getTeachersByCourse(Integer courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CourseNotFoundException("Курс не найден"));
+                .orElseThrow(() -> new CourseNotFoundException(messageSource.getMessage(
+                                "course.not.found.simple",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                        )
+                );
 
         List<CourseTeacher> courseTeachers = courseTeacherRepository.findByCourseId(courseId);
 

@@ -8,6 +8,12 @@
     <#assign bcInstance = springMacroRequestContext.getMessage("course.participants.breadcrumb.instance", [courseInstance.id?string])>
     <#assign bcParticipants = springMacroRequestContext.getMessage("course.participants.breadcrumb.participants")>
 
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcInstances, "url": "/admin/course-instances"},
@@ -24,11 +30,6 @@
             </p>
         </div>
 
-        <#if errorMessage??>
-            <div class="alert alert-danger mt-3 mx-auto" style="max-width: 600px;">
-                ${errorMessage}
-            </div>
-        </#if>
 
         <div class="feature-card mb-5 p-4 bg-white shadow-sm rounded">
             <h3 class="mb-3"><@spring.message code="course.participants.current.title"/></h3>

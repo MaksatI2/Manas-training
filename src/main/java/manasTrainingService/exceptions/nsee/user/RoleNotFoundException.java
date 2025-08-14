@@ -1,6 +1,8 @@
 package manasTrainingService.exceptions.nsee.user;
 
-public class RoleNotFoundException extends RuntimeException {
+import jakarta.persistence.EntityNotFoundException;
+
+public class RoleNotFoundException extends EntityNotFoundException {
     public RoleNotFoundException(String message) {
         super(message);
     }

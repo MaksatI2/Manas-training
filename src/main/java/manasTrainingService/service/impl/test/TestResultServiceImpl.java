@@ -17,7 +17,9 @@ import manasTrainingService.service.test.TestInstanceService;
 import manasTrainingService.service.test.TestResultService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,6 +35,7 @@ public class TestResultServiceImpl implements TestResultService {
     private final TestResultRepository testResultRepository;
     private UserService userService;
     private TestInstanceService testInstanceService;
+    private final MessageSource messageSource;
 
     @Autowired
     public void setUserService(@Lazy UserService userService) {
@@ -62,7 +65,14 @@ public class TestResultServiceImpl implements TestResultService {
     @Override
     public TestResultDto getTestResultsByUserId(){
         TestResult testResult = testResultRepository.findByStudentId(userService.getAuthorizedUser().getId())
-                .orElseThrow(() -> new TestResultNotFoundException("Результатов по данному пользователю не найденно"));
+                .orElseThrow(() -> new TestResultNotFoundException(
+                        messageSource.getMessage(
+                                "test.result.not.found.for.user",
+                                null,
+                                "Результатов по данному пользователю не найдено",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return TestResultDto.builder()
                 .totalPoints(testResult.getScore().intValue())
                 .passingTime(testResult.getTimeSpentMinutes())
@@ -73,7 +83,14 @@ public class TestResultServiceImpl implements TestResultService {
     @Override
     public TestResultDto getResultsByTestInstanceIdAndStudentId(int testInstanceId){
         TestResult testResult = testResultRepository.findOneByStudentIdAndTestInstanceId(userService.getAuthorizedUser().getId(), testInstanceId)
-                .orElseThrow(() -> new TestResultNotFoundException("Результатов по данному запросу не найденно"));
+                .orElseThrow(() -> new TestResultNotFoundException(
+                        messageSource.getMessage(
+                                "test.result.not.found.for.request",
+                                null,
+                                "Результатов по данному запросу не найдено",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return TestResultDto.builder()
                 .id(testResult.getId())
                 .totalPoints(testResult.getScore().intValue())
@@ -91,7 +108,14 @@ public class TestResultServiceImpl implements TestResultService {
     @Override
     public TestResultDto getResultsByTestInstanceIdAndStudentId(int testInstanceId, int userId){
         TestResult testResult = testResultRepository.findOneByStudentIdAndTestInstanceId(userId, testInstanceId)
-                .orElseThrow(() -> new TestResultNotFoundException("Результатов по данному запросу не найденно"));
+                .orElseThrow(() -> new TestResultNotFoundException(
+                        messageSource.getMessage(
+                                "test.result.not.found.for.request",
+                                null,
+                                "Результатов по данному запросу не найдено",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return TestResultDto.builder()
                 .id(testResult.getId())
                 .totalPoints(testResult.getScore().intValue())
@@ -191,7 +215,14 @@ public class TestResultServiceImpl implements TestResultService {
     @Override
     public TestResultAdminDto getTestResultById(int id){
         TestResult testResult = testResultRepository.findById(id)
-                .orElseThrow(() -> new TestResultNotFoundException("Результатов по данному запросу не найденно"));
+                .orElseThrow(() -> new TestResultNotFoundException(
+                        messageSource.getMessage(
+                                "test.result.not.found.for.request",
+                                null,
+                                "Результатов по данному запросу не найдено",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return TestResultAdminDto
                                 .builder()
                                 .id(testResult.getId())

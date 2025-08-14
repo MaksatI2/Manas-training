@@ -11,7 +11,9 @@ import manasTrainingService.exceptions.nsee.user.UserNotFoundException;
 import manasTrainingService.repositories.user.TeacherProfileRepository;
 import manasTrainingService.service.user.TeacherService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,11 +25,13 @@ import java.util.List;
 public class TeacherServiceImpl implements TeacherService {
     private final TeacherProfileRepository teacherProfileRepository;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     public TeacherServiceImpl(TeacherProfileRepository teacherProfileRepository,
-                              @Lazy UserService userService) {
+                              @Lazy UserService userService, MessageSource messageSource) {
         this.teacherProfileRepository = teacherProfileRepository;
         this.userService = userService;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -45,7 +49,14 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public TeacherProfileDto getTeacherProfile(User user) {
         TeacherProfile teacherProfile = teacherProfileRepository.findByUser(user)
-                .orElseThrow(() -> new UserNotFoundException("Профиль преподавателя не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "teacher.profile.not.found",
+                                null,
+                                "Профиль преподавателя не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         return TeacherProfileDto.builder()
                 .teacher(user)
@@ -71,8 +82,14 @@ public class TeacherServiceImpl implements TeacherService {
         userService.saveUser(user);
 
         TeacherProfile teacherProfile = teacherProfileRepository.findByUser(user)
-                .orElseThrow(() -> new UserNotFoundException("Профиль преподавателя не найден"));
-
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "teacher.profile.not.found",
+                                null,
+                                "Профиль преподавателя не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         teacherProfile.setDepartment(teacherProfileEditDto.getDepartment());
         teacherProfile.setQualifications(teacherProfileEditDto.getQualifications());
         teacherProfile.setBio(teacherProfileEditDto.getBio());
@@ -132,11 +149,25 @@ public class TeacherServiceImpl implements TeacherService {
         User user = userService.getUserById(id.intValue());
 
         if (!"TEACHER".equalsIgnoreCase(user.getRole().getName())) {
-            throw new UserNotFoundException("Пользователь не является преподавателем");
+            throw new UserNotFoundException(
+                    messageSource.getMessage(
+                            "user.not.teacher",
+                            null,
+                            "Пользователь не является преподавателем",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
 
         TeacherProfile teacherProfile = teacherProfileRepository.findByUser(user)
-                .orElseThrow(() -> new UserNotFoundException("Профиль преподавателя не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "teacher.profile.not.found",
+                                null,
+                                "Профиль преподавателя не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         return TeacherProfileDto.builder()
                 .teacher(user)

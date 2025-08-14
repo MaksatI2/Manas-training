@@ -8,6 +8,13 @@
 <#assign bcCurrent><@spring.message code='application.admin.list.breadcrumb.current'/></#assign>
 
 <@layout.page title="<@spring.message code='application.admin.list.title'/>">
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcCurrent, "url": ""}

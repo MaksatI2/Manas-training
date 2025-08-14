@@ -22,11 +22,11 @@ public class QuestionDto {
     private Boolean isRequired;
     @Valid
     private List<OptionDto> options = new ArrayList<>();
-    @NotNull(message = "Укажите какой вариант ответа является верным")
+    @NotNull(message = "{QuestionDto.correctOptionIndex.NotNull}")
     private Integer correctOptionIndex;
     private Boolean isRemoved;
 
-    @AssertTrue(message = "Вопрос обязателен для заполнения")
+    @AssertTrue(message = "{QuestionDto.question.AssertTrue}")
     public boolean isValidTextIfNotRemoved() {
         return Boolean.TRUE.equals(isRemoved) || (question != null && !question.trim().isEmpty());
     }

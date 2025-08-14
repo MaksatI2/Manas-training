@@ -17,7 +17,7 @@ public class LessonQuizOptionDto {
     private Boolean isRemoved;
 
 
-    @AssertTrue(message = "Ответ обязательно должен быть заполнен")
+    @AssertTrue(message = "{lessonQuizOptionDto.validTextIfNotRemoved}")
     public boolean isValidTextIfNotRemoved() {
         return Boolean.TRUE.equals(isRemoved) || (optionText != null && !optionText.trim().isEmpty());
     }

@@ -10,6 +10,8 @@ import manasTrainingService.service.CourseApplicationService;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.user.OrganizationService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +32,7 @@ public class CourseApplicationController {
     private final CourseService courseService;
     private final OrganizationService organizationService;
     private final CourseInstanceService courseInstanceService;
+    private final MessageSource messageSource;
 
     @GetMapping("/organization")
     @PreAuthorize("hasRole('organization')")
@@ -117,21 +120,30 @@ public class CourseApplicationController {
                                RedirectAttributes redirectAttributes,
                                Model model) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Укажите статус и комментарий при необходимости");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("application.status.validation.error", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/applications/admin/" + id;
         }
 
             try {
             applicationService.updateApplicationStatus(id, dto, principal.getName());
-            redirectAttributes.addFlashAttribute("successMessage", "Статус заявки успешно обновлён.");
-        } catch (BadRequestException ex) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        messageSource.getMessage("application.status.update.success", null, LocaleContextHolder.getLocale())
+                );
+            } catch (BadRequestException ex) {
             CourseApplicationViewDto app = applicationService.getApplicationDetailsForAdmin(id);
             List<ApplicationCommentDto> comments = applicationService.getCommentsForApplication(id);
 
             model.addAttribute("application", app);
             model.addAttribute("comments", comments);
             model.addAttribute("statusUpdateDto", dto);
-            model.addAttribute("errorMessage", ex.getMessage());
+            model.addAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("application.status.update.error", new Object[]{ex.getMessage()}, LocaleContextHolder.getLocale())
+            );
             return "admin/admin_applications_detail";
         }
 
@@ -223,7 +235,10 @@ public class CourseApplicationController {
 
         applicationService.updateApplicationForOrganization(id, dto, principal.getName());
 
-        redirectAttributes.addFlashAttribute("successMessage", "Заявка успешно обновлена!");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("application.update.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/applications/organization";
     }
 
@@ -267,7 +282,10 @@ public class CourseApplicationController {
         }
 
         applicationService.createApplicationFromStudent(dto, principal.getName());
-        redirectAttributes.addFlashAttribute("successMessage", "Заявка успешно отправлена!");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("application.submit.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/applications/student/applications";
     }
 
@@ -309,7 +327,10 @@ public class CourseApplicationController {
         }
 
         applicationService.updateApplicationFromStudent(id, dto, principal.getName());
-        redirectAttributes.addAttribute("successMessage", "Заявка успешно обновлена!");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("application.update.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/applications/student/applications";
     }
 
@@ -319,7 +340,10 @@ public class CourseApplicationController {
                                            Principal principal,
                                            RedirectAttributes redirectAttributes) {
         applicationService.deleteApplicationById(id, principal.getName());
-        redirectAttributes.addFlashAttribute("successMessage", "Заявка удалена.");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("application.delete.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/applications/student/applications";
     }
 
@@ -329,7 +353,10 @@ public class CourseApplicationController {
                                                 Principal principal,
                                                 RedirectAttributes redirectAttributes) {
         applicationService.deleteApplicationById(id, principal.getName());
-        redirectAttributes.addFlashAttribute("successMessage", "Заявка удалена.");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage("application.delete.success", null, LocaleContextHolder.getLocale())
+        );
         return "redirect:/applications/organization";
     }
 

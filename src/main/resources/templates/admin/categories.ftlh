@@ -3,6 +3,12 @@
 <#import "/spring.ftl" as spring>
 
 <@layout.page title="<@spring.message code='categories.admin.list.title'/>">
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <#assign bcHome><@spring.message code='categories.admin.list.breadcrumb.home'/></#assign>
     <#assign bcCurrent><@spring.message code='categories.admin.list.breadcrumb.current'/></#assign>
 
@@ -12,12 +18,7 @@
     ] />
 
     <div class="card shadow mb-4">
-        <#if successMessage??>
-            <div id="successMessage" data-message="${successMessage?js_string}"></div>
-        </#if>
-        <#if errorMessage??>
-            <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
-        </#if>
+
 
         <div class="card-header d-flex filter-panel">
             <h5 class="m-0 font-weight-bold text-white">
@@ -128,6 +129,7 @@
                 responsive: true,
                 pageLength: 10,
                 lengthChange: true,
+                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
                 searching: true,
                 info: false,
                 paging: true,

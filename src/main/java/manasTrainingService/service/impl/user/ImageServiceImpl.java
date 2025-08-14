@@ -9,6 +9,8 @@ import manasTrainingService.repositories.user.UserRepository;
 import manasTrainingService.service.user.ImageService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.FileUtil;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +22,7 @@ public class ImageServiceImpl implements ImageService {
     private final FileUtil fileUtil;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final MessageSource messageSource;
 
     @Override
     public String saveImage(ImageDto imageDto) {
@@ -29,7 +32,14 @@ public class ImageServiceImpl implements ImageService {
 
         try {
             String oldImage = userRepository.findById(imageDto.getUserId())
-                    .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"))
+                    .orElseThrow(() -> new UserNotFoundException(
+                            messageSource.getMessage(
+                                    "user.not.found",
+                                    null,
+                                    "Пользователь не найден",
+                                    LocaleContextHolder.getLocale()
+                            )
+                    ))
                     .getAvatarUrl();
 
             if (oldImage != null && !oldImage.isEmpty()) {
@@ -52,26 +62,52 @@ public class ImageServiceImpl implements ImageService {
 
     private void validateImage(MultipartFile image) {
         if (image == null) {
-            throw new ImageValidationException("Изображение не может быть null");
+            throw new ImageValidationException(messageSource.getMessage(
+                    "image.null",
+                    null,
+                    "Изображение не может быть null",
+                    LocaleContextHolder.getLocale()
+            ));
         }
 
         if (image.isEmpty()) {
-            throw new ImageValidationException("Пожалуйста, выберите изображение для загрузки");
+            throw new ImageValidationException(messageSource.getMessage(
+                    "image.empty",
+                    null,
+                    "Пожалуйста, выберите изображение для загрузки",
+                    LocaleContextHolder.getLocale()
+            ));
         }
 
         if (image.getSize() == 0) {
-            throw new ImageValidationException("Файл изображения пустой");
+            throw new ImageValidationException(messageSource.getMessage(
+                    "image.file.empty",
+                    null,
+                    "Файл изображения пустой",
+                    LocaleContextHolder.getLocale()
+            ));
         }
 
         long maxSize = 5 * 1024 * 1024;
         if (image.getSize() > maxSize) {
-            throw new ImageValidationException("Размер изображения не должен превышать 5 МБ");
+            throw new ImageValidationException(messageSource.getMessage(
+                    "image.too.large",
+                    new Object[]{maxSize / (1024 * 1024)},
+                    "Размер изображения не должен превышать {0} МБ",
+                    LocaleContextHolder.getLocale()
+            ));
         }
 
         String contentType = image.getContentType();
         if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/jpg"))) {
-            throw new ImageValidationException("Поддерживаются только изображения в формате JPEG/JPG");
+            throw new ImageValidationException(messageSource.getMessage(
+                    "image.invalid.format",
+                    null,
+                    "Поддерживаются только изображения в формате JPEG/JPG",
+                    LocaleContextHolder.getLocale()
+            ));
         }
+
 
         log.info("Валидация изображения прошла успешно. Размер: {} байт, тип: {}",
                 image.getSize(), contentType);

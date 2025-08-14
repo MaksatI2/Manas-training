@@ -13,27 +13,27 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @EndDateAfterStartDate
 public class EditCertificateDto {
-    @NotNull
+
+    @NotNull(message = "{editCertificate.id.notnull}")
     private Integer id;
 
-    @NotNull
+    @NotNull(message = "{editCertificate.studentId.notnull}")
     private Integer studentId;
 
-    @NotBlank(message="Номер сертификата обязателен")
+    @NotBlank(message = "{editCertificate.certificateNumber.notblank}")
     private String certificateNumber;
 
-    @NotNull(message="Дата выдачи обязательна")
+    @NotNull(message = "{editCertificate.issueDate.notnull}")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate issueDate;
 
-    @NotNull(message="Срок действия обязателен")
-    @FutureOrPresent(message="Срок действия не может быть в прошлом")
+    @NotNull(message = "{editCertificate.expiryDate.notnull}")
+    @FutureOrPresent(message = "{editCertificate.expiryDate.futureOrPresent}")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate expiryDate;
 
-    @NotNull(message="Оценка обязательна")
-    @Min(value=0, message="Оценка не может быть меньше 0")
-    @Max(value=100, message="Оценка не может быть больше 100")
+    @NotNull(message = "{editCertificate.mark.notnull}")
+    @Min(value = 0, message = "{editCertificate.mark.min}")
+    @Max(value = 100, message = "{editCertificate.mark.max}")
     private Integer mark;
-
 }

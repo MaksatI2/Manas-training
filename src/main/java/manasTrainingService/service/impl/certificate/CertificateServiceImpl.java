@@ -11,7 +11,10 @@ import manasTrainingService.repositories.course.CourseInstanceRepository;
 import manasTrainingService.service.certificate.CertificateService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.DateUtil;
+import org.aspectj.bridge.Message;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ public class CertificateServiceImpl implements CertificateService {
     private final CertificateRepository certRepo;
     private final UserService userService;
     private final CourseInstanceRepository ciRepo;
+    private final MessageSource messageSource;
 
     @Override
     public List<CourseCertificateStatusDto> getStatuses(Integer studentId) {
@@ -58,7 +62,13 @@ public class CertificateServiceImpl implements CertificateService {
     public CertificateViewDto findOneByIdAndStudentId(Integer certId, Integer studentId) {
         Certificate cert = certRepo.findById(certId)
                 .filter(c -> c.getStudent().getId().equals(studentId))
-                .orElseThrow(() -> new EntityNotFoundException("Сертификат не найден"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "certificate.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return toDto(cert);
     }
 
@@ -132,7 +142,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public EditCertificateDto prepareEdit(Integer certId) {
         var cert = certRepo.findById(certId)
-                .orElseThrow(() -> new EntityNotFoundException("Certificate not found"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "certificate.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return new EditCertificateDto(
                 cert.getId(),
                 cert.getStudent().getId(),
@@ -146,7 +162,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public void saveEditedCertificate(EditCertificateDto dto) {
         var cert = certRepo.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Certificate not found"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "certificate.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         cert.setCertificateNumber(dto.getCertificateNumber());
         cert.setIssueDate(dto.getIssueDate());
         cert.setExpiryDate(dto.getExpiryDate());
@@ -157,7 +179,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public void createCertificate(CreateCertificateDto dto, Integer issuerUserId) {
         var ci = ciRepo.findById(dto.getCourseInstanceId())
-                .orElseThrow(() -> new EntityNotFoundException("Course instance not found"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "course.instance.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         var issuer = userService.getUserById(issuerUserId);
         Certificate cert = new Certificate();
         cert.setStudent(userService.getUserById(dto.getStudentId()));
@@ -173,7 +201,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public CertificateViewDto getCertificateView(Integer certId) {
         var cert = certRepo.findById(certId)
-                .orElseThrow(() -> new EntityNotFoundException("Certificate not found"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "certificate.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         return CertificateViewDto.builder()
                 .certificate(cert)
                 .id(cert.getId())
@@ -189,7 +223,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public Certificate getCertificate(Integer certId) {
         return certRepo.findById(certId)
-                .orElseThrow(() -> new EntityNotFoundException("Certificate not found"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "certificate.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override
@@ -200,7 +240,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public Certificate getCertificateWithModules(Integer certId) {
         return certRepo.findByIdWithModules(certId)
-                .orElseThrow(() -> new EntityNotFoundException("Certificate not found"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageSource.getMessage(
+                                "certificate.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override

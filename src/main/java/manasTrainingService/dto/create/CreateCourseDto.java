@@ -14,28 +14,27 @@ import manasTrainingService.validation.UniqueCourseCreate;
 @NoArgsConstructor
 @AllArgsConstructor
 @UniqueCourseCreate
-
 public class CreateCourseDto {
 
-    @NotBlank(message = "Название обязательно")
-    @Size(max = 200, message = "Максимум 200 символов")
+    @NotBlank(message = "{createCourse.title.notblank}")
+    @Size(max = 200, message = "{createCourse.title.size}")
     private String title;
 
-    @NotBlank(message = "Код курса обязателен")
-    @Size(max = 20, message = "Максимум 20 символов")
+    @NotBlank(message = "{createCourse.code.notblank}")
+    @Size(max = 20, message = "{createCourse.code.size}")
     private String code;
 
-    @Size(max = 1000, message = "Максимум 1000 символов")
+    @Size(max = 1000, message = "{createCourse.description.size}")
     private String description;
 
-    @NotNull(message = "Продолжительность обязательна")
-    @Min(value = 1, message = "Должно быть положительным числом")
-    @Max(value = 10000, message = "Слишком большая продолжительность, максимальное значение 10000")
+    @NotNull(message = "{createCourse.duration.notnull}")
+    @Min(value = 1, message = "{createCourse.duration.min}")
+    @Max(value = 10000, message = "{createCourse.duration.max}")
     private Integer duration;
 
     @Builder.Default
     private Boolean active = true;
 
-    @NotNull(message = "Категория обязательна")
+    @NotNull(message = "{createCourse.categoryId.notnull}")
     private Integer categoryId;
 }

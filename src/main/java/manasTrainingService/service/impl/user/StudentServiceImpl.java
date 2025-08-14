@@ -12,7 +12,9 @@ import manasTrainingService.repositories.user.StudentProfileRepository;
 import manasTrainingService.service.ActivityLogService;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,12 +23,14 @@ public class StudentServiceImpl implements StudentService {
     private final StudentProfileRepository studentProfileRepository;
     private final UserService userService;
     private final ActivityLogService activityLogService;
+    private final MessageSource messageSource;
 
     public StudentServiceImpl(StudentProfileRepository studentProfileRepository,
-                              @Lazy UserService userService, ActivityLogService activityLogService) {
+                              @Lazy UserService userService, ActivityLogService activityLogService, MessageSource messageSource) {
         this.studentProfileRepository = studentProfileRepository;
         this.userService = userService;
         this.activityLogService = activityLogService;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -47,7 +51,14 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void editStudentInformation(UserProfileEditDto userProfileEditDto){
         StudentProfile studentProfile = studentProfileRepository.findByUserId(userProfileEditDto.getUserId())
-                .orElseThrow(() -> new StudentProfileNotFoundException("Профиль студента не найден"));
+                .orElseThrow(() -> new StudentProfileNotFoundException(
+                        messageSource.getMessage(
+                                "student.profile.not.found",
+                                null,
+                                "Профиль студента не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         User user = studentProfile.getUser();
 
@@ -71,7 +82,14 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentProfileDto getAuthorizedStudentProfile(User user){
         StudentProfile studentProfile = studentProfileRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new StudentProfileNotFoundException("Профиль студента не найден"));
+                .orElseThrow(() -> new StudentProfileNotFoundException(
+                        messageSource.getMessage(
+                                "student.profile.not.found",
+                                null,
+                                "Профиль студента не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         String organizationName = null;
         if (studentProfile.getOrganization() != null &&

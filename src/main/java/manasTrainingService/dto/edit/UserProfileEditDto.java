@@ -14,20 +14,20 @@ import manasTrainingService.validation.ValidPhoneNumber;
 public class UserProfileEditDto {
     private Integer userId;
 
-    @NotBlank(message = "Имя обязательно для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
-    @Size(max = 100, message = "Имя не должно превышать 100 символов")
+    @NotBlank(message = "{userProfile.name.notBlank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "{userProfile.name.pattern}")
+    @Size(max = 100, message = "{userProfile.name.size}")
     private String name;
 
-    @NotBlank(message = "Фамилия обязательна для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
-    @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
+    @NotBlank(message = "{userProfile.surname.notBlank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "{userProfile.surname.pattern}")
+    @Size(max = 100, message = "{userProfile.surname.size}")
     private String surname;
 
-    @NotBlank(message = "Номер телефона не может быть пустым")
+    @NotBlank(message = "{userProfile.phone.notBlank}")
     @ValidPhoneNumber
     private String phone;
 
-    @NotBlank(message = "Специализация обязательно должна быть указана")
+    @NotBlank(message = "{userProfile.specialization.notBlank}")
     private String specialization;
 }

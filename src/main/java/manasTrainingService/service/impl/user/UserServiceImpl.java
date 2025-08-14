@@ -22,8 +22,11 @@ import manasTrainingService.repositories.user.StudentProfileRepository;
 import manasTrainingService.repositories.user.UserRepository;
 import manasTrainingService.service.user.*;
 import org.hibernate.Hibernate;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,18 +48,43 @@ public class UserServiceImpl implements UserService {
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetService passwordResetService;
     private final StudentProfileRepository studentProfileRepository;
+    private final MessageSource messageSource;
 
     @Override
     public void registerOrganization(OrganizationRegisterDto organizationRegisterDto) {
         if (userRepository.existsByEmail(organizationRegisterDto.getEmail())) {
-            throw new EmailAlreadyExistsException("Организация с такой почтой уже существует");
+            throw new EmailAlreadyExistsException(
+                    messageSource.getMessage(
+                            "organization.email.exists",
+                            null,
+                            "Организация с такой почтой уже существует",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
         if (userRepository.existsByPhone(organizationRegisterDto.getPhone())) {
-            throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+            throw new PhoneAlreadyExistsException(
+                    messageSource.getMessage(
+                            "user.phone.exists",
+                            null,
+                            "Пользователь с таким номером телефона уже существует",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
         if (userRepository.existsByName(organizationRegisterDto.getCompanyName())) {
-            throw new OrganizationNameAlreadyExistsException("Организация с таким названием уже существует");
+            throw new OrganizationNameAlreadyExistsException(
+                    messageSource.getMessage(
+                            "organization.name.exists",
+                            null,
+                            "Организация с таким названием уже существует",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
 
         Role companyRole = roleService.getCompanyTypeId();
         User user = User.builder()
@@ -81,11 +109,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerStudent(StudentRegisterDto studentRegisterDto) {
         if (userRepository.existsByEmail(studentRegisterDto.getEmail())) {
-            throw new EmailAlreadyExistsException("Студент с такой почтой уже существует");
+            throw new EmailAlreadyExistsException(
+                    messageSource.getMessage(
+                            "student.email.exists",
+                            null,
+                            "Студент с такой почтой уже существует",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
         if (userRepository.existsByPhone(studentRegisterDto.getPhone())) {
-            throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+            throw new PhoneAlreadyExistsException(
+                    messageSource.getMessage(
+                            "user.phone.exists",
+                            null,
+                            "Пользователь с таким номером телефона уже существует",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
 
         Organization organization = null;
         String orgCode = studentRegisterDto.getOrganizationCode();
@@ -118,11 +162,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerTeacher(TeacherRegisterDto teacherRegisterDto) {
         if (userRepository.existsByEmail(teacherRegisterDto.getEmail())) {
-            throw new EmailAlreadyExistsException("Преподаватель с такой почтой уже существует");
+            throw new EmailAlreadyExistsException(
+                    messageSource.getMessage(
+                            "teacher.email.exists",
+                            null,
+                            "Преподаватель с такой почтой уже существует",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
         if (userRepository.existsByPhone(teacherRegisterDto.getPhone())) {
-            throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+            throw new PhoneAlreadyExistsException(
+                    messageSource.getMessage(
+                            "user.phone.exists",
+                            null,
+                            "Пользователь с таким номером телефона уже существует",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
 
         Role teacherRole = roleService.getTeacherRoleId();
         User user = User.builder()
@@ -150,7 +210,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editStudentInformation(UserProfileEditDto userProfileEditDto) {
         User user = userRepository.findById(userProfileEditDto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким ID не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.id.not.found",
+                                null,
+                                "Пользователь с таким ID не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         user.setName(userProfileEditDto.getName());
         user.setLastName(userProfileEditDto.getSurname());
         user.setPhone(userProfileEditDto.getPhone());
@@ -160,7 +227,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editManagerInformation(OrganizationProfileEditDto organizationProfileEditDto) {
         User user = userRepository.findById(organizationProfileEditDto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким ID не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.id.not.found",
+                                null,
+                                "Пользователь с таким ID не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         user.setName(organizationProfileEditDto.getName());
         user.setLastName(organizationProfileEditDto.getSurname());
         user.setPhone(organizationProfileEditDto.getPhone());
@@ -170,7 +244,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendResetToken(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким email не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.email.not.found",
+                                null,
+                                "Пользователь с таким email не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
         passwordResetService.createResetToken(user);
 
     }
@@ -198,7 +279,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserEntityByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с данным Email не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.email.not.found",
+                                null,
+                                "Пользователь с таким email не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override
@@ -220,7 +308,17 @@ public class UserServiceImpl implements UserService {
 
 
     public void addAvatarUrl(int userId, String filename) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage(
+                                "user.id.not.found",
+                                null,
+                                "Пользователь с таким ID не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+
+
+                        )
+                );
         user.setAvatarUrl(filename);
         userRepository.saveAndFlush(user);
     }
@@ -233,7 +331,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Integer id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + id + " не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.not.found",
+                                null,
+                                "Пользователь не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
     }
 
     @Override
@@ -249,10 +354,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public void resendVerificationEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с email " + email + " не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.email.not.found",
+                                null,
+                                "Пользователь с таким email не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         if (user.getIsActive()) {
-            throw new EmailAlreadyVerifiedException("Email уже подтвержден");
+            throw new EmailAlreadyVerifiedException(
+                    messageSource.getMessage(
+                            "email.already.verified",
+                            null,
+                            "Email уже подтвержден",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
         emailVerificationService.generateVerificationToken(user);
     }
@@ -277,12 +396,26 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUserById(Integer userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.not.found",
+                                null,
+                                "Пользователь не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         if ("ADMIN".equals(user.getRole().getName()) && user.getIsActive()) {
             long activeAdmins = countActiveAdmins();
             if (activeAdmins <= 1) {
-                throw new IllegalStateException("Нельзя удалить последнего активного администратора.");
+                throw new IllegalStateException(
+                        messageSource.getMessage(
+                                "admin.last.active.cannot.delete",
+                                null,
+                                "Нельзя удалить последнего активного администратора.",
+                                LocaleContextHolder.getLocale()
+                        )
+                );
             }
         }
 
@@ -293,7 +426,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserRelationsCountDto getUserRelationsCount(Integer userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.not.found",
+                                null,
+                                "Пользователь не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         Hibernate.initialize(user.getSchedules());
         Hibernate.initialize(user.getEmployees());
@@ -339,18 +479,40 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(UserEditDto userEditDto) {
         User user = userRepository.findById(userEditDto.getId())
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userEditDto.getId() + " не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.not.found",
+                                null,
+                                "Пользователь не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
 
         if (!user.getEmail().equals(userEditDto.getEmail())) {
             if (userRepository.existsByEmail(userEditDto.getEmail())) {
-                throw new EmailAlreadyExistsException("Пользователь с таким Email уже существует");
+                throw new EmailAlreadyExistsException(
+                        messageSource.getMessage(
+                                "user.email.exists",
+                                null,
+                                "Пользователь с таким Email уже существует",
+                                LocaleContextHolder.getLocale()
+                        )
+                );
             }
             user.setEmail(userEditDto.getEmail());
         }
 
         if (!user.getPhone().equals(userEditDto.getPhone()) && userRepository.existsByPhone(userEditDto.getPhone())) {
-            throw new PhoneAlreadyExistsException("Пользователь с таким номером телефона уже существует");
+            throw new PhoneAlreadyExistsException(
+                    messageSource.getMessage(
+                            "user.phone.exists",
+                            null,
+                            "Пользователь с таким номером телефона уже существует",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
         }
+
 
         user.setName(userEditDto.getName());
         user.setLastName(userEditDto.getLastName());
@@ -369,6 +531,23 @@ public class UserServiceImpl implements UserService {
         return new UserStatisticsDto(students, teachers, organizations, inactiveUsers);
     }
 
+    public User getCurrentUser(Authentication authentication) {
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.email.not.found",
+                                null,
+                                "Пользователь с таким email не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));    }
 
+    @Override
+    public void updateLanguage(Authentication authentication, String lang) {
+        User user = getCurrentUser(authentication);
+        user.setLanguagePreference(lang);
+        userRepository.save(user);
+    }
 
 }

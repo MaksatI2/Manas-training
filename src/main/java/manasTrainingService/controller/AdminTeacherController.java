@@ -8,6 +8,8 @@ import manasTrainingService.entity.Course;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.course.CourseTeacherService;
 import manasTrainingService.service.user.TeacherService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ public class AdminTeacherController {
     private final CourseService courseService;
     private final CourseTeacherService courseTeacherService;
     private final TeacherService teacherService;
+    private final MessageSource messageSource;
 
     @GetMapping("/{teacherId}/manage-courses")
     public String showManageCoursesForm(@PathVariable Integer teacherId, Model model) {
@@ -50,7 +53,14 @@ public class AdminTeacherController {
                                        @RequestParam(required = false, name = "courseIds") List<Integer> courseIds,
                                        RedirectAttributes redirectAttributes) {
         courseTeacherService.updateTeacherCourses(teacherId, courseIds != null ? courseIds : Collections.emptyList());
-        redirectAttributes.addFlashAttribute("successMessage", "Курсы преподавателя успешно обновлены!");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                messageSource.getMessage(
+                        "teacher.courses.update.success",
+                        null,
+                        LocaleContextHolder.getLocale()
+                )
+        );
         return "redirect:/admin/teachers/" + teacherId + "/manage-courses";
     }
 }

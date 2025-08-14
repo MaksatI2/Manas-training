@@ -14,6 +14,6 @@ import java.util.List;
 @Builder
 public class CourseModuleListDTO {
     @Valid
-    @NotEmpty(message = "Должен быть добавлен хотя бы один модуль")
+    @NotEmpty(message = "{courseModuleList.notEmpty}")
     private List<CourseModuleCreationDTO> modules = new ArrayList<>();
 }

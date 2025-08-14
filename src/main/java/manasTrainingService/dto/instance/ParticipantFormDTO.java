@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 @Getter
 public class ParticipantFormDTO {
-    @NotEmpty(message = "Выберите хотя бы одного участника")
+    @NotEmpty(message = "{participantForm.pendingEmployeeIds.notEmpty}")
     private List<Integer> pendingEmployeeIds = new ArrayList<>();
 }

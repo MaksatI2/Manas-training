@@ -15,18 +15,21 @@ public class UserEditDto {
 
     private Integer id;
 
-    @NotBlank(message = "Email обязателен")
-    @Email(message = "Некорректный формат email")
+    @NotBlank(message = "{UserEditDto.email.NotBlank}")
+    @Email(message = "{UserEditDto.email.Email}")
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            message = "Email должен содержать только английские символы")
+            message = "{UserEditDto.email.Pattern}")
     private String email;
-    @NotBlank(message = "Имя обязательно для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Имя должно содержать только буквы")
+
+    @NotBlank(message = "{UserEditDto.name.NotBlank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "{UserEditDto.name.Pattern}")
     private String name;
-    @NotBlank(message = "Фамилия обязательна для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Имя должно содержать только буквы")
+
+    @NotBlank(message = "{UserEditDto.lastName.NotBlank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "{UserEditDto.lastName.Pattern}")
     private String lastName;
-    @NotBlank(message = "Номер телефона не может быть пустым")
+
+    @NotBlank(message = "{UserEditDto.phone.NotBlank}")
     @ValidPhoneNumber
     private String phone;
 }

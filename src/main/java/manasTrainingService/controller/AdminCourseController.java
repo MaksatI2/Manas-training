@@ -11,6 +11,8 @@ import manasTrainingService.dto.edit.CourseEditDto;
 import manasTrainingService.service.course.CourseAdminService;
 import manasTrainingService.service.course.CourseCategoryService;
 import manasTrainingService.service.course.CourseService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,6 +34,7 @@ public class AdminCourseController {
     private final CourseAdminService courseAdminService;
     private final CourseCategoryService categoryAdminService;
     private final CourseService courseService;
+    private final MessageSource messageSource;
 
 
     @GetMapping
@@ -66,7 +69,8 @@ public class AdminCourseController {
         if (bindingResult.hasFieldErrors("duration")) {
             for (FieldError error : bindingResult.getFieldErrors("duration")) {
                 if ("typeMismatch".equals(error.getCode())) {
-                    bindingResult.rejectValue("duration", "duration.invalid", "Некорректная продолжительность — введите число от 1 до 10 000");
+                    bindingResult.rejectValue("duration", "duration.invalid",
+                            messageSource.getMessage("course.duration.invalid", null, LocaleContextHolder.getLocale()));
                     break;
                 }
             }
@@ -80,12 +84,14 @@ public class AdminCourseController {
 
         try {
             CourseDto savedCourse = courseAdminService.create(createCourseDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Курс успешно создан");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    messageSource.getMessage("course.create.success", null, LocaleContextHolder.getLocale()));
             return "redirect:/admin/courses/" + savedCourse.getId();
         } catch (Exception e) {
             List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
             model.addAttribute("categories", categories);
-            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("errorMessage",
+                    messageSource.getMessage("course.create.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale()));
             return "admin/course-add";
         }
     }
@@ -102,7 +108,8 @@ public class AdminCourseController {
             model.addAttribute("categories", categories);
             return "admin/course-edit";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    messageSource.getMessage("course.notFound", null, LocaleContextHolder.getLocale()));
             return "redirect:/admin/courses";
         }
     }
@@ -118,7 +125,8 @@ public class AdminCourseController {
         if (bindingResult.hasFieldErrors("duration")) {
             for (FieldError error : bindingResult.getFieldErrors("duration")) {
                 if ("typeMismatch".equals(error.getCode())) {
-                    bindingResult.rejectValue("duration", "duration.invalid", "Некорректная продолжительность — введите число от 1 до 10 000");
+                    bindingResult.rejectValue("duration", "duration.invalid",
+                            messageSource.getMessage("course.duration.invalid", null, LocaleContextHolder.getLocale()));
                     break;
                 }
             }
@@ -137,12 +145,14 @@ public class AdminCourseController {
 
         try {
             CourseDto updatedCourse = courseAdminService.update(updateCourseDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Курс успешно обновлен");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    messageSource.getMessage("course.update.success", null, LocaleContextHolder.getLocale()));
             return "redirect:/admin/courses/" + updatedCourse.getId();
         } catch (Exception e) {
             List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
             model.addAttribute("categories", categories);
-            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("errorMessage",
+                    messageSource.getMessage("course.update.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale()));
             return "admin/course-edit";
         }
     }
@@ -151,9 +161,11 @@ public class AdminCourseController {
     public String deleteCourse(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
             courseAdminService.deleteCourse(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Курс успешно удалён");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    messageSource.getMessage("course.delete.success", null, LocaleContextHolder.getLocale()));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    messageSource.getMessage("course.delete.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale()));
         }
         return "redirect:/admin/courses";
     }
@@ -168,7 +180,8 @@ public class AdminCourseController {
             model.addAttribute("canEnroll", canEnroll);
             return "admin/course-view";
         } catch (EntityNotFoundException e) {
-            model.addAttribute("errorMessage", "Курс не найден");
+            model.addAttribute("errorMessage",
+                    messageSource.getMessage("course.notFound", null, LocaleContextHolder.getLocale()));
             return "error/error";
         }
     }

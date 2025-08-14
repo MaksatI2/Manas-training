@@ -24,6 +24,8 @@ import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserProfileService;
 import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.RoleUtil;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,6 +51,8 @@ public class AdminController {
     private final TestInstanceService testInstanceService;
     private final TestService testService;
     private final TestAnswerService testAnswerService;
+    private final MessageSource messageSource;
+
 
     @GetMapping("/teachers/add")
     public String showAddTeacherForm(Model model) {
@@ -68,15 +72,18 @@ public class AdminController {
         try {
             userService.registerTeacher(teacherRegisterDto);
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Преподаватель успешно добавлен! Ссылка для активации отправлена на email.");
+                    messageSource.getMessage("admin.teacher.add.success", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/admin/users";
         } catch (EmailAlreadyExistsException e) {
             bindingResult.rejectValue("email", "email.exists", e.getMessage());
         } catch (PhoneAlreadyExistsException e) {
             bindingResult.rejectValue("phone", "phone.exists", e.getMessage());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        }
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("admin.teacher.add.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );        }
         return "auth/register-teacher";
     }
 
@@ -117,11 +124,15 @@ public class AdminController {
             User user = userService.getUserById(userId);
             user.setIsActive(true);
             userService.saveUser(user);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Пользователь " + user.getName() + " успешно активирован!");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("admin.user.activate.success", new Object[]{user.getName()}, LocaleContextHolder.getLocale())
+            );
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Ошибка при активации пользователя: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("admin.user.activate.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
         }
         return "redirect:/admin/users";
     }
@@ -137,8 +148,10 @@ public class AdminController {
             if (currentUserId.equals(userId)) {
                 long activeAdmins = userService.countActiveAdmins();
                 if (activeAdmins <= 1) {
-                    redirectAttributes.addFlashAttribute("errorMessage",
-                            "Невозможно деактивировать себя, так как Вы — последний активный администратор.");
+                    redirectAttributes.addFlashAttribute(
+                            "errorMessage",
+                            messageSource.getMessage("admin.user.deactivate.self.lastAdmin", null, LocaleContextHolder.getLocale())
+                    );
                     return "redirect:/admin/users";
                 }
             }
@@ -146,11 +159,15 @@ public class AdminController {
             User user = userService.getUserById(userId);
             user.setIsActive(false);
             userService.saveUser(user);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Пользователь " + user.getName() + " успешно деактивирован!");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("admin.user.deactivate.success", new Object[]{user.getName()}, LocaleContextHolder.getLocale())
+            );
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Ошибка при деактивации пользователя: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("admin.user.deactivate.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
         }
         return "redirect:/admin/users";
     }
@@ -164,15 +181,23 @@ public class AdminController {
             Integer currentUserId = currentUser.getUser().getId();
 
             if (currentUserId.equals(userId)) {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                        "Вы не можете удалить самого себя.");
+                redirectAttributes.addFlashAttribute(
+                        "errorMessage",
+                        messageSource.getMessage("admin.user.delete.self", null, LocaleContextHolder.getLocale())
+                );
                 return "redirect:/admin/users";
             }
 
             userService.deleteUserById(userId);
-            redirectAttributes.addFlashAttribute("successMessage", "Пользователь успешно удален.");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("admin.user.delete.success", null, LocaleContextHolder.getLocale())
+            );
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении пользователя: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("admin.user.delete.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
         }
         return "redirect:/admin/users";
     }
@@ -184,7 +209,10 @@ public class AdminController {
             model.addAttribute("userEditDto", userEditDto);
             return "admin/edit-user";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Пользователь не найден");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("admin.user.notFound", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/admin/users";
         }
     }
@@ -201,7 +229,10 @@ public class AdminController {
         try {
             userEditDto.setId(userId);
             userService.updateUser(userEditDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Пользователь успешно обновлен");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    messageSource.getMessage("admin.user.update.success", null, LocaleContextHolder.getLocale())
+            );
             return "redirect:/admin/users";
         } catch (EmailAlreadyExistsException e) {
             bindingResult.rejectValue("email", "email.exists", e.getMessage());
@@ -211,7 +242,10 @@ public class AdminController {
             bindingResult.rejectValue("phone", "email.exists", e.getMessage());
             return "admin/edit-user";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при обновлении пользователя: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("admin.user.update.error", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())
+            );
             return "redirect:/admin/users";
         }
     }
@@ -234,7 +268,9 @@ public class AdminController {
         TestResultAdminDto testResultAdminDto = testResultService.getTestResultById(id);
         TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(testResultAdminDto.getTestInstance().getId());
         if(!testService.testExistById(testInstanceDto.getTest().getId())){
-            throw new NoAccessException("Такого теста уже не существует");
+            throw new NoAccessException(
+                    messageSource.getMessage("admin.test.notFound", null, LocaleContextHolder.getLocale())
+            );
         }
         model.addAttribute("test", testService.getTestByIdForTestResult(testInstanceDto.getId(), testResultAdminDto.getStudent().getId()));
         model.addAttribute("result", testResultAdminDto);

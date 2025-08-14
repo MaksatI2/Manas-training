@@ -11,28 +11,30 @@ import manasTrainingService.validation.ValidPhoneNumber;
 @NoArgsConstructor
 public class StudentRegisterDto {
 
-    @NotBlank(message = "Имя обязательно для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
-    @Size(max = 100, message = "Имя не должно превышать 100 символов")
+    @NotBlank(message = "{studentRegisterDto.name.notBlank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "{studentRegisterDto.name.pattern}")
+    @Size(max = 100, message = "{studentRegisterDto.name.size}")
     private String name;
 
-    @NotBlank(message = "Фамилия обязательна для заполнения")
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "Поле может содержать только буквы и пробелы")
-    @Size(max = 100, message = "Фамилия не должна превышать 100 символов")
+    @NotBlank(message = "{studentRegisterDto.surname.notBlank}")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$", message = "{studentRegisterDto.surname.pattern}")
+    @Size(max = 100, message = "{studentRegisterDto.surname.size}")
     private String surname;
 
-    @NotBlank(message = "Email не может быть пустым")
-    @Email(message = "Неверный формат email", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+    @NotBlank(message = "{studentRegisterDto.email.notBlank}")
+    @Email(message = "{studentRegisterDto.email.invalid}")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            message = "{studentRegisterDto.email.pattern}")
     private String email;
 
     @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).+$",
-            message = "Пароль должен содержать хотя бы одну заглавную букву и одну цифру")
-    @Size(min = 8, message = "Пароль должен быть не менее 8 символов")
+            message = "{studentRegisterDto.password.pattern}")
+    @Size(min = 8, message = "{studentRegisterDto.password.size}")
     private String password;
 
     private String organizationCode;
 
-    @NotBlank(message = "Номер телефона не может быть пустым")
+    @NotBlank(message = "{studentRegisterDto.phone.notBlank}")
     @ValidPhoneNumber
     private String phone;
 }

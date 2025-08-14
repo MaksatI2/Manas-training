@@ -21,11 +21,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -48,10 +50,15 @@ class CourseServiceTest {
     @Mock
     private CourseInstanceRepository courseInstanceRepository;
 
+
+
     @Mock
     private UserService userService;
     @Mock
     private ActivityLogService activityLogService;
+
+    @Mock
+    private MessageSource messageSource;
 
     @InjectMocks
     private CourseServiceImpl courseService;
@@ -210,7 +217,9 @@ class CourseServiceTest {
 
             assertThatThrownBy(() -> courseService.getById(999))
                     .isInstanceOf(EntityNotFoundException.class)
-                    .hasMessage("Курс с ID 999 не найден");
+                    .hasMessage(messageSource != null
+                            ? messageSource.getMessage("course.not.found", null, Locale.getDefault())
+                            : "Course not found");
 
             verify(courseRepository).findById(999);
             verify(categoryAdminService, never()).convertToDto(any());
@@ -284,7 +293,9 @@ class CourseServiceTest {
 
             assertThatThrownBy(() -> courseService.getCourseById(999))
                     .isInstanceOf(CourseNotFoundException.class)
-                    .hasMessage("Курс не был найден");
+                    .hasMessage(messageSource != null
+                            ? messageSource.getMessage("course.not.found", null, Locale.getDefault())
+                            : "Course not found");
 
             verify(courseRepository).findById(999);
         }

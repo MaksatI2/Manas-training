@@ -17,6 +17,8 @@ import manasTrainingService.service.*;
 import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherInstanceService;
 import manasTrainingService.service.user.UserService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -40,6 +42,7 @@ public class ScheduleController {
     private final CourseTeacherInstanceService courseTeacherInstanceService;
     private final UserService userService;
     private final ObjectMapper objectMapper;
+    private final MessageSource messageSource;
 
     @GetMapping("/lessons/{lessonId}")
     public String showScheduleForm(@PathVariable Integer lessonId, Model model) {
@@ -47,7 +50,8 @@ public class ScheduleController {
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!user.hasRole("ADMIN")) {
-            throw new NoAccessException("У вас нет доступа к редактированию");
+            Locale locale = LocaleContextHolder.getLocale();
+            throw new NoAccessException(messageSource.getMessage("access.no_edit", null, locale));
         }
         LessonDTO lesson = lessonService.getLessonById(lessonId);
         CourseInstanceDTO courseInstance = courseInstanceService.getCourseInstanceByLessonId(lessonId);
@@ -87,12 +91,13 @@ public class ScheduleController {
             BindingResult bindingResult,
             Model model,
             RedirectAttributes redirectAttributes) {
+        Locale locale = LocaleContextHolder.getLocale();
 
         CustomUserDetails user = (CustomUserDetails)
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!user.hasRole("ADMIN")) {
-            throw new NoAccessException("У вас нет доступа к редактированию");
+            throw new NoAccessException(messageSource.getMessage("access.no_edit", null, locale));
         }
 
         if (bindingResult.hasErrors()) {
@@ -112,13 +117,13 @@ public class ScheduleController {
             Map<String, String> lessonTypesLocalized = Arrays.stream(LessonType.values())
                     .collect(Collectors.toMap(LessonType::name, LessonType::getValue));
             model.addAttribute("lessonTypes", lessonTypesLocalized);
-            model.addAttribute("errorMessage", "Пожалуйста, исправьте ошибки в форме");
+            model.addAttribute("errorMessage", messageSource.getMessage("form.errors.correct", null, locale));
             return "lessons/schedule-form";
         }
 
         try {
             scheduleService.saveSchedule(schedule);
-            redirectAttributes.addFlashAttribute("successMessage", "Расписание сохранено");
+            redirectAttributes.addFlashAttribute("successMessage", messageSource.getMessage("schedule.saved.success", null, locale));
             return "redirect:/lessons/" + lessonId;
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -175,7 +180,8 @@ public class ScheduleController {
 
             return "schedule/calendar";
         } catch (Exception e) {
-            model.addAttribute("error", "Произошла ошибка при загрузке расписания");
+            Locale locale = LocaleContextHolder.getLocale();
+            model.addAttribute("error", messageSource.getMessage("schedule.load.error", null, locale));
             return "schedule/calendar";
         }
     }
@@ -183,23 +189,28 @@ public class ScheduleController {
     @DeleteMapping("/{scheduleId}")
     @ResponseBody
     public Map<String, Object> deleteSchedule(@PathVariable Integer scheduleId, Authentication authentication) {
+        Locale locale = LocaleContextHolder.getLocale();
         Map<String, Object> response = new HashMap<>();
+
         try {
             User currentUser = userService.getUserEntityByEmail(authentication.getName());
             if (scheduleService.canUserEditSchedule(currentUser.getId(), currentUser.getRole().getName(), scheduleId)) {
                 scheduleService.deleteSchedule(scheduleId);
                 response.put("success", true);
-                response.put("message", "Расписание успешно удалено");
+                response.put("message", messageSource.getMessage("schedule.delete.success", null, locale));
             } else {
                 response.put("success", false);
-                response.put("message", "Недостаточно прав для удаления расписания");
+                response.put("message", messageSource.getMessage("schedule.delete.no_access", null, locale));
             }
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Ошибка при удалении расписания: " + e.getMessage());
+            response.put("message", messageSource.getMessage("schedule.delete.error",
+                    new Object[]{e.getMessage()}, locale));
         }
+
         return response;
     }
+
 
     private Set<String> getUniqueCourseTitles(List<ScheduleViewDTO> schedules) {
         return schedules.stream()
@@ -238,26 +249,37 @@ public class ScheduleController {
     }
 
     private Map<String, Object> convertToMap(ScheduleViewDTO schedule) {
+        Locale locale = LocaleContextHolder.getLocale();
         Map<String, Object> map = new HashMap<>();
         try {
             map.put("id", schedule.getId());
-            map.put("lessonTitle", schedule.getLessonTitle() != null ? schedule.getLessonTitle() : "Без названия");
-            map.put("lessonType", schedule.getLessonType() != null ? schedule.getLessonType().name() : "LECTURE");
-            map.put("teacherName", schedule.getTeacherName() != null ? schedule.getTeacherName() : "Преподаватель не указан");
+            map.put("lessonTitle", schedule.getLessonTitle() != null
+                    ? schedule.getLessonTitle()
+                    : messageSource.getMessage("lesson.title.default", null, locale));
+
+            map.put("lessonType", schedule.getLessonType() != null ?
+                    schedule.getLessonType().getValue()
+                    : messageSource.getMessage("lesson.type.lecture", null, locale));
+
+            map.put("teacherName", schedule.getTeacherName() != null
+                    ? schedule.getTeacherName()
+                    : messageSource.getMessage("teacher.not.specified", null, locale));
             map.put("teacherId", schedule.getTeacherId());
             map.put("meetingUrl", schedule.getMeetingUrl());
             map.put("notes", schedule.getNotes());
-            map.put("courseTitle", schedule.getCourseTitle() != null ? schedule.getCourseTitle() : "Курс не указан");
+            map.put("courseTitle", schedule.getCourseTitle() != null
+                    ? schedule.getCourseTitle()
+                    : messageSource.getMessage("course.title.default", null, locale));
             map.put("courseInstanceTitle", schedule.getCourseInstanceTitle());
             map.put("lessonDescription", schedule.getLessonDescription());
             map.put("durationHours", schedule.getDurationHours());
             map.put("lessonId", schedule.getLessonId());
         } catch (Exception e) {
             map.put("id", schedule.getId() != null ? schedule.getId() : 0);
-            map.put("lessonTitle", "Ошибка загрузки данных");
-            map.put("lessonType", "LECTURE");
-            map.put("teacherName", "Неизвестно");
-            map.put("courseTitle", "Неизвестно");
+            map.put("lessonTitle", messageSource.getMessage("error.loading.data", null, locale));
+            map.put("lessonType", messageSource.getMessage("lesson.type.lecture", null, locale));
+            map.put("teacherName", messageSource.getMessage("teacher.unknown", null, locale));
+            map.put("courseTitle", messageSource.getMessage("course.unknown", null, locale));
             map.put("teacherId", 0);
             map.put("lessonId", 0);
         }

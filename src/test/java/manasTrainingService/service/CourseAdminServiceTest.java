@@ -16,6 +16,7 @@ import manasTrainingService.service.course.CourseInstanceService;
 import manasTrainingService.service.course.CourseTeacherService;
 import manasTrainingService.service.impl.course.CourseAdminServiceImpl;
 import manasTrainingService.service.user.UserService;
+import org.aspectj.bridge.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -56,6 +59,8 @@ class CourseAdminServiceTest {
     private UserService userService;
     @Mock
     private ActivityLogService activityLogService;
+    @Mock
+    private MessageSource messageSource;
 
     @InjectMocks
     private CourseAdminServiceImpl courseAdminService;
@@ -257,7 +262,11 @@ class CourseAdminServiceTest {
 
             assertThatThrownBy(() -> courseAdminService.getById(999))
                     .isInstanceOf(EntityNotFoundException.class)
-                    .hasMessage("Курс с ID 999 не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "course.not.found",
+                            new Object[]{999},
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(courseRepository).findById(999);
         }
@@ -299,7 +308,11 @@ class CourseAdminServiceTest {
 
             assertThatThrownBy(() -> courseAdminService.create(createCourseDto))
                     .isInstanceOf(ValidationException.class)
-                    .hasMessage("Курс с кодом 'SPRING_BOOT' уже существует");
+                    .hasMessage(messageSource.getMessage(
+                            "course.code.exists",
+                            new Object[]{"SPRING_BOOT"},
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(courseRepository).existsByCode("SPRING_BOOT");
             verify(courseRepository, never()).save(any());
@@ -359,7 +372,11 @@ class CourseAdminServiceTest {
 
             assertThatThrownBy(() -> courseAdminService.update(courseEditDto))
                     .isInstanceOf(EntityNotFoundException.class)
-                    .hasMessage("Курс с ID 1 не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "course.not.found",
+                            new Object[]{1},
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(courseRepository).findById(1);
             verify(courseRepository, never()).save(any());
@@ -373,7 +390,11 @@ class CourseAdminServiceTest {
 
             assertThatThrownBy(() -> courseAdminService.update(courseEditDto))
                     .isInstanceOf(ValidationException.class)
-                    .hasMessage("Курс с кодом 'JAVA_ADV' уже существует");
+                    .hasMessage(messageSource.getMessage(
+                            "course.code.exists",
+                            new Object[]{"JAVA_ADV"},
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(courseRepository).findById(1);
             verify(courseRepository).existsByCodeAndIdNot("JAVA_ADV", 1);
@@ -429,7 +450,11 @@ class CourseAdminServiceTest {
 
             assertThatThrownBy(() -> courseAdminService.deleteCourse(999))
                     .isInstanceOf(EntityNotFoundException.class)
-                    .hasMessage("Курс с id=999 не найден");
+                    .hasMessage(messageSource.getMessage(
+                            "course.not.found",
+                            new Object[]{999},
+                            LocaleContextHolder.getLocale()
+                    ));
 
             verify(courseRepository).existsById(999);
             verify(courseRepository, never()).deleteById(any());
