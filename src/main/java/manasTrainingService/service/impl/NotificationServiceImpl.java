@@ -248,7 +248,7 @@ public class NotificationServiceImpl implements NotificationService {
         String courseName = courseEnrollment.getCourseInstance().getCourse().getTitle();
         Integer courseInstanceId = courseEnrollment.getCourseInstance().getId();
 
-        String link = "/certificates/create/" + courseInstanceId + "/" + courseEnrollment.getStudent().getId();
+        String link = "/admin/certificate/detail?studentId=" + courseEnrollment.getStudent().getId();
 
         List<User> admins = userRepository.findAllByRole_Name("ADMIN");
 
@@ -290,7 +290,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void notifyTeacherRemovedFromCourse(User teacher, CourseInstance courseInstance) {
         String courseName = courseInstance.getCourse().getTitle();
-        String link = "/teacher/my-courses" + courseInstance.getId();
+        String link = "/teacher/my-courses";
 
         Notification notification = Notification.builder()
                 .user(teacher)
@@ -332,14 +332,16 @@ public class NotificationServiceImpl implements NotificationService {
         String courseName = courseInstance.getCourse().getTitle();
         String title;
         String body;
-        String link = "/courses/student/" + courseInstance.getId();
+        String link;
 
         if (status == Status.ENROLLED) {
             title = "Запись на курс подтверждена";
             body = "Вы успешно записаны на курс: " + courseName;
+            link = "/student/course/" + courseInstance.getId();
         } else if (status == Status.DROPPED) {
             title = "Удаление с курса";
             body = "Вы больше не участвуете в курсе: " + courseName;
+            link = "student/my-courses";
         } else {
             return;
         }
