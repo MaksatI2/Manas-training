@@ -341,7 +341,7 @@ public class NotificationServiceImpl implements NotificationService {
         } else if (status == Status.DROPPED) {
             title = "Удаление с курса";
             body = "Вы больше не участвуете в курсе: " + courseName;
-            link = "student/my-courses";
+            link = "/student/my-courses";
         } else {
             return;
         }

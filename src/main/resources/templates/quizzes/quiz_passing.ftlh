@@ -16,7 +16,7 @@
     ] />
 
     <div class="hero-section">
-        <h1 class="hero-title"><i
+        <h1 class="hero-title text-break"><i
                     class="fa-solid fa-list-check"></i> <@spring.message code="student.quiz.take.title.prefix" />
             "${quiz.lesson.title}"</h1>
         <p class="hero-subtitle fs-4"><@spring.message code="student.quiz.take.timeLeft" /> <span class="fw-bold"
