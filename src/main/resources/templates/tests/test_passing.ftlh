@@ -23,7 +23,7 @@
                 <div class="card-body">
                     <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3 text-break">${test.title}</h5>
                     <p class="card-text fs-4 border-bottom border-primary-subtle pb-3 text-break">${test.description}</p>
-                    <p class="card-text fs-5"><span
+                    <p class="card-text fs-5 text-break"><span
                                 class="fw-bold"><@spring.message code="test.passing.page.label.questionsCount"/></span> ${test.questions?size}
                     </p>
                 </div>
