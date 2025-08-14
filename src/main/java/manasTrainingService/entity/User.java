@@ -91,5 +91,6 @@ public class User {
     List<RememberMeToken> rememberMeTokens;
 
     @Column(name = "language_preference", length = 5, nullable = false)
+    @Builder.Default
     String languagePreference = "ru";
 }
