@@ -211,6 +211,11 @@ public class TestController {
 
     @PostMapping("checking")
     public String checkTestResults(@Valid @ModelAttribute("result") TestAnswerDto result, BindingResult bindingResult, Model model) {
+        if (testResultService.userHasTestAttempt(result.getTestInstanceId())) {
+            throw new NoAccessException(
+                    messageSource.getMessage("test.already.passed", null, LocaleContextHolder.getLocale())
+            );
+        }
         TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(result.getTestInstanceId());
         TestDto test = testService.getTestById(result.getTestId());
         test.setQuestions(questionService.getQuestionsByAnswerQuestionId(result));
