@@ -155,7 +155,7 @@
                             <#list attendanceStatsList as stat>
                                 <tr class="${stat.courseInstance.isActive?string('', 'bg-red-50')}">
                                     <td class="px-4 py-3 text-center text-sm text-gray-900">
-                                        <#if stat.courseInstance.title?length gt 15>
+                                        <#if (stat.courseInstance.title?length gt 15)>
                                             ${stat.courseInstance.title?substring(0, 15)}...
                                         <#else>
                                             ${stat.courseInstance.title!'—'}
@@ -213,7 +213,7 @@
                             <#list testResults as result>
                                 <tr class="${result.isPassed?string('bg-green-50', 'bg-red-50')}">
                                     <td class="px-4 py-3 text-sm text-gray-900">
-                                        <#if result.courseTitle?length gt 15>
+                                        <#if (result.courseTitle?length gt 15)>
                                             ${result.courseTitle?substring(0, 15)}...
                                         <#else>
                                             ${result.courseTitle!'—'}
@@ -252,14 +252,14 @@
                                 <a href="/admin/course-instances/${course.courseInstanceId}"
                                    class="block text-decoration-none text-gray-900">
                                     <h5 class="text-lg font-semibold mb-2">
-                                        <#if course.courseTitle?length gt 15>
+                                        <#if (course.courseTitle?length gt 15)>
                                             ${course.courseTitle?substring(0, 15)}...
                                         <#else>
                                             ${course.courseTitle}
                                         </#if>
                                     </h5>
                                     <h6 class="text-sm text-blue-600 mb-3">
-                                        <#if course.instanceTitle?length gt 15>
+                                        <#if (course.instanceTitle?length gt 15)>
                                             ${course.instanceTitle?substring(0, 15)}...
                                         <#else>
                                             ${course.instanceTitle!'—'}

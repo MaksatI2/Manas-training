@@ -35,7 +35,7 @@
                     <#list attendanceStatsList as stat>
                         <tr class="${stat.courseInstance.isActive?string('', 'bg-red-50')}">
                             <td class="px-4 py-3 text-center text-sm text-gray-900">
-                                <#if stat.courseInstance.title?length gt 20>
+                                <#if (stat.courseInstance.title?length gt 20)>
                                     ${stat.courseInstance.title?substring(0, 20)}...
                                 <#else>
                                     ${stat.courseInstance.title}
@@ -90,7 +90,7 @@
                     <#list testResults as result>
                         <tr class="${result.isPassed?string('bg-green-50', 'bg-red-50')}">
                             <td class="px-4 py-3 text-sm text-gray-900">
-                                <#if result.courseTitle?length gt 20>
+                                <#if (result.courseTitle?length gt 20)>
                                     ${result.courseTitle?substring(0, 20)}...
                                 <#else>
                                     ${result.courseTitle!'—'}

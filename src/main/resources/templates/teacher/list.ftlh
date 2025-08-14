@@ -155,7 +155,7 @@
                 <div class="teacher-card-item"
                      data-name="${teacher.fullName?lower_case}" data-department="${teacher.department?lower_case}">
                     <div class="teacher-card">
-                        <#if teacher.avatarUrl?? && teacher.avatarUrl?length gt 0>
+                        <#if (teacher.avatarUrl?? && teacher.avatarUrl?length gt 0)>
                             <img src="/data/images/${teacher.avatarUrl}" class="teacher-img" alt="${teacher.fullName}">
                         <#else>
                             <img src="/static/images/default_avatar.jpg" class="teacher-img" alt="${teacher.fullName}">

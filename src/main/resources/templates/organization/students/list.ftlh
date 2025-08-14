@@ -26,18 +26,18 @@
                 <i class="fas fa-users me-2"></i>
                 <@spring.message code="organization.student.list.title"/>
             </h5>
-            <div class="d-flex gap-2">
-                <a href="/organization/students/unassigned" class="btn btn-light btn-sm"
-                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fas fa-user-check me-1" style="color: #0066cc;"></i>
-                    <@spring.message code="organization.student.list.button.unassigned"/>
-                </a>
-                <a href="/organization/students/add" class="btn btn-light btn-sm"
-                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
-                    <i class="fa fa-user-plus me-1" style="color: #0066cc;"></i>
-                    <@spring.message code="organization.student.list.button.add"/>
-                </a>
-            </div>
+<#--            <div class="d-flex gap-2">-->
+<#--                <a href="/organization/students/unassigned" class="btn btn-light btn-sm"-->
+<#--                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">-->
+<#--                    <i class="fas fa-user-check me-1" style="color: #0066cc;"></i>-->
+<#--                    <@spring.message code="organization.student.list.button.unassigned"/>-->
+<#--                </a>-->
+<#--                <a href="/organization/students/add" class="btn btn-light btn-sm"-->
+<#--                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">-->
+<#--                    <i class="fa fa-user-plus me-1" style="color: #0066cc;"></i>-->
+<#--                    <@spring.message code="organization.student.list.button.add"/>-->
+<#--                </a>-->
+<#--            </div>-->
         </div>
 
         <div class="card-body">
@@ -64,14 +64,14 @@
                         <#assign first = courseList[0]>
                         <tr>
                             <td class="field-value">
-                                <#if first.fullName?? && first.fullName?length > 20>
+                                <#if (first.fullName?? && first.fullName?length > 20)>
                                     ${first.fullName?substring(0, 20)}...
                                 <#else>
                                     ${first.fullName!""}
                                 </#if>
                             </td>
                             <td class="field-value">
-                                <#if first.email?? && first.email?length > 15>
+                                <#if (first.email?? && first.email?length > 15)>
                                     ${first.email?substring(0, 15)}...
                                 <#else>
                                     ${first.email!""}
@@ -84,26 +84,26 @@
                                         <li>
                                             <strong>${c.courseTitle}</strong> — ${c.localizedStatus}, ${c.progress}%
                                             <#if c.finalGrade??>, <@spring.message code="organization.student.list.course.grade"/>: ${c.finalGrade}</#if>
-                                            <#if c.enrollmentId??>
-                                                <form action="/organization/students/enrollment/${c.enrollmentId}/remove"
-                                                      method="post" class="d-inline">
-                                                    <input type="hidden" name="${_csrf.parameterName}"
-                                                           value="${_csrf.token}"/>
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-warning btn-remove-course ms-2">
-                                                        <i class="fa fa-times"></i>
-                                                    </button>
-                                                </form>
-                                            </#if>
+<#--                                            <#if c.enrollmentId??>-->
+<#--                                                <form action="/organization/students/enrollment/${c.enrollmentId}/remove"-->
+<#--                                                      method="post" class="d-inline">-->
+<#--                                                    <input type="hidden" name="${_csrf.parameterName}"-->
+<#--                                                           value="${_csrf.token}"/>-->
+<#--                                                    <button type="submit"-->
+<#--                                                            class="btn btn-sm btn-outline-warning btn-remove-course ms-2">-->
+<#--                                                        <i class="fa fa-times"></i>-->
+<#--                                                    </button>-->
+<#--                                                </form>-->
+<#--                                            </#if>-->
                                         </li>
                                     </#list>
                                 </ul>
                             </td>
                             <td class="text-nowrap text-center align-middle">
-                                <a href="/organization/students/${sid}/edit"
-                                   class="btn btn-sm btn-outline-secondary me-1" title="Редактировать">
-                                    <i class="fa fa-edit"></i>
-                                </a>
+<#--                                <a href="/organization/students/${sid}/edit"-->
+<#--                                   class="btn btn-sm btn-outline-secondary me-1" title="Редактировать">-->
+<#--                                    <i class="fa fa-edit"></i>-->
+<#--                                </a>-->
                                 <button type="button" class="btn btn-sm btn-outline-danger me-1" data-bs-toggle="modal"
                                         data-bs-target="#deleteModal${sid}" title="Удалить">
                                     <i class="fa fa-trash"></i>
