@@ -1,7 +1,5 @@
 (function () {
     const M = window.APP_MESSAGES || {};
-    const form = document.getElementById('create-test') || document.querySelector('form');
-    const pointsInput = document.querySelectorAll('input[type="number"][max="100"], input[data-points="true"], .points-input');
 
     pointsInput.forEach(input => {
         input.addEventListener('input', () => {

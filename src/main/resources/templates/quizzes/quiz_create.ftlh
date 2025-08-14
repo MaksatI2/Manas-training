@@ -259,7 +259,7 @@
             <div class="mb-3 col-lg-8 col-md-10 dropdown" id="createQuestionContainer">
                 <div class="row align-items-center">
                     <div class="col-12 col-md-6 col-lg-3 mb-3 d-flex align-items-center">
-                        <@spring.formCheckbox "lessonQuiz.isActive" 'class="form-check-input fs-4 me-2"'/>
+                        <@spring.formCheckbox "lessonQuiz.isActive" 'class="form-check-input fs-4 me-2" checked'/>
                         <label class="form-check-label fw-bold"
                                for="lessonQuiz.isActive"><@spring.message code='lesson.quiz.create.isActive'/></label>
                     </div>

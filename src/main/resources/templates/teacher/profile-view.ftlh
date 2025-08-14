@@ -328,10 +328,6 @@
                         <div class="detail-value">${teacher.bio}</div>
                     </div>
                 </#if>
-                <a href="/teacher/my-courses" class="edit-button">
-                    <i class="fas fa-edit"></i>
-                    <@spring.message code='teacher.profileView.myCourses'/>
-                </a>
             </div>
         </div>
     </div>

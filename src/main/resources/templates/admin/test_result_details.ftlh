@@ -14,7 +14,7 @@
     ] />
 
     <div class="hero-section">
-        <h1 class="hero-title">
+        <h1 class="hero-title text-break">
             <i class="fa-solid fa-list-check"></i>
             ${springMacroRequestContext.getMessage("admin.test.resultDetails.heroTitle", [test.title])}
         </h1>
@@ -25,23 +25,23 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-8">
+        <div class="col-12 col-md-10 col-lg-8 mx-auto">
             <div class="mb-3 text-end"></div>
             <div class="feature-card">
                 <div class="card-body">
-                    <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3"><span
+                    <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3 text-break"><span
                                 class="fw-bold">${test.title}</span></h5>
-                    <p class="card-text fs-4 border-bottom border-primary-subtle pb-3">${test.description}</p>
+                    <p class="card-text fs-4 border-bottom border-primary-subtle pb-3 text-break">${test.description}</p>
                     <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
-                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.questionsCount"/></span> ${test.questions?size}
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.questionsCount text-break"/></span> ${test.questions?size}
                     </p>
                     <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
-                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.gotPoints"/></span> ${result.score} <@spring.message code="admin.test.resultDetails.of"/> ${test.passingScore}
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.gotPoints text-break"/></span> ${result.score} <@spring.message code="admin.test.resultDetails.of"/> ${test.passingScore}
                     </p>
                     <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
-                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.timeSpentLabel"/></span> ${result.timeSpentMinutes} <@spring.message code="admin.test.resultDetails.minutes"/>
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.timeSpentLabel text-break"/></span> ${result.timeSpentMinutes} <@spring.message code="admin.test.resultDetails.minutes"/>
                     </p>
-                    <p class="card-text fs-5 fw-bold">
+                    <p class="card-text fs-5 fw-bold text-break">
                         <@spring.message code="admin.test.resultDetails.finalResult"/>
                         <#if result.isPassed>
                             <span class="text-success"><@spring.message code="admin.test.resultDetails.passed"/></span>
@@ -61,11 +61,11 @@
                         <h4 class="card-title mb-3 border-bottom border-primary-subtle pb-3">
                             <@spring.message code="admin.test.resultDetails.questionPrefix"/> №${question?index + 1}
                         </h4>
-                        <h5 class="card-title mb-3 fs-4">${question.question}</h5>
+                        <h5 class="card-title mb-3 fs-4 text-break">${question.question}</h5>
                         <ul class="list-group">
                             <#list question.options as option>
                                 <#if option??>
-                                    <li class="list-group-item border-primary-subtle fs-5">
+                                    <li class="list-group-item border-primary-subtle fs-5 text-break">
                                         <#if option.isCorrect>
                                             <i class="fa-solid fa-check text-success"></i>
                                         <#else>

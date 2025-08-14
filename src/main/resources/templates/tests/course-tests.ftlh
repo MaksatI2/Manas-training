@@ -142,6 +142,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+
+        <#if tests?has_content>
         $('#testsTable').DataTable({
             responsive: true,
             columnDefs: [
@@ -153,6 +155,7 @@
                 { responsivePriority: 6, targets: 2 }
             ]
         });
+        </#if>
 
     </script>
 

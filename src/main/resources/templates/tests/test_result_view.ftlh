@@ -12,24 +12,24 @@
     {"label": "${result.testInstance.courseInstance.title}", "url": "/teacher/courses/${result.testInstance.courseInstance.id}"},
     {"label": bcResults, "url": ""}
     ] />
-    <div class="hero-section">
-        <h1 class="hero-title"><i
+    <div class="hero-section text-break">
+        <h1 class="hero-title text-break"><i
                     class="fa-solid fa-list-check"></i> ${springMacroRequestContext.getMessage('test.result.view.hero.title', [test.title])}
         </h1>
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-8">
+        <div class="col-12 col-md-10 col-lg-8 mx-auto">
             <div class="mb-3 text-end"></div>
             <div class="feature-card">
                 <div class="card-body">
-                    <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3"><span
+                    <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3 text-break"><span
                                 class="fw-bold">${test.title}</span></h5>
-                    <p class="card-text fs-4 border-bottom border-primary-subtle pb-3">${test.description}</p>
-                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
+                    <p class="card-text fs-4 border-bottom border-primary-subtle pb-3 text-break">${test.description}</p>
+                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3 text-break">
                         <span class="fw-bold"><@spring.message code="test.result.view.label.questionsCount"/></span> ${test.questions?size}
                     </p>
-                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
+                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3 text-break">
                         ${springMacroRequestContext.getMessage('test.result.view.label.pointsScored', [result.totalPoints, test.passingScore])}
                     </p>
                     <p class="card-text fs-5 fw-bold">
@@ -49,11 +49,11 @@
                         <h4 class="card-title mb-3 border-bottom border-primary-subtle pb-3">
                             ${springMacroRequestContext.getMessage('test.result.view.question.title', [question?index + 1])}
                         </h4>
-                        <h5 class="card-title mb-3 fs-4">${question.question}</h5>
+                        <h5 class="card-title mb-3 fs-4 text-break">${question.question}</h5>
                         <ul class="list-group">
                             <#list question.options as option>
                                 <#if option??>
-                                    <li class="list-group-item border-primary-subtle fs-5">
+                                    <li class="list-group-item border-primary-subtle fs-5 text-break">
                                         <#if option.isCorrect>
                                             <i class="fa-solid fa-check text-success"></i>
                                         <#else>

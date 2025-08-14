@@ -231,12 +231,6 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/#" class="nav-link" data-tooltip="<@spring.message code='sidebar.tests' />">
-                            <i class="fas fa-question-circle"></i>
-                            <span><@spring.message code="sidebar.tests" /></span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
                         <a href="/schedules" class="nav-link"
                            data-tooltip="<@spring.message code='sidebar.schedule' />">
                             <i class="fas fa-calendar"></i>
