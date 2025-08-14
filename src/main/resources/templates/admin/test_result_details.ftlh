@@ -32,14 +32,14 @@
                     <h5 class="card-title fs-3 mb-3 border-bottom border-primary-subtle pb-3 text-break"><span
                                 class="fw-bold">${test.title}</span></h5>
                     <p class="card-text fs-4 border-bottom border-primary-subtle pb-3 text-break">${test.description}</p>
-                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
-                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.questionsCount text-break"/></span> ${test.questions?size}
+                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3 text-break">
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.questionsCount"/></span> ${test.questions?size}
                     </p>
-                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
-                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.gotPoints text-break"/></span> ${result.score} <@spring.message code="admin.test.resultDetails.of"/> ${test.passingScore}
+                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3 text-break">
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.gotPoints"/></span> ${result.score} <@spring.message code="admin.test.resultDetails.of"/> ${test.passingScore}
                     </p>
-                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3">
-                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.timeSpentLabel text-break"/></span> ${result.timeSpentMinutes} <@spring.message code="admin.test.resultDetails.minutes"/>
+                    <p class="card-text fs-5 border-bottom border-primary-subtle pb-3 text-break">
+                        <span class="fw-bold"><@spring.message code="admin.test.resultDetails.timeSpentLabel"/></span> ${result.timeSpentMinutes} <@spring.message code="admin.test.resultDetails.minutes"/>
                     </p>
                     <p class="card-text fs-5 fw-bold text-break">
                         <@spring.message code="admin.test.resultDetails.finalResult"/>

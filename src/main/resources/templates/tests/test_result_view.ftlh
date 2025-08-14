@@ -12,7 +12,7 @@
     {"label": "${result.testInstance.courseInstance.title}", "url": "/teacher/courses/${result.testInstance.courseInstance.id}"},
     {"label": bcResults, "url": ""}
     ] />
-    <div class="hero-section text-break">
+    <div class="hero-section">
         <h1 class="hero-title text-break"><i
                     class="fa-solid fa-list-check"></i> ${springMacroRequestContext.getMessage('test.result.view.hero.title', [test.title])}
         </h1>

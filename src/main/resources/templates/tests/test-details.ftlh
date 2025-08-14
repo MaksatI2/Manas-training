@@ -13,7 +13,7 @@
     {"label": bcTestsForCourse, "url": "/courses/${test.course.id}/tests"},
     {"label": bcTestDetails, "url": ""}
     ] />
-    <div class="hero-section text-break">
+    <div class="hero-section">
         <h1 class="hero-title text-break">
             <i class="fa-solid fa-list-check"></i>
             ${springMacroRequestContext.getMessage('course.final.tests.list.detail.page.title', [test.title])}
@@ -52,7 +52,7 @@
                             ${springMacroRequestContext.getMessage('course.final.tests.list.detail.question.inactive')}
                         </#if>
                     </h4>
-                    <h5 class="card-title mb-3 border-bottom border-primary-subtle pb-3 fs-4 text-break text-break">
+                    <h5 class="card-title mb-3 border-bottom border-primary-subtle pb-3 fs-4 text-break">
                         <span class="fw-bold"><@spring.message code="course.final.tests.list.detail.question.text"/></span>${question.question}
                     </h5>
                     <h5 class="card-title mb-3 fw-bold">
