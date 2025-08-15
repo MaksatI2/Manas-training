@@ -14,6 +14,12 @@ public interface MeetingParticipantRepository extends JpaRepository<MeetingParti
 
     List<MeetingParticipant> findByMeetingId(Integer meetingId);
 
+    @Query("SELECT mp FROM MeetingParticipant mp WHERE mp.leftAt IS NULL")
+    List<MeetingParticipant> findAllActiveParticipants();
+
+    @Query("SELECT mp FROM MeetingParticipant mp WHERE mp.meeting.id = :meetingId")
+    List<MeetingParticipant> findAllByMeetingId(@Param("meetingId") Integer meetingId);
+
     @Query("SELECT mp FROM MeetingParticipant mp " +
            "WHERE mp.meeting.id = :meetingId AND mp.leftAt IS NULL")
     List<MeetingParticipant> findActiveMeetingParticipants(@Param("meetingId") Integer meetingId);

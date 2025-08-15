@@ -40,6 +40,8 @@ public class MeetingParticipantServiceImpl implements MeetingParticipantService 
         }
 
         User user = null;
+        String participantName = request.getParticipantName();
+
         if (request.getUserId() != null) {
             user = userService.getUserById(request.getUserId());
 
@@ -53,11 +55,23 @@ public class MeetingParticipantServiceImpl implements MeetingParticipantService 
             }
         }
 
-        String participantId = UUID.randomUUID().toString();
-        String participantName = request.getParticipantName();
-        if (user != null && (participantName == null || participantName.trim().isEmpty())) {
-            participantName = user.getName() + " " + user.getLastName();
+        if (user != null) {
+            String systemUserName = buildFullName(user.getName(), user.getLastName());
+
+            if (participantName == null || participantName.trim().isEmpty()) {
+                participantName = systemUserName;
+            } else {
+                participantName = systemUserName;
+                log.info("Using system name '{}' instead of provided name '{}' for user {}",
+                        systemUserName, request.getParticipantName(), user.getId());
+            }
+        } else {
+            if (participantName == null || participantName.trim().isEmpty()) {
+                participantName = "Гость";
+            }
         }
+
+        String participantId = UUID.randomUUID().toString();
 
         boolean isModerator = user != null &&
                               meeting.getSchedule().getTeacher().getId().equals(user.getId());
@@ -73,8 +87,8 @@ public class MeetingParticipantServiceImpl implements MeetingParticipantService 
 
         participant = participantRepository.save(participant);
 
-        log.info("User joined meeting: meetingId={}, userId={}, participantName={}",
-                meeting.getId(), request.getUserId(), participantName);
+        log.info("User joined meeting: meetingId={}, userId={}, participantName={}, isModerator={}",
+                meeting.getId(), request.getUserId(), participantName, isModerator);
 
         return mapToMeetingParticipantDTO(participant);
     }
@@ -94,8 +108,8 @@ public class MeetingParticipantServiceImpl implements MeetingParticipantService 
 
         participantRepository.save(participant);
 
-        log.info("User left meeting: meetingId={}, userId={}, duration={} seconds",
-                meetingId, userId, durationSeconds);
+        log.info("User left meeting: meetingId={}, userId={}, participantName={}, duration={} seconds",
+                meetingId, userId, participant.getParticipantName(), durationSeconds);
     }
 
     @Transactional
@@ -108,14 +122,30 @@ public class MeetingParticipantServiceImpl implements MeetingParticipantService 
         LocalDateTime leftAt = LocalDateTime.now();
         participant.setLeftAt(leftAt);
 
-
         long durationSeconds = java.time.Duration.between(participant.getJoinedAt(), leftAt).getSeconds();
         participant.setDurationSeconds((int) durationSeconds);
 
         participantRepository.save(participant);
 
-        log.info("Participant left meeting: meetingId={}, participantId={}, duration={} seconds",
-                meetingId, participantId, durationSeconds);
+        log.info("Participant left meeting: meetingId={}, participantId={}, participantName={}, duration={} seconds",
+                meetingId, participantId, participant.getParticipantName(), durationSeconds);
+    }
+
+    private String buildFullName(String firstName, String lastName) {
+        StringBuilder fullName = new StringBuilder();
+
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            fullName.append(firstName.trim());
+        }
+
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            if (fullName.length() > 0) {
+                fullName.append(" ");
+            }
+            fullName.append(lastName.trim());
+        }
+
+        return fullName.length() > 0 ? fullName.toString() : "Пользователь";
     }
 
     private MeetingParticipantDTO mapToMeetingParticipantDTO(MeetingParticipant participant) {
