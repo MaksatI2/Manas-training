@@ -203,3 +203,7 @@ databaseChangeLog:
   - include:
       file: db/changelog/fixes/068_language_preference.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/features/069_add_participant_pings.sql
+      relativeToChangelogFile: false
+
