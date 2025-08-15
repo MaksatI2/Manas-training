@@ -136,7 +136,7 @@
                             </div>
                             <div class="lesson-info-item">
                                 <span class="lesson-info-label"><i class="fas fa-clock me-2"></i><@spring.message code="lesson.schedule.duration"/></span>
-                                <span class="lesson-info-value">${schedule.durationHours} <@spring.message code="lesson.quiz.minutes"/></span>
+                                <span class="lesson-info-value">${schedule.durationHours} <@spring.message code="lesson.duration.hours"/></span>
                             </div>
                             <div class="lesson-info-item">
                                 <span class="lesson-info-label"><i class="fas fa-user me-2"></i><@spring.message code="lesson.schedule.teacher"/></span>
@@ -144,7 +144,9 @@
                             </div>
                             <div class="lesson-info-item">
                                 <span class="lesson-info-label"><i class="fas fa-chalkboard me-2"></i><@spring.message code="lesson.schedule.type"/></span>
-                                <span class="lesson-info-value">${schedule.lessonType.value}</span>
+                                    <span class="lesson-info-value">
+                                        <@spring.message code=schedule.lessonType.value />
+                                    </span>
                             </div>
                             <#if schedule.meetingUrl?has_content>
                                 <div class="lesson-info-item">
