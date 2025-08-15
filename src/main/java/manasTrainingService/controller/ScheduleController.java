@@ -65,7 +65,9 @@ public class ScheduleController {
         }
 
         Map<String, String> lessonTypesLocalized = Arrays.stream(LessonType.values())
-                .collect(Collectors.toMap(LessonType::name, LessonType::getValue));
+                .collect(Collectors.toMap(LessonType::name,
+                        lt -> messageSource.getMessage(lt.getValue(), null, LocaleContextHolder.getLocale())
+                ));
 
         Map<String, String> teachers = courseTeacherInstanceService.getTeachersByCourseInstanceId(courseInstance.getId()).stream()
                 .sorted(Comparator.comparing(CourseInstanceTeacherDTO::getIsPrimary, Comparator.reverseOrder()))
