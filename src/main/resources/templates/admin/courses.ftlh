@@ -214,28 +214,28 @@
                     </#if>
                     </tbody>
                 </table>
-
-                <div id="deleteCourseModal" class="modal fade" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">${i18nDelTitle}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="depList"></div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18nDelCancel}</button>
-                                <button type="button" id="confirmDeleteCourse" class="btn btn-danger">${i18nDelConfirm}</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="row mt-3">
                 <div class="col-md-6">
                     <div id="usersTable_paginate" class="dataTables_paginate"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteCourseModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">${i18nDelTitle}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="depList"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18nDelCancel}</button>
+                    <button type="button" id="confirmDeleteCourse" class="btn btn-danger">${i18nDelConfirm}</button>
                 </div>
             </div>
         </div>

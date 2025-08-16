@@ -40,7 +40,7 @@
             <div class="filters-content" id="filtersContent">
                 <form class="filters-form" id="filtersForm">
                     <div class="filter-row">
-                        <div class="filter-group">
+                        <div class="filter-group col-12">
                             <label for="courseTitle"><@spring.message code="calendar.filter.course"/></label>
                             <select name="courseTitle" id="courseTitle" onchange="applyFilters()">
                                 <option value=""><@spring.message code="calendar.filter.course.all"/></option>
@@ -52,7 +52,7 @@
                                 </#list>
                             </select>
                         </div>
-                        <div class="filter-group">
+                        <div class="filter-group col-12">
                             <label for="courseInstanceTitle"><@spring.message code="calendar.filter.group"/></label>
                             <select name="courseInstanceTitle" id="courseInstanceTitle" onchange="applyFilters()">
                                 <option value=""><@spring.message code="calendar.filter.group.all"/></option>
@@ -64,7 +64,7 @@
                                 </#list>
                             </select>
                         </div>
-                        <div class="filter-group">
+                        <div class="filter-group col-12">
                             <label for="teacherName"><@spring.message code="calendar.filter.teacher"/></label>
                             <select name="teacherName" id="teacherName" onchange="applyFilters()">
                                 <option value=""><@spring.message code="calendar.filter.teacher.all"/></option>
@@ -76,7 +76,7 @@
                                 </#list>
                             </select>
                         </div>
-                        <div class="filter-group">
+                        <div class="filter-group col-12">
                             <label for="lessonType"><@spring.message code="calendar.filter.lessonType"/></label>
                             <select name="lessonType" id="lessonType" onchange="applyFilters()">
                                 <option value=""><@spring.message code="calendar.filter.lessonType.all"/></option>
