@@ -7,6 +7,10 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
 echo -e "${GREEN}🚀 Начинаем деплой приложения на новом сервере...${NC}"
 
 echo -e "${YELLOW}🛑 Остановка старых контейнеров (если есть)...${NC}"
