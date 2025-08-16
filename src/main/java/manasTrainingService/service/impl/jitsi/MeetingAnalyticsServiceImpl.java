@@ -63,7 +63,7 @@ public class MeetingAnalyticsServiceImpl implements MeetingAnalyticsService {
                 .average()
                 .orElse(0.0);
 
-        return MeetingAnalyticsDTO.builder()
+        MeetingAnalyticsDTO analyticsDTO = MeetingAnalyticsDTO.builder()
                 .meetingId(meeting.getId())
                 .lessonTitle(meeting.getSchedule().getTitle())
                 .teacherName(meeting.getSchedule().getTeacher().getName() + " " +
@@ -75,6 +75,10 @@ public class MeetingAnalyticsServiceImpl implements MeetingAnalyticsService {
                 .averageParticipationPercentage((int) Math.round(averageParticipation))
                 .participantAnalytics(participantAnalytics)
                 .build();
+
+        analyticsDTO.formatTimes();
+
+        return analyticsDTO;
     }
 
     private ParticipantAnalyticsDTO buildParticipantAnalytics(MeetingParticipant participant,
@@ -83,7 +87,6 @@ public class MeetingAnalyticsServiceImpl implements MeetingAnalyticsService {
         List<ParticipantPing> pings = pingRepository
                 .findByMeetingParticipantIdOrderByPingTimeDesc(participant.getId());
 
-        // Определяем роль пользователя
         String userRole = "GUEST";
         if (participant.getUser() != null) {
             if (participant.getIsModerator()) {
@@ -104,7 +107,7 @@ public class MeetingAnalyticsServiceImpl implements MeetingAnalyticsService {
         double participationPercentage = calculateParticipationPercentage(
                 pingAnalysis, actualJoinTime, actualLeaveTime, meetingStart, meetingEnd);
 
-        return ParticipantAnalyticsDTO.builder()
+        ParticipantAnalyticsDTO participantDTO = ParticipantAnalyticsDTO.builder()
                 .participantId(participant.getId())
                 .participantName(participant.getParticipantName())
                 .userRole(userRole)
@@ -120,6 +123,10 @@ public class MeetingAnalyticsServiceImpl implements MeetingAnalyticsService {
                 .inactiveGaps(pingAnalysis.inactiveGaps)
                 .wasFullyPresent(pingAnalysis.wasFullyPresent)
                 .build();
+
+        participantDTO.formatTimes();
+
+        return participantDTO;
     }
 
     private PingAnalysis analyzePings(List<ParticipantPing> pings,
@@ -174,12 +181,14 @@ public class MeetingAnalyticsServiceImpl implements MeetingAnalyticsService {
             long gapMinutes = Duration.between(previousTime, ping.getPingTime()).toMinutes();
 
             if (gapMinutes > MAX_GAP_TOLERANCE_MINUTES) {
-                gaps.add(PingGapDTO.builder()
+                PingGapDTO gap = PingGapDTO.builder()
                         .gapStartTime(previousTime)
                         .gapEndTime(ping.getPingTime())
                         .gapDurationMinutes((int) gapMinutes)
                         .reason(!ping.getIsActive() ? "INACTIVE" : "NO_PING")
-                        .build());
+                        .build();
+                gap.formatTimes();
+                gaps.add(gap);
             }
 
             previousTime = ping.getPingTime();
@@ -189,12 +198,14 @@ public class MeetingAnalyticsServiceImpl implements MeetingAnalyticsService {
         long finalGapMinutes = Duration.between(lastPingTime, leaveTime).toMinutes();
 
         if (finalGapMinutes > MAX_GAP_TOLERANCE_MINUTES) {
-            gaps.add(PingGapDTO.builder()
+            PingGapDTO finalGap = PingGapDTO.builder()
                     .gapStartTime(lastPingTime)
                     .gapEndTime(leaveTime)
                     .gapDurationMinutes((int) finalGapMinutes)
                     .reason("NO_FINAL_PING")
-                    .build());
+                    .build();
+            finalGap.formatTimes();
+            gaps.add(finalGap);
         }
 
         return gaps;
