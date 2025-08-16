@@ -88,14 +88,14 @@ deploy:
     - ssh-keyscan -H 195.38.165.94 >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - echo "Деплой на сервер $DEPLOY_SERVER_IP"
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER_IP "mkdir -p $DEPLOY_PATH"
-    - rsync -avz --delete $(echo $EXCLUDE_PATHS | tr ',' ' ' | sed 's/\([^[:space:]]\+\)/--exclude=\1/g') ./ $DEPLOY_USER@$DEPLOY_SERVER_IP:$DEPLOY_PATH/
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER_IP "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh"
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER_IP "cd $DEPLOY_PATH && ./deploy.sh"
+    - echo "Деплой на сервер 195.38.165.94"
+    - ssh manastraining_kg@195.38.165.94 "mkdir -p /home/manastraining_kg/manas-training-service"
+    - rsync -avz --delete --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/ssl' --exclude='nginx/logs' --exclude='nginx/html/.well-known' ./ manastraining_kg@195.38.165.94:/home/manastraining_kg/manas-training-service/
+    - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && chmod +x deploy.sh && chmod +x setup-ssl.sh"
+    - ssh manastraining_kg@195.38.165.94 "cd /home/manastraining_kg/manas-training-service && ./deploy.sh"
   environment:
     name: production
-    url: $PRODUCTION_URL
+    url: https://manastraining.kg
   only:
     - dev
   when: manual
