@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Сертификат о достижении</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap');
@@ -23,7 +24,7 @@
             box-shadow: 0 25px 80px rgba(0,0,0,0.15);
             border-radius: 16px;
             position: relative;
-            margin: 80px auto 40px;
+            margin: 10px auto 10px;
             overflow: visible;
         }
 
@@ -72,6 +73,14 @@
             gap:8px;
             padding:20px;
             box-sizing:border-box;
+        }
+
+        .pdf-ready .certificate-title,
+        .pdf-ready .recipient-name {
+            color: #ad8c53 !important;
+            background: none !important;
+            -webkit-background-clip: unset !important;
+            -webkit-text-fill-color: unset !important;
         }
 
         .shape { width:100%; height:100%; min-height:30px; border-radius:8px; aspect-ratio:1; }
@@ -212,12 +221,12 @@
 
 <body>
 <div id="languageModal" class="no-print" style="
-    display: none;
+    display: none !important;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 9999;
-    display: flex;
+    /*display: flex;*/
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(4px);
@@ -284,7 +293,7 @@
 
 
 <div class="print-button-wrapper no-print">
-    <button id="printCert">Скачать PDF</button>
+    <button id="printCert">📄 Скачать PDF</button>
 </div>
 
 <div class="certificate-container">
@@ -418,9 +427,8 @@
             'Ң': 'Ng', 'Ө': 'Ö', 'Ү': 'Ü'
         };
 
-        return text.replace(/[а-яёңөүА-ЯЁҢӨҮ]/g, match => translitMap[match] || match);
+        return text.replace(/[а-яё\u04a3\u04e9\u04afА-ЯЁ\u04a2\u04e8\u04ae]/g, match => translitMap[match] || match);
     }
-
 
     function transliterateToCyrillic(text) {
         const translitMap = {
@@ -447,7 +455,7 @@
     }
 
     function isCyrillic(text) {
-        return /[а-яёңөүА-ЯЁҢӨҮ]/.test(text);
+        return /[а-яё\u04a3\u04e9\u04afА-ЯЁ\u04a2\u04e8\u04ae]/.test(text);
     }
 
     function transformName(originalName, targetLanguage) {
@@ -468,7 +476,144 @@
         }
     }
 
-    function setLanguage(lang) {
+    function showLoadingIndicator(show) {
+        let indicator = document.getElementById('pdfLoadingIndicator');
+
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.id = 'pdfLoadingIndicator';
+            indicator.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                backdrop-filter: blur(4px);
+            ">
+                <div style="
+                    background: white;
+                    padding: 30px 40px;
+                    border-radius: 12px;
+                    text-align: center;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                ">
+                    <div style="
+                        width: 40px;
+                        height: 40px;
+                        border: 4px solid #e2e8f0;
+                        border-top: 4px solid #1d4ed8;
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite;
+                        margin: 0 auto 20px;
+                    "></div>
+                    <p style="
+                        font-family: 'Inter', sans-serif;
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #1e293b;
+                        margin: 0;
+                    ">Создается PDF...</p>
+                    <p style="
+                        font-family: 'Inter', sans-serif;
+                        font-size: 12px;
+                        color: #64748b;
+                        margin: 5px 0 0 0;
+                    ">Пожалуйста, подождите</p>
+                </div>
+            </div>
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        `;
+            document.body.appendChild(indicator);
+        }
+
+        indicator.style.display = show ? 'block' : 'none';
+    }
+
+    async function generatePDF(language = 'ru') {
+        if (typeof html2pdf === 'undefined') {
+            alert('Ошибка: Библиотека html2pdf не загружена. Проверьте подключение скрипта.');
+            return;
+        }
+
+        showLoadingIndicator(true);
+
+        const element = document.querySelector('.certificate-container');
+        element.classList.add('pdf-ready');
+        await preloadFonts();
+
+        const studentNameElement = document.querySelector('.recipient-name');
+        const courseTitleElement = document.querySelector('.course-title');
+        const certificateNumberElement = document.querySelectorAll('.detail-item .value')[2];
+
+        const studentName = studentNameElement ? studentNameElement.textContent.trim() : 'Certificate';
+        const courseTitle = courseTitleElement ? courseTitleElement.textContent.trim() : '';
+        const certificateNumber = certificateNumberElement ? certificateNumberElement.textContent.trim() : '';
+
+        const fileName = `certificate.pdf`;
+
+        const opt = {
+            margin: [0, 0, 0, 0],
+            filename: fileName,
+            image: {
+                type: 'jpeg',
+                quality: 0.95
+            },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                letterRendering: true,
+                logging: false
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: [235, 267],
+                orientation: 'landscape'
+            },
+            pagebreak: { mode: ['avoid'] }
+        };
+
+        element.style.width = '267mm';
+        element.style.height = '180mm';
+        element.style.overflow = 'hidden';
+        element.style.pageBreakInside = 'avoid';
+        element.style.breakInside = 'avoid';
+        ensureFontsReady().then(() => {
+            html2pdf()
+                .set(opt)
+                .from(element)
+                .save()
+                .then(() => {
+                    showLoadingIndicator(false);
+                    console.log('PDF generated successfully:', fileName);
+                })
+                .catch(error => {
+                    showLoadingIndicator(false);
+                    console.error('Error generating PDF:', error);
+                    alert('Ошибка при создании PDF. Попробуйте еще раз.');
+                });
+        });
+    }
+
+    async function preloadFonts() {
+        await document.fonts.load('800 52px Inter');
+        await document.fonts.load('600 32px "Playfair Display"');
+        await document.fonts.ready;
+    }
+
+    async function setLanguage(lang) {
         const dict = {
             ru: {
                 certificate: "Сертификат",
@@ -487,7 +632,8 @@
                 companyLegal: "ООО «Манас Тренинг Центр»",
                 companyLocation: "г. Бишкек, Кыргызская Республика",
                 directorName: "Айылчиев Э.Р.",
-                companyType: "Центр профессионального обучения"
+                companyType: "Центр профессионального обучения",
+                sgName: "Студент"
             },
             en: {
                 certificate: "Certificate",
@@ -532,29 +678,47 @@
 
         const t = dict[lang];
 
-        document.querySelector('.certificate-title').textContent = t.certificate;
-        document.querySelector('.certificate-subtitle').textContent = t.subtitle;
-        document.querySelector('.presentation-text').textContent = t.presentation;
-        document.querySelector('.description-text').textContent = t.description;
-        document.querySelector('.company-mention').textContent = t.org;
-        document.querySelector('.company-name').textContent = t.companyName;
-        document.querySelector('.company-legal').textContent = t.companyLegal;
-        document.querySelector('.company-location').textContent = t.companyLocation;
-        document.querySelector('.company-type').textContent = t.companyType;
-        document.querySelector('.sgName').textContent = t.sgName;
+        const certificateTitle = document.querySelector('.certificate-title');
+        const certificateSubtitle = document.querySelector('.certificate-subtitle');
+        const presentationText = document.querySelector('.presentation-text');
+        const descriptionText = document.querySelector('.description-text');
+        const companyMention = document.querySelector('.company-mention');
+        const companyName = document.querySelector('.company-name');
+        const companyLegal = document.querySelector('.company-legal');
+        const companyLocation = document.querySelector('.company-location');
+        const companyType = document.querySelector('.company-type');
+        const sgName = document.querySelector('.sgName');
+
+        if (certificateTitle) certificateTitle.textContent = t.certificate;
+        if (certificateSubtitle) certificateSubtitle.textContent = t.subtitle;
+        if (presentationText) presentationText.textContent = t.presentation;
+        if (descriptionText) descriptionText.textContent = t.description;
+        if (companyMention) companyMention.textContent = t.org;
+        if (companyName) companyName.textContent = t.companyName;
+        if (companyLegal) companyLegal.textContent = t.companyLegal;
+        if (companyLocation) companyLocation.textContent = t.companyLocation;
+        if (companyType) companyType.textContent = t.companyType;
+        if (sgName) sgName.textContent = t.sgName;
 
         const labels = document.querySelectorAll('.detail-item .label');
-        labels[0].textContent = t.issued;
-        labels[1].textContent = t.valid;
-        labels[2].textContent = t.number;
-        labels[3].textContent = t.grade;
+        if (labels.length >= 4) {
+            labels[0].textContent = t.issued;
+            labels[1].textContent = t.valid;
+            labels[2].textContent = t.number;
+            labels[3].textContent = t.grade;
+        }
 
         const sigs = document.querySelectorAll('.signature-section .label');
-        sigs[0].textContent = t.director;
-        sigs[1].textContent = t.signature;
+        if (sigs.length >= 2) {
+            sigs[0].textContent = t.director;
+            sigs[1].textContent = t.signature;
+        }
 
-        document.querySelector('.logo-container img').src = t.logo;
-        document.querySelector('.director-name').textContent = t.directorName;
+        const logoImg = document.querySelector('.logo-container img');
+        const directorName = document.querySelector('.director-name');
+
+        if (logoImg) logoImg.src = t.logo;
+        if (directorName) directorName.textContent = t.directorName;
 
         const nameElement = document.querySelector('.recipient-name');
         if (nameElement) {
@@ -567,14 +731,17 @@
             nameElement.textContent = transformedName;
         }
 
-        document.getElementById('languageModal').style.display = 'none';
-        setTimeout(() => window.print(), 200);
+        if (languageModal) {
+            languageModal.style.display = 'none';
+        }
+        setTimeout(() => generatePDF(lang), 500);
     }
 
     async function ensureFontsReady() {
         if (document.fonts && document.fonts.ready) {
             await document.fonts.ready;
         }
+        return new Promise(resolve => setTimeout(resolve, 100));
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -594,18 +761,25 @@
             nameElement.dataset.originalName = nameElement.textContent.trim();
         }
     });
-
-    document.getElementById('printCert').addEventListener('click', () => {
-        document.getElementById('languageModal').style.display = 'flex';
+    document.addEventListener('DOMContentLoaded', function() {
+        const printButton = document.getElementById('printCert');
+        if (printButton) {
+            printButton.addEventListener('click', () => {
+                const languageModal = document.getElementById('languageModal');
+                if (languageModal) {
+                    languageModal.style.display = 'flex';
+                }
+            });
+        }
     });
 
-    (async () => {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('print') === '1') {
-            await ensureFontsReady();
-            setTimeout(() => window.print(), 200);
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof html2pdf === 'undefined') {
+            console.error('html2pdf не загружен!');
+            alert('Ошибка: Библиотека html2pdf не загрузилась. Проверьте интернет соединение.');
+        } else {
+            console.log('html2pdf успешно загружен');
         }
-    })();
+    });
 </script>
-
 </@layout.page>
