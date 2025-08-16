@@ -791,7 +791,6 @@
             padding: 1rem;
         }
 
-        /* Адаптивность для мобильных устройств */
         @media (max-width: 768px) {
             .analytics-container {
                 padding: 1rem;
@@ -1039,14 +1038,12 @@
             }
         });
 
-        // Обработчик для кнопок деталей
         document.addEventListener('click', function(e) {
             if (e.target.closest('.btn-details')) {
                 const button = e.target.closest('.btn-details');
                 const icon = button.querySelector('i');
                 const isExpanded = button.getAttribute('aria-expanded') === 'true';
 
-                // Анимация иконки
                 if (isExpanded) {
                     icon.style.transform = 'rotate(0deg)';
                 } else {
@@ -1055,7 +1052,6 @@
             }
         });
 
-        // Добавление плавной анимации для карточек статистики
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -1070,7 +1066,6 @@
             });
         }, observerOptions);
 
-        // Применение анимации к карточкам
         document.querySelectorAll('.stat-item, .section-card').forEach(card => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
