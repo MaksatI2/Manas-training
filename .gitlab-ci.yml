@@ -27,13 +27,67 @@ deploy:
   stage: deploy
   image: ubuntu:20.04
   before_script:
+    - apt-get update -qq && apt-get install -y -qq openssh-client rsync
     - apt-get update -qq && apt-get install -y -qq openssh-client rsync sshpass
     - eval "$(ssh-agent -s)"
+    - |
+      cat << 'EOF' > /tmp/deploy_key
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      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
+      -----END OPENSSH PRIVATE KEY-----
+      EOF
     - echo "$DEPLOY_SSH_PRIVATE_KEY" > /tmp/deploy_key
     - chmod 600 /tmp/deploy_key
     - ssh-add /tmp/deploy_key
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
+    - ssh-keyscan -H 195.38.165.94 >> ~/.ssh/known_hosts
     - echo "$SSH_KNOWN_HOSTS_ENTRY" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
