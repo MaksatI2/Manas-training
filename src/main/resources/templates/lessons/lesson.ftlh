@@ -173,13 +173,6 @@
                                 <span class="lesson-info-label"><i class="fas fa-chalkboard me-2"></i>Тип урока:</span>
                                 <span class="lesson-info-value">${schedule.lessonType.value}</span>
                             </div>
-                            <#if schedule.meetingUrl?has_content>
-                                <div class="lesson-info-item">
-                                    <span class="lesson-info-label"><i class="fas fa-link me-2"></i>Ссылка:</span>
-                                    <span class="lesson-info-value"><a href="${schedule.meetingUrl}" target="_blank"
-                                                                       class="link-primary">Присоединиться</a></span>
-                                </div>
-                            </#if>
                             <#if schedule.notes?has_content>
                                 <div class="lesson-info-item">
                                     <span class="lesson-info-label"><i

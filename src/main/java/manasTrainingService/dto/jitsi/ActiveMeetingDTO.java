@@ -15,7 +15,6 @@ public class ActiveMeetingDTO {
     Integer id;
     Integer scheduleId;
     String roomName;
-    String meetingUrl;
     String lessonTitle;
     String courseTitle;
     String teacherName;

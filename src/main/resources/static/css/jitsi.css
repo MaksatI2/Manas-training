@@ -379,13 +379,17 @@ body {
     padding: 12px 20px;
     border-radius: 6px;
     transform: translateX(400px);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     z-index: 3000;
     backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
 }
 
 .notification.show {
     transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .notification.error {

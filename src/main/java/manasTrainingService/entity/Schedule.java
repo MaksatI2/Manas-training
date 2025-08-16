@@ -48,9 +48,6 @@ public class Schedule {
     @Column(name = "lesson_type", nullable = false)
     LessonType lessonType;
 
-    @Column(name = "meeting_url", length = 500)
-    String meetingUrl;
-
     @Column(name = "notes", columnDefinition = "TEXT")
     String notes;
 
