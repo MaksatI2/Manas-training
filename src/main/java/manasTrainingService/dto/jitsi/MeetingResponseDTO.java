@@ -15,7 +15,6 @@ public class MeetingResponseDTO {
     Integer lessonId;
     Integer meetingId;
     String roomName;
-    String meetingUrl;
     String status;
     LocalDateTime startedAt;
     String lessonTitle;

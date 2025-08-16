@@ -393,10 +393,6 @@
                         '</div>' : '') +
                     (lesson.notes ? '<div class="lesson-notes">' +
                         '<strong><@spring.message code="calendar.lesson.notes"/></strong><br>' + lesson.notes +
-                        '</div>' : '') +
-                    (lesson.meetingUrl ? '<div class="lesson-notes">' +
-                        '<strong><@spring.message code="calendar.lesson.meetingUrl"/></strong><br>' +
-                        '<a href="' + lesson.meetingUrl + '" target="_blank" class="meeting-link">' + lesson.meetingUrl + '</a>' +
                         '</div>' : '');
 
                 modalBody.appendChild(lessonDiv);

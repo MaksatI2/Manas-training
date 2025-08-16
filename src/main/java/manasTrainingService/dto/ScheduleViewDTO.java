@@ -29,7 +29,6 @@ public class ScheduleViewDTO {
     Integer teacherId;
 
     LessonType lessonType;
-    String meetingUrl;
     String notes;
 
     Boolean isActive;

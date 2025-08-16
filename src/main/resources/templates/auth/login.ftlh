@@ -98,7 +98,7 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
                                 <label class="form-check-label" for="rememberMe">
-                                    <i class="fas fa-bookmark me-1"></i><@spring.message code="login.remember"/>
+                                   <@spring.message code="login.remember"/>
                                 </label>
                             </div>
                         </div>

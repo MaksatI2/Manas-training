@@ -32,9 +32,6 @@ public class Meeting {
     @Column(name = "room_name", nullable = false, length = 100)
     String roomName;
 
-    @Column(name = "meeting_url", nullable = false, length = 500)
-    String meetingUrl;
-
     @Column(name = "started_at")
     LocalDateTime startedAt;
 

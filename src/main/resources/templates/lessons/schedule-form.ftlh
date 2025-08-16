@@ -13,7 +13,6 @@
     <#assign lblTeacher = springMacroRequestContext.getMessage("schedule.form.teacher")>
     <#assign lblName = springMacroRequestContext.getMessage("schedule.form.name")>
     <#assign lblType = springMacroRequestContext.getMessage("schedule.form.type")>
-    <#assign lblMeeting = springMacroRequestContext.getMessage("schedule.form.meetingUrl")>
     <#assign lblNotes = springMacroRequestContext.getMessage("schedule.form.notes")>
     <#assign btnSave = springMacroRequestContext.getMessage("schedule.save")>
     <#assign btnCancel = springMacroRequestContext.getMessage("schedule.cancel")>
@@ -67,11 +66,6 @@
             <div class="mb-3">
                 <label for="lessonType" class="form-label">${lblType}</label>
                 <@spring.formSingleSelect "schedule.lessonType" lessonTypes 'class="form-control" id="lessonType"' />
-                <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
-            </div>
-            <div class="mb-3">
-                <label for="meetingUrl" class="form-label">${lblMeeting}</label>
-                <@spring.formInput "schedule.meetingUrl" 'class="form-control" id="meetingUrl" maxlength="500"' />
                 <div class="error-block"><@spring.showErrors "<br>" "text-danger small" /></div>
             </div>
             <div class="mb-3">

@@ -267,7 +267,6 @@ public class ScheduleController {
                     ? schedule.getTeacherName()
                     : messageSource.getMessage("teacher.not.specified", null, locale));
             map.put("teacherId", schedule.getTeacherId());
-            map.put("meetingUrl", schedule.getMeetingUrl());
             map.put("notes", schedule.getNotes());
             map.put("courseTitle", schedule.getCourseTitle() != null
                     ? schedule.getCourseTitle()

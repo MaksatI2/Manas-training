@@ -51,7 +51,6 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .teacherId(schedule.getTeacher().getId())
                 .title(schedule.getTitle())
                 .lessonType(schedule.getLessonType())
-                .meetingUrl(schedule.getMeetingUrl())
                 .notes(schedule.getNotes())
                 .formattedLessonDate(DateUtil.format(schedule.getLessonDate()))
                 .teacherName(schedule.getTeacher().getName() + " " + schedule.getTeacher().getLastName())
@@ -147,7 +146,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         entity.setTeacher(teacher);
         entity.setTitle(schedule.getTitle());
         entity.setLessonType(schedule.getLessonType());
-        entity.setMeetingUrl(schedule.getMeetingUrl());
         entity.setNotes(schedule.getNotes());
         entity.setIsActive(true);
 
@@ -235,7 +233,6 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .teacherName(teacher.getName() + " " + teacher.getLastName())
                 .teacherId(teacher.getId())
                 .lessonType(schedule.getLessonType())
-                .meetingUrl(schedule.getMeetingUrl())
                 .notes(schedule.getNotes())
                 .isActive(schedule.getIsActive())
                 .build();

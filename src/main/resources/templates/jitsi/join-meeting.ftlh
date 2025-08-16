@@ -107,10 +107,6 @@
             <i class="fas fa-desktop"></i>
         </button>
 
-        <button class="control-btn" onclick="toggleFilmstrip()" title="Показать/скрыть участников">
-            <i class="fas fa-th"></i>
-        </button>
-
         <button class="control-btn" onclick="toggleParticipants()" title="Участники">
             <i class="fas fa-users"></i>
         </button>
@@ -121,10 +117,6 @@
 
         <button class="control-btn" onclick="raiseHand()" title="Поднять руку" id="raise-hand">
             <i class="fas fa-hand-paper"></i>
-        </button>
-
-        <button class="control-btn" onclick="toggleRecording()" title="Запись" id="recording">
-            <i class="fas fa-record-vinyl"></i>
         </button>
 
         <button class="control-btn danger" onclick="leaveMeeting()" title="Покинуть встречу">
@@ -422,16 +414,16 @@
                 let response;
 
                 if (userData.id) {
-                    response = await fetch(
-                        `/api/jitsi/meetings/${meeting.meetingId}/leave?userId=${userId}`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                [header]: token
-                            }
-                        }
-                    );
+                    response = await fetch(`/api/jitsi/meetings/${meeting.meetingId}/leave`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(token && header ? { [header]: token } : {})
+                        },
+                        body: JSON.stringify({
+                            userId: parseInt(userData.id)
+                        })
+                    });
                 }
 
                 hideLoading();
@@ -711,11 +703,6 @@
             seconds.toString().padStart(2, '0');
     }
 
-    function toggleFilmstrip() {
-        const filmstrip = document.getElementById('filmstrip');
-        filmstrip.classList.toggle('show');
-    }
-
     function toggleParticipants() {
         const panel = document.getElementById('participants-panel');
         panel.classList.toggle('show');
@@ -739,19 +726,6 @@
         }
 
         updateParticipantsList();
-    }
-
-    function toggleRecording() {
-        isRecording = !isRecording;
-        const btn = document.getElementById('recording');
-
-        if (isRecording) {
-            btn.classList.add('active');
-            showNotification('Запись начата', 'success');
-        } else {
-            btn.classList.remove('active');
-            showNotification('Запись остановлена');
-        }
     }
 
     function toggleSettings() {
@@ -852,19 +826,24 @@
         const notification = document.getElementById('notification');
         const textElement = document.getElementById('notification-text');
 
-        textElement.textContent = text;
-        notification.className = 'notification show';
-
-        if (type === 'error') {
-            notification.classList.add('error');
-        }
+        notification.classList.remove('show');
 
         setTimeout(() => {
-            notification.classList.remove('show');
+            textElement.textContent = text;
+            notification.className = 'notification';
+
+            if (type === 'error') {
+                notification.classList.add('error');
+            }
+
             setTimeout(() => {
-                notification.classList.remove('error');
-            }, 300);
-        }, 3000);
+                notification.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }, 300);
     }
 
     function initializeChat() {
@@ -1114,10 +1093,6 @@
             case 'p':
                 event.preventDefault();
                 toggleParticipants();
-                break;
-            case 'f':
-                event.preventDefault();
-                toggleFilmstrip();
                 break;
             case 's':
                 event.preventDefault();

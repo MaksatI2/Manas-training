@@ -35,7 +35,6 @@ public class ScheduleDTO {
     @NotNull(message = "{schedule.lessonType.notNull}")
     private LessonType lessonType;
 
-    private String meetingUrl;
     private String notes;
     private String formattedLessonDate;
 }

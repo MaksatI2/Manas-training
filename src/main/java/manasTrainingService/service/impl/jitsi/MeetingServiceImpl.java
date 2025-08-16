@@ -67,13 +67,11 @@ public class MeetingServiceImpl implements MeetingService {
 
         String meetingId = generateUniqueMeetingId();
         String roomName = generateRoomName(schedule);
-        String meetingUrl = buildMeetingUrl(roomName);
 
         Meeting meeting = Meeting.builder()
                 .schedule(schedule)
                 .meetingId(meetingId)
                 .roomName(roomName)
-                .meetingUrl(meetingUrl)
                 .startedAt(LocalDateTime.now())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -82,7 +80,6 @@ public class MeetingServiceImpl implements MeetingService {
 
         addTeacherAsParticipant(meeting, teacher);
 
-        schedule.setMeetingUrl(meetingUrl);
         scheduleRepository.save(schedule);
 
         log.info("Meeting started: scheduleId={}, meetingId={}, teacherId={}, roomName={}",
@@ -211,16 +208,6 @@ public class MeetingServiceImpl implements MeetingService {
                 System.currentTimeMillis() % 10000);
     }
 
-    private String buildMeetingUrl(String roomName) {
-        if ("80".equals(jitsiPort) && "http".equals(jitsiProtocol)) {
-            return String.format("%s://%s/meet/%s", jitsiProtocol, jitsiDomain, roomName);
-        } else if ("443".equals(jitsiPort) && "https".equals(jitsiProtocol)) {
-            return String.format("%s://%s/meet/%s", jitsiProtocol, jitsiDomain, roomName);
-        } else {
-            return String.format("%s://%s:%s/meet/%s", jitsiProtocol, jitsiDomain, jitsiPort, roomName);
-        }
-    }
-
     public String getJitsiDomain() {
         return jitsiDomain;
     }
@@ -240,7 +227,6 @@ public class MeetingServiceImpl implements MeetingService {
                 .lessonId(meeting.getSchedule().getLesson().getId())
                 .meetingId(meeting.getId())
                 .roomName(meeting.getRoomName())
-                .meetingUrl(meeting.getMeetingUrl())
                 .status(meeting.getEndedAt() == null ? "ACTIVE" : "ENDED")
                 .startedAt(meeting.getStartedAt())
                 .lessonTitle(meeting.getSchedule().getTitle())
@@ -258,7 +244,6 @@ public class MeetingServiceImpl implements MeetingService {
                 .id(meeting.getId())
                 .scheduleId(schedule.getId())
                 .roomName(meeting.getRoomName())
-                .meetingUrl(meeting.getMeetingUrl())
                 .lessonTitle(schedule.getTitle())
                 .courseTitle(schedule.getCourseInstance().getCourse().getTitle())
                 .teacherName(schedule.getTeacher().getName() + " " + schedule.getTeacher().getLastName())
