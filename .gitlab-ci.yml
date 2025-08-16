@@ -28,7 +28,6 @@ deploy:
   image: ubuntu:20.04
   before_script:
     - apt-get update -qq && apt-get install -y -qq openssh-client rsync
-    - apt-get update -qq && apt-get install -y -qq openssh-client rsync sshpass
     - eval "$(ssh-agent -s)"
     - |
       cat << 'EOF' > /tmp/deploy_key
@@ -82,13 +81,11 @@ deploy:
       mF51f/FOxMMAAAAUemVyMGljZW1heEBnbWFpbC5jb20BAgMEBQYH
       -----END OPENSSH PRIVATE KEY-----
       EOF
-    - echo "$DEPLOY_SSH_PRIVATE_KEY" > /tmp/deploy_key
     - chmod 600 /tmp/deploy_key
     - ssh-add /tmp/deploy_key
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H 195.38.165.94 >> ~/.ssh/known_hosts
-    - echo "$SSH_KNOWN_HOSTS_ENTRY" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
     - echo "Деплой на сервер $DEPLOY_SERVER_IP"
