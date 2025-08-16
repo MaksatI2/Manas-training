@@ -14,62 +14,40 @@
     <style>
         :root {
             --primary-blue: #0066cc;
-            --light-blue: #87ceeb;
-            --white: #ffffff;
             --dark-blue: #003d7a;
             --text-dark: #2c3e50;
         }
 
-        .page-title-block {
-            margin: 2rem auto 1.5rem;
-            text-align: center;
-        }
-
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .page-title i {
-            color: var(--primary-blue);
-            margin-right: .5rem;
-        }
-
         .teacher-profile-container {
-            max-width: 1140px;
-            margin: 0 auto 2rem;
-            padding: 0 1rem;
-            display: grid;
-            grid-template-columns:280px 1fr;
-            gap: 2rem;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.1);
         }
 
-        .teacher-photo img {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, .15);
+        .profile-photo img {
+            border: 5px solid var(--primary-blue);
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.15);
             object-fit: cover;
-        }
-
-        .teacher-info-block {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+            width: 250px;
+            height: 250px;
         }
 
         .info-section {
-            background: var(--white);
-            border-left: 4px solid var(--primary-blue);
-            padding: 1.2rem 1.5rem;
+            padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, .1);
-            box-sizing: border-box;
-            min-height: 80px;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .info-section:hover {
+            transform: translateY(-3px);
         }
 
         .section-title {
@@ -81,31 +59,27 @@
 
         .section-content {
             color: #444;
-            font-size: 1rem;
+            font-size: 1.2rem;
+            line-height: 1.8;
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
             max-width: 100%;
-            word-break: break-all;
+            flex-grow: 1;
+            align-items: center;
         }
 
         .contact-line {
-            display: flex;
             align-items: center;
-            margin-bottom: .5rem;
             color: #444;
             cursor: pointer;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            white-space: normal;
-            max-width: 100%;
-            flex-wrap: wrap;
-            word-break: break-all;
+            transition: color 0.3s ease;
         }
 
         .contact-line i {
-            margin-right: 10px;
+            margin-right: 12px;
             color: var(--primary-blue);
+            font-size: 1.2rem;
         }
 
         .contact-line a {
@@ -115,7 +89,6 @@
             overflow-wrap: break-word;
             white-space: normal;
             max-width: 100%;
-            word-break: break-all;
         }
 
         .contact-line:hover {
@@ -135,34 +108,37 @@
             box-shadow: 0 4px 15px rgba(0, 102, 204, .3);
         }
 
-        @media (max-width: 992px) {
-            .teacher-profile-container {
-                grid-template-columns:1fr;
-                text-align: center;
+        @media (max-width: 768px) {
+            .profile-photo img {
+                width: 200px;
+                height: 200px;
             }
 
-            .teacher-info-block {
-                text-align: left;
+            .section-title {
+                font-size: 1rem;
             }
 
-            .contact-line {
-                justify-content: flex-start;
-            }
-
-            .page-title {
-                font-size: 2rem;
+            .section-content {
+                font-size: 1.1rem;
             }
 
             .info-section {
                 padding: 1rem;
             }
+        }
+
+        @media (max-width: 576px) {
+            .profile-photo img {
+                width: 150px;
+                height: 150px;
+            }
 
             .section-title {
-                font-size: .95rem;
+                font-size: 0.9rem;
             }
 
             .section-content {
-                font-size: .95rem;
+                font-size: 1rem;
             }
         }
     </style>
@@ -174,71 +150,85 @@
         <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
 
-    <div class="page-title-block">
-        <h1 class="page-title">
-            <i class="fas fa-user-graduate"></i><@spring.message code='teacher.profile.public.pageTitle'/>
+    <div class="hero-section">
+        <h1 class="hero-title">
+            <i class="fas fa-user-graduate"></i> <@spring.message code='teacher.profile.public.pageTitle'/>
         </h1>
     </div>
 
     <div class="teacher-profile-container">
-        <div class="teacher-photo">
-            <img src="<#if teacher.teacher.avatarUrl??>/data/images/${teacher.teacher.avatarUrl}<#else>/static/images/default_avatar.jpg</#if>"
-                 alt="${teacher.teacher.name} ${teacher.teacher.lastName}">
-            <#if Session.SPRING_SECURITY_CONTEXT?? && (Session.SPRING_SECURITY_CONTEXT.authentication.principal.getAuthorities()?join(",")?contains("ADMIN"))>
-                <div style="margin-top: 1rem; text-align: center;" class="w-100">
-                    <a href="/admin/teachers/${teacher.teacher.id}/manage-courses" class="btn btn-primary w-100">
-                        <@spring.message code='teacher.profile.public.manageCourses'/>
-                    </a>
-                </div>
-            </#if>
-        </div>
 
-        <div class="teacher-info-block">
-            <div class="info-section">
-                <div class="section-title"><@spring.message code='teacher.profile.public.fullName'/></div>
-                <div class="section-content">${teacher.teacher.name} ${teacher.teacher.lastName}</div>
-            </div>
-
-            <div class="info-section">
-                <div class="section-title"><@spring.message code='teacher.profile.public.subjects'/></div>
-                <div class="section-content">${teacher.department}</div>
-            </div>
-
-            <div class="info-section">
-                <div class="section-title"><@spring.message code='teacher.profile.public.contactInfo'/></div>
-                <div class="section-content">
-                    <div class="contact-line" onclick="copyToClipboard('${teacher.teacher.email}')">
-                        <i class="fas fa-envelope"></i>
-                        <a href="mailto:${teacher.teacher.email}"
-                           title="<@spring.message code='teacher.profile.public.emailTooltip'/>">
-                            ${teacher.teacher.email}
-                        </a>
+        <div class="profile-card">
+            <div class="row">
+                <div class="col-12 text-center mb-4">
+                    <div class="profile-photo">
+                        <img src="<#if teacher.teacher.avatarUrl??>/data/images/${teacher.teacher.avatarUrl}<#else>/static/images/default_avatar.jpg</#if>"
+                             alt="${teacher.teacher.name} ${teacher.teacher.lastName}">
                     </div>
-                    <#if teacher.teacher.phone??>
-                        <div class="contact-line">
-                            <i class="fas fa-phone"></i> <@spring.message code='teacher.profile.public.phone'/>
-                            : ${teacher.teacher.phone}
+                    <#if Session.SPRING_SECURITY_CONTEXT?? && (Session.SPRING_SECURITY_CONTEXT.authentication.principal.getAuthorities()?join(",")?contains("ADMIN"))>
+                        <div style="margin-top: 1rem; text-align: center;" class="w-100">
+                            <a href="/admin/teachers/${teacher.teacher.id}/manage-courses"
+                               class="btn btn-primary p-3 rounded-4">
+                                <@spring.message code='teacher.profile.public.manageCourses'/>
+                            </a>
                         </div>
                     </#if>
                 </div>
             </div>
-
-            <#if teacher.qualifications?has_content>
-                <div class="info-section">
-                    <div class="section-title"><@spring.message code='teacher.profile.public.qualification'/></div>
-                    <div class="section-content">${teacher.qualifications}</div>
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <div class="col">
+                    <div class="info-section">
+                        <div class="section-title"><@spring.message code='teacher.profile.public.fullName'/></div>
+                        <div class="section-content">${teacher.teacher.name} ${teacher.teacher.lastName}</div>
+                    </div>
                 </div>
-            </#if>
-
+                <div class="col">
+                    <div class="info-section">
+                        <div class="section-title"><@spring.message code='teacher.profile.public.subjects'/></div>
+                        <div class="section-content">${teacher.department}</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="info-section">
+                        <div class="section-title"><@spring.message code='teacher.profile.public.contactInfo'/></div>
+                        <div class="section-content">
+                            <div class="contact-line" onclick="copyToClipboard('${teacher.teacher.email}')">
+                                <i class="fas fa-envelope"></i>
+                                <a href="mailto:${teacher.teacher.email}"
+                                   title="<@spring.message code='teacher.profile.public.emailTooltip'/>">
+                                    ${teacher.teacher.email}
+                                </a>
+                            </div>
+                            <#if teacher.teacher.phone??>
+                                <div class="contact-line">
+                                    <i class="fas fa-phone"></i> <@spring.message code='teacher.profile.public.phone'/>
+                                    : ${teacher.teacher.phone}
+                                </div>
+                            </#if>
+                        </div>
+                    </div>
+                </div>
+                <#if teacher.qualifications?has_content>
+                    <div class="col">
+                        <div class="info-section">
+                            <div class="section-title"><@spring.message code='teacher.profile.public.qualification'/></div>
+                            <div class="section-content">${teacher.qualifications}</div>
+                        </div>
+                    </div>
+                </#if>
+            </div>
             <#if teacher.bio?has_content>
-                <div class="info-section">
-                    <div class="section-title"><@spring.message code='teacher.profile.public.about'/></div>
-                    <div class="section-content">${teacher.bio}</div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="info-section">
+                            <div class="section-title"><@spring.message code='teacher.profile.public.about'/></div>
+                            <div class="section-content">${teacher.bio}</div>
+                        </div>
+                    </div>
                 </div>
             </#if>
         </div>
     </div>
-
     <script>
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
