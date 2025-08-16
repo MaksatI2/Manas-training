@@ -1,4 +1,4 @@
-package manasTrainingService.service.impl;
+package manasTrainingService.service.impl.course;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,6 @@ import manasTrainingService.service.user.UserService;
 import manasTrainingService.util.StatusUtil;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
