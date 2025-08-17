@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<script src='https://${DOMAIN:-manastraining.kg}/libs/external_api.min.js'></script>
+<script src='https://manastraining.kg/libs/external_api.min.js'></script>
 
 <script>
     let jitsiApi = null;
@@ -73,7 +73,7 @@
     });
 
     function initializeJitsiMeet() {
-        const domain = '${DOMAIN:-manastraining.kg}';
+        const domain = 'manastraining.kg';
         const roomName = meetingData.roomName;
 
         const options = {
@@ -128,7 +128,7 @@
             },
             userInfo: {
                 displayName: userData.name,
-                email: userData.id ? `user${userData.id}@manastraining.kg` : undefined
+                email: userData.id ? `user${userId}@manastraining.kg` : undefined
             }
         };
 
@@ -339,7 +339,7 @@
                 const token = document.querySelector('meta[name="_csrf"]').content;
                 const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-                const response = await fetch(`/api/jitsi/meetings/${meetingData.id}/leave`, {
+                const response = await fetch(`/api/jitsi/meetings/${meeting.meetingId}/leave`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
