@@ -18,7 +18,7 @@
                 ${springMacroRequestContext.getMessage('home.hero.subtitle')}
             </p>
             <div class="hero-buttons-group fade-in">
-                <a href="https://manastraining.kg/courses" class="btn btn-hero primary">
+                <a href="/courses" class="btn btn-hero primary">
                     <i class="fas fa-rocket me-2"></i>${springMacroRequestContext.getMessage('home.hero.button')}
                 </a>
             </div>
@@ -162,7 +162,7 @@
                             <span class="duration"><i
                                         class="fas fa-clock"></i> ${springMacroRequestContext.getMessage('home.courses.1.duration')}</span>
                         </div>
-                        <a href="https://manastraining.kg/courses/aircraft-maintenance"
+                        <a href="/courses/1"
                            class="btn btn-outline-primary btn-sm mt-2">
                             ${springMacroRequestContext.getMessage('home.courses.more')}
                         </a>
@@ -181,7 +181,7 @@
                             <span class="duration"><i
                                         class="fas fa-clock"></i> ${springMacroRequestContext.getMessage('home.courses.2.duration')}</span>
                         </div>
-                        <a href="https://manastraining.kg/courses/radio-communication"
+                        <a href="/courses/4"
                            class="btn btn-outline-primary btn-sm mt-2">
                             ${springMacroRequestContext.getMessage('home.courses.more')}
                         </a>
@@ -200,7 +200,7 @@
                             <span class="duration"><i
                                         class="fas fa-clock"></i> ${springMacroRequestContext.getMessage('home.courses.3.duration')}</span>
                         </div>
-                        <a href="https://manastraining.kg/courses/aviation-security"
+                        <a href="/courses/2"
                            class="btn btn-outline-primary btn-sm mt-2">
                             ${springMacroRequestContext.getMessage('home.courses.more')}
                         </a>
@@ -240,7 +240,7 @@
             ${springMacroRequestContext.getMessage('home.cta.desc')}
         </p>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="https://manastraining.kg/courses" class="btn btn-primary-custom btn-lg">
+            <a href="/courses" class="btn btn-primary-custom btn-lg">
                 <i class="fas fa-play me-2"></i>${springMacroRequestContext.getMessage('home.cta.button.courses')}
             </a>
         </div>
@@ -249,7 +249,7 @@
     <div class="contact-info-bar">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 mb-lg-0 contact-col">
                     <div class="contact-item">
                         <a href="tel:${springMacroRequestContext.getMessage('home.contact.phone')?replace(' ', '')?replace('-', '')}"
                            class="contact-link">
@@ -259,7 +259,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 mb-lg-0 contact-col">
                     <div class="contact-item">
                         <a href="mailto:${springMacroRequestContext.getMessage('home.contact.email')}"
                            class="contact-link">
@@ -269,7 +269,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 mb-lg-0 contact-col">
                     <div class="contact-item">
                         <div class="contact-link" onclick="showOnMap()" style="cursor: pointer;">
                             <i class="fas fa-map-marker-alt contact-icon"></i>
@@ -277,7 +277,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
+
+                <div class="col-lg-3 col-md-6 col-sm-12 contact-col">
                     <div class="social-links d-flex justify-content-center justify-content-lg-end">
                         <a href="https://wa.me/996557878300" target="_blank" class="social-link whatsapp"
                            aria-label="WhatsApp">
@@ -428,6 +429,56 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        @media (max-width: 1200px) and (min-width: 768px) {
+            .contact-info-bar .row {
+                flex-wrap: wrap;
+            }
+
+            .contact-info-bar .col-lg-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+                margin-bottom: 1rem;
+            }
+
+            .contact-info-bar .col-lg-3:last-child {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-top: 1rem;
+            }
+
+            .contact-item {
+                justify-content: flex-start;
+                padding: 0 15px;
+            }
+
+            .social-links {
+                justify-content: center;
+                margin-top: 0.5rem;
+            }
+
+            .contact-text {
+                white-space: normal;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .contact-info-bar .col-lg-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .contact-item {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
         }
 
         .contact-info-bar {
@@ -1098,7 +1149,6 @@
             flex-direction: column;
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
             .contact-info-bar .col-md-6 {
                 margin-bottom: 1rem;

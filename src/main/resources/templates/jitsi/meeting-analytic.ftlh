@@ -391,7 +391,6 @@
         .section-card {
             background: var(--white);
             border-radius: 15px;
-            border-left: 4px solid var(--primary-blue);
             box-shadow: 0 4px 15px rgba(0,102,204,0.1);
             margin-bottom: 2rem;
             transition: all 0.3s ease;
@@ -441,13 +440,7 @@
             align-items: center;
             gap: 1rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid var(--primary-blue);
         }
-
-        .stat-duration { border-left-color: var(--primary-blue); }
-        .stat-participants { border-left-color: var(--success-color); }
-        .stat-activity { border-left-color: var(--warning-color); }
-        .stat-teacher { border-left-color: var(--dark-blue); }
 
         .stat-icon {
             font-size: 2.5rem;
@@ -473,7 +466,6 @@
             background: var(--light-gray);
             border-radius: 10px;
             padding: 1.5rem;
-            border-left: 4px solid var(--light-blue);
         }
 
         .info-row {
