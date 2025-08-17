@@ -47,6 +47,11 @@ public class JitsiController {
             }
         }
 
+        if (meeting.getRoomName() == null || meeting.getRoomName().isEmpty()) {
+            String roomName = "meeting-" + meetingId;
+            meeting.setRoomName(roomName);
+        }
+
         model.addAttribute("meeting", meeting);
         model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);

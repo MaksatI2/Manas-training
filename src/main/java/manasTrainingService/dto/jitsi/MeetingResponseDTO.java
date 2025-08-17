@@ -1,23 +1,35 @@
 package manasTrainingService.dto.jitsi;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MeetingResponseDTO {
-    Integer lessonId;
-    Integer meetingId;
-    String roomName;
-    String status;
-    LocalDateTime startedAt;
-    String lessonTitle;
-    String teacherName;
-    Integer participantCount;
+    private Integer lessonId;
+    private Integer meetingId;
+    private Integer scheduleId;
+    private String roomName;
+    private LocalDateTime startedAt;
+    private String lessonTitle;
+    private String status;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private Integer teacherId;
+    private String teacherName;
+    private String meetingUrl;
+    private Integer participantCount;
+
+    public String getRoomName() {
+        if (roomName == null || roomName.isEmpty()) {
+            return "meeting-" + meetingId;
+        }
+        return roomName;
+    }
 }
