@@ -149,6 +149,10 @@
     }
 
     function setupJitsiEvents() {
+        jitsiApi.addEventListener('apiReady', () => {
+            console.log('Jitsi API готов');
+            hideLoading();
+        });
         jitsiApi.addEventListener('videoConferenceJoined', (event) => {
             console.log('Присоединились к конференции:', event);
             hideLoading();
