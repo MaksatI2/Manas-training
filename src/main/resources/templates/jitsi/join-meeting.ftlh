@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<script src='/libs/external_api.min.js'></script>
+<script src='/static/js/external_api.js'></script>
 
 <script>
     let jitsiApi = null;
