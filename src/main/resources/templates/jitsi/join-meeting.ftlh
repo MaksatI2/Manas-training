@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<script src='/static/js/external_api.js'></script>
+<script src='/libs/external_api.min.js'></script>
 
 <script>
     let jitsiApi = null;
@@ -83,8 +83,8 @@
             parentNode: document.querySelector('#jitsi-container'),
             configOverwrite: {
                 prejoinPageEnabled: false,
-                startWithAudioMuted: true,
-                startWithVideoMuted: true,
+                startWithAudioMuted: false,
+                startWithVideoMuted: false,
                 enableWelcomePage: false,
                 enableClosePage: false,
                 defaultLanguage: 'ru',
@@ -98,7 +98,7 @@
                 channelLastN: 20,
                 enableLayerSuspension: true,
                 p2p: {
-                    enabled: true,
+                    enabled: false,
                     stunServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' }
@@ -185,6 +185,13 @@
 
         jitsiApi.addEventListener('videoMuteStatusChanged', (event) => {
             console.log('Статус видео изменен:', event);
+        });
+
+        jitsiApi.addEventListener('participantRoleChanged', (event) => {
+            console.log('Роль участника изменилась:', event);
+            if (!hasJoinedMeeting) {
+                hideLoading();
+            }
         });
     }
 
