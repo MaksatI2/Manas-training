@@ -23,7 +23,6 @@ public class MeetingResponseDTO {
     private LocalDateTime endTime;
     private Integer teacherId;
     private String teacherName;
-    private String meetingUrl;
     private Integer participantCount;
 
     public String getRoomName() {

@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<script src='https://manastraining.kg/libs/external_api.min.js'></script>
+<script src='/static/js/external_api.js'></script>
 
 <script>
     let jitsiApi = null;
@@ -68,13 +68,25 @@
             return;
         }
 
+        if (typeof JitsiMeetExternalAPI === 'undefined') {
+            console.error('Jitsi Meet External API не загружен');
+            showError('Ошибка: не удалось загрузить Jitsi Meet API');
+            return;
+        }
+
         showLoading('Подключение к видеоконференции...');
         initializeJitsiMeet();
     });
 
     function initializeJitsiMeet() {
-        const domain = 'manastraining.kg';
+        const domain = window.location.hostname;
         const roomName = meetingData.roomName;
+
+        console.log('Создание Jitsi Meet с параметрами:', {
+            domain: domain,
+            roomName: roomName,
+            userName: userData.name
+        });
 
         const options = {
             roomName: roomName,
@@ -97,6 +109,8 @@
                 },
                 channelLastN: 20,
                 enableLayerSuspension: true,
+                websocket: 'wss://' + domain + '/xmpp-websocket',
+                bosh: '//' + domain + '/http-bind',
                 p2p: {
                     enabled: true,
                     stunServers: [
@@ -110,11 +124,10 @@
                     'microphone', 'camera', 'closedcaptions', 'desktop',
                     'fullscreen', 'fodeviceselection', 'hangup', 'profile',
                     'chat', 'raisehand', 'videoquality', 'filmstrip',
-                    'invite', 'settings', 'tileview', 'select-background',
-                    'mute-everyone', 'security'
+                    'invite', 'settings', 'tileview', 'select-background'
                 ],
                 SETTINGS_SECTIONS: [
-                    'devices', 'language', 'moderator', 'profile', 'calendar'
+                    'devices', 'language', 'moderator', 'profile'
                 ],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
@@ -124,7 +137,8 @@
                 GENERATE_ROOMNAMES_ON_WELCOME_PAGE: false,
                 DISPLAY_WELCOME_PAGE_CONTENT: false,
                 LANG_DETECTION: false,
-                DEFAULT_LANGUAGE: 'ru'
+                DEFAULT_LANGUAGE: 'ru',
+                MOBILE_APP_PROMO: false
             },
             userInfo: {
                 displayName: userData.name,
@@ -156,9 +170,15 @@
 
             if (userData.role === 'TEACHER') {
                 document.getElementById('complete-btn').style.display = 'block';
+                document.getElementById('custom-controls').style.display = 'block';
             }
 
             initializePing();
+        });
+
+        jitsiApi.addEventListener('videoConferenceLeft', (event) => {
+            console.log('Покинули конференцию:', event);
+            cleanupAndRedirect();
         });
 
         jitsiApi.addEventListener('participantJoined', (event) => {
@@ -176,16 +196,22 @@
 
         jitsiApi.addEventListener('error', (error) => {
             console.error('Ошибка Jitsi:', error);
-            showError('Ошибка видеоконференции: ' + error.message);
+            showError('Ошибка видеоконференции: ' + (error.message || 'Неизвестная ошибка'));
         });
 
-        jitsiApi.addEventListener('audioMuteStatusChanged', (event) => {
-            console.log('Статус аудио изменен:', event);
+        jitsiApi.addEventListener('connectionFailed', (event) => {
+            console.error('Ошибка подключения:', event);
+            hideLoading();
+            showError('Не удалось подключиться к видеоконференции. Проверьте интернет-соединение.');
         });
 
-        jitsiApi.addEventListener('videoMuteStatusChanged', (event) => {
-            console.log('Статус видео изменен:', event);
-        });
+        setTimeout(() => {
+            if (!hasJoinedMeeting) {
+                console.warn('Таймаут подключения к конференции');
+                hideLoading();
+                showError('Таймаут подключения. Пожалуйста, попробуйте еще раз.');
+            }
+        }, 30000);
     }
 
     async function joinMeetingAutomatically() {
@@ -390,6 +416,7 @@
     }
 
     function showError(message) {
+        hideLoading();
         alert('Ошибка: ' + message);
         console.error('Error:', message);
     }
@@ -429,7 +456,7 @@
 
 <style>
     .loading-overlay {
-        display: none;
+        display: flex;
         position: fixed;
         top: 0;
         left: 0;
