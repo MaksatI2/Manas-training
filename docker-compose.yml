@@ -60,6 +60,7 @@ services:
       - JITSI_DOMAIN=${DOMAIN:-manastraining.kg}
       - SERVER_PORT=8089
       - JAVA_OPTS=-Xmx512m -Xms256m
+      - TZ=Asia/Bishkek
     expose:
       - "8089"
     depends_on:
