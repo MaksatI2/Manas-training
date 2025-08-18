@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<script src='/libs/external_api.min.js'></script>
+<script src='/static/js/external_api.js'></script>
 
 <script>
     let jitsiApi = null;
@@ -440,7 +440,7 @@
             const data = new URLSearchParams();
             data.append('participantId', participantId);
 
-            fetch(`/api/jitsi/meetings/${meeting.meetingId}/leave-by-participant`, {
+            fetch(`/api/jitsi/meetings/${meetingData.id}/leave-by-participant`, {
                 method: 'POST',
                 headers: headers,
                 body: data,

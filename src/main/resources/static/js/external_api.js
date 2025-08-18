@@ -1,4 +1,3 @@
-
 (function() {
     'use strict';
 
@@ -103,6 +102,7 @@
         this.iframe.setAttribute('allow', 'camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write; autoplay');
 
         const url = this.buildUrl();
+        console.log('JitsiMeetExternalAPI: Creating iframe with URL:', url);
         this.iframe.src = url;
 
         this.parentNode.appendChild(this.iframe);
@@ -110,7 +110,7 @@
 
     JitsiMeetExternalAPI.prototype.buildUrl = function() {
         const protocol = location.protocol;
-        let url = `${protocol}//${this.domain}/${this.roomName}`;
+        let url = `${protocol}//${this.domain}/meet/${this.roomName}`;
 
         const params = new URLSearchParams();
 
@@ -131,11 +131,27 @@
         }
 
         if (Object.keys(this.configOverwrite).length > 0) {
-            params.append('config', JSON.stringify(this.configOverwrite));
+            if (this.configOverwrite.startWithAudioMuted !== undefined) {
+                params.append('config.startWithAudioMuted', this.configOverwrite.startWithAudioMuted);
+            }
+            if (this.configOverwrite.startWithVideoMuted !== undefined) {
+                params.append('config.startWithVideoMuted', this.configOverwrite.startWithVideoMuted);
+            }
+            if (this.configOverwrite.prejoinPageEnabled !== undefined) {
+                params.append('config.prejoinPageEnabled', this.configOverwrite.prejoinPageEnabled);
+            }
+            if (this.configOverwrite.defaultLanguage) {
+                params.append('config.defaultLanguage', this.configOverwrite.defaultLanguage);
+            }
         }
 
         if (Object.keys(this.interfaceConfigOverwrite).length > 0) {
-            params.append('interfaceConfig', JSON.stringify(this.interfaceConfigOverwrite));
+            if (this.interfaceConfigOverwrite.SHOW_JITSI_WATERMARK !== undefined) {
+                params.append('interfaceConfig.SHOW_JITSI_WATERMARK', this.interfaceConfigOverwrite.SHOW_JITSI_WATERMARK);
+            }
+            if (this.interfaceConfigOverwrite.SHOW_WATERMARK_FOR_GUESTS !== undefined) {
+                params.append('interfaceConfig.SHOW_WATERMARK_FOR_GUESTS', this.interfaceConfigOverwrite.SHOW_WATERMARK_FOR_GUESTS);
+            }
         }
 
         if (this.devices.audioInput) {
@@ -160,6 +176,7 @@
         const self = this;
 
         this.iframe.addEventListener('load', function() {
+            console.log('JitsiMeetExternalAPI: Iframe loaded successfully');
             self.isReady = true;
             self.triggerEvent(EVENTS.API_READY);
 
@@ -167,13 +184,19 @@
                 self.onload();
             }
         });
+
+        this.iframe.addEventListener('error', function(error) {
+            console.error('JitsiMeetExternalAPI: Iframe load error:', error);
+            self.triggerEvent(EVENTS.ERROR, { error: 'Failed to load Jitsi Meet' });
+        });
     };
 
     JitsiMeetExternalAPI.prototype.setupMessageHandling = function() {
         const self = this;
 
         window.addEventListener('message', function(event) {
-            if (event.origin !== `${location.protocol}//${self.domain}`) {
+            const expectedOrigin = `${location.protocol}//${self.domain}`;
+            if (event.origin !== expectedOrigin && !event.origin.includes(self.domain)) {
                 return;
             }
 
@@ -186,14 +209,18 @@
         });
 
         setTimeout(function() {
-            self.sendMessage({
-                type: 'init',
-                parentOrigin: location.origin
-            });
-        }, 1000);
+            if (self.iframe && self.iframe.contentWindow) {
+                self.sendMessage({
+                    type: 'init',
+                    parentOrigin: location.origin
+                });
+            }
+        }, 2000);
     };
 
     JitsiMeetExternalAPI.prototype.handleMessage = function(data) {
+        console.log('JitsiMeetExternalAPI: Received message:', data.type, data.payload);
+
         switch (data.type) {
             case 'videoConferenceJoined':
                 this.triggerEvent(EVENTS.VIDEO_CONFERENCE_JOINED, data.payload);
@@ -242,6 +269,9 @@
             case 'readyToClose':
                 this.triggerEvent(EVENTS.READY_TO_CLOSE, data.payload);
                 break;
+            case 'error':
+                this.triggerEvent(EVENTS.ERROR, data.payload);
+                break;
             default:
                 if (Object.values(EVENTS).includes(data.type)) {
                     this.triggerEvent(data.type, data.payload);
@@ -252,7 +282,8 @@
 
     JitsiMeetExternalAPI.prototype.sendMessage = function(message) {
         if (this.iframe && this.iframe.contentWindow) {
-            this.iframe.contentWindow.postMessage(message, `${location.protocol}//${this.domain}`);
+            const targetOrigin = `${location.protocol}//${this.domain}`;
+            this.iframe.contentWindow.postMessage(message, targetOrigin);
         }
     };
 
@@ -281,12 +312,14 @@
     };
 
     JitsiMeetExternalAPI.prototype.triggerEvent = function(event, data) {
+        console.log('JitsiMeetExternalAPI: Triggering event:', event, data);
+
         if (this.eventHandlers[event]) {
             this.eventHandlers[event].forEach(handler => {
                 try {
                     handler(data);
                 } catch (error) {
-                    console.error('Error in event handler:', error);
+                    console.error('Error in event handler for', event, ':', error);
                 }
             });
         }
@@ -334,6 +367,8 @@
     };
 
     JitsiMeetExternalAPI.prototype.dispose = function() {
+        console.log('JitsiMeetExternalAPI: Disposing API');
+
         if (this.iframe && this.iframe.parentNode) {
             this.iframe.parentNode.removeChild(this.iframe);
         }
@@ -414,8 +449,9 @@
     };
 
     window.JitsiMeetExternalAPI = JitsiMeetExternalAPI;
-
     window.JitsiMeetExternalAPI.events = EVENTS;
     window.JitsiMeetExternalAPI.commands = COMMANDS;
+
+    console.log('JitsiMeetExternalAPI: API loaded and ready');
 
 })();
