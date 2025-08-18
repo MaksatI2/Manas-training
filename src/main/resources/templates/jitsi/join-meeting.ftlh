@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<script src='/static/js/external_api.js'></script>
+<script src='/libs/external_api.min.js'></script>
 
 <script>
     let jitsiApi = null;
@@ -110,7 +110,11 @@
                 channelLastN: 20,
                 enableLayerSuspension: true,
                 websocket: 'wss://' + domain + '/xmpp-websocket',
-                bosh: '//' + domain + '/http-bind',
+                bosh: 'https://' + domain + '/http-bind',
+                hosts: {
+                    domain: domain,
+                    muc: 'conference.' + domain
+                },
                 p2p: {
                     enabled: true,
                     stunServers: [
@@ -152,7 +156,6 @@
             jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
             setupJitsiEvents();
-
             joinMeetingAutomatically();
 
         } catch (error) {
@@ -211,7 +214,7 @@
                 hideLoading();
                 showError('Таймаут подключения. Пожалуйста, попробуйте еще раз.');
             }
-        }, 30000);
+        }, 45000);
     }
 
     async function joinMeetingAutomatically() {
