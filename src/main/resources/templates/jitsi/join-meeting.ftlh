@@ -41,6 +41,8 @@
 </div>
 
 <script src='/static/js/external_api.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
 <script>
     let jitsiApi = null;
@@ -58,6 +60,33 @@
     let participantId = null;
     let hasJoinedMeeting = false;
     let pingInterval = null;
+    let stompClient = null;
+
+    function connectWs() {
+        try {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null;
+            stompClient.connect({}, function () {
+                console.log('WS connected');
+                if (meetingData.id) {
+                    stompClient.subscribe('/topic/meetings/' + meetingData.id, function (message) {
+                        const body = message.body || '';
+                        console.log('WS message:', body);
+                        if (body === 'ENDED') {
+                            if (jitsiApi) {
+                                try { jitsiApi.dispose(); } catch (e) {}
+                            }
+                            alert('Урок завершен преподавателем');
+                            cleanupAndRedirect();
+                        }
+                    });
+                }
+            });
+        } catch (e) {
+            console.warn('WS connect error', e);
+        }
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Инициализация с данными:', { userData, meetingData });
@@ -70,6 +99,7 @@
 
         showLoading('Подключение к видеоконференции...');
         initializeJitsiMeet();
+        connectWs();
     });
 
     function initializeJitsiMeet() {
@@ -173,6 +203,35 @@
             console.log('Участник покинул встречу:', event);
         });
 
+        jitsiApi.addEventListener('videoConferenceLeft', async () => {
+            console.log('Пользователь вышел из конференции (videoConferenceLeft)');
+            try {
+                if (participantId && meetingData.id) {
+                    const token = document.querySelector('meta[name="_csrf"]').content;
+                    const header = document.querySelector('meta[name="_csrf_header"]').content;
+
+                    const headers = new Headers();
+                    if (header && token) {
+                        headers.append(header, token);
+                    }
+                    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+                    const data = new URLSearchParams();
+                    data.append('participantId', participantId);
+
+                    await fetch('/api/jitsi/meetings/' + meetingData.id + '/leave-by-participant', {
+                        method: 'POST',
+                        headers: headers,
+                        body: data
+                    });
+                }
+            } catch (e) {
+                console.warn('Не удалось отправить leave-by-participant при videoConferenceLeft');
+            } finally {
+                cleanupAndRedirect();
+            }
+        });
+
         jitsiApi.addEventListener('readyToClose', () => {
             console.log('Готовность к закрытию');
             cleanupAndRedirect();
@@ -226,6 +285,7 @@
                 const participantData = await response.json();
                 participantId = participantData.participantId;
                 console.log('Backend: успешно присоединились к встрече, participantId:', participantId);
+                initializePing();
             } else {
                 console.error('Backend: ошибка присоединения к встрече:', response.status);
             }
@@ -235,11 +295,15 @@
     }
 
     function initializePing() {
-        if (participantId && meetingData.id) {
-            pingInterval = setInterval(sendPing, 600000);
-            sendPing();
-            console.log('Ping инициализирован для участника:', participantId);
+        if (!participantId || !meetingData.id) {
+            console.log('Ping: ожидаю participantId/meetingId...');
+            return;
         }
+        if (!pingInterval) {
+            pingInterval = setInterval(sendPing, 60000);
+            console.log('Ping таймер запущен (60s) для участника:', participantId);
+        }
+        sendPing();
     }
 
     async function sendPing() {
@@ -350,15 +414,19 @@
                 const token = document.querySelector('meta[name="_csrf"]').content;
                 const header = document.querySelector('meta[name="_csrf_header"]').content;
 
+                const headers = new Headers();
+                if (header && token) {
+                    headers.append(header, token);
+                }
+                headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+                const body = new URLSearchParams();
+                body.append('userId', String(parseInt(userData.id)));
+
                 const response = await fetch('/api/jitsi/meetings/' + meetingData.id + '/leave', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token && header ? { [header]: token } : {})
-                    },
-                    body: JSON.stringify({
-                        userId: parseInt(userData.id)
-                    })
+                    headers: headers,
+                    body: body
                 });
 
                 if (response.ok) {
@@ -383,6 +451,11 @@
     function cleanupAndRedirect() {
         stopPing();
         hideLoading();
+        try {
+            if (stompClient) {
+                stompClient.disconnect(() => console.log('WS disconnected'));
+            }
+        } catch (e) {}
         setTimeout(() => {
             window.location.href = '/schedules';
         }, 1000);
