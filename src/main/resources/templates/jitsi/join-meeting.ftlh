@@ -91,9 +91,9 @@
 
         let displayName = userData.name;
         if (userData.role === 'TEACHER') {
-            displayName = `Преподаватель: ${userName}`;
+            displayName = 'Преподаватель: ' + userData.name;
         } else if (userData.role === 'STUDENT') {
-            displayName = `Студент: ${userName}`;
+            displayName = 'Студент: ' + userData.name;
         }
 
         const options = {
@@ -117,21 +117,11 @@
                 },
                 channelLastN: 20,
                 enableLayerSuspension: true,
-                websocket: 'wss://' + domain + '/xmpp-websocket',
-                bosh: 'https://' + domain + '/http-bind',
-                hosts: {
-                    domain: domain,
-                    muc: 'conference.' + domain
-                },
-                p2p: {
-                    enabled: true,
-                    stunServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' }
-                    ]
-                },
                 displayJids: false,
-                hideDisplayName: false
+                hideDisplayName: false,
+                p2p: {
+                    enabled: false
+                }
             },
             interfaceConfigOverwrite: {
                 TOOLBAR_BUTTONS: [
@@ -158,7 +148,7 @@
             },
             userInfo: {
                 displayName: displayName,
-                email: userData.id ? `user${userId}@manastraining.kg` : undefined
+                email: userData.id ? 'user' + userData.id + '@manastraining.kg' : undefined
             }
         };
 
@@ -171,7 +161,7 @@
 
             setTimeout(() => {
                 joinMeetingAutomatically();
-            }, 2000);
+            }, 3000);
 
         } catch (error) {
             console.error('Ошибка создания Jitsi API:', error);
@@ -183,19 +173,22 @@
     function setupJitsiEvents() {
         jitsiApi.addEventListener('videoConferenceJoined', (event) => {
             console.log('Присоединились к конференции:', event);
+            console.log('Данные пользователя:', userData);
+            console.log('Данные встречи:', meetingData);
+
             hideLoading();
             hasJoinedMeeting = true;
 
             setTimeout(() => {
                 let displayName = userData.name;
                 if (userData.role === 'TEACHER') {
-                    displayName = `Преподаватель: ${userName}`;
+                    displayName = 'Преподаватель: ' + userData.name;
                 } else if (userData.role === 'STUDENT') {
-                    displayName = `Студент: ${userName}`;
+                    displayName = 'Студент: ' + userData.name;
                 }
 
+                console.log('Устанавливаем отображаемое имя:', displayName);
                 jitsiApi.executeCommand('displayName', displayName);
-                console.log('Установлено отображаемое имя:', displayName);
             }, 1000);
 
             if (userData.role === 'TEACHER') {
@@ -213,10 +206,16 @@
 
         jitsiApi.addEventListener('participantJoined', (event) => {
             console.log('Участник присоединился:', event);
+            console.log('ID участника:', event.id);
+            console.log('Отображаемое имя участника:', event.displayName);
         });
 
         jitsiApi.addEventListener('participantLeft', (event) => {
             console.log('Участник покинул встречу:', event);
+        });
+
+        jitsiApi.addEventListener('displayNameChanged', (event) => {
+            console.log('Изменено отображаемое имя:', event);
         });
 
         jitsiApi.addEventListener('readyToClose', () => {
@@ -226,22 +225,48 @@
 
         jitsiApi.addEventListener('error', (error) => {
             console.error('Ошибка Jitsi:', error);
+            console.error('Детали ошибки:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
             showError('Ошибка видеоконференции: ' + (error.message || 'Неизвестная ошибка'));
         });
 
         jitsiApi.addEventListener('connectionFailed', (event) => {
             console.error('Ошибка подключения:', event);
+            console.error('Детали события:', event);
             hideLoading();
             showError('Не удалось подключиться к видеоконференции. Проверьте интернет-соединение.');
         });
 
+        jitsiApi.addEventListener('connectionEstablished', (event) => {
+            console.log('Подключение установлено:', event);
+        });
+
+        jitsiApi.addEventListener('connectionInterrupted', (event) => {
+            console.log('Подключение прервано:', event);
+            showLoading('Переподключение...');
+        });
+
+        jitsiApi.addEventListener('connectionRestored', (event) => {
+            console.log('Подключение восстановлено:', event);
+            hideLoading();
+        });
+
         setTimeout(() => {
             if (!hasJoinedMeeting) {
-                console.warn('Таймаут подключения к конференции');
+                console.error('Таймаут подключения к конференции');
+                console.error('Состояние:', {
+                    userData,
+                    meetingData,
+                    jitsiApiExists: !!jitsiApi,
+                    containerExists: !!document.querySelector('#jitsi-container')
+                });
                 hideLoading();
                 showError('Таймаут подключения. Пожалуйста, попробуйте еще раз.');
             }
-        }, 45000);
+        }, 60000);
     }
 
     async function joinMeetingAutomatically() {
@@ -406,7 +431,7 @@
                 const token = document.querySelector('meta[name="_csrf"]').content;
                 const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-                const response = await fetch(`/api/jitsi/meetings/${meeting.meetingId}/leave`, {
+                const response = await fetch(`/api/jitsi/meetings/`+ meetingData.id`/leave`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -481,11 +506,13 @@
             const data = new URLSearchParams();
             data.append('participantId', participantId);
 
-            fetch(`/api/jitsi/meetings/${meeting.meetingId}/leave-by-participant`, {
+            fetch(`/api/jitsi/meetings/`+ meetingData.id`/leave-by-participant`, {
                 method: 'POST',
                 headers: headers,
                 body: data,
                 keepalive: true
+            }).catch(error => {
+                console.error('Ошибка при покидании встречи:', error);
             });
         }
     });
