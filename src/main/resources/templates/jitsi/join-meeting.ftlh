@@ -440,7 +440,7 @@
             const data = new URLSearchParams();
             data.append('participantId', participantId);
 
-            fetch(`/api/jitsi/meetings/${meetingData.id}/leave-by-participant`, {
+            fetch(`/api/jitsi/meetings/${meeting.meetingId}/leave-by-participant`, {
                 method: 'POST',
                 headers: headers,
                 body: data,
