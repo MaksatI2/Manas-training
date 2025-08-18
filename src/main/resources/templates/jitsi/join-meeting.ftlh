@@ -85,8 +85,16 @@
         console.log('Создание Jitsi Meet с параметрами:', {
             domain: domain,
             roomName: roomName,
-            userName: userData.name
+            userName: userData.name,
+            userRole: userData.role
         });
+
+        let displayName = userData.name;
+        if (userData.role === 'TEACHER') {
+            displayName = `Преподаватель: ${userName}`;
+        } else if (userData.role === 'STUDENT') {
+            displayName = `Студент: ${userName}`;
+        }
 
         const options = {
             roomName: roomName,
@@ -95,8 +103,8 @@
             parentNode: document.querySelector('#jitsi-container'),
             configOverwrite: {
                 prejoinPageEnabled: false,
-                startWithAudioMuted: true,
-                startWithVideoMuted: true,
+                startWithAudioMuted: userData.role === 'STUDENT',
+                startWithVideoMuted: userData.role === 'STUDENT',
                 enableWelcomePage: false,
                 enableClosePage: false,
                 defaultLanguage: 'ru',
@@ -121,7 +129,9 @@
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' }
                     ]
-                }
+                },
+                displayJids: false,
+                hideDisplayName: false
             },
             interfaceConfigOverwrite: {
                 TOOLBAR_BUTTONS: [
@@ -142,10 +152,12 @@
                 DISPLAY_WELCOME_PAGE_CONTENT: false,
                 LANG_DETECTION: false,
                 DEFAULT_LANGUAGE: 'ru',
-                MOBILE_APP_PROMO: false
+                MOBILE_APP_PROMO: false,
+                SHOW_CHROME_EXTENSION_BANNER: false,
+                DISABLE_JOIN_LEAVE_NOTIFICATIONS: false
             },
             userInfo: {
-                displayName: userData.name,
+                displayName: displayName,
                 email: userData.id ? `user${userId}@manastraining.kg` : undefined
             }
         };
@@ -156,7 +168,10 @@
             jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
             setupJitsiEvents();
-            joinMeetingAutomatically();
+
+            setTimeout(() => {
+                joinMeetingAutomatically();
+            }, 2000);
 
         } catch (error) {
             console.error('Ошибка создания Jitsi API:', error);
@@ -170,6 +185,18 @@
             console.log('Присоединились к конференции:', event);
             hideLoading();
             hasJoinedMeeting = true;
+
+            setTimeout(() => {
+                let displayName = userData.name;
+                if (userData.role === 'TEACHER') {
+                    displayName = `Преподаватель: ${userName}`;
+                } else if (userData.role === 'STUDENT') {
+                    displayName = `Студент: ${userName}`;
+                }
+
+                jitsiApi.executeCommand('displayName', displayName);
+                console.log('Установлено отображаемое имя:', displayName);
+            }, 1000);
 
             if (userData.role === 'TEACHER') {
                 document.getElementById('complete-btn').style.display = 'block';
@@ -227,6 +254,12 @@
             const token = document.querySelector('meta[name="_csrf"]').content;
             const header = document.querySelector('meta[name="_csrf_header"]').content;
 
+            console.log('Отправка запроса на присоединение к встрече:', {
+                meetingId: parseInt(meetingData.id),
+                userId: parseInt(userData.id),
+                participantName: userData.name
+            });
+
             const response = await fetch('/api/jitsi/meetings/join', {
                 method: 'POST',
                 headers: {
@@ -245,7 +278,8 @@
                 participantId = participantData.participantId;
                 console.log('Backend: успешно присоединились к встрече, participantId:', participantId);
             } else {
-                console.error('Backend: ошибка присоединения к встрече:', response.status);
+                const errorText = await response.text();
+                console.error('Backend: ошибка присоединения к встрече:', response.status, errorText);
             }
         } catch (error) {
             console.error('Ошибка при присоединении к встрече на backend:', error);
@@ -257,11 +291,14 @@
             pingInterval = setInterval(sendPing, 600000);
             sendPing();
             console.log('Ping инициализирован для участника:', participantId);
+        } else {
+            console.warn('Не удалось инициализировать ping - отсутствует participantId или meetingId');
         }
     }
 
     async function sendPing() {
         if (!participantId || !meetingData.id) {
+            console.warn('Не удалось отправить ping - отсутствует participantId или meetingId');
             return;
         }
 
@@ -284,7 +321,8 @@
             if (response.ok) {
                 console.log('Ping отправлен успешно');
             } else {
-                console.warn('Ошибка ping:', response.status);
+                const errorText = await response.text();
+                console.warn('Ошибка ping:', response.status, errorText);
             }
         } catch (error) {
             console.error('Ошибка отправки ping:', error);
@@ -381,6 +419,9 @@
 
                 if (response.ok) {
                     console.log('Успешно покинули встречу на backend');
+                } else {
+                    const errorText = await response.text();
+                    console.warn('Ошибка покидания встречи на backend:', errorText);
                 }
             }
 
