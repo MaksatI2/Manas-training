@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<script src='/static/js/external_api.js'></script>
+<script src='/libs/external_api.min.js'></script>
 
 <script>
     let jitsiApi = null;
@@ -68,33 +68,13 @@
             return;
         }
 
-        if (typeof JitsiMeetExternalAPI === 'undefined') {
-            console.error('Jitsi Meet External API не загружен');
-            showError('Ошибка: не удалось загрузить Jitsi Meet API');
-            return;
-        }
-
         showLoading('Подключение к видеоконференции...');
         initializeJitsiMeet();
     });
 
     function initializeJitsiMeet() {
-        const domain = window.location.hostname;
+        const domain = window.location.host;
         const roomName = meetingData.roomName;
-
-        console.log('Создание Jitsi Meet с параметрами:', {
-            domain: domain,
-            roomName: roomName,
-            userName: userData.name,
-            userRole: userData.role
-        });
-
-        let displayName = userData.name;
-        if (userData.role === 'TEACHER') {
-            displayName = 'Преподаватель: ' + userData.name;
-        } else if (userData.role === 'STUDENT') {
-            displayName = 'Студент: ' + userData.name;
-        }
 
         const options = {
             roomName: roomName,
@@ -103,8 +83,8 @@
             parentNode: document.querySelector('#jitsi-container'),
             configOverwrite: {
                 prejoinPageEnabled: false,
-                startWithAudioMuted: userData.role === 'STUDENT',
-                startWithVideoMuted: userData.role === 'STUDENT',
+                startWithAudioMuted: true,
+                startWithVideoMuted: true,
                 enableWelcomePage: false,
                 enableClosePage: false,
                 defaultLanguage: 'ru',
@@ -117,10 +97,12 @@
                 },
                 channelLastN: 20,
                 enableLayerSuspension: true,
-                displayJids: false,
-                hideDisplayName: false,
                 p2p: {
-                    enabled: false
+                    enabled: true,
+                    stunServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
+                    ]
                 }
             },
             interfaceConfigOverwrite: {
@@ -128,10 +110,11 @@
                     'microphone', 'camera', 'closedcaptions', 'desktop',
                     'fullscreen', 'fodeviceselection', 'hangup', 'profile',
                     'chat', 'raisehand', 'videoquality', 'filmstrip',
-                    'invite', 'settings', 'tileview', 'select-background'
+                    'invite', 'settings', 'tileview', 'select-background',
+                    'mute-everyone', 'security'
                 ],
                 SETTINGS_SECTIONS: [
-                    'devices', 'language', 'moderator', 'profile'
+                    'devices', 'language', 'moderator', 'profile', 'calendar'
                 ],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
@@ -141,14 +124,11 @@
                 GENERATE_ROOMNAMES_ON_WELCOME_PAGE: false,
                 DISPLAY_WELCOME_PAGE_CONTENT: false,
                 LANG_DETECTION: false,
-                DEFAULT_LANGUAGE: 'ru',
-                MOBILE_APP_PROMO: false,
-                SHOW_CHROME_EXTENSION_BANNER: false,
-                DISABLE_JOIN_LEAVE_NOTIFICATIONS: false
+                DEFAULT_LANGUAGE: 'ru'
             },
             userInfo: {
-                displayName: displayName,
-                email: userData.id ? 'user' + userData.id + '@manastraining.kg' : undefined
+                displayName: userData.name,
+                email: userData.id ? ('user' + userData.id + '@manastraining.kg') : undefined
             }
         };
 
@@ -159,9 +139,7 @@
 
             setupJitsiEvents();
 
-            setTimeout(() => {
-                joinMeetingAutomatically();
-            }, 3000);
+            joinMeetingAutomatically();
 
         } catch (error) {
             console.error('Ошибка создания Jitsi API:', error);
@@ -173,49 +151,22 @@
     function setupJitsiEvents() {
         jitsiApi.addEventListener('videoConferenceJoined', (event) => {
             console.log('Присоединились к конференции:', event);
-            console.log('Данные пользователя:', userData);
-            console.log('Данные встречи:', meetingData);
-
             hideLoading();
             hasJoinedMeeting = true;
 
-            setTimeout(() => {
-                let displayName = userData.name;
-                if (userData.role === 'TEACHER') {
-                    displayName = 'Преподаватель: ' + userData.name;
-                } else if (userData.role === 'STUDENT') {
-                    displayName = 'Студент: ' + userData.name;
-                }
-
-                console.log('Устанавливаем отображаемое имя:', displayName);
-                jitsiApi.executeCommand('displayName', displayName);
-            }, 1000);
-
             if (userData.role === 'TEACHER') {
                 document.getElementById('complete-btn').style.display = 'block';
-                document.getElementById('custom-controls').style.display = 'block';
             }
 
             initializePing();
         });
 
-        jitsiApi.addEventListener('videoConferenceLeft', (event) => {
-            console.log('Покинули конференцию:', event);
-            cleanupAndRedirect();
-        });
-
         jitsiApi.addEventListener('participantJoined', (event) => {
             console.log('Участник присоединился:', event);
-            console.log('ID участника:', event.id);
-            console.log('Отображаемое имя участника:', event.displayName);
         });
 
         jitsiApi.addEventListener('participantLeft', (event) => {
             console.log('Участник покинул встречу:', event);
-        });
-
-        jitsiApi.addEventListener('displayNameChanged', (event) => {
-            console.log('Изменено отображаемое имя:', event);
         });
 
         jitsiApi.addEventListener('readyToClose', () => {
@@ -225,48 +176,16 @@
 
         jitsiApi.addEventListener('error', (error) => {
             console.error('Ошибка Jitsi:', error);
-            console.error('Детали ошибки:', {
-                name: error.name,
-                message: error.message,
-                stack: error.stack
-            });
-            showError('Ошибка видеоконференции: ' + (error.message || 'Неизвестная ошибка'));
+            showError('Ошибка видеоконференции: ' + error.message);
         });
 
-        jitsiApi.addEventListener('connectionFailed', (event) => {
-            console.error('Ошибка подключения:', event);
-            console.error('Детали события:', event);
-            hideLoading();
-            showError('Не удалось подключиться к видеоконференции. Проверьте интернет-соединение.');
+        jitsiApi.addEventListener('audioMuteStatusChanged', (event) => {
+            console.log('Статус аудио изменен:', event);
         });
 
-        jitsiApi.addEventListener('connectionEstablished', (event) => {
-            console.log('Подключение установлено:', event);
+        jitsiApi.addEventListener('videoMuteStatusChanged', (event) => {
+            console.log('Статус видео изменен:', event);
         });
-
-        jitsiApi.addEventListener('connectionInterrupted', (event) => {
-            console.log('Подключение прервано:', event);
-            showLoading('Переподключение...');
-        });
-
-        jitsiApi.addEventListener('connectionRestored', (event) => {
-            console.log('Подключение восстановлено:', event);
-            hideLoading();
-        });
-
-        setTimeout(() => {
-            if (!hasJoinedMeeting) {
-                console.error('Таймаут подключения к конференции');
-                console.error('Состояние:', {
-                    userData,
-                    meetingData,
-                    jitsiApiExists: !!jitsiApi,
-                    containerExists: !!document.querySelector('#jitsi-container')
-                });
-                hideLoading();
-                showError('Таймаут подключения. Пожалуйста, попробуйте еще раз.');
-            }
-        }, 60000);
     }
 
     async function joinMeetingAutomatically() {
@@ -278,12 +197,6 @@
         try {
             const token = document.querySelector('meta[name="_csrf"]').content;
             const header = document.querySelector('meta[name="_csrf_header"]').content;
-
-            console.log('Отправка запроса на присоединение к встрече:', {
-                meetingId: parseInt(meetingData.id),
-                userId: parseInt(userData.id),
-                participantName: userData.name
-            });
 
             const response = await fetch('/api/jitsi/meetings/join', {
                 method: 'POST',
@@ -303,8 +216,7 @@
                 participantId = participantData.participantId;
                 console.log('Backend: успешно присоединились к встрече, participantId:', participantId);
             } else {
-                const errorText = await response.text();
-                console.error('Backend: ошибка присоединения к встрече:', response.status, errorText);
+                console.error('Backend: ошибка присоединения к встрече:', response.status);
             }
         } catch (error) {
             console.error('Ошибка при присоединении к встрече на backend:', error);
@@ -316,14 +228,11 @@
             pingInterval = setInterval(sendPing, 600000);
             sendPing();
             console.log('Ping инициализирован для участника:', participantId);
-        } else {
-            console.warn('Не удалось инициализировать ping - отсутствует participantId или meetingId');
         }
     }
 
     async function sendPing() {
         if (!participantId || !meetingData.id) {
-            console.warn('Не удалось отправить ping - отсутствует participantId или meetingId');
             return;
         }
 
@@ -346,8 +255,7 @@
             if (response.ok) {
                 console.log('Ping отправлен успешно');
             } else {
-                const errorText = await response.text();
-                console.warn('Ошибка ping:', response.status, errorText);
+                console.warn('Ошибка ping:', response.status);
             }
         } catch (error) {
             console.error('Ошибка отправки ping:', error);
@@ -431,7 +339,7 @@
                 const token = document.querySelector('meta[name="_csrf"]').content;
                 const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-                const response = await fetch(`/api/jitsi/meetings/`+ meetingData.id`/leave`, {
+                const response = await fetch('/api/jitsi/meetings/' + meetingData.id + '/leave', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -444,9 +352,6 @@
 
                 if (response.ok) {
                     console.log('Успешно покинули встречу на backend');
-                } else {
-                    const errorText = await response.text();
-                    console.warn('Ошибка покидания встречи на backend:', errorText);
                 }
             }
 
@@ -485,7 +390,6 @@
     }
 
     function showError(message) {
-        hideLoading();
         alert('Ошибка: ' + message);
         console.error('Error:', message);
     }
@@ -506,13 +410,11 @@
             const data = new URLSearchParams();
             data.append('participantId', participantId);
 
-            fetch(`/api/jitsi/meetings/`+ meetingData.id`/leave-by-participant`, {
+            fetch('/api/jitsi/meetings/' + meetingData.id + '/leave-by-participant', {
                 method: 'POST',
                 headers: headers,
                 body: data,
                 keepalive: true
-            }).catch(error => {
-                console.error('Ошибка при покидании встречи:', error);
             });
         }
     });
@@ -527,7 +429,7 @@
 
 <style>
     .loading-overlay {
-        display: flex;
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
