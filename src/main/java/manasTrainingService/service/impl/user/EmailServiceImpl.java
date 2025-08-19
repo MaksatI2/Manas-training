@@ -23,8 +23,9 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.email.from:noreply@manastraining.kg}")
     private String from;
 
-    @Value("${app.base-url:http://localhost:8089}")
+    @Value("${APP_BASE_URL}")
     private String baseUrl;
+
 
     @Override
     public void sendVerificationEmail(User user, String token) {

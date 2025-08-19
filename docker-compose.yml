@@ -54,6 +54,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-qwerty}
       - MAIL_USERNAME=${MAIL_USERNAME:-zer0icemax@gmail.com}
       - MAIL_PASSWORD=${MAIL_PASSWORD:-chfe zivr epbv zbco}
+      - APP_BASE_URL=${APP_BASE_URL:-https://manastraining.kg}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-postgres}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-postgres}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-qwerty}
