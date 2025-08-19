@@ -28,7 +28,7 @@ public class CustomUserDetails implements UserDetails {
 
     public String getFullName() {
         String lastName = user.getLastName();
-        if (lastName != null && !lastName.isBlank()) {
+        if (lastName != null && !lastName.isBlank() && !"null".equalsIgnoreCase(lastName)) {
             return user.getName() + " " + lastName;
         }
         return user.getName();
