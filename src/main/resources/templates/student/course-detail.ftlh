@@ -5,7 +5,7 @@
 <@layout.page>
     <#assign bcHome><@spring.message code='student.course.detail.breadcrumb.home'/></#assign>
     <#assign bcMyCourses><@spring.message code='student.course.detail.breadcrumb.myCourses'/></#assign>
-    <#assign bcCourse><@spring.message code='student.course.detail.breadcrumb.course'/> + " #" + courseInstance.title</#assign>
+    <#assign bcCourse = courseInstance.title>
 
     <div class="page-wrapper">
         <#if successMessage??>

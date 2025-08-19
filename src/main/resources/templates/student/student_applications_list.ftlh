@@ -222,7 +222,6 @@
             font-weight: 700;
             border-radius: 0.375rem;
             display: inline-block;
-            width: 140px;
             text-align: center;
         }
 

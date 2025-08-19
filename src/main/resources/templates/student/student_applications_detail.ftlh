@@ -48,7 +48,6 @@
             border-radius: .375rem;
             padding: .35em .65em;
             display: inline-block;
-            min-width: 80px;
             text-align: center;
         }
 

@@ -144,7 +144,6 @@
             white-space: nowrap;
             vertical-align: baseline;
             border-radius: 0.375rem;
-            min-width: 100px;
         }
 
         .bg-warning {

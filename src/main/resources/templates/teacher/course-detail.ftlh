@@ -4,7 +4,7 @@
 
 <#assign bcHome><@spring.message code='teacher.course.detail.breadcrumb.home'/></#assign>
 <#assign bcMy><@spring.message code='teacher.course.detail.breadcrumb.myCourses'/></#assign>
-<#assign bcCourse>${springMacroRequestContext.getMessage("teacher.course.detail.breadcrumb.course", [courseInstance.title], "Курс #" + courseInstance.title)}</#assign>
+<#assign bcCourse = courseInstance.title>
 
 <@layout.page>
     <#if successMessage??>
