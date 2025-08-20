@@ -35,14 +35,10 @@
 
 <@layout.page>
     <#if successMessage??>
-        <div id="successMessage" class="alert alert-success rounded-3 mb-4">
-            <i class="fas fa-check-circle me-2"></i>${successMessage?js_string}
-        </div>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
     </#if>
     <#if errorMessage??>
-        <div id="errorMessage" class="alert alert-danger rounded-3 mb-4">
-            <i class="fas fa-exclamation-circle me-2"></i>${errorMessage?js_string}
-        </div>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
     <@roadmap.breadcrumbs items=breadcrumbs/>
 
@@ -355,24 +351,6 @@
 
         .text-success {
             color: #28a745 !important;
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .alert-success {
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-            border: 1px solid #28a745;
-        }
-
-        .alert-danger {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-            border: 1px solid #dc3545;
         }
 
         .bg-light {
