@@ -59,7 +59,6 @@ class CertificateServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        // Создание тестовых объектов без проблемных дат
         testUser = new User();
         testUser.setId(1);
         testUser.setName("John");
@@ -92,16 +91,13 @@ class CertificateServiceImplTest {
 
     @Test
     void getStatuses_WhenStudentHasCompletedCourses_ShouldReturnStatuses() {
-        // Given
         when(enrollRepo.findByStudentIdAndCompletionDateIsNotNull(1))
                 .thenReturn(List.of(testEnrollment));
         when(certRepo.findByStudentIdAndCourseInstanceId(1, 1))
                 .thenReturn(List.of(testCertificate));
 
-        // When
         List<CourseCertificateStatusDto> result = certificateService.getStatuses(1);
 
-        // Then
         assertThat(result).hasSize(1);
         CourseCertificateStatusDto status = result.get(0);
         assertThat(status.getCourseTitle()).isEqualTo("Test Course");
@@ -112,16 +108,13 @@ class CertificateServiceImplTest {
 
     @Test
     void getStatuses_WhenNoCertificateExists_ShouldReturnStatusWithNoCertificate() {
-        // Given
         when(enrollRepo.findByStudentIdAndCompletionDateIsNotNull(1))
                 .thenReturn(List.of(testEnrollment));
         when(certRepo.findByStudentIdAndCourseInstanceId(1, 1))
                 .thenReturn(Collections.emptyList());
 
-        // When
         List<CourseCertificateStatusDto> result = certificateService.getStatuses(1);
 
-        // Then
         assertThat(result).hasSize(1);
         CourseCertificateStatusDto status = result.get(0);
         assertThat(status.isCertificateCreated()).isFalse();
@@ -130,13 +123,10 @@ class CertificateServiceImplTest {
 
     @Test
     void findAllByStudentId_ShouldReturnCertificateViewDtos() {
-        // Given
         when(certRepo.findByStudentId(1)).thenReturn(List.of(testCertificate));
 
-        // When
         List<CertificateViewDto> result = certificateService.findAllByStudentId(1);
 
-        // Then
         assertThat(result).hasSize(1);
         CertificateViewDto dto = result.get(0);
         assertThat(dto.getId()).isEqualTo(1);
@@ -148,13 +138,10 @@ class CertificateServiceImplTest {
 
     @Test
     void findOneByIdAndStudentId_WhenCertificateExists_ShouldReturnCertificateViewDto() {
-        // Given
         when(certRepo.findById(1)).thenReturn(Optional.of(testCertificate));
 
-        // When
         CertificateViewDto result = certificateService.findOneByIdAndStudentId(1, 1);
 
-        // Then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1);
         assertThat(result.getCertificateNumber()).isEqualTo("123");
@@ -163,12 +150,10 @@ class CertificateServiceImplTest {
 
     @Test
     void findOneByIdAndStudentId_WhenCertificateNotFound_ShouldThrowException() {
-        // Given
         when(certRepo.findById(1)).thenReturn(Optional.empty());
         when(messageSource.getMessage(eq("certificate.not.found"), isNull(), any()))
                 .thenReturn("Certificate not found");
 
-        // When & Then
         assertThatThrownBy(() -> certificateService.findOneByIdAndStudentId(1, 1))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Certificate not found");
@@ -176,12 +161,10 @@ class CertificateServiceImplTest {
 
     @Test
     void findOneByIdAndStudentId_WhenStudentIdDoesNotMatch_ShouldThrowException() {
-        // Given
         when(certRepo.findById(1)).thenReturn(Optional.of(testCertificate));
         when(messageSource.getMessage(eq("certificate.not.found"), isNull(), any()))
                 .thenReturn("Certificate not found");
 
-        // When & Then
         assertThatThrownBy(() -> certificateService.findOneByIdAndStudentId(1, 2))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Certificate not found");
@@ -189,44 +172,35 @@ class CertificateServiceImplTest {
 
     @Test
     void listStudentsWithCertificates_ShouldReturnPageOfStudents() {
-        // Given
         Page<User> userPage = new PageImpl<>(List.of(testUser));
         when(enrollRepo.findStudentsWithCompletedCourses(any(PageRequest.class)))
                 .thenReturn(userPage);
         when(enrollRepo.findByStudentIdAndCompletionDateIsNotNull(1))
                 .thenReturn(List.of(testEnrollment));
 
-        // When
         Page<StudentDto> result = certificateService.listStudentsWithCertificates(0, 10);
 
-        // Then
         assertThat(result.getContent()).hasSize(1);
         StudentDto studentDto = result.getContent().get(0);
         assertThat(studentDto.getId()).isEqualTo(1);
         assertThat(studentDto.getName()).isEqualTo("John");
         assertThat(studentDto.getLastName()).isEqualTo("Doe");
         assertThat(studentDto.getEmail()).isEqualTo("john.doe@test.com");
-        // Пропускаем проверку completedCourses из-за неопределенности в названии метода
     }
 
     @Test
     void deleteCertificate_ShouldCallRepository() {
-        // When
         certificateService.deleteCertificate(1);
 
-        // Then
         verify(certRepo).deleteById(1);
     }
 
     @Test
     void prepareEdit_WhenCertificateExists_ShouldReturnEditDto() {
-        // Given
         when(certRepo.findById(1)).thenReturn(Optional.of(testCertificate));
 
-        // When
         EditCertificateDto result = certificateService.prepareEdit(1);
 
-        // Then
         assertThat(result.getId()).isEqualTo(1);
         assertThat(result.getStudentId()).isEqualTo(1);
         assertThat(result.getCertificateNumber()).isEqualTo("123");
@@ -237,12 +211,10 @@ class CertificateServiceImplTest {
 
     @Test
     void prepareEdit_WhenCertificateNotFound_ShouldThrowException() {
-        // Given
         when(certRepo.findById(1)).thenReturn(Optional.empty());
         when(messageSource.getMessage(eq("certificate.not.found"), isNull(), any()))
                 .thenReturn("Certificate not found");
 
-        // When & Then
         assertThatThrownBy(() -> certificateService.prepareEdit(1))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Certificate not found");
@@ -250,17 +222,14 @@ class CertificateServiceImplTest {
 
     @Test
     void saveEditedCertificate_WhenCertificateExists_ShouldUpdateAndSave() {
-        // Given
         EditCertificateDto editDto = new EditCertificateDto(
                 1, 1, "456", LocalDate.now(),
                 LocalDate.now().plusYears(1), 90
         );
         when(certRepo.findById(1)).thenReturn(Optional.of(testCertificate));
 
-        // When
         certificateService.saveEditedCertificate(editDto);
 
-        // Then
         assertThat(testCertificate.getCertificateNumber()).isEqualTo("456");
         assertThat(testCertificate.getMark()).isEqualTo(90);
         verify(certRepo).save(testCertificate);
@@ -268,7 +237,6 @@ class CertificateServiceImplTest {
 
     @Test
     void createCertificate_ShouldCreateAndSaveCertificate() {
-        // Given
         CreateCertificateDto createDto = new CreateCertificateDto();
         createDto.setStudentId(1);
         createDto.setCourseInstanceId(1);
@@ -277,19 +245,16 @@ class CertificateServiceImplTest {
 
         when(ciRepo.findById(1)).thenReturn(Optional.of(testCourseInstance));
         when(userService.getUserById(1)).thenReturn(testUser);
-        when(userService.getUserById(2)).thenReturn(testUser); // issuer
+        when(userService.getUserById(2)).thenReturn(testUser);
         when(certRepo.findMaxCertificateNumber()).thenReturn(100);
 
-        // When
         certificateService.createCertificate(createDto, 2);
 
-        // Then
         verify(certRepo).save(any(Certificate.class));
     }
 
     @Test
     void createCertificate_WhenCourseInstanceNotFound_ShouldThrowException() {
-        // Given
         CreateCertificateDto createDto = new CreateCertificateDto();
         createDto.setCourseInstanceId(999);
 
@@ -297,7 +262,6 @@ class CertificateServiceImplTest {
         when(messageSource.getMessage(eq("course.instance.not.found"), isNull(), any()))
                 .thenReturn("Course instance not found");
 
-        // When & Then
         assertThatThrownBy(() -> certificateService.createCertificate(createDto, 1))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Course instance not found");
@@ -305,64 +269,50 @@ class CertificateServiceImplTest {
 
     @Test
     void getCertificate_WhenExists_ShouldReturnCertificate() {
-        // Given
         when(certRepo.findById(1)).thenReturn(Optional.of(testCertificate));
 
-        // When
         Certificate result = certificateService.getCertificate(1);
 
-        // Then
         assertThat(result).isEqualTo(testCertificate);
     }
 
     @Test
     void getCertificate_WhenNotFound_ShouldThrowException() {
-        // Given
         when(certRepo.findById(1)).thenReturn(Optional.empty());
         when(messageSource.getMessage(eq("certificate.not.found"), isNull(), any()))
                 .thenReturn("Certificate not found");
 
-        // When & Then
         assertThatThrownBy(() -> certificateService.getCertificate(1))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     void getCertificatesByStudentAndCourseInstance_ShouldReturnCertificates() {
-        // Given
         when(certRepo.findByStudentIdAndCourseInstanceId(1, 1))
                 .thenReturn(List.of(testCertificate));
 
-        // When
         List<Certificate> result = certificateService.getCertificatesByStudentAndCourseInstance(1, 1);
 
-        // Then
         assertThat(result).containsExactly(testCertificate);
     }
 
     @Test
     void getTotalCertificates_ShouldReturnCount() {
-        // Given
         when(certRepo.count()).thenReturn(42L);
 
-        // When
         long result = certificateService.getTotalCertificates();
 
-        // Then
         assertThat(result).isEqualTo(42L);
     }
 
     @Test
     void getCertificatesIssuedThisMonth_ShouldReturnCount() {
-        // Given
         LocalDate startDate = LocalDate.of(2024, 1, 1);
         LocalDate endDate = LocalDate.of(2024, 1, 31);
         when(certRepo.countByIssueDateBetween(startDate, endDate)).thenReturn(15L);
 
-        // When
         long result = certificateService.getCertificatesIssuedThisMonth(startDate, endDate);
 
-        // Then
         assertThat(result).isEqualTo(15L);
     }
 }
