@@ -8,10 +8,10 @@
 
 <@layout.page>
     <#if successMessage??>
-        <div id="successMessage" class="alert alert-success">${successMessage?js_string}</div>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
     </#if>
     <#if errorMessage??>
-        <div id="errorMessage" class="alert alert-danger">${errorMessage?js_string}</div>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
     </#if>
     <div class="page-wrapper">
         <@roadmap.breadcrumbs items=[
@@ -447,25 +447,8 @@
             padding: 0.6rem 1rem;
         }
 
-        .alert {
-            padding: 1rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
 
-        .alert-success {
-            background: rgba(var(--success), 0.2);
-            color: var(--success);
-        }
 
-        .alert-danger {
-            background: rgba(var(--danger), 0.2);
-            color: var(--danger);
-        }
 
         @media (max-width: 768px) {
             .hero-title {
