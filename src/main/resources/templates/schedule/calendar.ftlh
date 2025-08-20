@@ -367,7 +367,7 @@
                     '</div>' +
                     '<div class="lesson-info">' +
                     '<div class="lesson-info-item">' +
-                    '<span class="lesson-type-badge ' + (lesson.lessonType ? lesson.lessonType.toLowerCase() : 'lecture') + '">' + typeText + '</span>' +
+                    '<span class="lesson-type-badge ' + (lesson.lessonTypeName ? lesson.lessonTypeName : 'lecture') + '">' + typeText + '</span>' +
                     '</div>' +
                     '<div class="lesson-info-item">' +
                     '<i class="fas fa-user"></i>' +

@@ -259,8 +259,11 @@ public class ScheduleController {
                     ? schedule.getLessonTitle()
                     : messageSource.getMessage("lesson.title.default", null, locale));
 
+            map.put("lessonTypeName", schedule.getLessonType() != null
+                    ? schedule.getLessonType().name().toLowerCase()
+                    : "lecture");
             map.put("lessonType", schedule.getLessonType() != null ?
-                    schedule.getLessonType().getValue()
+                    messageSource.getMessage(schedule.getLessonType().getValue(), null, locale)
                     : messageSource.getMessage("lesson.type.lecture", null, locale));
 
             map.put("teacherName", schedule.getTeacherName() != null
