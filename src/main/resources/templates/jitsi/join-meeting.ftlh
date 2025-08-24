@@ -61,6 +61,7 @@
     let hasJoinedMeeting = false;
     let pingInterval = null;
     let stompClient = null;
+    let isProcessingHangup = false;
 
     function connectWs() {
         try {
@@ -168,6 +169,7 @@
             jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
             setupJitsiEvents();
+            setupCustomButtonHandlers();
 
             joinMeetingAutomatically();
 
@@ -183,6 +185,7 @@
             console.log('Jitsi API готов');
             hideLoading();
         });
+
         jitsiApi.addEventListener('videoConferenceJoined', (event) => {
             console.log('Присоединились к конференции:', event);
             hideLoading();
@@ -205,6 +208,13 @@
 
         jitsiApi.addEventListener('videoConferenceLeft', async () => {
             console.log('Пользователь вышел из конференции (videoConferenceLeft)');
+
+            if (isProcessingHangup) {
+                console.log('Уже обрабатывается выход из конференции');
+                return;
+            }
+            isProcessingHangup = true;
+
             try {
                 if (participantId && meetingData.id) {
                     const token = document.querySelector('meta[name="_csrf"]').content;
@@ -256,6 +266,103 @@
                 hideLoading();
             }
         });
+
+        jitsiApi.addEventListener('endpointTextMessageReceived', (event) => {
+            console.log('Получено текстовое сообщение:', event);
+        });
+    }
+
+    function setupCustomButtonHandlers() {
+        setTimeout(() => {
+            const jitsiIframe = document.querySelector('#jitsi-container iframe');
+            if (jitsiIframe) {
+                try {
+                    const iframeDocument = jitsiIframe.contentDocument || jitsiIframe.contentWindow.document;
+
+                    const observer = new MutationObserver((mutations) => {
+                        const hangupButton = iframeDocument.querySelector('[data-testid="hangup"]') ||
+                            iframeDocument.querySelector('.toolbox-button-wth-dialog') ||
+                            iframeDocument.querySelector('[aria-label*="Leave"]') ||
+                            iframeDocument.querySelector('[title*="Leave"]');
+
+                        if (hangupButton && !hangupButton.hasCustomHandler) {
+                            console.log('Найдена кнопка hangup, добавляем обработчик');
+                            hangupButton.hasCustomHandler = true;
+
+                            const originalClick = hangupButton.onclick;
+                            hangupButton.onclick = function(e) {
+                                console.log('Перехвачен клик по кнопке Leave');
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleJitsiLeave();
+                                return false;
+                            };
+
+                            hangupButton.addEventListener('click', function(e) {
+                                console.log('Перехвачен клик по кнопке Leave (addEventListener)');
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleJitsiLeave();
+                            }, true);
+                        }
+                    });
+
+                    observer.observe(iframeDocument.body, {
+                        childList: true,
+                        subtree: true
+                    });
+
+                } catch (e) {
+                    console.log('Нет доступа к iframe содержимому из-за CORS, используем альтернативный метод');
+                    useAlternativeButtonHandling();
+                }
+            }
+        }, 3000);
+    }
+
+    function useAlternativeButtonHandling() {
+        if (jitsiApi) {
+            const originalExecuteCommand = jitsiApi.executeCommand;
+            jitsiApi.executeCommand = function(command, ...args) {
+                console.log('Перехвачена команда Jitsi:', command, args);
+
+                if (command === 'hangup') {
+                    console.log('Перехвачена команда hangup');
+                    handleJitsiLeave();
+                    return;
+                }
+
+                if (command === 'endConference' && userData.role === 'TEACHER') {
+                    console.log('Перехвачена команда endConference');
+                    handleJitsiEndMeeting();
+                    return;
+                }
+
+                return originalExecuteCommand.call(this, command, ...args);
+            };
+        }
+    }
+
+    async function handleJitsiLeave() {
+        console.log('Обработка кнопки Leave из Jitsi');
+
+        if (isProcessingHangup) {
+            console.log('Уже обрабатывается выход');
+            return;
+        }
+
+        await leaveMeetingInternal(false);
+    }
+
+    async function handleJitsiEndMeeting() {
+        console.log('Обработка кнопки End meeting for all из Jitsi');
+
+        if (userData.role !== 'TEACHER') {
+            showError('Только преподаватель может завершить урок');
+            return;
+        }
+
+        await completeCallInternal(false);
     }
 
     async function joinMeetingAutomatically() {
@@ -345,7 +452,7 @@
         }
     }
 
-    async function completeCall() {
+    async function completeCallInternal(requireConfirmation = true) {
         if (!userData.id || !meetingData.id) {
             showError('Ошибка: недостаточно данных для завершения встречи');
             return;
@@ -356,7 +463,7 @@
             return;
         }
 
-        if (!confirm('Вы уверены, что хотите завершить урок для всех участников?')) {
+        if (requireConfirmation && !confirm('Вы уверены, что хотите завершить урок для всех участников?')) {
             return;
         }
 
@@ -401,8 +508,18 @@
         }
     }
 
-    async function leaveMeeting() {
-        if (!confirm('Вы уверены, что хотите покинуть встречу?')) {
+    async function completeCall() {
+        await completeCallInternal(true);
+    }
+
+    async function leaveMeetingInternal(requireConfirmation = true) {
+        if (isProcessingHangup) {
+            return;
+        }
+        isProcessingHangup = true;
+
+        if (requireConfirmation && !confirm('Вы уверены, что хотите покинуть встречу?')) {
+            isProcessingHangup = false;
             return;
         }
 
@@ -448,6 +565,10 @@
         }
     }
 
+    async function leaveMeeting() {
+        await leaveMeetingInternal(true);
+    }
+
     function cleanupAndRedirect() {
         stopPing();
         hideLoading();
@@ -481,7 +602,7 @@
     window.addEventListener('beforeunload', function(event) {
         stopPing();
 
-        if (hasJoinedMeeting && participantId && meetingData.id) {
+        if (hasJoinedMeeting && participantId && meetingData.id && !isProcessingHangup) {
             const token = document.querySelector('meta[name="_csrf"]').content;
             const header = document.querySelector('meta[name="_csrf_header"]').content;
 
