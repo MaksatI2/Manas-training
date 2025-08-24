@@ -183,7 +183,6 @@
                                        value="true"
                                        <#if course.active?? && course.active == true>checked</#if>>
                                 <label class="form-check-label" for="active">
-                                    <i class="fas fa-check-circle me-1" style="color: #28a745;"></i>
                                     <@spring.message code="courses.admin.edit.field.active"/>
                                 </label>
                             </div>

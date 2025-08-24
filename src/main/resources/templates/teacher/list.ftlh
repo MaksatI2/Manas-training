@@ -125,6 +125,15 @@
             color: #333;
         }
 
+        .no-results-message {
+            display: none;
+            padding: 2rem 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #888;
+        }
+
+
         .teacher-contact i {
             color: var(--primary-blue);
             margin-right: 6px;
@@ -178,6 +187,9 @@
                     </div>
                 </div>
             </#list>
+            <div id="noResultsMessage" class="w-100 text-center text-muted no-results-message">
+                <@spring.message code="list.teacher.noResults" />
+            </div>
         </div>
 
         <#if totalPages?has_content && (totalPages?int > 1)>
@@ -196,14 +208,21 @@
         document.addEventListener("DOMContentLoaded", function () {
             const searchInput = document.getElementById("searchInput");
             const teacherCards = document.querySelectorAll(".teacher-card-item");
+            const noResultsMessage = document.getElementById("noResultsMessage");
 
             searchInput.addEventListener("input", function () {
                 const query = this.value.toLowerCase();
+                let visibleCount = 0;
+
                 teacherCards.forEach(function (card) {
                     const name = card.dataset.name;
                     const department = card.dataset.department;
-                    card.style.display = (name.includes(query) || department.includes(query)) ? "" : "none";
+                    const match = name.includes(query) || department.includes(query);
+                    card.style.display = match ? "" : "none";
+                    if (match) visibleCount++;
                 });
+                noResultsMessage.style.display = visibleCount === 0 ? "block" : "none";
+
             });
         });
     </script>
