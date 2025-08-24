@@ -19,6 +19,12 @@
 <#assign errLoadTeachers = springMacroRequestContext.getMessage("student.applications.edit.error.loadTeachers")>
 
 <@layout.page title="${tTitle}">
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcMyApps, "url": "/applications/student/applications"},

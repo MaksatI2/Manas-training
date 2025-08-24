@@ -58,6 +58,23 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                                 LocaleContextHolder.getLocale()
                         )
                 ));
+
+        boolean exists = courseApplicationRepository.existsBySubmittedByAndCourseIdAndStatusIn(
+                user,
+                dto.getCourseId(),
+                List.of(Status.PENDING, Status.IN_PROGRESS)
+        );
+
+        if (exists) {
+            throw new BadRequestException(
+                    messageSource.getMessage(
+                            "application.duplicate.exists",
+                            null,
+                            "У вас уже есть активная заявка на этот курс",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
+        }
         Organization org = organizationRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BadRequestException(
                         messageSource.getMessage(
@@ -276,7 +293,7 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                 throw new BadRequestException(messageSource.getMessage(
                         "application.cannot.approve.unenrolled.students",
                         null,
-                        "Нельзя одобрить заявку, пока все сотрудники не зачислены на поток курса. Пожалуйста, перейдите в раздел Потоки курсов и назначьте студентов вручную.",
+                        "Нельзя одобрить заявку, пока все сотрудники не зачислены на поток курса.",
                         LocaleContextHolder.getLocale()
                 ));
             }
@@ -384,6 +401,26 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                         )
                 ));
 
+
+        boolean exists = courseApplicationRepository.existsBySubmittedByAndCourseIdAndStatusInAndIdNot(
+                application.getSubmittedBy(),
+                dto.getCourseId(),
+                List.of(Status.PENDING, Status.IN_PROGRESS),
+                id
+        );
+
+        if (exists) {
+            throw new BadRequestException(
+                    messageSource.getMessage(
+                            "application.duplicate.exists",
+                            null,
+                            "У вас уже есть активная заявка на этот курс",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
+        }
+
+
         if (!application.getSubmittedBy().getEmail().equals(email)) {
             throw new BadRequestException(
                     messageSource.getMessage(
@@ -479,6 +516,24 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                                 LocaleContextHolder.getLocale()
                         )
                 ));
+
+        boolean exists = courseApplicationRepository.existsBySubmittedByAndCourseIdAndStatusIn(
+                student,
+                dto.getCourseId(),
+                List.of(Status.PENDING, Status.IN_PROGRESS)
+        );
+
+        if (exists) {
+            throw new BadRequestException(
+                    messageSource.getMessage(
+                            "application.duplicate.exists",
+                            null,
+                            "У вас уже есть активная заявка на этот курс",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
+        }
+
         if (dto.getCourseId() == null) {
             throw new BadRequestException(messageSource.getMessage(
                     "required.fields.missing",
@@ -563,6 +618,24 @@ public class CourseApplicationServiceImpl implements CourseApplicationService {
                                 LocaleContextHolder.getLocale()
                         )
                 ));
+
+        boolean exists = courseApplicationRepository.existsBySubmittedByAndCourseIdAndStatusInAndIdNot(
+                application.getSubmittedBy(),
+                dto.getCourseId(),
+                List.of(Status.PENDING, Status.IN_PROGRESS),
+                id
+        );
+
+        if (exists) {
+            throw new BadRequestException(
+                    messageSource.getMessage(
+                            "application.duplicate.exists",
+                            null,
+                            "У вас уже есть активная заявка на этот курс",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
+        }
 
         if (!application.getSubmittedBy().getEmail().equals(email)) {
             throw new BadRequestException(

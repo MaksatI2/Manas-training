@@ -8,6 +8,12 @@
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 <@layout.page title="<@spring.message code='student.applications.create.title'/>">
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
     <#assign bcHome><@spring.message code='student.applications.create.breadcrumb.home'/></#assign>
     <#assign bcMyApps><@spring.message code='student.applications.create.breadcrumb.myApplications'/></#assign>
     <#assign bcCreate><@spring.message code='student.applications.create.breadcrumb.create'/></#assign>

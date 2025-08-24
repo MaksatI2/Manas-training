@@ -2,6 +2,7 @@ package manasTrainingService.repositories.course;
 
 import manasTrainingService.entity.CourseApplication;
 import manasTrainingService.entity.Status;
+import manasTrainingService.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,4 +37,15 @@ public interface CourseApplicationRepository extends JpaRepository<CourseApplica
                 WHERE a.id = :id
             """)
     Optional<CourseApplication> findDetailedById(@Param("id") Integer id);
+
+    boolean existsBySubmittedByAndCourseIdAndStatusIn(
+            User submittedBy, Integer courseId, List<Status> statuses
+    );
+
+    boolean existsBySubmittedByAndCourseIdAndStatusInAndIdNot(
+            User submittedBy, Integer courseId, List<Status> statuses, Integer id
+    );
+
 }
+
+

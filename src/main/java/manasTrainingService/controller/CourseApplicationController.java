@@ -77,8 +77,25 @@ public class CourseApplicationController {
 
             return "organization/organization_applications_create";
         }
+        try {
+            applicationService.createApplicationForOrganization(dto, principal.getName());
+        } catch (BadRequestException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
 
-        applicationService.createApplicationForOrganization(dto, principal.getName());
+            List<CourseDto> courses = courseService
+                    .getAvailableCoursesForOrganization(organizationService
+                            .getAuthorizedUserOrganizationByEmail(principal.getName()).getUser());
+            List<EmployeeShortDto> employees = organizationService.getMyEmployees(principal.getName());
+            List<EmployeeShortDto> teachers = organizationService.getAllTeachersShortDto();
+
+            model.addAttribute("courses", courses);
+            model.addAttribute("employees", employees);
+            model.addAttribute("teachers", teachers);
+            model.addAttribute("application", dto);
+            model.addAttribute("errors", bindingResult);
+
+            return "organization/organization_applications_create";
+        }
         return "redirect:/applications/organization?success";
     }
 
@@ -232,8 +249,18 @@ public class CourseApplicationController {
             model.addAttribute("errors", bindingResult);
             return "organization/organization_applications_edit";
         }
-
-        applicationService.updateApplicationForOrganization(id, dto, principal.getName());
+        try {
+            applicationService.updateApplicationForOrganization(id, dto, principal.getName());
+        } catch (BadRequestException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            model.addAttribute("courses", courseService
+                    .getAvailableCoursesForOrganization(
+                            organizationService.getAuthorizedUserOrganizationByEmail(principal.getName()).getUser()));
+            model.addAttribute("employees", organizationService.getMyEmployees(principal.getName()));
+            model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            model.addAttribute("errors", bindingResult);
+            return "organization/organization_applications_edit";
+        }
 
         redirectAttributes.addFlashAttribute(
                 "successMessage",
@@ -281,7 +308,15 @@ public class CourseApplicationController {
             return "student/student_applications_create";
         }
 
-        applicationService.createApplicationFromStudent(dto, principal.getName());
+        try {
+            applicationService.createApplicationFromStudent(dto, principal.getName());
+        } catch (BadRequestException ex) {
+            model.addAttribute("application", dto);
+            model.addAttribute("courses", courseService.getAllCourses());
+            model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "student/student_applications_create";
+        }
         redirectAttributes.addFlashAttribute(
                 "successMessage",
                 messageSource.getMessage("application.submit.success", null, LocaleContextHolder.getLocale())
@@ -326,7 +361,15 @@ public class CourseApplicationController {
             return "student/student_applications_edit";
         }
 
-        applicationService.updateApplicationFromStudent(id, dto, principal.getName());
+        try {
+            applicationService.updateApplicationFromStudent(id, dto, principal.getName());
+        } catch (BadRequestException ex) {
+            model.addAttribute("application", dto);
+            model.addAttribute("courses", courseService.getAllCourses());
+            model.addAttribute("teachers", organizationService.getAllTeachersShortDto());
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "student/student_applications_edit";
+        }
         redirectAttributes.addFlashAttribute(
                 "successMessage",
                 messageSource.getMessage("application.update.success", null, LocaleContextHolder.getLocale())

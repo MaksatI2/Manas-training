@@ -90,7 +90,7 @@
                         <label for="phone" class="form-label">
                             <i class="fas fa-phone me-1"></i><@spring.message code="register.student.phone"/>
                         </label>
-                        <@spring.formInput "studentRegisterDto.phone" ' type="tel" class="form-control" id="phone" autocomplete="off" placeholder="${springMacroRequestContext.getMessage("register.student.phone.placeholder")}" '/>
+                        <@spring.formInput "studentRegisterDto.phone" ' type="tel" class="form-control" id="phone" autocomplete="off" '/>
                         <div class="error-block">
                             <@spring.showErrors "<br>" "error-message" />
                         </div>
