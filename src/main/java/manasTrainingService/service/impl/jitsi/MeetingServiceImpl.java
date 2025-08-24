@@ -19,6 +19,7 @@ import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.jitsi.MeetingService;
 import manasTrainingService.service.user.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ public class MeetingServiceImpl implements MeetingService {
     private final ScheduleRepository scheduleRepository;
     private final UserService userService;
     private final EnrollmentService enrollmentService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Value("${jitsi.domain:localhost}")
     private String jitsiDomain;
@@ -102,11 +104,30 @@ public class MeetingServiceImpl implements MeetingService {
             throw new MeetingEndedException("Встреча уже завершена");
         }
 
-        meeting.setEndedAt(LocalDateTime.now());
+        // 1. Сначала отправляем уведомление о завершении всем участникам
+        log.info("Sending end meeting notification to all participants for meeting: {}", meeting.getId());
+        try {
+            messagingTemplate.convertAndSend("/topic/meetings/" + meeting.getId(), "MEETING_ENDING");
+            // Небольшая пауза для обработки уведомления клиентами
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            log.error("Failed to send meeting ending notification", e);
+        }
 
+        // 2. Завершаем всех активных участников
         endAllActiveParticipants(meeting);
 
+        // 3. Обновляем статус встречи
+        meeting.setEndedAt(LocalDateTime.now());
         meetingRepository.save(meeting);
+
+        // 4. Отправляем финальное уведомление
+        try {
+            messagingTemplate.convertAndSend("/topic/meetings/" + meeting.getId(), "ENDED");
+            log.info("Final ENDED notification sent for meeting: {}", meeting.getId());
+        } catch (Exception e) {
+            log.error("Failed to send final ENDED notification", e);
+        }
 
         log.info("Meeting ended: meetingId={}, teacherId={}", meeting.getId(), request.getTeacherId());
     }
@@ -188,6 +209,10 @@ public class MeetingServiceImpl implements MeetingService {
             participant.setLeftAt(endTime);
             long durationSeconds = java.time.Duration.between(participant.getJoinedAt(), endTime).getSeconds();
             participant.setDurationSeconds((int) durationSeconds);
+
+            log.info("Ending participation for user: {} (participantId: {})",
+                    participant.getUser() != null ? participant.getUser().getId() : "guest",
+                    participant.getParticipantId());
         }
 
         meetingParticipantRepository.saveAll(activeParticipants);
