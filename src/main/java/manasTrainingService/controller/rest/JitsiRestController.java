@@ -30,15 +30,11 @@ public class JitsiRestController {
     @PostMapping("/meetings/end")
     public ResponseEntity<Void> endMeeting(@RequestBody EndMeetingRequestDTO request) {
         try {
-            // Завершаем встречу
             meetingService.endMeeting(request);
-
-            // КРИТИЧНО: Отправляем WebSocket уведомление ПОСЛЕ завершения встречи
             try {
                 messagingTemplate.convertAndSend("/topic/meetings/" + request.getMeetingId(), "ENDED");
-                Thread.sleep(100); // Небольшая пауза для доставки сообщения
+                Thread.sleep(100);
             } catch (Exception e) {
-                // Логируем ошибку, но не прерываем выполнение
                 System.err.println("Ошибка отправки WebSocket уведомления: " + e.getMessage());
             }
 
@@ -73,25 +69,6 @@ public class JitsiRestController {
                                                             @RequestParam String participantId) {
         try {
             participantService.leaveMeetingByParticipantId(meetingId, participantId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    // Новый endpoint для принудительного завершения встречи для всех
-    @PostMapping("/meetings/{meetingId}/force-end-all")
-    public ResponseEntity<Void> forceEndMeetingForAll(@PathVariable Integer meetingId) {
-        try {
-            // Отправляем команду принудительного завершения
-            messagingTemplate.convertAndSend("/topic/meetings/" + meetingId, "FORCE_DISCONNECT");
-
-            // Даем время для обработки команды клиентами
-            Thread.sleep(2000);
-
-            // Затем отправляем обычное уведомление о завершении
-            messagingTemplate.convertAndSend("/topic/meetings/" + meetingId, "ENDED");
-
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

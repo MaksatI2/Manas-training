@@ -61,7 +61,6 @@
     let hasJoinedMeeting = false;
     let pingInterval = null;
     let stompClient = null;
-    let isMeetingEnding = false; // Флаг для предотвращения дублирующих действий
 
     function connectWs() {
         try {
@@ -73,83 +72,19 @@
                 if (meetingData.id) {
                     stompClient.subscribe('/topic/meetings/' + meetingData.id, function (message) {
                         const body = message.body || '';
-                        console.log('WS message received:', body);
-
-                        // Обработка разных типов сообщений
-                        switch(body) {
-                            case 'MEETING_ENDING':
-                                console.log('Meeting is ending...');
-                                showLoading('Урок завершается...');
-                                isMeetingEnding = true;
-                                // Подготавливаем к завершению, но не закрываем сразу
-                                break;
-
-                            case 'ENDED':
-                                console.log('Meeting ended by teacher');
-                                handleMeetingEnded('Урок завершен преподавателем');
-                                break;
-
-                            case 'FORCE_DISCONNECT':
-                                console.log('Force disconnect received');
-                                handleMeetingEnded('Соединение принудительно завершено');
-                                break;
-
-                            default:
-                                console.log('Unknown WS message:', body);
+                        console.log('WS message:', body);
+                        if (body === 'ENDED') {
+                            if (jitsiApi) {
+                                try { jitsiApi.dispose(); } catch (e) {}
+                            }
+                            alert('Урок завершен преподавателем');
+                            cleanupAndRedirect();
                         }
                     });
                 }
-            }, function(error) {
-                console.error('WS connection failed:', error);
-                // Переподключение через 5 секунд
-                setTimeout(connectWs, 5000);
             });
         } catch (e) {
             console.warn('WS connect error', e);
-            setTimeout(connectWs, 5000);
-        }
-    }
-
-    function handleMeetingEnded(message) {
-        if (isMeetingEnding) {
-            return; // Избегаем дублирующих действий
-        }
-
-        isMeetingEnding = true;
-        showLoading('Завершение соединения...');
-
-        // Принудительно закрываем Jitsi
-        if (jitsiApi) {
-            try {
-                // Попробуем мягко завершить
-                jitsiApi.executeCommand('hangup');
-
-                // Если через 2 секунды не сработало - принудительно
-                setTimeout(() => {
-                    try {
-                        jitsiApi.dispose();
-                    } catch (e) {
-                        console.log('Jitsi dispose error (expected):', e);
-                    }
-
-                    // Показываем уведомление и перенаправляем
-                    alert(message);
-                    cleanupAndRedirect();
-                }, 2000);
-
-            } catch (e) {
-                console.log('Jitsi hangup error:', e);
-                try {
-                    jitsiApi.dispose();
-                } catch (disposeError) {
-                    console.log('Jitsi dispose error:', disposeError);
-                }
-                alert(message);
-                cleanupAndRedirect();
-            }
-        } else {
-            alert(message);
-            cleanupAndRedirect();
         }
     }
 
@@ -231,8 +166,11 @@
 
         try {
             jitsiApi = new JitsiMeetExternalAPI(domain, options);
+
             setupJitsiEvents();
+
             joinMeetingAutomatically();
+
         } catch (error) {
             console.error('Ошибка создания Jitsi API:', error);
             hideLoading();
@@ -245,7 +183,6 @@
             console.log('Jitsi API готов');
             hideLoading();
         });
-
         jitsiApi.addEventListener('videoConferenceJoined', (event) => {
             console.log('Присоединились к конференции:', event);
             hideLoading();
@@ -268,13 +205,31 @@
 
         jitsiApi.addEventListener('videoConferenceLeft', async () => {
             console.log('Пользователь вышел из конференции (videoConferenceLeft)');
+            try {
+                if (participantId && meetingData.id) {
+                    const token = document.querySelector('meta[name="_csrf"]').content;
+                    const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-            // Если это не преднамеренное завершение, отправляем уведомление на бэк
-            if (!isMeetingEnding) {
-                await sendLeaveNotification();
+                    const headers = new Headers();
+                    if (header && token) {
+                        headers.append(header, token);
+                    }
+                    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+                    const data = new URLSearchParams();
+                    data.append('participantId', participantId);
+
+                    await fetch('/api/jitsi/meetings/' + meetingData.id + '/leave-by-participant', {
+                        method: 'POST',
+                        headers: headers,
+                        body: data
+                    });
+                }
+            } catch (e) {
+                console.warn('Не удалось отправить leave-by-participant при videoConferenceLeft');
+            } finally {
+                cleanupAndRedirect();
             }
-
-            cleanupAndRedirect();
         });
 
         jitsiApi.addEventListener('readyToClose', () => {
@@ -286,32 +241,21 @@
             console.error('Ошибка Jitsi:', error);
             showError('Ошибка видеоконференции: ' + error.message);
         });
-    }
 
-    async function sendLeaveNotification() {
-        try {
-            if (participantId && meetingData.id) {
-                const token = document.querySelector('meta[name="_csrf"]').content;
-                const header = document.querySelector('meta[name="_csrf_header"]').content;
+        jitsiApi.addEventListener('audioMuteStatusChanged', (event) => {
+            console.log('Статус аудио изменен:', event);
+        });
 
-                const headers = new Headers();
-                if (header && token) {
-                    headers.append(header, token);
-                }
-                headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        jitsiApi.addEventListener('videoMuteStatusChanged', (event) => {
+            console.log('Статус видео изменен:', event);
+        });
 
-                const data = new URLSearchParams();
-                data.append('participantId', participantId);
-
-                await fetch('/api/jitsi/meetings/' + meetingData.id + '/leave-by-participant', {
-                    method: 'POST',
-                    headers: headers,
-                    body: data
-                });
+        jitsiApi.addEventListener('participantRoleChanged', (event) => {
+            console.log('Роль участника изменилась:', event);
+            if (!hasJoinedMeeting) {
+                hideLoading();
             }
-        } catch (e) {
-            console.warn('Не удалось отправить leave notification');
-        }
+        });
     }
 
     async function joinMeetingAutomatically() {
@@ -363,7 +307,7 @@
     }
 
     async function sendPing() {
-        if (!participantId || !meetingData.id || isMeetingEnding) {
+        if (!participantId || !meetingData.id) {
             return;
         }
 
@@ -416,15 +360,13 @@
             return;
         }
 
-        isMeetingEnding = true;
-        showLoading('Завершение встречи для всех участников...');
+        showLoading('Завершение встречи...');
         stopPing();
 
         try {
             const token = document.querySelector('meta[name="_csrf"]').content;
             const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-            // Отправляем запрос на завершение встречи
             const response = await fetch('/api/jitsi/meetings/end', {
                 method: 'POST',
                 headers: {
@@ -437,52 +379,22 @@
                 })
             });
 
+            hideLoading();
+
             if (response.ok) {
-                console.log('Встреча успешно завершена на сервере');
-
-                // Дополнительно отправляем команду принудительного завершения
-                setTimeout(async () => {
-                    try {
-                        await fetch('/api/jitsi/meetings/' + meetingData.id + '/force-end-all', {
-                            method: 'POST',
-                            headers: {
-                                ...(token && header ? { [header]: token } : {})
-                            }
-                        });
-                    } catch (e) {
-                        console.warn('Ошибка отправки force-end-all:', e);
-                    }
-                }, 500);
-
-                // Закрываем соединение учителя
                 if (jitsiApi) {
-                    try {
-                        jitsiApi.executeCommand('hangup');
-                        setTimeout(() => {
-                            try {
-                                jitsiApi.dispose();
-                            } catch (e) {}
-                        }, 1000);
-                    } catch (e) {
-                        try {
-                            jitsiApi.dispose();
-                        } catch (e2) {}
-                    }
+                    jitsiApi.dispose();
                 }
 
                 alert('Урок завершен для всех участников');
                 setTimeout(() => {
                     window.location.href = '/schedules';
-                }, 2000);
-
+                }, 1000);
             } else {
-                isMeetingEnding = false;
-                hideLoading();
                 const errorText = await response.text();
                 showError('Ошибка завершения встречи: ' + errorText);
             }
         } catch (error) {
-            isMeetingEnding = false;
             hideLoading();
             console.error('Ошибка при завершении встречи:', error);
             showError('Ошибка сети при завершении встречи');
@@ -490,20 +402,15 @@
     }
 
     async function leaveMeeting() {
-        if (isMeetingEnding) {
-            return; // Предотвращаем дублирующие действия
-        }
-
         if (!confirm('Вы уверены, что хотите покинуть встречу?')) {
             return;
         }
 
-        isMeetingEnding = true;
         showLoading('Покидание встречи...');
         stopPing();
 
         try {
-            if (userData.id && meetingData.id) {
+            if (participantId && meetingData.id) {
                 const token = document.querySelector('meta[name="_csrf"]').content;
                 const header = document.querySelector('meta[name="_csrf_header"]').content;
 
@@ -516,22 +423,26 @@
                 const body = new URLSearchParams();
                 body.append('userId', String(parseInt(userData.id)));
 
-                await fetch('/api/jitsi/meetings/' + meetingData.id + '/leave', {
+                const response = await fetch('/api/jitsi/meetings/' + meetingData.id + '/leave', {
                     method: 'POST',
                     headers: headers,
                     body: body
                 });
 
-                console.log('Успешно покинули встречу на backend');
+                if (response.ok) {
+                    console.log('Успешно покинули встречу на backend');
+                }
             }
+
+            if (jitsiApi) {
+                jitsiApi.dispose();
+            }
+
+            cleanupAndRedirect();
         } catch (error) {
             console.error('Ошибка при покидании встречи:', error);
-        } finally {
-            // Закрываем Jitsi и перенаправляем
             if (jitsiApi) {
-                try {
-                    jitsiApi.dispose();
-                } catch (e) {}
+                jitsiApi.dispose();
             }
             cleanupAndRedirect();
         }
@@ -540,15 +451,11 @@
     function cleanupAndRedirect() {
         stopPing();
         hideLoading();
-
         try {
-            if (stompClient && stompClient.connected) {
+            if (stompClient) {
                 stompClient.disconnect(() => console.log('WS disconnected'));
             }
-        } catch (e) {
-            console.log('WS disconnect error:', e);
-        }
-
+        } catch (e) {}
         setTimeout(() => {
             window.location.href = '/schedules';
         }, 1000);
@@ -571,11 +478,10 @@
         console.error('Error:', message);
     }
 
-    // Обработка закрытия окна/вкладки
     window.addEventListener('beforeunload', function(event) {
         stopPing();
 
-        if (hasJoinedMeeting && participantId && meetingData.id && !isMeetingEnding) {
+        if (hasJoinedMeeting && participantId && meetingData.id) {
             const token = document.querySelector('meta[name="_csrf"]').content;
             const header = document.querySelector('meta[name="_csrf_header"]').content;
 
@@ -588,29 +494,20 @@
             const data = new URLSearchParams();
             data.append('participantId', participantId);
 
-            // Используем sendBeacon для надежной отправки при закрытии страницы
-            const blob = new Blob([data.toString()], {type: 'application/x-www-form-urlencoded'});
-            navigator.sendBeacon('/api/jitsi/meetings/' + meetingData.id + '/leave-by-participant', blob);
+            fetch('/api/jitsi/meetings/' + meetingData.id + '/leave-by-participant', {
+                method: 'POST',
+                headers: headers,
+                body: data,
+                keepalive: true
+            });
         }
     });
 
     window.addEventListener('unload', function() {
         if (jitsiApi) {
-            try {
-                jitsiApi.dispose();
-            } catch (e) {}
+            jitsiApi.dispose();
         }
         stopPing();
-    });
-
-    // Обработка потери фокуса (например, при переключении вкладки)
-    document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'hidden' && isMeetingEnding) {
-            // Если встреча завершается и пользователь ушел с вкладки, ускоряем перенаправление
-            setTimeout(() => {
-                window.location.href = '/schedules';
-            }, 3000);
-        }
     });
 </script>
 
@@ -655,28 +552,7 @@
     #jitsi-container {
         background: #000;
     }
-
-    /* Дополнительные стили для индикации завершения встречи */
-    .meeting-ending {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(255, 0, 0, 0.9);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        z-index: 10001;
-        text-align: center;
-        font-size: 18px;
-        display: none;
-    }
 </style>
-
-<div class="meeting-ending" id="meeting-ending-notification">
-    <i class="fas fa-exclamation-triangle"></i>
-    Встреча завершается...
-</div>
 
 </body>
 </html>
