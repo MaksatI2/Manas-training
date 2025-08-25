@@ -121,5 +121,4 @@ class LessonServiceImplTest {
         assertEquals("New Desc", lesson.getDescription());
         verify(lessonRepository).save(lesson);
     }
-
 }
