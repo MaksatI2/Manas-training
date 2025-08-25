@@ -17,8 +17,8 @@ Thumbs.db
 .git/
 .gitignore
 
-Dockerfile
-docker-compose.yml
+deploy/Dockerfile
+deploy/docker-compose.yml
 .dockerignore
 
 *.log
