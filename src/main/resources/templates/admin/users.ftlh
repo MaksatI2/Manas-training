@@ -138,14 +138,14 @@
                                     <#if !user.isActive>
                                         <a href="/admin/users/${user.id}/activate"
                                            class="btn btn-sm btn-success"
-                                           title="Активировать">
+                                           title="<@spring.message code='admin.user.list.configrm.activate'/>">
                                             <i class="fas fa-check"></i>
                                         </a>
                                     <#else>
                                         <a href="/admin/users/${user.id}/deactivate"
                                            class="btn btn-sm btn-warning"
-                                           title="Деактивировать"
-                                           onclick="return confirm('Вы уверены, что хотите деактивировать пользователя?')">
+                                           title="<@spring.message code='admin.user.list.action.deactivate'/>"
+                                           onclick="return confirm('<@spring.message code="admin.user.list.confirm.deactivate"/>')">
                                             <i class="fas fa-ban"></i>
                                         </a>
                                     </#if>

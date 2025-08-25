@@ -104,10 +104,12 @@
                 </section>
 
                 <section class="test-section">
-                    <h2 class="section-title">Тестирование</h2>
+                    <h2 class="section-title">
+                        <@spring.message code="test.section.title"/>
+                    </h2>
                     <div class="test-card glass-effect">
                         <#if testInstance?has_content>
-                            <h3 class="test-title">Тест: ${testInstance.test.title}</h3>
+                            <h3 class="test-title"><@spring.message code="test.title"/>: ${testInstance.test.title}</h3>
                             <p class="test-info">
                                 <@spring.message code="courseInstances.admin.detail.startDate"/>:
                                 <strong>${startDate} ${testInstance.startTime}</strong>
@@ -117,10 +119,11 @@
                                 <strong>${endDate} ${testInstance.endTime}</strong>
                             </p>
                             <a href="/instance/${courseInstance.id}/change-time" class="btn btn-warning btn-icon">
-                                <i class="fas fa-clock"></i> Изменить время
+                                <i class="fas fa-clock"></i> <@spring.message code="test.changeTime"/>
+
                             </a>
                         <#else>
-                            <div class="empty-state">На данный поток пока не был назначен тест.</div>
+                            <div class="empty-state"><@spring.message code="test.emptyState"/></div>
                         </#if>
                     </div>
                 </section>
