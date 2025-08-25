@@ -151,6 +151,12 @@
                                            class="btn btn-success btn-sm rounded-pill">
                                             <i class="fas fa-video me-1"></i><@spring.message code="lesson.login"/>
                                         </a>
+                                        <#if isTeacher>
+                                            <button type="button" class="btn btn-danger btn-sm rounded-pill"
+                                                    onclick="endMeeting(${activeMeeting.meetingId})">
+                                                <i class="fas fa-stop me-1"></i><@spring.message code="lesson.end"/>
+                                            </button>
+                                        </#if>
                                     <#else>
                                         <#if isTeacher>
                                             <a href="<@spring.url '/jitsi/schedule/${schedule.id}/start?teacherId=${currentUserId}'/>"
@@ -434,4 +440,21 @@
             }
         }
     </style>
+
+    <script>
+        function endMeeting(meetingId) {
+            fetch('/api/jitsi/meetings/end', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    '${_csrf.headerName}': '${_csrf.token}'
+                },
+                body: JSON.stringify({
+                    meetingId: meetingId,
+                    teacherId: ${currentUserId}
+                })
+            })
+        }
+    </script>
 </@layout.page>

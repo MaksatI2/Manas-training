@@ -5,7 +5,6 @@ import manasTrainingService.dto.jitsi.*;
 import manasTrainingService.service.jitsi.MeetingParticipantService;
 import manasTrainingService.service.jitsi.MeetingService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +14,6 @@ public class JitsiRestController {
 
     private final MeetingService meetingService;
     private final MeetingParticipantService participantService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/meetings/start")
     public ResponseEntity<MeetingResponseDTO> startMeeting(@RequestBody StartMeetingRequestDTO request) {
@@ -31,13 +29,6 @@ public class JitsiRestController {
     public ResponseEntity<Void> endMeeting(@RequestBody EndMeetingRequestDTO request) {
         try {
             meetingService.endMeeting(request);
-            try {
-                messagingTemplate.convertAndSend("/topic/meetings/" + request.getMeetingId(), "ENDED");
-                Thread.sleep(100);
-            } catch (Exception e) {
-                System.err.println("Ошибка отправки WebSocket уведомления: " + e.getMessage());
-            }
-
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
