@@ -49,13 +49,15 @@ deploy:
     - apt-get update -qq && apt-get install -y -qq openssh-client rsync
     - eval "$(ssh-agent -s)"
     - |
-      echo "$SSH_PRIVATE_KEY_BASE64" | base64 -d > /tmp/deploy_key
-    - chmod 600 /tmp/deploy_key
-    - ssh-add /tmp/deploy_key
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
+      cp $SSH_PRIVATE_KEY_BASE64 /tmp/deploy_key
+      chmod 600 /tmp/deploy_key
+
+      if ! ssh-keygen -l -f /tmp/deploy_key 2>/dev/null; then
+        echo "Преобразуем ключ в PEM формат..."
+        ssh-keygen -p -m PEM -f /tmp/deploy_key -N ""
+      fi
+
+      ssh-add /tmp/deploy_key
   script:
     - echo "Деплой на сервер $DEPLOY_SERVER"
     - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
