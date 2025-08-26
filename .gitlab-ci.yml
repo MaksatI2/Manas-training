@@ -4,7 +4,6 @@ stages:
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-  # Переменные для деплоя (устанавливаются в GitLab UI как защищенные переменные)
   DEPLOY_SERVER: "195.38.165.94"
   DEPLOY_USER: "manastraining_kg"
   DEPLOY_PATH: "/home/manastraining_kg/manas-training-service"
