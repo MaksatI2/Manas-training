@@ -53,7 +53,7 @@ deploy:
     - |
       cat > /tmp/deploy_key << EOF
       -----BEGIN OPENSSH PRIVATE KEY-----
-      $SSH_PRIVATE_KEY_BASE64
+      $SSH_PRIVATE_KEY
       -----END OPENSSH PRIVATE KEY-----
       EOF
     - chmod 600 /tmp/deploy_key
