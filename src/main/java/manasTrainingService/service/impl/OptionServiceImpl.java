@@ -39,22 +39,24 @@ public class OptionServiceImpl implements OptionService {
     public void saveQuestionOptions(List<OptionDto> options, TestQuestion testQuestion, Integer correctOptionIndex){
         User user = userService.getAuthorizedUser();
         for(int i = 0; i<options.size(); i++){
-            QuestionOption questionOption = new QuestionOption();
-            questionOption.setQuestion(testQuestion);
-            questionOption.setOptionText(options.get(i).getOptionText());
-            if(correctOptionIndex != null && i == correctOptionIndex){
-                questionOption.setIsCorrect(true);
-            }else{
-                questionOption.setIsCorrect(false);
-            }
-            QuestionOption saved = questionOptionRepository.saveAndFlush(questionOption);
+            if(options.get(i).getIsRemoved() == null){
+                QuestionOption questionOption = new QuestionOption();
+                questionOption.setQuestion(testQuestion);
+                questionOption.setOptionText(options.get(i).getOptionText());
+                if(correctOptionIndex != null && i == correctOptionIndex){
+                    questionOption.setIsCorrect(true);
+                }else{
+                    questionOption.setIsCorrect(false);
+                }
+                QuestionOption saved = questionOptionRepository.saveAndFlush(questionOption);
 
-            activityLogService.log(
-                    user,
-                    ActionType.CREATE,
-                    TargetType.QUESTION_OPTION,
-                    saved.getId()
-            );
+                activityLogService.log(
+                        user,
+                        ActionType.CREATE,
+                        TargetType.QUESTION_OPTION,
+                        saved.getId()
+                );
+            }
         }
     }
 

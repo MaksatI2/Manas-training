@@ -41,21 +41,23 @@ public class LessonQuizOptionServiceImpl implements LessonQuizOptionService {
     @Override
     public void saveQuizOptions(List<LessonQuizOptionDto> options, LessonQuizQuestion lessonQuizQuestion, Integer correctOptionIndex){
         for(int i = 0; i<options.size(); i++){
-            LessonQuizOption lessonQuizOption = new LessonQuizOption();
-            lessonQuizOption.setQuestion(lessonQuizQuestion);
-            lessonQuizOption.setOptionText(options.get(i).getOptionText());
-            if(correctOptionIndex != null && i == correctOptionIndex){
-                lessonQuizOption.setIsCorrect(true);
-            }else{
-                lessonQuizOption.setIsCorrect(false);
+            if(options.get(i).getIsRemoved() == null){
+                LessonQuizOption lessonQuizOption = new LessonQuizOption();
+                lessonQuizOption.setQuestion(lessonQuizQuestion);
+                lessonQuizOption.setOptionText(options.get(i).getOptionText());
+                if(correctOptionIndex != null && i == correctOptionIndex){
+                    lessonQuizOption.setIsCorrect(true);
+                }else{
+                    lessonQuizOption.setIsCorrect(false);
+                }
+                LessonQuizOption saved = lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
+                activityLogService.log(
+                        userService.getAuthorizedUser(),
+                        ActionType.CREATE,
+                        TargetType.LESSON_QUIZ_OPTION,
+                        saved.getId()
+                );
             }
-            LessonQuizOption saved = lessonQuizOptionRepository.saveAndFlush(lessonQuizOption);
-            activityLogService.log(
-                    userService.getAuthorizedUser(),
-                    ActionType.CREATE,
-                    TargetType.LESSON_QUIZ_OPTION,
-                    saved.getId()
-            );
         }
     }
 
