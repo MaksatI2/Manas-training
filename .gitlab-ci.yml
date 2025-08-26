@@ -22,11 +22,16 @@ deploy:
     - eval "$(ssh-agent -s)"
     - echo "$SSH_PRIVATE_KEY" | base64 -d > /tmp/deploy_key
     - chmod 600 /tmp/deploy_key
+    - echo "Проверяем формат декодированного ключа:"
+    - head -1 /tmp/deploy_key
+    - tail -1 /tmp/deploy_key
+    - ssh-keygen -l -f /tmp/deploy_key || echo "Ключ невалиден"
     - ssh-add /tmp/deploy_key
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "echo 'SSH connection successful'"
   script:
     - echo "Деплой на сервер $DEPLOY_SERVER"
     - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
