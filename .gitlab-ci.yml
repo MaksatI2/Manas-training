@@ -1,37 +1,71 @@
 stages:
+  - test
+  - build
   - deploy
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-  DEPLOY_SERVER: "195.38.165.94"
-  DEPLOY_USER: "manastraining_kg"
-  DEPLOY_PATH: "/home/manastraining_kg/manas-training-service"
-  PRODUCTION_URL: "https://manastraining.kg"
 
 cache:
   paths:
     - .m2/repository/
     - target/
 
+test:
+  stage: test
+  image: maven:3.8.6-eclipse-temurin-17
+  script:
+    - mvn $MAVEN_CLI_OPTS clean test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+    paths:
+      - target/surefire-reports/
+    expire_in: 1 week
+    when: always
+  coverage: '/Total.*?([0-9]{1,3})%/'
+  only:
+    - dev
+    - merge_requests
+
+build:
+  stage: build
+  image: maven:3.8.6-eclipse-temurin-17
+  script:
+    - mvn $MAVEN_CLI_OPTS compile package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 day
+  only:
+    - dev
+
 deploy:
   stage: deploy
   image: ubuntu:20.04
   before_script:
-    - apt-get update -qq && apt-get install -y -qq sshpass rsync
+    - apt-get update -qq && apt-get install -y -qq openssh-client rsync
+    - eval "$(ssh-agent -s)"
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - |
+      cat > /tmp/deploy_key << EOF
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      $SSH_PRIVATE_KEY_BASE64
+      -----END OPENSSH PRIVATE KEY-----
+      EOF
+    - chmod 600 /tmp/deploy_key
+    - ssh-add /tmp/deploy_key
+    - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
   script:
-    - echo "🚀 Деплой на сервер $DEPLOY_SERVER"
-    - sshpass -p "$DEPLOY_PASS" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
-    - sshpass -p "$DEPLOY_PASS" rsync -avz --delete \
-      --exclude='postgres/**' \
-      --exclude='logs/**' \
-      --exclude='nginx/ssl/**' \
-      --exclude='nginx/ssl' \
-      --exclude='nginx/logs' \
-      --exclude='nginx/html/.well-known' \
-      ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
-    - sshpass -p "$DEPLOY_PASS" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh"
-    - sshpass -p "$DEPLOY_PASS" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && ./deploy.sh"
+    - echo "Деплой на сервер $DEPLOY_SERVER"
+    - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
+    - rsync -avz --delete --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/ssl' --exclude='nginx/logs' --exclude='nginx/html/.well-known' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
+    - ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh"
+    - ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && ./deploy.sh"
   environment:
     name: production
     url: $PRODUCTION_URL
