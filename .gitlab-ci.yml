@@ -48,12 +48,16 @@ deploy:
   before_script:
     - apt-get update -qq && apt-get install -y -qq openssh-client rsync
     - eval "$(ssh-agent -s)"
-    - |
-      echo "$SSH_PRIVATE_KEY_BASE64" | base64 -d > /tmp/deploy_key
-    - chmod 600 /tmp/deploy_key
-    - ssh-add /tmp/deploy_key
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
+    - |
+      cat > /tmp/deploy_key << EOF
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      $SSH_PRIVATE_KEY_BASE64
+      -----END OPENSSH PRIVATE KEY-----
+      EOF
+    - chmod 600 /tmp/deploy_key
+    - ssh-add /tmp/deploy_key
     - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
