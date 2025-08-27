@@ -184,7 +184,7 @@
                             </div>
                             <div class="lesson-info-item">
                                 <span class="lesson-info-label"><i class="fas fa-clock me-2"></i><@spring.message code="lesson.schedule.duration"/></span>
-                                <span class="lesson-info-value">${schedule.durationHours} <@spring.message code="lesson.quiz.minutes"/></span>
+                                <span class="lesson-info-value">${schedule.durationHours} <@spring.message code="lesson.quiz.hours"/></span>
                             </div>
                             <div class="lesson-info-item">
                                 <span class="lesson-info-label"><i class="fas fa-user me-2"></i><@spring.message code="lesson.schedule.teacher"/></span>
