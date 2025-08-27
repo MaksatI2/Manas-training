@@ -167,7 +167,7 @@
                                     </#if>
                                 </#if>
 
-                                <#if (isTeacher || isAdmin)>
+                                <#if (isTeacher || isAdmin) && (isMeetingActive!false)>
                                     <a href="<@spring.url '/analytics/schedule/${schedule.id}'/>"
                                        class="btn btn-outline-info btn-sm rounded-pill"
                                        title="Посмотреть аналитику урока">
