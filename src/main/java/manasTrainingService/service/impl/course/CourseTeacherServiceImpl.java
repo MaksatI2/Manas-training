@@ -97,6 +97,4 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
                 .map(ct -> new ShortDto(ct.getId(), ct.getTeacher().getName()))
                 .toList();
     }
-
-
 }

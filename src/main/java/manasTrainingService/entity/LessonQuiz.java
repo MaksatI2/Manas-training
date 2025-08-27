@@ -20,10 +20,6 @@ public class LessonQuiz {
     @Column(name = "id", nullable = false)
     Integer id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "lesson_id", nullable = false)
-//    Lesson lesson;
-
     @Column(name = "question_time_limit")
     Integer questionTimeLimit;
 

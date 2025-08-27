@@ -368,7 +368,7 @@
                 },
                 responsive: {
                     details: {
-                        type: 'inline', // Collapses hidden columns into expandable child rows
+                        type: 'inline',
                         renderer: $.fn.dataTable.Responsive.renderer.tableAll({
                             tableClass: 'table'
                         })
@@ -459,10 +459,9 @@
                 columnDefs: [
                     { targets: [3, 5, 6], orderable: true, searchable: true },
                     { targets: [7], orderable: false, searchable: false },
-                    { targets: 1, responsivePriority: 1 }, // Name
-                    { targets: 7, responsivePriority: 2 }, // Actions
-                    { targets: 4, responsivePriority: 3 }  // Duration
-                    // Other columns will have default priority
+                    { targets: 1, responsivePriority: 1 },
+                    { targets: 7, responsivePriority: 2 },
+                    { targets: 4, responsivePriority: 3 }
                 ],
                 initComplete: function () {
                     console.log('DataTables initialized successfully');

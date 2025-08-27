@@ -156,9 +156,15 @@ public class LessonQuizQuestionServiceImpl implements LessonQuizQuestionService 
 
     private void editQuestionsFromEdit(List<LessonQuizQuestionDto> questions, LessonQuiz quiz){
         User user = userService.getAuthorizedUser();
+
+        if (questions.isEmpty()) {
+            return;
+        }
+
         int requiredCount = questions.size();
         int basePoints = 100 / requiredCount;
         int remainder = 100 % requiredCount;
+
         for(int i = 0; i < questions.size(); i++){
             if (questions.get(i).getId() != null){
                 LessonQuizQuestion lessonQuizQuestion = lessonQuizQuestionRepository.findById(questions.get(i).getId())

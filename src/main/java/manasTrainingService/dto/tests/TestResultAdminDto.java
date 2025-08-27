@@ -3,7 +3,6 @@ package manasTrainingService.dto.tests;
 import lombok.*;
 import manasTrainingService.dto.certificate.StudentDto;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
-import manasTrainingService.entity.CourseInstance;
 
 import java.math.BigDecimal;
 

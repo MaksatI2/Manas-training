@@ -45,15 +45,4 @@ public class CourseInstanceStatisticsServiceImpl implements CourseInstanceStatis
 
         return statsList;
     }
-
-//    @Override
-//    public List<TestResultDTO> getTestResultsByCourseInstance(CourseInstance courseInstance) {
-//        List<CourseEnrollment> enrollments = enrollmentService.findAllEnrollmentsForCourseInstance(courseInstance.getId());
-//
-//        List<Integer> studentIds = enrollments.stream()
-//                .map(enrollment -> enrollment.getStudent().getId())
-//                .collect(Collectors.toList());
-//
-//        return testResultService.getTestResultsByStudentIdsAndCourseInstance(studentIds, courseInstance.getId());
-//    }
 }

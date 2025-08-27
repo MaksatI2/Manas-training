@@ -23,6 +23,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -104,24 +105,19 @@ public class MeetingServiceImpl implements MeetingService {
             throw new MeetingEndedException("Встреча уже завершена");
         }
 
-        // 1. Сначала отправляем уведомление о завершении всем участникам
         log.info("Sending end meeting notification to all participants for meeting: {}", meeting.getId());
         try {
             messagingTemplate.convertAndSend("/topic/meetings/" + meeting.getId(), "MEETING_ENDING");
-            // Небольшая пауза для обработки уведомления клиентами
             Thread.sleep(1000);
         } catch (Exception e) {
             log.error("Failed to send meeting ending notification", e);
         }
 
-        // 2. Завершаем всех активных участников
         endAllActiveParticipants(meeting);
 
-        // 3. Обновляем статус встречи
         meeting.setEndedAt(LocalDateTime.now());
         meetingRepository.save(meeting);
 
-        // 4. Отправляем финальное уведомление
         try {
             messagingTemplate.convertAndSend("/topic/meetings/" + meeting.getId(), "ENDED");
             log.info("Final ENDED notification sent for meeting: {}", meeting.getId());
@@ -226,10 +222,14 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     private String generateRoomName(Schedule schedule) {
+        String dateString = schedule.getLessonDate() != null
+                ? schedule.getLessonDate().toString().replace("-", "")
+                : LocalDate.now().toString().replace("-", "");
+
         return String.format("%s_Meeting_%d_%s_%d",
                 roomPrefix,
                 schedule.getId(),
-                schedule.getLessonDate().toString().replace("-", ""),
+                dateString,
                 System.currentTimeMillis() % 10000);
     }
 
