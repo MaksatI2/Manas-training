@@ -220,6 +220,12 @@ function deleteOption(id, errorId, questionId) {
             document.getElementById("add-options-button-question-" + questionId).disabled = false;
         }
     });
+    let hiddenInput = document.createElement("input")
+    hiddenInput.setAttribute("type", "hidden")
+    hiddenInput.setAttribute("name", "questions["+questionId+"].options["+optionId+"].isRemoved")
+    hiddenInput.setAttribute("value", "true")
+    const optionsBlock =  document.getElementById("options-questionId-"+questionId)
+    optionsBlock.append(hiddenInput);
 }
 
 function deleteQuestionFromEdit(id, index) {

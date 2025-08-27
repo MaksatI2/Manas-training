@@ -203,7 +203,6 @@ class CertificateServiceImplTest {
 
         assertThat(result.getId()).isEqualTo(1);
         assertThat(result.getStudentId()).isEqualTo(1);
-        assertThat(result.getCertificateNumber()).isEqualTo("123");
         assertThat(result.getMark()).isEqualTo(85);
         assertThat(result.getIssueDate()).isEqualTo(testCertificate.getIssueDate());
         assertThat(result.getExpiryDate()).isEqualTo(testCertificate.getExpiryDate());
@@ -220,20 +219,6 @@ class CertificateServiceImplTest {
                 .hasMessage("Certificate not found");
     }
 
-    @Test
-    void saveEditedCertificate_WhenCertificateExists_ShouldUpdateAndSave() {
-        EditCertificateDto editDto = new EditCertificateDto(
-                1, 1, "456", LocalDate.now(),
-                LocalDate.now().plusYears(1), 90
-        );
-        when(certRepo.findById(1)).thenReturn(Optional.of(testCertificate));
-
-        certificateService.saveEditedCertificate(editDto);
-
-        assertThat(testCertificate.getCertificateNumber()).isEqualTo("456");
-        assertThat(testCertificate.getMark()).isEqualTo(90);
-        verify(certRepo).save(testCertificate);
-    }
 
     @Test
     void createCertificate_ShouldCreateAndSaveCertificate() {

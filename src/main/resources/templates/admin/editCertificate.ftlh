@@ -22,48 +22,30 @@
     {"label": bcEdit, "url": ""}
     ]/>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center"
-             style="background:linear-gradient(135deg,#0066cc,#003d7a); color:#fff;">
-            <h5 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-edit me-2"></i>
-                ${headerTitle}
-            </h5>
-            <a href="/admin/certificate/detail?studentId=${certificateForm.studentId}"
-               class="btn btn-light btn-sm"
-               style="border-radius:25px; background:white; color:#0066cc; border:1px solid #0066cc;">
-                <i class="fas fa-arrow-left me-1" style="color:#0066cc;"></i> ${backText}
-            </a>
-        </div>
+    <div class="container d-flex justify-content-center">
+        <div class="card shadow mb-4 col-12 col-md-10 col-lg-8">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                 style="background:linear-gradient(135deg,#0066cc,#003d7a); color:#fff;">
+                <h5 class="m-0 font-weight-bold text-white">
+                    <i class="fas fa-edit me-2"></i>
+                    ${headerTitle}
+                </h5>
+                <a href="/admin/certificate/detail?studentId=${certificateForm.studentId}"
+                   class="btn btn-light btn-sm"
+                   style="border-radius:25px; background:white; color:#0066cc; border:1px solid #0066cc;">
+                    <i class="fas fa-arrow-left me-1" style="color:#0066cc;"></i> ${backText}
+                </a>
+            </div>
 
-        <div class="card-body">
-            <form action="/admin/certificate/edit" method="post" novalidate>
-                <#if _csrf??>
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                </#if>
-                <input type="hidden" name="id" value="${certificateForm.id}"/>
-                <input type="hidden" name="studentId" value="${certificateForm.studentId}"/>
+            <div class="card-body">
+                <form action="/admin/certificate/edit" method="post" novalidate>
+                    <#if _csrf??>
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    </#if>
+                    <input type="hidden" name="id" value="${certificateForm.id}"/>
+                    <input type="hidden" name="studentId" value="${certificateForm.studentId}"/>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="certificateNumber" class="form-label required">${labelNumber}</label>
-                        <input type="text"
-                               id="certificateNumber"
-                               name="certificateNumber"
-                               value="${certificateForm.certificateNumber!''}"
-                               maxlength="50"
-                               class="form-control <#if .globals['org.springframework.validation.BindingResult.certificateForm']?? && .globals['org.springframework.validation.BindingResult.certificateForm'].hasFieldErrors('certificateNumber')>is-invalid</#if>"
-                               required>
-                        <#if .globals['org.springframework.validation.BindingResult.certificateForm']?? && .globals['org.springframework.validation.BindingResult.certificateForm'].hasFieldErrors('certificateNumber')>
-                            <div class="invalid-feedback">
-                                <#list .globals['org.springframework.validation.BindingResult.certificateForm'].getFieldErrors('certificateNumber') as err>
-                                    ${err.defaultMessage}
-                                </#list>
-                            </div>
-                        </#if>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
+                    <div class="mb-3">
                         <label for="issueDate" class="form-label required">${labelIssue}</label>
                         <input type="date"
                                id="issueDate"
@@ -79,10 +61,8 @@
                             </div>
                         </#if>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="mb-3">
                         <label for="expiryDate" class="form-label required">${labelExpiry}</label>
                         <input type="date"
                                id="expiryDate"
@@ -100,7 +80,7 @@
                         </#if>
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="mb-3">
                         <label for="mark" class="form-label required">${labelMark}</label>
                         <input type="number"
                                id="mark"
@@ -117,18 +97,18 @@
                             </div>
                         </#if>
                     </div>
-                </div>
 
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="/admin/certificate/detail?studentId=${certificateForm.studentId}"
-                       class="btn btn-secondary">
-                        <i class="fas fa-times me-1"></i> ${cancelText}
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-check me-1"></i> ${saveText}
-                    </button>
-                </div>
-            </form>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="/admin/certificate/detail?studentId=${certificateForm.studentId}"
+                           class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i> ${cancelText}
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-1"></i> ${saveText}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
