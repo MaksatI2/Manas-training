@@ -5,11 +5,12 @@ import jakarta.validation.ConstraintValidatorContext;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.lesson.ScheduleDTO;
 import manasTrainingService.service.course.CourseInstanceService;
+import manasTrainingService.util.DateUtil;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Component
 public class LessonDateInCourseRangeValidator implements ConstraintValidator<LessonDateInCourseRange, ScheduleDTO> {
@@ -34,15 +35,16 @@ public class LessonDateInCourseRangeValidator implements ConstraintValidator<Les
 
         if (lessonDate.isBefore(courseStart) || lessonDate.isAfter(courseEnd)) {
             context.disableDefaultConstraintViolation();
-
-            context.buildConstraintViolationWithTemplate(
-                    context.getDefaultConstraintMessageTemplate()
-                            .replace("{startDate}", courseStart.format(DateTimeFormatter.ISO_DATE))
-                            .replace("{endDate}", courseEnd.format(DateTimeFormatter.ISO_DATE))
-            ).addPropertyNode("lessonDate").addConstraintViolation();
+            context.unwrap(HibernateConstraintValidatorContext.class)
+                    .addMessageParameter("startDate", DateUtil.format(courseStart))
+                    .addMessageParameter("endDate", DateUtil.format(courseEnd))
+                    .buildConstraintViolationWithTemplate("{LessonDateInCourseRange.message}")
+                    .addPropertyNode("lessonDate")
+                    .addConstraintViolation();
 
             return false;
         }
+
 
         return true;
     }
