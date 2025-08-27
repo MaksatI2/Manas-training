@@ -20,8 +20,6 @@ public class EditCertificateDto {
     @NotNull(message = "{editCertificate.studentId.notnull}")
     private Integer studentId;
 
-    @NotBlank(message = "{editCertificate.certificateNumber.notblank}")
-    private String certificateNumber;
 
     @NotNull(message = "{editCertificate.issueDate.notnull}")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

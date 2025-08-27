@@ -152,7 +152,6 @@ public class CertificateServiceImpl implements CertificateService {
         return new EditCertificateDto(
                 cert.getId(),
                 cert.getStudent().getId(),
-                cert.getCertificateNumber(),
                 cert.getIssueDate(),
                 cert.getExpiryDate(),
                 cert.getMark()
@@ -169,7 +168,6 @@ public class CertificateServiceImpl implements CertificateService {
                                 LocaleContextHolder.getLocale()
                         )
                 ));
-        cert.setCertificateNumber(dto.getCertificateNumber());
         cert.setIssueDate(dto.getIssueDate());
         cert.setExpiryDate(dto.getExpiryDate());
         cert.setMark(dto.getMark());
