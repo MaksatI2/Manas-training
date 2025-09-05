@@ -44,11 +44,8 @@ build:
 
 deploy:
   stage: deploy
-  image: ubuntu:20.04
+  image: bitnami/minideb:bullseye
   before_script:
-    - echo "Проверяем интернет..."
-    - curl -sSf http://archive.ubuntu.com || echo "Не удалось подключиться к archive.ubuntu.com"
-    - apt-get update -qq && apt-get install -y -qq openssh-client rsync
     - eval "$(ssh-agent -s)"
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
