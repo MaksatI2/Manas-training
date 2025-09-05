@@ -44,8 +44,9 @@ build:
 
 deploy:
   stage: deploy
-  image: bitnami/minideb:bullseye
+  image: ubuntu:20.04
   before_script:
+    - apt-get update -qq && apt-get install -y -qq openssh-client rsync
     - eval "$(ssh-agent -s)"
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
