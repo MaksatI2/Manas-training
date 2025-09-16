@@ -72,7 +72,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./logs:/app/logs
-      - ./uploads:/app/uploads
+      - ./data:/app/data
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8089/actuator/health || exit 1"]
       interval: 30s
