@@ -4,6 +4,7 @@
 <@layout.page>
     <div class="hero-section-enhanced parallax">
         <#if successMessage??>
+
             <div id="successMessage" data-message="${successMessage?js_string}"></div>
         </#if>
         <#if errorMessage??>
