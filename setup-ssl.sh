@@ -10,6 +10,32 @@ DOMAIN="manastraining.kg"
 EMAIL="zer0icemax@gmail.com"
 SSL_DIR="./nginx/ssl"
 CERTBOT_DIR="./letsencrypt"
+FORCE_RENEW=false
+
+if [ "$1" == "--force" ] || [ "$1" == "-f" ]; then
+    FORCE_RENEW=true
+    echo -e "${YELLOW}🔄 Принудительное обновление сертификата${NC}"
+fi
+
+if [ "$1" == "--check" ] || [ "$1" == "-c" ]; then
+    echo -e "${GREEN}🔍 Проверка статуса SSL сертификата${NC}"
+    if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
+        echo -e "${GREEN}✅ Сертификаты найдены${NC}"
+        echo -e "Информация о сертификате:"
+        openssl x509 -in "$SSL_DIR/fullchain.pem" -noout -subject -issuer -dates
+        
+        if openssl x509 -checkend 2592000 -noout -in "$SSL_DIR/fullchain.pem" > /dev/null 2>&1; then
+            DAYS_LEFT=$(( ($(date -j -f "%b %d %T %Y %Z" "$(openssl x509 -enddate -noout -in "$SSL_DIR/fullchain.pem" | cut -d= -f2)" "+%s") - $(date +%s)) / 86400 ))
+            echo -e "${GREEN}✅ Сертификат действителен. Осталось дней: ~$DAYS_LEFT${NC}"
+        else
+            echo -e "${RED}❌ Сертификат истекает в ближайшие 30 дней!${NC}"
+            echo -e "${YELLOW}Запустите: ./setup-ssl.sh --force для обновления${NC}"
+        fi
+    else
+        echo -e "${RED}❌ Сертификаты не найдены${NC}"
+    fi
+    exit 0
+fi
 
 echo -e "${GREEN}🔐 Настройка SSL сертификата для $DOMAIN${NC}"
 
@@ -51,6 +77,11 @@ run_certbot_docker() {
 }
 
 check_certificate() {
+    if [ "$FORCE_RENEW" = "true" ]; then
+        echo -e "${YELLOW}🔄 Принудительное обновление - пропускаем проверку${NC}"
+        return 1
+    fi
+    
     if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
         echo -e "${GREEN}✅ SSL сертификат уже существует${NC}"
 
@@ -62,6 +93,7 @@ check_certificate() {
             return 1
         fi
     else
+        echo -e "${YELLOW}⚠️ Сертификаты не найдены${NC}"
         return 1
     fi
 }
