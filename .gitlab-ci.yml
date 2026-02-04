@@ -1,4 +1,5 @@
 stages:
+  - test
   - build
   - deploy
 
@@ -9,12 +10,30 @@ variables:
 cache:
   paths:
     - .m2/repository/
+    - target/
+
+test:
+  stage: test
+  image: maven:3.8.6-eclipse-temurin-17
+  script:
+    - mvn $MAVEN_CLI_OPTS clean test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+    paths:
+      - target/surefire-reports/
+    expire_in: 1 week
+    when: always
+  coverage: '/Total.*?([0-9]{1,3})%/'
+  only:
+    - dev
 
 build:
   stage: build
   image: maven:3.8.6-eclipse-temurin-17
   script:
-    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+    - mvn $MAVEN_CLI_OPTS compile package -DskipTests
   artifacts:
     paths:
       - target/*.jar
@@ -43,30 +62,8 @@ deploy:
   script:
     - echo "Деплой на сервер $DEPLOY_SERVER"
     - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
-
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER "sudo chown -R $DEPLOY_USER:$DEPLOY_USER $DEPLOY_PATH || true"
-    - rsync -avz target/*.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/
-
-    - |
-      rsync -avz --delete \
-        --exclude='data/**' \
-        --exclude='postgres/**' \
-        --exclude='logs/**' \
-        --exclude='nginx/ssl/**' \
-        --exclude='nginx/logs/**' \
-        --exclude='nginx/html/.well-known/**' \
-        --exclude='.git/**' \
-        --exclude='.m2/**' \
-        --exclude='target/**' \
-        --exclude='src/test/**' \
-        --exclude='**/*.class' \
-        --exclude='.idea/**' \
-        --exclude='.vscode/**' \
-        --exclude='*.iml' \
-        --exclude='*.log' \
-        ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
-
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh setup-ssl.sh"
+    - rsync -avz --delete --exclude='data' --exclude='data/**' --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/ssl' --exclude='nginx/logs' --exclude='nginx/html/.well-known' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
+    - ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh"
     - ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && ./deploy.sh"
   environment:
     name: production
