@@ -45,16 +45,20 @@ deploy:
   stage: deploy
   image: ubuntu:20.04
   before_script:
-    - apt-get update -qq && apt-get install -y -qq openssh-client rsync sshpass
+    - apt-get update -qq && apt-get install -y -qq openssh-client sshpass
     - mkdir -p ~/.ssh
     - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts 2>/dev/null || true
   script:
     - echo "🚀 Деплой на сервер $DEPLOY_SERVER"
     - export SSHPASS=$SSH_PASSWORD
-    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
-    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" --exclude='data' --exclude='data/**' --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/ssl' --exclude='nginx/logs' --exclude='nginx/html/.well-known' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
-    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh"
-    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && ./deploy.sh"
+    - echo "📦 Инициализация git репозитория на сервере (если нужно)..."
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH && cd $DEPLOY_PATH && (git rev-parse --git-dir > /dev/null 2>&1 || git init)"
+    - echo "🔗 Настройка git remote..."
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && (git remote | grep origin > /dev/null && git remote set-url origin $CI_REPOSITORY_URL || git remote add origin $CI_REPOSITORY_URL)"
+    - echo "⬇️ Получение обновлений из репозитория..."
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && git fetch origin dev && git reset --hard origin/dev"
+    - echo "🔧 Запуск деплоя..."
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh && ./deploy.sh"
     - echo "✅ Деплой завершен успешно!"
   environment:
     name: production
