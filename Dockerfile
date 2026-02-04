@@ -1,9 +1,16 @@
+FROM eclipse-temurin:17-jdk-jammy AS builder
 
-FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /build
+
+COPY . .
+
+RUN ./mvnw clean package -DskipTests -q
+
+FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-COPY target/*.jar app.jar
+COPY --from=builder /build/target/manas-training-service-*.jar app.jar
 
 EXPOSE 8089
 

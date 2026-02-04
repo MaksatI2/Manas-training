@@ -13,6 +13,10 @@ fi
 
 echo -e "${GREEN}🚀 Начинаем деплой приложения на новом сервере...${NC}"
 
+echo -e "${YELLOW}🧹 Очистка проблемных файлов...${NC}"
+rm -rf src/test 2>/dev/null || true
+rm -rf target 2>/dev/null || true
+
 echo -e "${YELLOW}🛑 Остановка старых контейнеров (если есть)...${NC}"
 docker-compose down --remove-orphans 2>/dev/null || true
 
