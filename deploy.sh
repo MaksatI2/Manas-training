@@ -13,10 +13,6 @@ fi
 
 echo -e "${GREEN}🚀 Начинаем деплой приложения на новом сервере...${NC}"
 
-echo -e "${YELLOW}🧹 Очистка проблемных файлов...${NC}"
-rm -rf src/test 2>/dev/null || true
-rm -rf target 2>/dev/null || true
-
 echo -e "${YELLOW}🛑 Остановка старых контейнеров (если есть)...${NC}"
 docker-compose down --remove-orphans 2>/dev/null || true
 
@@ -26,15 +22,8 @@ docker rmi $(docker images -q manas-training-service_app) 2>/dev/null || true
 echo -e "${YELLOW}📁 Создание необходимых директорий...${NC}"
 mkdir -p logs uploads nginx/ssl nginx/logs nginx/html/.well-known/acme-challenge
 
-echo -e "${YELLOW}🔐 Проверка SSL сертификатов...${NC}"
+echo -e "${YELLOW}🔐 Настройка SSL сертификатов...${NC}"
 chmod +x setup-ssl.sh
-if [ -f "nginx/ssl/fullchain.pem" ]; then
-    echo -e "${GREEN}ℹ️ Проверка срока действия сертификата...${NC}"
-    ./setup-ssl.sh --check
-    echo -e "${YELLOW}📝 SSL сертификаты будут обновлены при необходимости${NC}"
-else
-    echo -e "${YELLOW}🆕 Сертификаты не найдены, создаем новые...${NC}"
-fi
 ./setup-ssl.sh
 
 echo -e "${YELLOW}🔨 Сборка и запуск контейнеров...${NC}"

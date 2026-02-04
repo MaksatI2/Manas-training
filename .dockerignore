@@ -1,9 +1,9 @@
+
 target/
-!target/manas-training-service-*.jar
+!target/*.jar
 .mvn/
 mvnw
 mvnw.cmd
-src/test/
 
 .idea/
 .vscode/
@@ -32,6 +32,7 @@ temp/
 
 *.class
 
+*.jar
 *.war
 *.ear
 
