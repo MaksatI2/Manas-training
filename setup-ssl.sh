@@ -116,21 +116,66 @@ sleep 15
 
 echo -e "${YELLOW}🌐 Получение SSL сертификата от Let's Encrypt...${NC}"
 
-run_certbot_docker || true
-
-if [ -f "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" ] && [ -f "$CERTBOT_DIR/live/$DOMAIN/privkey.pem" ]; then
-    echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
-    cp "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
-    cp "$CERTBOT_DIR/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
-    chmod 644 "$SSL_DIR/fullchain.pem"
-    chmod 600 "$SSL_DIR/privkey.pem"
-    echo -e "${GREEN}✅ SSL сертификат успешно установлен от Let's Encrypt!${NC}"
+if [ "$USE_DOCKER_CERTBOT" = "true" ]; then
+    if run_certbot_docker; then
+        if [ -f "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" ]; then
+            echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
+            cp "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
+            cp "$CERTBOT_DIR/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
+            chmod 644 "$SSL_DIR/fullchain.pem"
+            chmod 600 "$SSL_DIR/privkey.pem"
+            echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+        else
+            echo -e "${RED}❌ Ошибка получения сертификата от Let's Encrypt${NC}"
+            echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
+        fi
+    else
+        echo -e "${RED}❌ Ошибка выполнения Certbot в Docker${NC}"
+        echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
+    fi
 else
-    echo -e "${YELLOW}⚠️ Не удалось получить сертификат от Let's Encrypt${NC}"
-    echo -e "${YELLOW}🔒 Используем самоподписанный сертификат${NC}"
+    install_certbot_local
+
+    if certbot certonly \
+        --webroot \
+        --webroot-path=./nginx/html \
+        --email "$EMAIL" \
+        --agree-tos \
+        --no-eff-email \
+        --domains "$DOMAIN,www.$DOMAIN" \
+        --non-interactive \
+        --keep-until-expiring; then
+
+        if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+            echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
+            cp "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
+            cp "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
+            chmod 644 "$SSL_DIR/fullchain.pem"
+            chmod 600 "$SSL_DIR/privkey.pem"
+            echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+        else
+            echo -e "${RED}❌ Ошибка: сертификаты не найдены после успешного выполнения Certbot${NC}"
+            echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
+        fi
+    else
+        echo -e "${RED}❌ Ошибка выполнения Certbot${NC}"
+        echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
+    fi
 fi
 
 echo -e "${YELLOW}🔄 Перезапуск nginx с новыми сертификатами...${NC}"
 docker-compose restart nginx
+
+if [ "$USE_DOCKER_CERTBOT" = "false" ]; then
+    echo -e "${YELLOW}⏰ Настройка автоматического обновления сертификата...${NC}"
+    CRON_JOB="0 3 */1 * * /usr/bin/certbot renew --quiet --post-hook 'cd $(pwd) && docker-compose restart nginx'"
+
+    if ! crontab -l 2>/dev/null | grep -q "certbot renew"; then
+        (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+        echo -e "${GREEN}✅ Автоматическое обновление сертификата настроено${NC}"
+    else
+        echo -e "${GREEN}✅ Автоматическое обновление сертификата уже настроено${NC}"
+    fi
+fi
 
 echo -e "${GREEN}🎉 SSL настройка завершена!${NC}"
