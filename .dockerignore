@@ -16,5 +16,6 @@ postgres
 
 nginx/logs
 nginx/ssl
+letsencrypt
 .env
 .env.local
