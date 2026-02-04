@@ -44,9 +44,11 @@ deploy:
     - echo "Деплой на сервер $DEPLOY_SERVER"
     - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
 
+    - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH/target"
     - rsync -avz target/*.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/
 
-    - rsync -avz --delete \
+    - |
+      rsync -avz --delete \
         --exclude='data/**' \
         --exclude='postgres/**' \
         --exclude='logs/**' \
