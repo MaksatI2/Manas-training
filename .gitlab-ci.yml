@@ -44,7 +44,7 @@ deploy:
     - echo "Деплой на сервер $DEPLOY_SERVER"
     - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
 
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH/target"
+    - ssh $DEPLOY_USER@$DEPLOY_SERVER "sudo chown -R $DEPLOY_USER:$DEPLOY_USER $DEPLOY_PATH || true"
     - rsync -avz target/*.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/
 
     - |
