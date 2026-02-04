@@ -50,6 +50,11 @@ deploy:
     - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts 2>/dev/null || true
   script:
     - echo "🚀 Деплой на сервер $DEPLOY_SERVER"
+    - echo "Проверка переменных..."
+    - echo "DEPLOY_SERVER: $DEPLOY_SERVER"
+    - echo "DEPLOY_USER: $DEPLOY_USER"
+    - echo "DEPLOY_PATH: $DEPLOY_PATH"
+    - if [ -z "$SSH_PASSWORD" ]; then echo "ERROR: SSH_PASSWORD не установлена!"; exit 1; fi
     - export SSHPASS=$SSH_PASSWORD
     - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
     - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" --exclude='data' --exclude='data/**' --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/ssl' --exclude='nginx/logs' --exclude='nginx/html/.well-known' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
