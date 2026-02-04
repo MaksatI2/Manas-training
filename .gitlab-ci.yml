@@ -45,26 +45,17 @@ deploy:
   stage: deploy
   image: ubuntu:20.04
   before_script:
-    - apt-get update -qq && apt-get install -y -qq openssh-client rsync
-    - eval "$(ssh-agent -s)"
+    - apt-get update -qq && apt-get install -y -qq openssh-client rsync sshpass
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - |
-      cat > /tmp/deploy_key << EOF
-      -----BEGIN OPENSSH PRIVATE KEY-----
-      $SSH_PRIVATE_KEY
-      -----END OPENSSH PRIVATE KEY-----
-      EOF
-    - chmod 600 /tmp/deploy_key
-    - ssh-add /tmp/deploy_key
-    - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
+    - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts 2>/dev/null || true
   script:
-    - echo "Деплой на сервер $DEPLOY_SERVER"
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
-    - rsync -avz --delete --exclude='data' --exclude='data/**' --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/ssl' --exclude='nginx/logs' --exclude='nginx/html/.well-known' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh"
-    - ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && ./deploy.sh"
+    - echo "🚀 Деплой на сервер $DEPLOY_SERVER"
+    - export SSHPASS=$SSH_PASSWORD
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
+    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" --exclude='data' --exclude='data/**' --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/ssl' --exclude='nginx/logs' --exclude='nginx/html/.well-known' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh"
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && ./deploy.sh"
+    - echo "✅ Деплой завершен успешно!"
   environment:
     name: production
     url: $PRODUCTION_URL
