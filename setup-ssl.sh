@@ -24,13 +24,9 @@ if [ "$1" == "--check" ] || [ "$1" == "-c" ]; then
         echo -e "Информация о сертификате:"
         openssl x509 -in "$SSL_DIR/fullchain.pem" -noout -subject -issuer -dates
         
-        ISSUER=$(openssl x509 -in "$SSL_DIR/fullchain.pem" -noout -issuer)
-        if echo "$ISSUER" | grep -q "ManasTraining"; then
-            echo -e "${YELLOW}⚠️ Обнаружен самоподписанный сертификат${NC}"
-            echo -e "${YELLOW}Запустите: ./setup-ssl.sh --force для получения настоящего сертификата${NC}"
-        elif openssl x509 -checkend 2592000 -noout -in "$SSL_DIR/fullchain.pem" > /dev/null 2>&1; then
-            EXPIRY=$(openssl x509 -enddate -noout -in "$SSL_DIR/fullchain.pem" | cut -d= -f2)
-            echo -e "${GREEN}✅ Сертификат действителен до: $EXPIRY${NC}"
+        if openssl x509 -checkend 2592000 -noout -in "$SSL_DIR/fullchain.pem" > /dev/null 2>&1; then
+            DAYS_LEFT=$(( ($(date -j -f "%b %d %T %Y %Z" "$(openssl x509 -enddate -noout -in "$SSL_DIR/fullchain.pem" | cut -d= -f2)" "+%s") - $(date +%s)) / 86400 ))
+            echo -e "${GREEN}✅ Сертификат действителен. Осталось дней: ~$DAYS_LEFT${NC}"
         else
             echo -e "${RED}❌ Сертификат истекает в ближайшие 30 дней!${NC}"
             echo -e "${YELLOW}Запустите: ./setup-ssl.sh --force для обновления${NC}"
@@ -47,52 +43,25 @@ mkdir -p "$SSL_DIR"
 mkdir -p "./nginx/logs"
 mkdir -p "./nginx/html/.well-known/acme-challenge"
 
-echo -e "${YELLOW}🐳 Используем Docker для Certbot${NC}"
-USE_DOCKER_CERTBOT=true
+if [ -n "$CI" ] || [ -n "$GITLAB_CI" ]; then
+    echo -e "${YELLOW}🔧 Обнаружена CI среда, используем Docker для Certbot${NC}"
+    USE_DOCKER_CERTBOT=true
+else
+    USE_DOCKER_CERTBOT=false
+fi
 
-check_valid_letsencrypt_cert() {
-    if [ "$FORCE_RENEW" = "true" ]; then
-        return 1
+install_certbot_local() {
+    if ! command -v certbot &> /dev/null; then
+        echo -e "${YELLOW}📦 Установка Certbot...${NC}"
+        apt-get update && apt-get install -y certbot
     fi
-    
-    if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
-        ISSUER=$(openssl x509 -in "$SSL_DIR/fullchain.pem" -noout -issuer)
-        if echo "$ISSUER" | grep -q "ManasTraining"; then
-            echo -e "${YELLOW}⚠️ Обнаружен самоподписанный сертификат, получаем настоящий...${NC}"
-            return 1
-        fi
-        
-        if openssl x509 -checkend 2592000 -noout -in "$SSL_DIR/fullchain.pem" > /dev/null 2>&1; then
-            echo -e "${GREEN}✅ Валидный Let's Encrypt сертификат уже установлен${NC}"
-            return 0
-        else
-            echo -e "${YELLOW}⚠️ Сертификат истекает скоро, обновляем...${NC}"
-            return 1
-        fi
-    fi
-    return 1
-}
-
-create_temp_certificate() {
-    echo -e "${YELLOW}🔒 Создание временного самоподписанного сертификата...${NC}"
-    openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
-        -keyout "$SSL_DIR/privkey.pem" \
-        -out "$SSL_DIR/fullchain.pem" \
-        -subj "/C=KG/ST=Bishkek/L=Bishkek/O=ManasTraining/CN=$DOMAIN"
 }
 
 run_certbot_docker() {
     echo -e "${YELLOW}🐳 Использование Certbot через Docker...${NC}"
     mkdir -p "$CERTBOT_DIR"
 
-    if [ "$FORCE_RENEW" = "true" ] && [ -d "$CERTBOT_DIR/live/$DOMAIN" ]; then
-        echo -e "${YELLOW}🗑️ Удаление старых сертификатов для принудительного обновления...${NC}"
-        rm -rf "$CERTBOT_DIR/live/$DOMAIN"
-        rm -rf "$CERTBOT_DIR/archive/$DOMAIN"
-        rm -f "$CERTBOT_DIR/renewal/$DOMAIN.conf"
-    fi
-
-    if docker run --rm \
+    docker run --rm \
         -v "$(pwd)/nginx/html:/var/www/html" \
         -v "$(pwd)/$CERTBOT_DIR:/etc/letsencrypt" \
         -v "$(pwd)/$CERTBOT_DIR/log:/var/log/letsencrypt" \
@@ -104,78 +73,113 @@ run_certbot_docker() {
         --no-eff-email \
         --domains "$DOMAIN,www.$DOMAIN" \
         --non-interactive \
-        $([ "$FORCE_RENEW" = "true" ] && echo "--force-renewal" || echo "--keep-until-expiring"); then
-        return 0
+        --keep-until-expiring
+}
+
+check_certificate() {
+    if [ "$FORCE_RENEW" = "true" ]; then
+        echo -e "${YELLOW}🔄 Принудительное обновление - пропускаем проверку${NC}"
+        return 1
+    fi
+    
+    if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
+        echo -e "${GREEN}✅ SSL сертификат уже существует${NC}"
+
+        if openssl x509 -checkend 2592000 -noout -in "$SSL_DIR/fullchain.pem" > /dev/null 2>&1; then
+            echo -e "${GREEN}✅ Сертификат действителен еще минимум 30 дней${NC}"
+            return 0
+        else
+            echo -e "${YELLOW}⚠️ Сертификат истекает в ближайшие 30 дней, обновляем...${NC}"
+            return 1
+        fi
     else
+        echo -e "${YELLOW}⚠️ Сертификаты не найдены${NC}"
         return 1
     fi
 }
 
-if check_valid_letsencrypt_cert; then
-    echo -e "${GREEN}✅ SSL уже настроен корректно${NC}"
+create_temp_certificate() {
+    echo -e "${YELLOW}🔒 Создание временного самоподписанного сертификата...${NC}"
+    openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+        -keyout "$SSL_DIR/privkey.pem" \
+        -out "$SSL_DIR/fullchain.pem" \
+        -subj "/C=KG/ST=Bishkek/L=Bishkek/O=ManasTraining/CN=$DOMAIN"
+}
+
+if check_certificate; then
     exit 0
 fi
 
-if [ ! -f "$SSL_DIR/fullchain.pem" ] || [ "$FORCE_RENEW" = "true" ]; then
-    create_temp_certificate
-fi
+
+create_temp_certificate
 
 echo -e "${YELLOW}🚀 Запуск nginx для валидации домена...${NC}"
 docker-compose up -d nginx
 
-echo -e "${YELLOW}⏳ Ожидание запуска nginx...${NC}"
-sleep 10
-
-echo -e "${YELLOW}🔍 Проверка доступности веб-сервера...${NC}"
-if ! curl -f http://localhost/.well-known/acme-challenge/ > /dev/null 2>&1; then
-    echo -e "${YELLOW}⚠️ Веб-сервер может быть недоступен для валидации${NC}"
-fi
+sleep 15
 
 echo -e "${YELLOW}🌐 Получение SSL сертификата от Let's Encrypt...${NC}"
 
-if run_certbot_docker; then
-    if [ -f "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" ]; then
-        echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
-        cp "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
-        cp "$CERTBOT_DIR/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
-        chmod 644 "$SSL_DIR/fullchain.pem"
-        chmod 600 "$SSL_DIR/privkey.pem"
-        echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
-        
-        ISSUER=$(openssl x509 -in "$SSL_DIR/fullchain.pem" -noout -issuer)
-        if echo "$ISSUER" | grep -q "Let's Encrypt"; then
-            echo -e "${GREEN}✅ Подтверждено: сертификат выдан Let's Encrypt${NC}"
+if [ "$USE_DOCKER_CERTBOT" = "true" ]; then
+    if run_certbot_docker; then
+        if [ -f "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" ]; then
+            echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
+            cp "$CERTBOT_DIR/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
+            cp "$CERTBOT_DIR/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
+            chmod 644 "$SSL_DIR/fullchain.pem"
+            chmod 600 "$SSL_DIR/privkey.pem"
+            echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
         else
-            echo -e "${YELLOW}⚠️ Предупреждение: сертификат может быть не от Let's Encrypt${NC}"
+            echo -e "${RED}❌ Ошибка получения сертификата от Let's Encrypt${NC}"
+            echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
         fi
     else
-        echo -e "${RED}❌ Ошибка: сертификаты не найдены после выполнения Certbot${NC}"
+        echo -e "${RED}❌ Ошибка выполнения Certbot в Docker${NC}"
         echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
-        echo -e "${YELLOW}💡 Проверьте:${NC}"
-        echo -e "   1. DNS записи для $DOMAIN и www.$DOMAIN указывают на этот сервер"
-        echo -e "   2. Порты 80 и 443 открыты и доступны из интернета"
-        echo -e "   3. Nginx корректно настроен для webroot валидации"
     fi
 else
-    echo -e "${RED}❌ Ошибка выполнения Certbot${NC}"
-    echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
-    echo -e "${YELLOW}📋 Проверьте логи Certbot:${NC}"
-    ls -la "$CERTBOT_DIR/log/" 2>/dev/null || true
+    install_certbot_local
+
+    if certbot certonly \
+        --webroot \
+        --webroot-path=./nginx/html \
+        --email "$EMAIL" \
+        --agree-tos \
+        --no-eff-email \
+        --domains "$DOMAIN,www.$DOMAIN" \
+        --non-interactive \
+        --keep-until-expiring; then
+
+        if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+            echo -e "${YELLOW}📋 Копирование сертификатов...${NC}"
+            cp "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" "$SSL_DIR/"
+            cp "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$SSL_DIR/"
+            chmod 644 "$SSL_DIR/fullchain.pem"
+            chmod 600 "$SSL_DIR/privkey.pem"
+            echo -e "${GREEN}✅ SSL сертификат успешно установлен!${NC}"
+        else
+            echo -e "${RED}❌ Ошибка: сертификаты не найдены после успешного выполнения Certbot${NC}"
+            echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
+        fi
+    else
+        echo -e "${RED}❌ Ошибка выполнения Certbot${NC}"
+        echo -e "${YELLOW}🔒 Оставляем самоподписанный сертификат${NC}"
+    fi
 fi
 
 echo -e "${YELLOW}🔄 Перезапуск nginx с новыми сертификатами...${NC}"
 docker-compose restart nginx
 
-echo -e "${GREEN}🎉 SSL настройка завершена!${NC}"
+if [ "$USE_DOCKER_CERTBOT" = "false" ]; then
+    echo -e "${YELLOW}⏰ Настройка автоматического обновления сертификата...${NC}"
+    CRON_JOB="0 3 */1 * * /usr/bin/certbot renew --quiet --post-hook 'cd $(pwd) && docker-compose restart nginx'"
 
-echo -e "${YELLOW}🔍 Финальная проверка сертификата...${NC}"
-if [ -f "$SSL_DIR/fullchain.pem" ]; then
-    ISSUER=$(openssl x509 -in "$SSL_DIR/fullchain.pem" -noout -issuer)
-    echo -e "Издатель: $ISSUER"
-    
-    if echo "$ISSUER" | grep -q "ManasTraining"; then
-        echo -e "${YELLOW}⚠️ ВНИМАНИЕ: Используется самоподписанный сертификат!${NC}"
-        echo -e "${YELLOW}Для получения настоящего сертификата выполните:${NC}"
-        echo -e "${YELLOW}./setup-ssl.sh --force${NC}"
+    if ! crontab -l 2>/dev/null | grep -q "certbot renew"; then
+        (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+        echo -e "${GREEN}✅ Автоматическое обновление сертификата настроено${NC}"
+    else
+        echo -e "${GREEN}✅ Автоматическое обновление сертификата уже настроено${NC}"
     fi
 fi
+
+echo -e "${GREEN}🎉 SSL настройка завершена!${NC}"
