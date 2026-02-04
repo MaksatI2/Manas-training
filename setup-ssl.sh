@@ -43,12 +43,8 @@ mkdir -p "$SSL_DIR"
 mkdir -p "./nginx/logs"
 mkdir -p "./nginx/html/.well-known/acme-challenge"
 
-if [ -n "$CI" ] || [ -n "$GITLAB_CI" ]; then
-    echo -e "${YELLOW}🔧 Обнаружена CI среда, используем Docker для Certbot${NC}"
-    USE_DOCKER_CERTBOT=true
-else
-    USE_DOCKER_CERTBOT=false
-fi
+echo -e "${YELLOW}🐳 Используем Docker для Certbot${NC}"
+USE_DOCKER_CERTBOT=true
 
 install_certbot_local() {
     if ! command -v certbot &> /dev/null; then
@@ -169,17 +165,5 @@ fi
 
 echo -e "${YELLOW}🔄 Перезапуск nginx с новыми сертификатами...${NC}"
 docker-compose restart nginx
-
-if [ "$USE_DOCKER_CERTBOT" = "false" ]; then
-    echo -e "${YELLOW}⏰ Настройка автоматического обновления сертификата...${NC}"
-    CRON_JOB="0 3 */1 * * /usr/bin/certbot renew --quiet --post-hook 'cd $(pwd) && docker-compose restart nginx'"
-
-    if ! crontab -l 2>/dev/null | grep -q "certbot renew"; then
-        (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
-        echo -e "${GREEN}✅ Автоматическое обновление сертификата настроено${NC}"
-    else
-        echo -e "${GREEN}✅ Автоматическое обновление сертификата уже настроено${NC}"
-    fi
-fi
 
 echo -e "${GREEN}🎉 SSL настройка завершена!${NC}"
