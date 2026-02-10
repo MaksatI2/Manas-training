@@ -63,6 +63,7 @@ public class AdminCourseController {
     @PostMapping("/add")
     public String addCourse(@Valid @ModelAttribute("course") CreateCourseDto createCourseDto,
                             BindingResult bindingResult,
+                            HttpServletRequest request,
                             Model model,
                             RedirectAttributes redirectAttributes) {
 
@@ -80,6 +81,18 @@ public class AdminCourseController {
             List<CourseCategoryDto> categories = categoryAdminService.getAll(null);
             model.addAttribute("categories", categories);
             return "admin/course-add";
+        }
+
+        String[] activeValues = request.getParameterValues("active");
+        if (activeValues != null) {
+            boolean isActive = false;
+            for (String value : activeValues) {
+                if ("true".equals(value)) {
+                    isActive = true;
+                    break;
+                }
+            }
+            createCourseDto.setActive(isActive);
         }
 
         try {

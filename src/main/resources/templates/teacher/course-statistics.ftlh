@@ -27,7 +27,7 @@
     <@roadmap.breadcrumbs items=[
     {"label": bcHome, "url": "/"},
     {"label": bcMyCourses, "url": "/teacher/my-courses"},
-    {"label": bcCourse + " #" + courseInstance.id, "url": "/teacher/course/${courseInstance.id}"},
+    {"label": "${courseInstance.title}", "url": "/teacher/course/${courseInstance.id}"},
     {"label": bcStatistics, "url": "/"}
     ] />
     <div class="statistics-container">

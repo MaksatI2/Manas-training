@@ -85,11 +85,16 @@ check_certificate() {
     if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
         echo -e "${GREEN}✅ SSL сертификат уже существует${NC}"
 
+        if ! openssl x509 -in "$SSL_DIR/fullchain.pem" -noout -issuer | grep -qi "Let's Encrypt"; then
+            echo -e "${YELLOW}⚠️ Сертификат не от Let's Encrypt, получаем новый...${NC}"
+            return 1
+        fi
+
         if openssl x509 -checkend 2592000 -noout -in "$SSL_DIR/fullchain.pem" > /dev/null 2>&1; then
-            echo -e "${GREEN}✅ Сертификат действителен еще минимум 30 дней${NC}"
+            echo -e "${GREEN}✅ Сертификат Let's Encrypt действителен еще минимум 30 дней${NC}"
             return 0
         else
-            echo -e "${YELLOW}⚠️ Сертификат истекает в ближайшие 30 дней, обновляем...${NC}"
+            echo -e "${YELLOW}⚠️ Сертификат Let's Encrypt истекает в ближайшие 30 дней, обновляем...${NC}"
             return 1
         fi
     else
