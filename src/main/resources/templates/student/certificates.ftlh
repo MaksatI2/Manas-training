@@ -94,106 +94,103 @@
         </div>
     </#if>
 
-    <#noparse>
-        <script>
-            // If Spring Security CSRF meta tags are present in layout:
-            // <meta name="_csrf" content="...">
-            // <meta name="_csrf_header" content="...">
-            function getCsrfHeaders() {
-                const token = document.querySelector('meta[name="_csrf"]')?.content;
-                const header = document.querySelector('meta[name="_csrf_header"]')?.content;
-                const headers = { 'X-Requested-With': 'XMLHttpRequest' };
-                if (token && header) headers[header] = token;
-                return headers;
-            }
+    <script>
+        function getCsrfHeaders() {
+            const token = document.querySelector('meta[name="_csrf"]')?.content;
+            const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+            const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+            if (token && header) headers[header] = token;
+            return headers;
+        }
 
-            async function shareCertificate(certId) {
-                try {
-                    const res = await fetch(`/student/certificates/${certId}/public?enabled=true`, {
-                        method: 'POST',
-                        headers: getCsrfHeaders()
-                    });
-
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-                    const data = await res.json(); // { isPublic, publicUrl, publicToken }
-
-                    if (!data.publicUrl) throw new Error('No publicUrl returned');
-
-                    const fullUrl = new URL(data.publicUrl, window.location.origin).href;
-                    await navigator.clipboard.writeText(fullUrl);
-
-                    showToast("Публичная ссылка создана и скопирована", "success");
-                } catch (e) {
-                    console.error(e);
-                    showToast("Не удалось создать или скопировать ссылку", "error");
-                }
-            }
-
-            async function disableShare(certId) {
-                try {
-                    const res = await fetch(`/student/certificates/${certId}/public?enabled=false`, {
-                        method: 'POST',
-                        headers: getCsrfHeaders()
-                    });
-
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-                    showToast("Публичная ссылка отключена", "success");
-                } catch (e) {
-                    console.error(e);
-                    showToast("Не удалось отключить публичную ссылку", "error");
-                }
-            }
-
-            function showToast(message, type) {
-                const toast = document.createElement('div');
-                toast.className = `toast-notification ${type}`;
-                toast.innerHTML = `
-                    <div class="toast-content">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                        <span>${message}</span>
-                    </div>
-                    <button class="toast-close" onclick="this.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-
-                document.body.appendChild(toast);
-
-                setTimeout(() => toast.classList.add('show'), 100);
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 300);
-                }, 4000);
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.map(function (tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl);
+        async function shareCertificate(certId) {
+            try {
+                const res = await fetch('/student/certificates/' + certId + '/public?enabled=true', {
+                    method: 'POST',
+                    headers: getCsrfHeaders()
                 });
 
-                const observerOptions = {
-                    threshold: 0.1,
-                    rootMargin: '0px 0px -50px 0px'
-                };
+                if (!res.ok) throw new Error('HTTP ' + res.status);
 
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('animate-in');
-                        }
-                    });
-                }, observerOptions);
+                const data = await res.json();
 
-                document.querySelectorAll('.certificate-card').forEach(card => {
-                    observer.observe(card);
+                if (!data.publicUrl) throw new Error('No publicUrl returned');
+
+                const fullUrl = new URL(data.publicUrl, window.location.origin).href;
+                await navigator.clipboard.writeText(fullUrl);
+
+                showToast("Публичная ссылка создана и скопирована", "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Не удалось создать или скопировать ссылку", "error");
+            }
+        }
+
+        async function disableShare(certId) {
+            try {
+                const res = await fetch('/student/certificates/' + certId + '/public?enabled=false', {
+                    method: 'POST',
+                    headers: getCsrfHeaders()
                 });
+
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+
+                showToast("Публичная ссылка отключена", "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Не удалось отключить публичную ссылку", "error");
+            }
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification ' + type;
+
+            const iconClass = type === 'success' ? 'check-circle' : 'exclamation-circle';
+
+            toast.innerHTML = '\
+                <div class="toast-content">\
+                    <i class="fas fa-' + iconClass + '"></i>\
+                    <span>' + message + '</span>\
+                </div>\
+                <button class="toast-close" onclick="this.parentElement.remove()">\
+                    <i class="fas fa-times"></i>\
+                </button>\
+            ';
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
-        </script>
-    </#noparse>
 
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.certificate-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
     <style>
         :root {
             --primary-color: #667eea;

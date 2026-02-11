@@ -27,6 +27,8 @@ public class SecurityConfig {
                         .requestMatchers("/courses/{id}/tests").authenticated()
                         .requestMatchers(
                                 "/",
+                                "/actuator/health",
+                                "/actuator/info",
                                 "/auth/**",
                                 "/static/**",
                                 "/js/**",
