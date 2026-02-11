@@ -57,46 +57,15 @@ deploy:
 
     # Копируем jar файл
     - echo "📦 Копирование JAR файла..."
-    - ls -la target/*.jar || (echo "❌ JAR файл не найден!" && exit 1)
     - sshpass -e scp -o StrictHostKeyChecking=no target/*.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/
 
-    # Синхронизируем файлы (исправленная версия)
+    # Синхронизируем файлы - ВСЕ В ОДНОЙ СТРОКЕ!
     - echo "🔄 Синхронизация файлов..."
-    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" \
-      --exclude='data' \
-      --exclude='postgres/**' \
-      --exclude='logs/**' \
-      --exclude='nginx/ssl/**' \
-      --exclude='nginx/logs' \
-      --exclude='nginx/html/.well-known' \
-      --exclude='letsencrypt/**' \
-      --exclude='target' \
-      --exclude='.git' \
-      --exclude='.m2' \
-      --exclude='.idea' \
-      --exclude='*.iml' \
-      --exclude='README.md' \
-      ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
-
-    # Проверяем и устанавливаем права на скрипты
-    - echo "🔧 Настройка скриптов..."
-    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "
-      cd $DEPLOY_PATH &&
-      if [ -f deploy.sh ]; then chmod +x deploy.sh; else echo '⚠️ deploy.sh не найден'; fi &&
-      if [ -f setup-ssl.sh ]; then chmod +x setup-ssl.sh; else echo '⚠️ setup-ssl.sh не найден'; fi
-      "
+    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" --exclude='data' --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/logs' --exclude='nginx/html/.well-known' --exclude='letsencrypt/**' --exclude='target' --exclude='.git' --exclude='.m2' --exclude='.idea' --exclude='*.iml' --exclude='README.md' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
 
     # Запускаем деплой скрипт
     - echo "🚀 Запуск deploy.sh..."
-    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "
-      cd $DEPLOY_PATH &&
-      if [ -f deploy.sh ]; then
-      ./deploy.sh
-      else
-      echo '❌ deploy.sh не найден, пропускаем запуск'
-      exit 1
-      fi
-      "
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh 2>/dev/null || true && ./deploy.sh"
 
     - echo "✅ Деплой завершен успешно!"
   dependencies:
