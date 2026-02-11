@@ -18,7 +18,7 @@ build:
 
   script:
     # Сборка backend
-    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+    - mvn clean package -Dmaven.test.skip=true
 
     # Берём только нормальный spring boot jar
     - cp target/*SNAPSHOT.jar target/app.jar
