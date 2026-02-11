@@ -11,16 +11,19 @@ cache:
   paths:
     - .m2/repository/
 
+# ---------- BUILD ----------
 build:
   stage: build
   image: maven:3.8.6-eclipse-temurin-17
+
   script:
+    # Сборка Spring Boot
     - mvn $MAVEN_CLI_OPTS clean package -DskipTests
 
-    # ВАЖНО: берём только нормальный spring boot jar
+    # Берём только финальный boot jar (НЕ .jar.original)
     - cp target/*SNAPSHOT.jar target/app.jar
 
-    - echo "Build complete:"
+    - echo "=== BUILD SUCCESS ==="
     - ls -lh target/app.jar
 
   artifacts:
@@ -32,11 +35,12 @@ build:
     - dev
 
 
+# ---------- DEPLOY ----------
 deploy:
   stage: deploy
   image: ubuntu:20.04
 
-  # ВОТ ЭТО ИСПРАВЛЯЕТ undefined dependency
+  # получаем app.jar из build
   needs:
     - job: build
       artifacts: true
@@ -51,32 +55,34 @@ deploy:
     - echo "🚀 Deploy to $DEPLOY_SERVER"
     - export SSHPASS=$SSH_PASSWORD
 
-    # 1) директория
+    # 1) создаём папку
     - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH/target"
 
-    # 2) копируем jar
+    # 2) копируем JAR
     - echo "📦 Upload app.jar..."
     - sshpass -e scp -o StrictHostKeyChecking=no target/app.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/app.jar
 
-    # 3) синхронизация проекта
-    - echo "🔄 Rsync project files..."
-    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" \
-      --exclude='data' \
-      --exclude='postgres/**' \
-      --exclude='logs/**' \
-      --exclude='nginx/ssl/**' \
-      --exclude='nginx/logs' \
-      --exclude='nginx/html/.well-known' \
-      --exclude='letsencrypt/**' \
-      --exclude='target' \
-      --exclude='.git' \
-      --exclude='.m2' \
-      --exclude='.idea' \
-      --exclude='*.iml' \
-      --exclude='README.md' \
+    # 3) rsync (ВАЖНО: многострочная команда)
+    - echo "🔄 Sync project files..."
+    - |
+      sshpass -e rsync -avz --delete \
+      -e "ssh -o StrictHostKeyChecking=no" \
+      --exclude 'data' \
+      --exclude 'postgres/**' \
+      --exclude 'logs/**' \
+      --exclude 'nginx/ssl/**' \
+      --exclude 'nginx/logs' \
+      --exclude 'nginx/html/.well-known' \
+      --exclude 'letsencrypt/**' \
+      --exclude 'target' \
+      --exclude '.git' \
+      --exclude '.m2' \
+      --exclude '.idea' \
+      --exclude '*.iml' \
+      --exclude 'README.md' \
       ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
 
-    # 4) запуск
+    # 4) запуск deploy.sh
     - echo "🚀 Run deploy.sh..."
     - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "\
       cd $DEPLOY_PATH && \
