@@ -13,7 +13,7 @@ import manasTrainingService.dto.tests.TestDto;
 import manasTrainingService.entity.*;
 import manasTrainingService.exceptions.nsee.IncorrectDateException;
 import manasTrainingService.exceptions.nsee.TestNotFoundException;
-import manasTrainingService.repositories.test.TestRepository;
+import manasTrainingService.repositories.TestRepository;
 import manasTrainingService.service.*;
 import manasTrainingService.service.course.CourseService;
 import manasTrainingService.service.test.TestAnswerService;
