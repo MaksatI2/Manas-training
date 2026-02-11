@@ -14,6 +14,16 @@ spring:
   jackson:
     time-zone: Asia/Bishkek
 
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info
+    endpoint:
+      health:
+        probes:
+          enabled: true
+
   servlet:
     multipart:
       enabled: true
