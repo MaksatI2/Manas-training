@@ -18,6 +18,6 @@ public class PublicCertificateController {
     public String viewPublic(@PathVariable String token, Model model) {
         Certificate cert = certificateService.getPublicCertificateOrThrow(token);
         model.addAttribute("certificate", cert);
-        return "public/certificate-view";
+        return "public/viewCertificate";
     }
 }

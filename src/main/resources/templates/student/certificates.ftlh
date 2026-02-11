@@ -68,9 +68,23 @@
                                 <i class="fa-solid fa-circle-info"></i>
                                 <span>Просмотр</span>
                             </a>
-                            <button type="button" class="action-btn tertiary" title="Скопировать ссылку" data-bs-toggle="tooltip" onclick="copyLink('${cert.viewUrl}')">
+
+                            <button type="button"
+                                    class="action-btn tertiary"
+                                    title="Создать публичную ссылку и скопировать"
+                                    data-bs-toggle="tooltip"
+                                    onclick="shareCertificate(${cert.id})">
                                 <i class="fas fa-link"></i>
                                 <span>Поделиться</span>
+                            </button>
+
+                            <button type="button"
+                                    class="action-btn tertiary"
+                                    title="Отключить публичную ссылку"
+                                    data-bs-toggle="tooltip"
+                                    onclick="disableShare(${cert.id})">
+                                <i class="fas fa-ban"></i>
+                                <span>Отключить</span>
                             </button>
                         </div>
 
@@ -82,11 +96,54 @@
 
     <#noparse>
         <script>
-            function copyLink(path) {
-                const url = window.location.origin + path;
-                navigator.clipboard.writeText(url)
-                    .then(() => showToast("Ссылка успешно скопирована в буфер обмена", "success"))
-                    .catch(() => showToast("Не удалось скопировать ссылку", "error"));
+            // If Spring Security CSRF meta tags are present in layout:
+            // <meta name="_csrf" content="...">
+            // <meta name="_csrf_header" content="...">
+            function getCsrfHeaders() {
+                const token = document.querySelector('meta[name="_csrf"]')?.content;
+                const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+                const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+                if (token && header) headers[header] = token;
+                return headers;
+            }
+
+            async function shareCertificate(certId) {
+                try {
+                    const res = await fetch(`/student/certificates/${certId}/public?enabled=true`, {
+                        method: 'POST',
+                        headers: getCsrfHeaders()
+                    });
+
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                    const data = await res.json(); // { isPublic, publicUrl, publicToken }
+
+                    if (!data.publicUrl) throw new Error('No publicUrl returned');
+
+                    const fullUrl = new URL(data.publicUrl, window.location.origin).href;
+                    await navigator.clipboard.writeText(fullUrl);
+
+                    showToast("Публичная ссылка создана и скопирована", "success");
+                } catch (e) {
+                    console.error(e);
+                    showToast("Не удалось создать или скопировать ссылку", "error");
+                }
+            }
+
+            async function disableShare(certId) {
+                try {
+                    const res = await fetch(`/student/certificates/${certId}/public?enabled=false`, {
+                        method: 'POST',
+                        headers: getCsrfHeaders()
+                    });
+
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                    showToast("Публичная ссылка отключена", "success");
+                } catch (e) {
+                    console.error(e);
+                    showToast("Не удалось отключить публичную ссылку", "error");
+                }
             }
 
             function showToast(message, type) {
@@ -362,35 +419,6 @@
             flex-shrink: 0;
         }
 
-        .detail-item.warning {
-            color: var(--warning-color);
-        }
-
-        .detail-item.expired {
-            color: var(--danger-color);
-        }
-
-        .status-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-left: auto;
-        }
-
-        .status-badge.warning {
-            background: rgba(255, 152, 0, 0.1);
-            color: var(--warning-color);
-        }
-
-        .status-badge.expired {
-            background: rgba(244, 67, 54, 0.1);
-            color: var(--danger-color);
-        }
-
-        /* Actions */
         .certificate-actions {
             display: flex;
             gap: 0.75rem;
@@ -443,18 +471,6 @@
             color: white;
         }
 
-        .action-btn.secondary {
-            background: var(--secondary-gradient);
-            color: white;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .action-btn.secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            color: white;
-        }
-
         .action-btn.tertiary {
             background: var(--bg-secondary);
             color: var(--text-primary);
@@ -465,38 +481,6 @@
             background: var(--text-primary);
             color: white;
             transform: translateY(-2px);
-        }
-
-        .progress-ring {
-            position: absolute;
-            bottom: 2rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-        }
-
-        .progress-ring svg {
-            transform: rotate(-90deg);
-        }
-
-        .progress-circle {
-            stroke-linecap: round;
-            animation: draw-circle 2s ease-out forwards;
-        }
-
-        @keyframes draw-circle {
-            from { stroke-dashoffset: 157; }
-            to { stroke-dashoffset: 0; }
-        }
-
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--success-color);
         }
 
         .toast-notification {
@@ -565,39 +549,13 @@
         }
 
         @media (max-width: 768px) {
-            .certificates-header {
-                padding: 1.5rem;
-            }
-
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-                gap: 1rem;
-            }
-
-            .header-title {
-                font-size: 1.5rem;
-            }
-
-            .stats-card {
-                margin-top: 1rem;
-            }
-
             .certificates-grid {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
             }
 
-            .certificate-card {
-                margin: 0 1rem;
-            }
-
             .certificate-actions {
                 flex-direction: column;
-            }
-
-            .action-btn {
-                min-width: auto;
             }
 
             .toast-notification {
@@ -622,10 +580,6 @@
                 width: 50px;
                 height: 50px;
                 font-size: 1.2rem;
-            }
-
-            .progress-ring {
-                display: none;
             }
         }
     </style>
