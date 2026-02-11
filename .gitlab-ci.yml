@@ -1,5 +1,4 @@
 stages:
-  - test
   - build
   - deploy
 
@@ -8,35 +7,25 @@ variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
 
 cache:
+  key: "m2-cache"
   paths:
     - .m2/repository/
-    - target/
-
-test:
-  stage: test
-  image: maven:3.8.6-eclipse-temurin-17
-  script:
-    - mvn $MAVEN_CLI_OPTS clean test
-  artifacts:
-    reports:
-      junit:
-        - target/surefire-reports/TEST-*.xml
-    paths:
-      - target/surefire-reports/
-    expire_in: 1 week
-    when: always
-  coverage: '/Total.*?([0-9]{1,3})%/'
-  rules:
-    - when: never
 
 build:
   stage: build
   image: maven:3.8.6-eclipse-temurin-17
   script:
-    - mvn $MAVEN_CLI_OPTS compile package -DskipTests
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+    # Делаем один понятный jar
+    - cp target/*.jar target/app.jar
+    # Быстрая проверка: нужный класс реально есть в jar
+    - echo "🔎 Check Test.class inside jar:"
+    - jar tf target/app.jar | grep -F "manasTrainingService/entity/Test.class" || (echo "❌ NO Test.class in jar!" && exit 1)
+    - echo "✅ Build done. app.jar:"
+    - ls -lh target/app.jar
   artifacts:
     paths:
-      - target/*.jar
+      - target/app.jar
     expire_in: 1 day
   only:
     - dev
@@ -49,25 +38,50 @@ deploy:
     - mkdir -p ~/.ssh
     - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts 2>/dev/null || true
   script:
-    - echo "🚀 Деплой на сервер $DEPLOY_SERVER"
+    - echo "🚀 Deploy to $DEPLOY_SERVER"
     - export SSHPASS=$SSH_PASSWORD
 
-    # Создаем директорию target
+    # 1) Создаем директорию на сервере
     - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH/target"
 
-    # Копируем jar файл
-    - echo "📦 Копирование JAR файла..."
-    - sshpass -e scp -o StrictHostKeyChecking=no target/*.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/
+    # 2) Копируем только app.jar
+    - echo "📦 Upload app.jar..."
+    - sshpass -e scp -o StrictHostKeyChecking=no target/app.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/app.jar
 
-    # Синхронизируем файлы - ВСЕ В ОДНОЙ СТРОКЕ!
-    - echo "🔄 Синхронизация файлов..."
-    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" --exclude='data' --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/logs' --exclude='nginx/html/.well-known' --exclude='letsencrypt/**' --exclude='target' --exclude='.git' --exclude='.m2' --exclude='.idea' --exclude='*.iml' --exclude='README.md' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
+    # 3) Синхронизируем проект (без target, логов, и т.п.)
+    - echo "🔄 Rsync project files..."
+    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" \
+      --exclude='data' \
+      --exclude='postgres/**' \
+      --exclude='logs/**' \
+      --exclude='nginx/ssl/**' \
+      --exclude='nginx/logs' \
+      --exclude='nginx/html/.well-known' \
+      --exclude='letsencrypt/**' \
+      --exclude='target' \
+      --exclude='.git' \
+      --exclude='.m2' \
+      --exclude='.idea' \
+      --exclude='*.iml' \
+      --exclude='README.md' \
+      ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
 
-    # Запускаем деплой скрипт
-    - echo "🚀 Запуск deploy.sh..."
-    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh 2>/dev/null || true && ./deploy.sh"
+    # 4) Проверяем на сервере что jar нормальный (и Test.class внутри есть)
+    - echo "🔎 Verify jar on server..."
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "\
+      ls -lh $DEPLOY_PATH/target/app.jar && \
+      jar tf $DEPLOY_PATH/target/app.jar | grep -F 'manasTrainingService/entity/Test.class' || (echo '❌ NO Test.class on server jar' && exit 1) \
+      "
 
-    - echo "✅ Деплой завершен успешно!"
+    # 5) Запускаем deploy.sh
+    - echo "🚀 Run deploy.sh..."
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "\
+      cd $DEPLOY_PATH && \
+      chmod +x deploy.sh 2>/dev/null || true && \
+      ./deploy.sh \
+      "
+
+    - echo "✅ Deploy finished!"
   dependencies:
     - build
   environment:

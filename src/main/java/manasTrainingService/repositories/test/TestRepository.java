@@ -1,4 +1,4 @@
-package manasTrainingService.repositories;
+package manasTrainingService.repositories.test;
 
 import manasTrainingService.entity.Test;
 import org.springframework.data.jpa.repository.JpaRepository;
