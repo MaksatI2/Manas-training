@@ -143,13 +143,13 @@
                 <div class="nav-item">
                     <a href="/" class="nav-link" data-tooltip="<@spring.message code='sidebar.home' />">
                         <i class="fas fa-home"></i>
-                        <span><@spring.message code="sidebar.home" />llo</span>
+                        <span><@spring.message code="sidebar.home" /></span>
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="/courses" class="nav-link" data-tooltip="<@spring.message code='sidebar.courses' />">
                         <i class="fas fa-book"></i>
-                        <span><@spring.message code="sidebar.courses" />llo</span>
+                        <span><@spring.message code="sidebar.courses" /></span>
                     </a>
                 </div>
                 <div class="nav-item">

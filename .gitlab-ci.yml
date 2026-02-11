@@ -51,11 +51,22 @@ deploy:
   script:
     - echo "🚀 Деплой на сервер $DEPLOY_SERVER"
     - export SSHPASS=$SSH_PASSWORD
-    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH"
-    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" --exclude='data' --exclude='data/**' --exclude='postgres/**' --exclude='logs/**' --exclude='nginx/ssl/**' --exclude='nginx/ssl' --exclude='nginx/logs' --exclude='nginx/html/.well-known' --exclude='letsencrypt' --exclude='letsencrypt/**' --exclude='target' --exclude='target/**' ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
+
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH/target"
+    - sshpass -e scp -o StrictHostKeyChecking=no target/*.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/
+
+    - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" \
+      --exclude='data' --exclude='postgres/**' --exclude='logs/**' \
+      --exclude='nginx/ssl/**' --exclude='nginx/logs' \
+      --exclude='nginx/html/.well-known' --exclude='letsencrypt/**' \
+      --exclude='target' \
+      ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
+
     - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && chmod +x deploy.sh && chmod +x setup-ssl.sh"
     - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && ./deploy.sh"
     - echo "✅ Деплой завершен успешно!"
+  dependencies:
+    - build
   environment:
     name: production
     url: $PRODUCTION_URL
