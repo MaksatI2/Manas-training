@@ -209,4 +209,7 @@ databaseChangeLog:
   - include:
       file: db/changelog/fixes/070_fix_meetingUrl.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/data/071_public_certificates.sql
+      relativeToChangelogFile: false
 
