@@ -18,6 +18,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -286,4 +287,63 @@ public class CertificateServiceImpl implements CertificateService {
                 .downloadUrl("/student/certificates/" + c.getId() + "/pdf")
                 .build();
     }
+
+    @Override
+public CertificateShareDto setPublicAccess(Integer certId, Integer studentId, boolean makePublic) {
+    Certificate cert = certRepo.findByIdAndStudentId(certId, studentId)
+            .orElseThrow(() -> new EntityNotFoundException(
+                    messageSource.getMessage(
+                            "certificate.not.found",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            ));
+
+    if (makePublic) {
+        if (cert.getPublicToken() == null || cert.getPublicToken().isBlank()) {
+            cert.setPublicToken(UUID.randomUUID().toString());
+        }
+        cert.setIsPublic(true);
+    } else {
+        cert.setIsPublic(false);
+        cert.setPublicToken(null);
+    }
+
+    certRepo.save(cert);
+
+    String url = cert.getIsPublic() != null && cert.getIsPublic()
+            ? "/certificates/public/" + cert.getPublicToken()
+            : null;
+
+    return CertificateShareDto.builder()
+            .isPublic(cert.getIsPublic())
+            .publicToken(cert.getPublicToken())
+            .publicUrl(url)
+            .build();
+}
+
+@Override
+public Certificate getPublicCertificateOrThrow(String token) {
+    Certificate cert = certRepo.findByPublicToken(token)
+            .orElseThrow(() -> new EntityNotFoundException(
+                    messageSource.getMessage(
+                            "certificate.not.found",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    )
+            ));
+
+    if (cert.getIsPublic() == null || !cert.getIsPublic()) {
+        throw new EntityNotFoundException(
+                messageSource.getMessage(
+                        "certificate.not.found",
+                        null,
+                        LocaleContextHolder.getLocale()
+                )
+        );
+    }
+
+    return cert;
+}
+
 }

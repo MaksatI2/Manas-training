@@ -39,4 +39,9 @@ public interface CertificateService {
     long getCertificatesIssuedThisMonth(LocalDate startDate, LocalDate endDate);
 
     List<StudentCertificateDetailDto> findAllDetailsByStudentId(Integer studentId);
+
+    CertificateShareDto setPublicAccess(Integer certId, Integer studentId, boolean makePublic);
+
+    Certificate getPublicCertificateOrThrow(String token);
+
 }

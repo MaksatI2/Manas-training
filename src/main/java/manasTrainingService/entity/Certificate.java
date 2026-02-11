@@ -54,6 +54,13 @@ public class Certificate {
 
     Integer mark;
 
+    @Column(name = "is_public", nullable = false)
+    @Builder.Default
+    Boolean isPublic = false;
+
+    @Column(name = "public_token", unique = true, length = 36)
+    String publicToken;
+
     @Column(name = "created_at", nullable = false)
     @Builder.Default
     LocalDateTime createdAt = LocalDateTime.now();

@@ -1,9 +1,8 @@
 package manasTrainingService.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import manasTrainingService.config.CustomUserDetails;
-import manasTrainingService.dto.certificate.CertificateViewDto;
+import manasTrainingService.dto.certificate.CertificateShareDto;
 import manasTrainingService.dto.certificate.StudentCertificateDetailDto;
 import manasTrainingService.entity.Certificate;
 import manasTrainingService.entity.CourseEnrollment;
@@ -12,14 +11,16 @@ import manasTrainingService.service.EnrollmentService;
 import manasTrainingService.service.certificate.CertificateService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Locale;
@@ -62,5 +63,17 @@ public class StudentCertificateController {
 
         return "admin/viewCertificate";
     }
+
+    @PostMapping("/{id}/public")
+        @ResponseBody
+        public ResponseEntity<CertificateShareDto> setPublic(
+        @PathVariable Integer id,
+        @AuthenticationPrincipal CustomUserDetails user,
+        @RequestParam boolean enabled
+        ) {
+        Integer studentId = user.getUser().getId();
+        CertificateShareDto dto = cas.setPublicAccess(id, studentId, enabled);
+        return ResponseEntity.ok(dto);
+        }
 
 }

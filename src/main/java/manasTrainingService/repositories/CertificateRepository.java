@@ -31,7 +31,8 @@ public interface CertificateRepository extends JpaRepository<Certificate, Intege
     WHERE c.id = :id
     """)
     Optional<Certificate> findByIdWithModules(@Param("id") Integer id);
-
     long countByIssueDateBetween(LocalDate startDate, LocalDate endDate);
-
+    Optional<Certificate> findByPublicToken(String publicToken);
+    @Query("select c from Certificate c where c.id = :id and c.student.id = :studentId")
+    Optional<Certificate> findByIdAndStudentId(@Param("id") Integer id, @Param("studentId") Integer studentId);
 }
