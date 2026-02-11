@@ -149,7 +149,8 @@
                 <div class="nav-item">
                     <a href="/courses" class="nav-link" data-tooltip="<@spring.message code='sidebar.courses' />">
                         <i class="fas fa-book"></i>
-                        <span><@spring.message code="sidebar.courses" /></span>
+                        <span><@spring.message code="sidebar.courses" /
+                        лло></span>
                     </a>
                 </div>
                 <div class="nav-item">
