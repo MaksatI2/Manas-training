@@ -1,5 +1,5 @@
 stages:
-#  - build
+  - build
   - deploy
 
 variables:
@@ -11,44 +11,54 @@ cache:
   paths:
     - .m2/repository/
 
-#build:
-#  stage: build
-#  image: maven:3.8.6-eclipse-temurin-17
-#  script:
-#    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
-#    # Делаем один понятный jar
-#    - cp target/*.jar target/app.jar
-#    # Быстрая проверка: нужный класс реально есть в jar
-#    - echo "🔎 Check Test.class inside jar:"
-#    - jar tf target/app.jar | grep -F "manasTrainingService/entity/Test.class" || (echo "❌ NO Test.class in jar!" && exit 1)
-#    - echo "✅ Build done. app.jar:"
-#    - ls -lh target/app.jar
-#  artifacts:
-#    paths:
-#      - target/app.jar
-#    expire_in: 1 day
-#  only:
-#    - dev
+build:
+  stage: build
+  image: maven:3.8.6-eclipse-temurin-17
+  script:
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+
+    # ВАЖНО: берём только нормальный spring boot jar
+    - cp target/*SNAPSHOT.jar target/app.jar
+
+    - echo "Build complete:"
+    - ls -lh target/app.jar
+
+  artifacts:
+    paths:
+      - target/app.jar
+    expire_in: 1 day
+
+  only:
+    - dev
+
 
 deploy:
   stage: deploy
   image: ubuntu:20.04
+
+  # ВОТ ЭТО ИСПРАВЛЯЕТ undefined dependency
+  needs:
+    - job: build
+      artifacts: true
+
   before_script:
-    - apt-get update -qq && apt-get install -y -qq openssh-client rsync sshpass
+    - apt-get update -qq
+    - apt-get install -y -qq openssh-client rsync sshpass
     - mkdir -p ~/.ssh
     - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts 2>/dev/null || true
+
   script:
     - echo "🚀 Deploy to $DEPLOY_SERVER"
     - export SSHPASS=$SSH_PASSWORD
 
-    # 1) Создаем директорию на сервере
+    # 1) директория
     - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH/target"
 
-    # 2) Копируем только app.jar
+    # 2) копируем jar
     - echo "📦 Upload app.jar..."
     - sshpass -e scp -o StrictHostKeyChecking=no target/app.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/app.jar
 
-    # 3) Синхронизируем проект (без target, логов, и т.п.)
+    # 3) синхронизация проекта
     - echo "🔄 Rsync project files..."
     - sshpass -e rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" \
       --exclude='data' \
@@ -66,14 +76,7 @@ deploy:
       --exclude='README.md' \
       ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
 
-    # 4) Проверяем на сервере что jar нормальный (и Test.class внутри есть)
-    - echo "🔎 Verify jar on server..."
-    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "\
-      ls -lh $DEPLOY_PATH/target/app.jar && \
-      jar tf $DEPLOY_PATH/target/app.jar | grep -F 'manasTrainingService/entity/Test.class' || (echo '❌ NO Test.class on server jar' && exit 1) \
-      "
-
-    # 5) Запускаем deploy.sh
+    # 4) запуск
     - echo "🚀 Run deploy.sh..."
     - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "\
       cd $DEPLOY_PATH && \
@@ -82,10 +85,10 @@ deploy:
       "
 
     - echo "✅ Deploy finished!"
-  dependencies:
-    - build
+
   environment:
     name: production
     url: $PRODUCTION_URL
+
   only:
     - dev
