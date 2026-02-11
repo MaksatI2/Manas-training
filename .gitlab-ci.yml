@@ -1,5 +1,5 @@
 stages:
-  - build
+#  - build
   - deploy
 
 variables:
@@ -11,24 +11,24 @@ cache:
   paths:
     - .m2/repository/
 
-build:
-  stage: build
-  image: maven:3.8.6-eclipse-temurin-17
-  script:
-    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
-    # Делаем один понятный jar
-    - cp target/*.jar target/app.jar
-    # Быстрая проверка: нужный класс реально есть в jar
-    - echo "🔎 Check Test.class inside jar:"
-    - jar tf target/app.jar | grep -F "manasTrainingService/entity/Test.class" || (echo "❌ NO Test.class in jar!" && exit 1)
-    - echo "✅ Build done. app.jar:"
-    - ls -lh target/app.jar
-  artifacts:
-    paths:
-      - target/app.jar
-    expire_in: 1 day
-  only:
-    - dev
+#build:
+#  stage: build
+#  image: maven:3.8.6-eclipse-temurin-17
+#  script:
+#    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+#    # Делаем один понятный jar
+#    - cp target/*.jar target/app.jar
+#    # Быстрая проверка: нужный класс реально есть в jar
+#    - echo "🔎 Check Test.class inside jar:"
+#    - jar tf target/app.jar | grep -F "manasTrainingService/entity/Test.class" || (echo "❌ NO Test.class in jar!" && exit 1)
+#    - echo "✅ Build done. app.jar:"
+#    - ls -lh target/app.jar
+#  artifacts:
+#    paths:
+#      - target/app.jar
+#    expire_in: 1 day
+#  only:
+#    - dev
 
 deploy:
   stage: deploy
