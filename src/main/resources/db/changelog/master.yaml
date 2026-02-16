@@ -218,4 +218,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/data/073_insert_admin_only.sql
       relativeToChangelogFile: false
-
+  - include:
+      file: db/changelog/data/074_insert_teacher_profiles.sql
+      relativeToChangelogFile: false
