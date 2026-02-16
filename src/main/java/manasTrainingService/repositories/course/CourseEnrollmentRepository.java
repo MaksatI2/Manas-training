@@ -1,0 +1,69 @@
+package manasTrainingService.repositories.course;
+
+import manasTrainingService.entity.CourseEnrollment;
+import manasTrainingService.entity.CourseInstance;
+import manasTrainingService.entity.Status;
+import manasTrainingService.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollment, Integer> {
+    List<CourseEnrollment> findAllByCourseInstanceId(Integer courseId);
+
+    List<CourseEnrollment> findAllByStudentId(Integer studentId);
+
+    Optional<CourseEnrollment> findByCourseInstanceIdAndStudentId(Integer courseId, Integer studentId);
+
+    List<CourseEnrollment> findAllByCourseInstanceIdAndStatus(Integer courseId, Status status);
+
+    List<CourseEnrollment> findAllByStudentIdAndStatus(Integer studentId, Status status);
+
+    List<CourseEnrollment> findByCourseInstanceId(Integer courseInstanceId);
+
+    boolean existsByCourseInstanceIdAndStudentId(Integer courseInstanceId, Integer studentId);
+    boolean existsByCourseInstanceIdAndStudentIdAndStatus(Integer courseInstanceId, Integer studentId, Status status);
+
+
+    List<CourseEnrollment> findByStudentIdAndStatus(Integer studentId, Status status);
+
+    boolean existsByStudentIdAndCourseInstanceId(Integer studentId, Integer courseInstanceId);
+
+    List<CourseEnrollment> findByStudentIn(List<User> students);
+
+    List<CourseEnrollment> findByStudent(User student);
+
+    @Query("""
+                SELECT e FROM CourseEnrollment e
+                JOIN FETCH e.courseInstance ci
+                JOIN FETCH ci.course
+                WHERE e.student IN :students
+            """)
+    List<CourseEnrollment> findWithCourseByStudentIn(@Param("students") List<User> students);
+
+    @Query("SELECT DISTINCT e.student FROM CourseEnrollment e WHERE e.completionDate IS NOT NULL")
+    Page<User> findStudentsWithCompletedCourses(Pageable pageable);
+
+    @Query("SELECT e.courseInstance FROM CourseEnrollment e WHERE e.student.id = :studentId AND e.completionDate IS NOT NULL")
+    List<CourseInstance> findCompletedCourseInstancesByStudentId(@Param("studentId") Integer studentId);
+
+    List<CourseEnrollment> findByStudentIdAndCompletionDateIsNotNull(Integer studentId);
+
+    List<CourseEnrollment> findByStudentIdAndCourseInstanceId(Integer studentId, Integer courseInstanceId);
+    @Query("""
+    SELECT e
+    FROM CourseEnrollment e
+    WHERE e.student.id = :studentId
+      AND e.courseInstance.isActive = true
+""")
+    List<CourseEnrollment> findAllActiveEnrollmentsByStudentId(@Param("studentId") Integer studentId);
+
+
+}

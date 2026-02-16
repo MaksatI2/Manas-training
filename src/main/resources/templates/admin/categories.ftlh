@@ -1,0 +1,342 @@
+<#import "../layout.ftlh" as layout>
+<#import "../RoadMap.ftlh" as roadmap>
+<#import "/spring.ftl" as spring>
+
+<@layout.page title="<@spring.message code='categories.admin.list.title'/>">
+    <#if successMessage??>
+        <div id="successMessage" data-message="${successMessage?js_string}"></div>
+    </#if>
+    <#if errorMessage??>
+        <div id="errorMessage" data-message="${errorMessage?js_string}"></div>
+    </#if>
+    <#assign bcHome><@spring.message code='categories.admin.list.breadcrumb.home'/></#assign>
+    <#assign bcCurrent><@spring.message code='categories.admin.list.breadcrumb.current'/></#assign>
+
+    <@roadmap.breadcrumbs items=[
+    {"label": bcHome, "url": "/"},
+    {"label": bcCurrent, "url": ""}
+    ] />
+
+    <div class="card shadow mb-4">
+
+
+        <div class="card-header d-flex filter-panel">
+            <h5 class="m-0 font-weight-bold text-white">
+                <i class="fas fa-folder me-2"></i>
+                <@spring.message code="categories.admin.list.title"/>
+            </h5>
+            <div class="filter-controls">
+                <a href="/admin/categories/add" class="btn btn-light"
+                   style="border-radius: 25px; background: white; color: #0066cc; border: 1px solid #0066cc;">
+                    <i class="fas fa-plus me-1"
+                       style="color:#0066cc;"></i><@spring.message code="categories.admin.list.addCategory"/>
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="categoriesTable" width="100%">
+                    <thead style="background: linear-gradient(135deg, #0066cc, #003d7a); color: white !important;">
+                    <tr>
+                        <th><@spring.message code="categories.admin.list.table.name"/></th>
+                        <th><@spring.message code="categories.admin.list.table.description"/></th>
+                        <th class="actions-col"><@spring.message code="categories.admin.list.table.actions"/></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <#list categories as category>
+                        <tr style="cursor: pointer;"
+                            onclick="window.location.href='/admin/categories/edit/${category.id}'">
+                            <td>
+                                <span class="badge"
+                                      style="background: #003d7a; color: white; font-size: 1.15rem">${category.name}</span>
+                            </td>
+                            <td style="color: #2c3e50;">${category.description!''}</td>
+                            <td onclick="event.stopPropagation();" class="actions-col">
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        title="<@spring.message code='categories.admin.list.delete.tooltip'/>"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteCategoryModal"
+                                        data-category-id="${category.id}"
+                                        data-category-name="${category.name?js_string}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </#list>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row mt-3 align-items-center">
+                <div class="col-md-6">
+                    <div id="categoriesTable_info" class="text-muted small" style="color: #2c3e50 !important;"></div>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end">
+                    <div id="categoriesTable_paginate" class="dataTables_paginate"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCategoryModalLabel">Удаление категории</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <p><@spring.message code="categories.admin.list.delete.confirm"/></p>
+                    <p>Курсы, связанные с этой категорией:</p>
+                    <ul id="courseList" class="list-group"></ul>
+                    <p id="noCoursesMessage" class="text-success mt-2" style="display: none;">Нет связанных курсов.
+                        Категорию можно удалить.</p>
+                    <p id="hasCoursesMessage" class="text-danger mt-2" style="display: none;">Невозможно удалить
+                        категорию, так как она связана с курсами.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <form id="deleteCategoryForm" action="" method="post" style="display:inline;">
+                        <#if _csrf??>
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        </#if>
+                        <button type="submit" class="btn btn-danger" id="deleteCategoryButton" disabled>Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var table = $('#categoriesTable').DataTable({
+                language: {
+                    url: '/js/datatables/${(springMacroRequestContext.locale?lower_case?starts_with("ru"))?then("ru",(springMacroRequestContext.locale?lower_case?starts_with("ky"))?then("ky","en"))}.json',
+                    paginate: {previous: '‹', next: '›'}
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthChange: true,
+                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Все"]],
+                searching: true,
+                info: false,
+                paging: true,
+                autoWidth: false,
+                stateSave: true,
+                columnDefs: [
+                    {targets: 2, orderable: false}
+                ]
+            });
+
+            $('#deleteCategoryModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var categoryId = button.data('category-id');
+                var categoryName = button.data('category-name');
+
+                $('#categoryName').text(categoryName);
+                $('#deleteCategoryForm').attr('action', '/admin/categories/delete/' + categoryId);
+
+                $('#courseList').empty();
+                $('#noCoursesMessage').hide();
+                $('#hasCoursesMessage').hide();
+                $('#deleteCategoryButton').prop('disabled', true);
+
+                $.ajax({
+                    url: '/api/courses/category/' + categoryId,
+                    method: 'GET',
+                    success: function (courses) {
+                        if (courses.length === 0) {
+                            $('#noCoursesMessage').show();
+                            $('#deleteCategoryButton').prop('disabled', false);
+                        } else {
+                            courses.forEach(function (course) {
+                                $('#courseList').append('<li class="list-group-item">' + course.title + '</li>');
+                            });
+                            $('#hasCoursesMessage').show();
+                        }
+                    },
+                    error: function () {
+                        $('#courseList').append('<li class="list-group-item text-danger">Ошибка при загрузке курсов.</li>');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary-blue: #0066cc;
+            --dark-blue: #003d7a;
+            --text-dark: #2c3e50;
+            --white: #ffffff;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.1);
+        }
+
+        .filter-panel {
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            border-radius: 15px 15px 0 0;
+            padding: 1rem;
+            border-left: 4px solid var(--primary-blue);
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item .page-link {
+            border-radius: 0 !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item:first-child .page-link {
+            border-top-left-radius: 12px !important;
+            border-bottom-left-radius: 12px !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item:last-child .page-link {
+            border-top-right-radius: 12px !important;
+            border-bottom-right-radius: 12px !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item.active .page-link {
+            background-color: var(--primary-blue) !important;
+            color: white !important;
+            font-weight: bold;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue) !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .pagination .page-item .page-link:hover {
+            background-color: #005bb5 !important;
+            color: white !important;
+        }
+
+        @media (min-width: 576px) {
+            .filter-panel {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 10px;
+        }
+
+        #categoriesTable th, #categoriesTable td {
+            vertical-align: middle;
+            padding: 0.75rem;
+        }
+
+        #categoriesTable td {
+            border-top: 1px solid #e3e6f0;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        #categoriesTable tr:hover {
+            background-color: rgba(0, 102, 204, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .badge {
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            border-radius: 0.375rem;
+        }
+
+        .actions-col {
+            max-width: 130px;
+            width: 1%;
+            white-space: nowrap;
+            text-align: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 569px) {
+            div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+                gap: 0.5rem;
+            }
+
+            div.dataTables_wrapper .dataTables_filter input {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 570px) and (max-width: 770px) {
+            div.dataTables_wrapper .dataTables_length, div.dataTables_wrapper .dataTables_filter {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                gap: 1rem;
+            }
+
+            div.dataTables_wrapper .dataTables_filter input, div.dataTables_wrapper .dataTables_length select {
+                height: 38px;
+                line-height: 1.5;
+            }
+
+            div.dataTables_wrapper label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0;
+            }
+        }
+
+        @media (min-width: 771px) {
+            div.dataTables_wrapper .dataTables_length {
+                justify-content: flex-start;
+            }
+
+            div.dataTables_wrapper .dataTables_filter {
+                justify-content: flex-end;
+            }
+        }
+
+        #categoriesTable thead {
+            background: linear-gradient(135deg, #0066cc, #003d7a) !important;
+            color: white !important;
+        }
+
+        #categoriesTable thead th {
+            background-image: linear-gradient(135deg, #0066cc, #003d7a) !important;
+            background-color: unset !important;
+            color: #ffffff !important;
+        }
+    </style>
+</@layout.page>

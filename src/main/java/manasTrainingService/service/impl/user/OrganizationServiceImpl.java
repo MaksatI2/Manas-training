@@ -1,0 +1,474 @@
+package manasTrainingService.service.impl.user;
+
+import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
+import manasTrainingService.dto.application.EmployeeShortDto;
+import manasTrainingService.dto.create.CreateOrganizationDto;
+import manasTrainingService.dto.edit.OrganizationProfileEditDto;
+import manasTrainingService.dto.organization.CreateStudentByOrganizationDto;
+import manasTrainingService.dto.organization.StudentCourseInfoDto;
+import manasTrainingService.dto.organization.StudentEditByOrganizationDto;
+import manasTrainingService.dto.profile.OrganizationProfileDto;
+import manasTrainingService.entity.*;
+import manasTrainingService.exceptions.nsee.course.CourseEnrollmentNotFoundException;
+import manasTrainingService.exceptions.nsee.user.*;
+import manasTrainingService.repositories.course.CourseEnrollmentRepository;
+import manasTrainingService.repositories.course.CourseInstanceRepository;
+import manasTrainingService.repositories.user.OrganizationRepository;
+import manasTrainingService.repositories.user.StudentProfileRepository;
+import manasTrainingService.repositories.user.UserRepository;
+import manasTrainingService.service.ActivityLogService;
+import manasTrainingService.service.user.EmailService;
+import manasTrainingService.service.user.OrganizationService;
+import manasTrainingService.service.user.RoleService;
+import manasTrainingService.service.user.UserService;
+import manasTrainingService.util.PasswordGenerator;
+import manasTrainingService.util.StatusUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class OrganizationServiceImpl implements OrganizationService {
+
+    private final OrganizationRepository organizationRepository;
+    private final UserRepository userRepository;
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+    private final StudentProfileRepository studentProfileRepository;
+    private final CourseInstanceRepository courseInstanceRepository;
+    private final EmailService emailService;
+    private UserService userService;
+    private final ActivityLogService activityLogService;
+    private final MessageSource messageSource;
+
+    @Autowired
+    public void setUserService(@Lazy UserService userService) {
+        this.userService = userService;
+    }
+
+    @Override
+    public void createOrganization(CreateOrganizationDto dto) {
+        Organization organization = Organization.builder()
+                .user(dto.getUser())
+                .code(generateOrganizationCode())
+                .build();
+        organizationRepository.save(organization);
+        activityLogService.log(
+                dto.getUser(),
+                ActionType.CREATE,
+                TargetType.ORGANIZATION,
+                organization.getId()
+        );
+    }
+
+    @Override
+    public void editOrganizationInformation(OrganizationProfileEditDto organizationProfileEditDto) {
+        Organization organization = organizationRepository.findByUserId(organizationProfileEditDto.getUserId())
+                .orElseThrow(() -> new OrganizationNotFoundException(
+                        messageSource.getMessage(
+                                "organization.not.found",
+                                null,
+                                "Организация не найдена",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+        organization.setDescription(organizationProfileEditDto.getOrganizationName());
+        userService.editManagerInformation(organizationProfileEditDto);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.ORGANIZATION,
+                organization.getId()
+        );
+    }
+
+    @Override
+    public OrganizationProfileEditDto getOrganizationUserInformationForEdit(User user) {
+        return OrganizationProfileEditDto.builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .surname(user.getLastName())
+                .phone(user.getPhone())
+                .organizationName(organizationRepository.findByUserId(user.getId()).get().getDescription())
+                .build();
+    }
+
+    @Override
+    public Organization getOrganizationByCode(String code) {
+        return organizationRepository.findByCode(code)
+                .orElseThrow(() -> new OrganizationCodeNotFound("Организация с таким кодом не найдена"));
+    }
+
+    @Override
+    public Organization getOrganizationById(int id) {
+        return organizationRepository.findById(id)
+                .orElseThrow(() -> new OrganizationCodeNotFound("Организация с таким ID не найдена"));
+    }
+
+    @Override
+    public OrganizationProfileDto getAuthorizedUserOrganization(User user) {
+        return OrganizationProfileDto.builder()
+                .user(user)
+                .organization(organizationRepository.findByUserId(user.getId()).orElseThrow(() -> new OrganizationNotFoundException("Организация не найдена")))
+                .build();
+    }
+
+    private String generateOrganizationCode() {
+        int maxAttempts = 10000;
+        for (int i = 1; i <= maxAttempts; i++) {
+            String code = String.format("ORG%04d", i);
+            if (!organizationRepository.findByCode(code).isPresent()) {
+                return code;
+            }
+        }
+        throw new IllegalStateException("Не удалось сгенерировать уникальный код организации");
+    }
+
+    @Override
+    public String getOrganizationName(Organization organization) {
+        if (organization != null && organization.getUser() != null) {
+            return organization.getUser().getName();
+        }
+        return null;
+    }
+
+    @Override
+    public String getOrganizationNameByCode(String code) {
+        Organization organization = getOrganizationByCode(code);
+        return getOrganizationName(organization);
+    }
+
+    @Override
+    public String getOrganizationNameById(int id) {
+        Organization organization = getOrganizationById(id);
+        return getOrganizationName(organization);
+    }
+
+    @Override
+    public List<StudentCourseInfoDto> getStudentsCourseInfoForOrganization(User organizationUser) {
+        Organization organization = organizationRepository.findByUserId(organizationUser.getId())
+                .orElseThrow(() -> new OrganizationNotFoundException(
+                        messageSource.getMessage(
+                                "organization.not.found",
+                                null,
+                                "Организация не найдена",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+
+        List<StudentProfile> profiles = studentProfileRepository.findAllByOrganization(organization);
+        List<User> students = profiles.stream().map(StudentProfile::getUser).toList();
+
+        List<CourseEnrollment> enrollments = courseEnrollmentRepository.findWithCourseByStudentIn(students);
+
+
+        return students.stream()
+                .flatMap(student -> {
+                    List<CourseEnrollment> studentEnrollments = enrollments.stream()
+                            .filter(e -> e.getStudent().getId().equals(student.getId()))
+                            .toList();
+
+                    if (studentEnrollments.isEmpty()) {
+                        return Stream.of(
+                                StudentCourseInfoDto.builder()
+                                        .studentId(student.getId())
+                                        .fullName(student.getName() + " " + student.getLastName())
+                                        .email(student.getEmail())
+                                        .phone(student.getPhone())
+                                        .courseTitle("-")
+                                        .status("-")
+                                        .localizedStatus("-")
+                                        .progress(BigDecimal.ZERO)
+                                        .finalGrade(null)
+                                        .build()
+                        );
+                    } else {
+                        return studentEnrollments.stream().map(enrollment ->
+                                StudentCourseInfoDto.builder()
+                                        .studentId(student.getId())
+                                        .enrollmentId(enrollment.getId())
+                                        .fullName(student.getName() + " " + student.getLastName())
+                                        .email(student.getEmail())
+                                        .phone(student.getPhone())
+                                        .courseTitle(enrollment.getCourseInstance().getCourse().getTitle())
+                                        .localizedStatus(StatusUtil.localize(enrollment.getStatus()))
+                                        .progress(enrollment.getProgressPercentage())
+                                        .finalGrade(enrollment.getFinalGrade())
+                                        .build()
+                        );
+                    }
+                })
+                .toList();
+    }
+
+    @Override
+    public void editStudentProfileByOrganization(StudentEditByOrganizationDto dto) {
+        User user = userRepository.findById(dto.getStudentId().intValue())
+                .orElseThrow(() -> new UserNotFoundException("Студент не найден"));
+        if (userRepository.existsByEmailAndIdNot(dto.getEmail(), user.getId())) {
+            throw new EmailAlreadyExistsException("Данная почта уже используется");
+        }
+
+        user.setName(dto.getName());
+        user.setLastName(dto.getLastName());
+        user.setPhone(dto.getPhone());
+        user.setEmail(dto.getEmail());
+
+        userRepository.save(user);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.STUDENT,
+                user.getId()
+        );
+    }
+
+    @Override
+    public void removeStudentFromCourse(Integer enrollmentId, User organizationUser) {
+        CourseEnrollment enrollment = courseEnrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new CourseEnrollmentNotFoundException("Запись на курс не найдена"));
+
+        User student = enrollment.getStudent();
+
+        Organization org = organizationRepository.findByUserId(organizationUser.getId())
+                .orElseThrow(() -> new OrganizationNotFoundException(
+                        messageSource.getMessage(
+                                "organization.not.found",
+                                null,
+                                "Организация не найдена",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+
+        if (student.getStudentProfile() == null ||
+                !student.getStudentProfile().getOrganization().getId().equals(org.getId())) {
+            throw new AccessDeniedException("Доступ запрещен: студент не принадлежит вашей организации");
+        }
+
+        courseEnrollmentRepository.delete(enrollment);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.ENROLLMENT,
+                enrollment.getId()
+        );
+    }
+
+    @Override
+    public void deleteStudentFromOrganization(Integer studentId, User organizationUser) {
+        Organization organization = organizationRepository.findByUserId(organizationUser.getId())
+                .orElseThrow(() -> new OrganizationNotFoundException(
+                        messageSource.getMessage(
+                                "organization.not.found",
+                                null,
+                                "Организация не найдена",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "student.not.found",
+                                null,
+                                "Студент не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+
+        StudentProfile profile = student.getStudentProfile();
+        if (profile == null || profile.getOrganization() == null ||
+                !profile.getOrganization().getId().equals(organization.getId())) {
+            throw new IllegalArgumentException(
+                    messageSource.getMessage(
+                            "student.not.in.organization",
+                            null,
+                            "Студент не принадлежит данной организации",
+                            LocaleContextHolder.getLocale()
+                    )
+            );
+        }
+
+
+        List<CourseEnrollment> enrollments = courseEnrollmentRepository.findByStudent(student);
+        courseEnrollmentRepository.deleteAll(enrollments);
+
+        profile.setOrganization(null);
+        studentProfileRepository.save(profile);
+
+        student.setIsActive(false);
+        userRepository.save(student);
+
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.DELETE,
+                TargetType.STUDENT,
+                student.getId()
+        );
+    }
+
+    @Override
+    @Transactional
+    public void createStudentByOrganization(CreateStudentByOrganizationDto dto, User organizationUser) {
+        Organization organization = organizationRepository.findByUserId(organizationUser.getId())
+                .orElseThrow(() -> new OrganizationNotFoundException(
+                        messageSource.getMessage(
+                                "organization.not.found",
+                                null,
+                                "Организация не найдена",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new EmailAlreadyExistsException("Email уже используется");
+        }
+        if (userRepository.existsByPhone(dto.getPhone())) {
+            throw new PhoneAlreadyExistsException("Телефон уже используется");
+        }
+
+        Role studentRole = roleService.getStudentRoleId();
+        String rawPassword = PasswordGenerator.generateDefault();
+        User student = User.builder()
+                .email(dto.getEmail())
+                .passwordHash(passwordEncoder.encode(rawPassword))
+                .name(dto.getName())
+                .lastName(dto.getLastName())
+                .phone(dto.getPhone())
+                .isActive(true)
+                .role(studentRole)
+                .build();
+
+        userRepository.save(student);
+
+        StudentProfile studentProfile = StudentProfile.builder()
+                .user(student)
+                .organization(organization)
+                .build();
+        studentProfileRepository.save(studentProfile);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.CREATE,
+                TargetType.STUDENT,
+                student.getId()
+        );
+        emailService.sendStudentWelcomeEmail(student.getEmail(), student.getName(), rawPassword);
+    }
+
+    @Override
+    public void attachStudentToOrganization(Integer studentId, User organizationUser) {
+        Organization organization = organizationRepository.findByUserId(organizationUser.getId())
+                .orElseThrow(() -> new OrganizationNotFoundException(
+                        messageSource.getMessage(
+                                "organization.not.found",
+                                null,
+                                "Организация не найдена",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new UserNotFoundException("Студент не найден"));
+        StudentProfile profile = student.getStudentProfile();
+
+        if (profile == null) {
+            throw new IllegalStateException("У пользователя нет профиля студента");
+        }
+        if (profile.getOrganization() != null) {
+            throw new IllegalArgumentException("Студент уже прикреплён к другой организации");
+        }
+        profile.setOrganization(organization);
+        studentProfileRepository.save(profile);
+        activityLogService.log(
+                userService.getAuthorizedUser(),
+                ActionType.UPDATE,
+                TargetType.STUDENT,
+                student.getId()
+        );
+    }
+
+    @Override
+    public List<EmployeeShortDto> getMyEmployees(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.not.found",
+                                null,
+                                "Пользователь не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+
+        Organization organization = organizationRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new OrganizationNotFoundException(
+                        messageSource.getMessage(
+                                "organization.not.found",
+                                null,
+                                "Организация не найдена",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+        List<StudentProfile> profiles = studentProfileRepository.findAllByOrganization(organization);
+        return profiles.stream().map(p -> {
+            User student = p.getUser();
+            return EmployeeShortDto.builder()
+                    .id(student.getId())
+                    .fullName(student.getName() + " " + student.getLastName())
+                    .email(student.getEmail())
+                    .build();
+        }).toList();
+    }
+
+    @Override
+    public OrganizationProfileDto getAuthorizedUserOrganizationByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(
+                        messageSource.getMessage(
+                                "user.not.found",
+                                null,
+                                "Пользователь не найден",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+        return getAuthorizedUserOrganization(user);
+    }
+
+    @Override
+    public List<EmployeeShortDto> getAllTeachersShortDto() {
+        return userRepository.findAllByRole_Name("TEACHER").stream().map(u -> {
+            EmployeeShortDto dto = new EmployeeShortDto();
+            dto.setId(u.getId());
+            dto.setFullName(u.getName() + " " + u.getLastName());
+            dto.setEmail(u.getEmail());
+            return dto;
+        }).toList();
+    }
+
+    @Override
+    public Organization getByUserId(Integer userId) {
+        return organizationRepository.findByUserId(userId)
+                .orElseThrow(() -> new OrganizationNotFoundException(
+                        messageSource.getMessage(
+                                "organization.not.found",
+                                null,
+                                "Организация не найдена",
+                                LocaleContextHolder.getLocale()
+                        )
+                ));
+    }
+}

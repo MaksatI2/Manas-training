@@ -1,0 +1,100 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+
+cache:
+  key: "m2-cache"
+  paths:
+    - .m2/repository/
+
+# ---------------- BUILD ----------------
+build:
+  stage: build
+  image: maven:3.8.6-eclipse-temurin-17
+
+  script:
+    # Сборка backend
+    - mvn clean package -Dmaven.test.skip=true
+
+    # Берём только нормальный spring boot jar
+    - cp target/*SNAPSHOT.jar target/app.jar
+
+    - echo "=== BUILD SUCCESS ==="
+    - ls -lh target/app.jar
+
+  artifacts:
+    paths:
+      - target/app.jar
+    expire_in: 1 day
+
+  only:
+    - dev
+
+
+# ---------------- DEPLOY ----------------
+deploy:
+  stage: deploy
+  image: ubuntu:20.04
+
+  needs:
+    - job: build
+      artifacts: true
+
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq openssh-client rsync sshpass
+    - mkdir -p ~/.ssh
+    - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts 2>/dev/null || true
+
+  script:
+    - echo "🚀 Deploy to $DEPLOY_SERVER"
+    - export SSHPASS=$SSH_PASSWORD
+
+    # Создаём папку target на сервере
+    - sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER "mkdir -p $DEPLOY_PATH/target"
+
+    # Копируем jar
+    - echo "📦 Upload app.jar..."
+    - sshpass -e scp -o StrictHostKeyChecking=no target/app.jar $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/target/app.jar
+
+    # Синхронизация проекта
+    - echo "🔄 Sync project files..."
+    - |
+      sshpass -e rsync -avz --delete \
+      -e "ssh -o StrictHostKeyChecking=no" \
+      --exclude 'data' \
+      --exclude 'postgres/**' \
+      --exclude 'logs/**' \
+      --exclude 'nginx/ssl/**' \
+      --exclude 'nginx/logs' \
+      --exclude 'nginx/html/.well-known' \
+      --exclude 'letsencrypt/**' \
+      --exclude 'target' \
+      --exclude '.git' \
+      --exclude '.m2' \
+      --exclude '.idea' \
+      --exclude '*.iml' \
+      --exclude 'README.md' \
+      ./ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
+
+    # Запуск deploy.sh ПРАВИЛЬНО (через here script)
+    - echo "🚀 Run deploy.sh..."
+    - |
+      sshpass -e ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER << EOF
+      cd $DEPLOY_PATH
+      chmod +x deploy.sh 2>/dev/null || true
+      ./deploy.sh
+      EOF
+
+    - echo "✅ Deploy finished!"
+
+  environment:
+    name: production
+    url: $PRODUCTION_URL
+
+  only:
+    - dev

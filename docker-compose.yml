@@ -1,0 +1,244 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: manas-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/html:/var/www/html
+    depends_on:
+      - app
+      - jitsi-web
+      - prosody
+    networks:
+      - manas-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "--no-check-certificate", "https://127.0.0.1/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: manas-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qwerty}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - manas-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: eclipse-temurin:17-jdk-jammy
+    container_name: manas-app
+    working_dir: /app
+    command: [ "java","-jar","/app/app.jar" ]
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-docker}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-qwerty}
+      - MAIL_USERNAME=${MAIL_USERNAME:-zer0icemax@gmail.com}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-chfe zivr epbv zbco}
+      - APP_BASE_URL=${APP_BASE_URL:-https://manastraining.kg}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-postgres}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-qwerty}
+      - JITSI_DOMAIN=${DOMAIN:-manastraining.kg}
+      - SERVER_PORT=8089
+      - JAVA_OPTS=-Xmx512m -Xms256m
+      - TZ=Asia/Bishkek
+    expose:
+      - "8089"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - manas-network
+    restart: unless-stopped
+    volumes:
+      - ./target/app.jar:/app/app.jar
+      - ./logs:/app/logs
+      - ./data:/app/data
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8089/actuator/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  prosody:
+    image: jitsi/prosody:stable
+    container_name: manas-prosody
+    environment:
+      - AUTH_TYPE=internal
+      - ENABLE_GUESTS=1
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_MUC_DOMAIN=muc.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - JICOFO_COMPONENT_SECRET=${JICOFO_COMPONENT_SECRET:-jicofo-secret}
+      - JVB_AUTH_USER=jvb
+      - JVB_AUTH_PASSWORD=${JVB_AUTH_PASSWORD:-jvb-password}
+      - JICOFO_AUTH_USER=focus
+      - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD:-focus-password}
+      - TZ=Asia/Bishkek
+      - ENABLE_LOBBY=1
+      - LOG_LEVEL=warn
+      - ENABLE_XMPP_WEBSOCKET=1
+      - ENABLE_SUBDOMAINS=true
+      - PUBLIC_URL=https://${DOMAIN:-manastraining.kg}
+      - ENABLE_XMPP_WEBSOCKET_CORS=1
+      - WEBSOCKET_DOMAIN=${DOMAIN:-manastraining.kg}
+    networks:
+      manas-network:
+        aliases:
+          - xmpp.meet.jitsi
+          - auth.meet.jitsi
+          - muc.meet.jitsi
+          - internal-muc.meet.jitsi
+    volumes:
+      - prosody-config:/config
+      - prosody-plugins:/prosody-plugins-custom
+    expose:
+      - "5222"
+      - "5280"
+    restart: unless-stopped
+
+  jicofo:
+    image: jitsi/jicofo:stable
+    container_name: manas-jicofo
+    environment:
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_SERVER=prosody
+      - XMPP_PORT=5222
+      - JICOFO_COMPONENT_SECRET=${JICOFO_COMPONENT_SECRET:-jicofo-secret}
+      - JICOFO_AUTH_USER=focus
+      - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD:-focus-password}
+      - JVB_BREWERY_MUC=jvbbrewery
+      - JIGASI_BREWERY_MUC=jigasibrewery
+      - TZ=Asia/Bishkek
+      - JICOFO_ENABLE_BRIDGE_HEALTH_CHECKS=true
+      - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=15000
+      - JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT=20000
+    networks:
+      - manas-network
+    volumes:
+      - jicofo-config:/config
+    depends_on:
+      - prosody
+    restart: unless-stopped
+
+  jvb:
+    image: jitsi/jvb:stable
+    container_name: manas-jvb
+    environment:
+      - DOCKER_HOST_ADDRESS=${DOMAIN:-manastraining.kg}
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_SERVER=prosody
+      - JVB_AUTH_USER=jvb
+      - JVB_AUTH_PASSWORD=${JVB_AUTH_PASSWORD:-jvb-password}
+      - JVB_BREWERY_MUC=jvbbrewery
+      - JVB_PORT=10000
+      - JVB_TCP_HARVESTER_DISABLED=true
+      - JVB_STUN_SERVERS=stun.l.google.com:19302,stun1.l.google.com:19302,stun2.l.google.com:19302
+      - TZ=Asia/Bishkek
+      - JVB_ENABLE_APIS=rest,colibri
+      - JVB_WS_DOMAIN=${DOMAIN:-manastraining.kg}
+      - JVB_WS_SERVER_ID=jvb1
+      - COLIBRI_REST_ENABLED=true
+      - SHUTDOWN_REST_ENABLED=true
+      - PUBLIC_URL=https://${DOMAIN:-manastraining.kg}
+    networks:
+      - manas-network
+    volumes:
+      - jvb-config:/config
+    ports:
+      - "10000:10000/udp"
+      - "4443:4443"
+    depends_on:
+      - prosody
+    restart: unless-stopped
+
+  jitsi-web:
+    image: jitsi/web:stable
+    container_name: manas-jitsi-web
+    expose:
+      - "80"
+      - "443"
+    environment:
+      - ENABLE_LETSENCRYPT=0
+      - ENABLE_HTTP_REDIRECT=0
+      - DISABLE_HTTPS=1
+      - JICOFO_AUTH_USER=focus
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_BOSH_URL_BASE=http://prosody:5280
+      - XMPP_MUC_DOMAIN=muc.meet.jitsi
+      - TZ=Asia/Bishkek
+      - JVB_TCP_HARVESTER_DISABLED=true
+      - ENABLE_PREJOIN_PAGE=false
+      - ENABLE_WELCOME_PAGE=false
+      - ENABLE_CLOSE_PAGE=false
+      - DISABLE_DEEP_LINKING=true
+      - ENABLE_RECORDING=false
+      - ENABLE_LIVESTREAMING=false
+      - RESOLUTION=720
+      - RESOLUTION_MIN=180
+      - RESOLUTION_MAX=1080
+      - PUBLIC_URL=https://${DOMAIN:-manastraining.kg}
+      - ENABLE_GUESTS=1
+      - ENABLE_LOBBY=1
+      - XMPP_WEBSOCKET_URL=wss://${DOMAIN:-manastraining.kg}/xmpp-websocket
+      - DEFAULT_LANGUAGE=ru
+      - LANG_DETECTION=false
+      - TOOLBAR_BUTTONS=microphone,camera,closedcaptions,desktop,fullscreen,fodeviceselection,hangup,profile,info,chat,recording,livestreaming,etherpad,sharedvideo,settings,raisehand,videoquality,filmstrip,invite,feedback,stats,shortcuts,tileview,videobackgroundblur,download,help,mute-everyone,security
+    networks:
+      - manas-network
+    volumes:
+      - jitsi-web-config:/config
+      - jitsi-web-transcripts:/usr/share/jitsi-meet/transcripts
+    depends_on:
+      - prosody
+      - jicofo
+      - jvb
+    restart: unless-stopped
+
+networks:
+  manas-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+  jitsi-web-config:
+    driver: local
+  jitsi-web-transcripts:
+    driver: local
+  prosody-config:
+    driver: local
+  prosody-plugins:
+    driver: local
+  jicofo-config:
+    driver: local
+  jvb-config:
+    driver: local
