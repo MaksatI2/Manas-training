@@ -212,4 +212,10 @@ databaseChangeLog:
   - include:
       file: db/changelog/data/071_public_certificates.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/data/072_clear_all_data.sql
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/data/073_insert_admin_only.sql
+      relativeToChangelogFile: false
 
