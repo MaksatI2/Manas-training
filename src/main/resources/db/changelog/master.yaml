@@ -220,4 +220,6 @@ databaseChangeLog:
       relativeToChangelogFile: false
   - include:
       file: db/changelog/data/074_insert_teacher_profiles.sql
+      relativeToChangelogFile: false  - include:
+      file: db/changelog/data/075_update_teacher_password.sql
       relativeToChangelogFile: false
