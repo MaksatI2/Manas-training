@@ -25,10 +25,6 @@
             hasError = true;
             isInvalid("title").insertAdjacentElement('afterend', errorMessage("title", M['test_form_validation.title.required']));
         }
-        if (!data.description) {
-            hasError = true;
-            isInvalid("description").insertAdjacentElement('afterend', errorMessage("description", M['test_form_validation.description.required']));
-        }
         if (!data.passingScore) {
             hasError = true;
             isInvalid("passingScore").insertAdjacentElement('afterend', errorMessage("passingScore", M['test_form_validation.passingScore.required']));

@@ -224,3 +224,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/data/075_update_teacher_password.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/features/076_add_attempt_number_to_test_results.sql
+      relativeToChangelogFile: false

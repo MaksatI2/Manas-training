@@ -29,9 +29,8 @@
                         <@spring.showErrors "<br>" "error text-danger" />
                     </div>
                     <div class="mb-3">
-                        <label for="test.description" class="form-label fw-bold required">
-                            <@spring.message code="test.final.create.field.description"/> <span
-                                    class="text-danger">*</span>
+                        <label for="test.description" class="form-label fw-bold">
+                            <@spring.message code="test.final.create.field.description"/>
                         </label>
                         <@spring.formTextarea "test.description" 'class="form-control" rows="3" id="test.description"' />
                         <@spring.showErrors "<br>" "error text-danger" />

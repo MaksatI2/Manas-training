@@ -28,7 +28,6 @@ public class TestDto {
     @NotBlank(message = "{TestDto.title.NotBlank}")
     private String title;
 
-    @NotBlank(message = "{TestDto.description.NotBlank}")
     private String description;
 
     @NotNull(message = "{TestDto.passingScore.NotNull}")

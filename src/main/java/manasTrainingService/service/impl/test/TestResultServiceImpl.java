@@ -50,6 +50,11 @@ public class TestResultServiceImpl implements TestResultService {
     public TestResult saveTestResult(TestAnswerDto testAnswerDto, int resultScore, int percentage,  Boolean isPassed) {
         LocalDateTime endTime = LocalDateTime.now();
         int duration = (int) Duration.between(testAnswerDto.getPassingStart(), endTime).toMinutes();
+        
+        List<TestResult> existingAttempts = testResultRepository
+                .findAllByStudentIdAndTestInstanceId(userService.getAuthorizedUser().getId(), testAnswerDto.getTestInstanceId());
+        int attemptNumber = existingAttempts.size() + 1;
+        
         TestResult testResult = new TestResult();
         testResult.setTestInstance(testInstanceService.getTestInstanceEntityById(testAnswerDto.getTestInstanceId()));
         testResult.setStudent(userService.getAuthorizedUser());
@@ -59,6 +64,7 @@ public class TestResultServiceImpl implements TestResultService {
         testResult.setSubmittedAt(endTime);
         testResult.setTimeSpentMinutes(duration);
         testResult.setIsPassed(isPassed);
+        testResult.setAttemptNumber(attemptNumber);
         return testResultRepository.saveAndFlush(testResult);
     }
 
@@ -133,6 +139,20 @@ public class TestResultServiceImpl implements TestResultService {
     @Override
     public Boolean userHasTestAttempt(int testId) {
         return testResultRepository.existsByStudentIdAndTestInstanceId(userService.getAuthorizedUser().getId(), testId);
+    }
+
+    @Override
+    public int countUserTestAttempts(int testInstanceId) {
+        List<TestResult> attempts = testResultRepository
+                .findAllByStudentIdAndTestInstanceId(userService.getAuthorizedUser().getId(), testInstanceId);
+        return attempts.size();
+    }
+
+    @Override
+    public boolean hasPassedAttempt(int testInstanceId) {
+        List<TestResult> attempts = testResultRepository
+                .findAllByStudentIdAndTestInstanceId(userService.getAuthorizedUser().getId(), testInstanceId);
+        return attempts.stream().anyMatch(TestResult::getIsPassed);
     }
 
     public List<TestResult> getTestResultsByStudentId(Integer studentId) {

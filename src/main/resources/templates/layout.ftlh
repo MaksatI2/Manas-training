@@ -94,7 +94,6 @@
                 'test_form.label.active': '${springMacroRequestContext.getMessage("test_form.label.active")?js_string}',
 
                 'test_form_validation.title.required': '${springMacroRequestContext.getMessage("test_form_validation.title.required")?js_string}',
-                'test_form_validation.description.required': '${springMacroRequestContext.getMessage("test_form_validation.description.required")?js_string}',
                 'test_form_validation.passingScore.required': '${springMacroRequestContext.getMessage("test_form_validation.passingScore.required")?js_string}',
                 'test_form_validation.question.required': '${springMacroRequestContext.getMessage("test_form_validation.question.required")?js_string}',
                 'test_form_validation.option.required': '${springMacroRequestContext.getMessage("test_form_validation.option.required")?js_string}',
@@ -264,6 +263,13 @@
                            data-tooltip="<@spring.message code='sidebar.my.courses' />">
                             <i class="fas fa-book-open"></i>
                             <span><@spring.message code="sidebar.my.courses" /></span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/student/my-tests" class="nav-link"
+                           data-tooltip="<@spring.message code='sidebar.tests' />">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span><@spring.message code="sidebar.tests" /></span>
                         </a>
                     </div>
                     <div class="nav-item">

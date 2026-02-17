@@ -20,6 +20,8 @@ public interface TestResultRepository extends JpaRepository<TestResult, Integer>
 
     Optional<TestResult> findByStudentId(int studentId);
 
+    List<TestResult> findAllByStudentIdAndTestInstanceId(int studentId, int testInstanceId);
+
     Boolean existsByStudentIdAndTestInstanceId(int studentId, int testInstanceId);
 
     Boolean existsByTestInstance_Id(int testInstanceId);

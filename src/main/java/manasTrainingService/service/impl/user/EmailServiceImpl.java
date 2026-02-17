@@ -23,7 +23,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.email.from:noreply@manastraining.kg}")
     private String from;
 
-    @Value("${APP_BASE_URL}")
+    @Value("${APP_BASE_URL:http://localhost:8089}")
     private String baseUrl;
 
 

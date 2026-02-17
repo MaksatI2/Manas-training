@@ -19,6 +19,8 @@ public interface EnrollmentService {
 
     List<CourseEnrollment> getStudentEnrollments(Integer studentId);
 
+    List<CourseEnrollment> getAllEnrollmentsByStudentId(Integer studentId);
+
     List<CourseEnrollmentCardDTO> getStudentCourses();
 
     List<CourseEnrollmentCardDTO> getStudentFinishedCourses();

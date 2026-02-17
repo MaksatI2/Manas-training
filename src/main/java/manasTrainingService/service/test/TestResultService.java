@@ -21,6 +21,10 @@ public interface TestResultService {
 
     Boolean userHasTestAttempt(int testId);
 
+    int countUserTestAttempts(int testInstanceId);
+
+    boolean hasPassedAttempt(int testInstanceId);
+
     List<TestResult> getTestResultsByStudentId(Integer studentId);
 
     BigDecimal getAverageScore();

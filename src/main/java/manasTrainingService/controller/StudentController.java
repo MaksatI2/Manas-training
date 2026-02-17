@@ -6,6 +6,9 @@ import manasTrainingService.dto.edit.UserProfileEditDto;
 import manasTrainingService.dto.instance.CourseEnrollmentCardDTO;
 import manasTrainingService.dto.instance.CourseInstanceDTO;
 import manasTrainingService.dto.tests.TestInstanceDto;
+import manasTrainingService.dto.tests.StudentTestListItemDto;
+import manasTrainingService.entity.CourseEnrollment;
+import manasTrainingService.entity.TestInstance;
 import manasTrainingService.exceptions.nsee.TestInstanceNotFoundException;
 import manasTrainingService.dto.statistics.AttendanceStatsDTO;
 import manasTrainingService.entity.User;
@@ -18,6 +21,7 @@ import manasTrainingService.service.test.TestService;
 import manasTrainingService.service.user.StudentService;
 import manasTrainingService.service.user.StudentStatisticsService;
 import manasTrainingService.service.user.UserService;
+import manasTrainingService.util.DateUtil;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
@@ -32,8 +36,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/student")
@@ -50,22 +57,23 @@ public class StudentController {
     private final MessageSource messageSource;
 
     @GetMapping("/profile")
-    public String profilePage(Model model){
+    public String profilePage(Model model) {
         model.addAttribute("student", studentService.getAuthorizedStudentProfile(userService.getAuthorizedUser()));
         return "student/profile-view";
     }
 
     @GetMapping("/profile/edit")
-    public String editStudentProfilePage(Model model){
-        model.addAttribute("studentProfile", studentService.getStudentInformationForEdit(userService.getAuthorizedUser()));
+    public String editStudentProfilePage(Model model) {
+        model.addAttribute("studentProfile",
+                studentService.getStudentInformationForEdit(userService.getAuthorizedUser()));
         return "student/profile-edit";
     }
 
     @PostMapping("/profile/edit")
     public String editStudentProfile(@Valid @ModelAttribute("studentProfile") UserProfileEditDto userProfileEditDto,
-                                     BindingResult bindingResult,
-                                     RedirectAttributes redirectAttributes,
-                                     Model model){
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         Locale locale = LocaleContextHolder.getLocale();
         if (bindingResult.hasErrors()) {
             return "student/profile-edit";
@@ -75,14 +83,12 @@ public class StudentController {
             studentService.editStudentInformation(userProfileEditDto);
             redirectAttributes.addFlashAttribute(
                     "successMessage",
-                    messageSource.getMessage("profile.update.success", null, locale)
-            );
+                    messageSource.getMessage("profile.update.success", null, locale));
             return "redirect:/student/profile";
         } catch (PhoneAlreadyExistsException e) {
             model.addAttribute(
                     "errorMessage",
-                    messageSource.getMessage("phone.already.exists", null, locale)
-            );
+                    messageSource.getMessage("phone.already.exists", null, locale));
             model.addAttribute("studentProfile", userProfileEditDto);
             return "student/profile-edit";
         }
@@ -105,9 +111,11 @@ public class StudentController {
         model.addAttribute("now", LocalDateTime.now());
         try {
             TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceByCourseInstanceId(id);
-            model.addAttribute("testInstance",  testInstanceDto);
-            if(testResultService.userHasTestAttempt(testInstanceDto.getId())){
-                model.addAttribute("testResult", testResultService.getTestResultsByUserId());
+            model.addAttribute("testInstance", testInstanceDto);
+            if (testResultService.userHasTestAttempt(testInstanceDto.getId())) {
+                model.addAttribute(
+                        "testResult",
+                        testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceDto.getId()));
             }
             model.addAttribute("isAvailableTime", testInstanceService.isValidAccessTime(testInstanceDto.getId()));
             model.addAttribute("testExits", testService.testExistById(testInstanceDto.getTest().getId()));
@@ -118,10 +126,8 @@ public class StudentController {
                     "testInstanceNotFound",
                     messageSource.getMessage(
                             "test.instance.not.found",
-                            new Object[]{courseInstanceDto.getCourseTitle()},
-                            LocaleContextHolder.getLocale()
-                    )
-            );
+                            new Object[] { courseInstanceDto.getCourseTitle() },
+                            LocaleContextHolder.getLocale()));
         }
         return "student/course-detail";
     }
@@ -135,5 +141,63 @@ public class StudentController {
         return "student/statistics";
     }
 
+    @GetMapping("/my-tests")
+    public String viewMyTests(Model model) {
+        User student = userService.getAuthorizedUser();
+        List<CourseEnrollment> enrollments = enrollmentService.getAllEnrollmentsByStudentId(student.getId());
+        List<StudentTestListItemDto> activeTests = new ArrayList<>();
+        List<StudentTestListItemDto> pastTests = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (CourseEnrollment enrollment : enrollments) {
+            Integer courseInstanceId = enrollment.getCourseInstance().getId();
+            Optional<TestInstance> testInstanceOpt = testInstanceService
+                    .getTestInstanceModelByCourseInstanceIdWithDetails(courseInstanceId);
+            if (testInstanceOpt.isEmpty()) {
+                continue;
+            }
+
+            TestInstance testInstance = testInstanceOpt.get();
+            int attemptCount = testResultService.countUserTestAttempts(testInstance.getId());
+            boolean hasPassedAttempt = testResultService.hasPassedAttempt(testInstance.getId());
+            boolean hasAttempt = attemptCount > 0;
+            boolean isAvailable = testInstance.getScheduledStart().isBefore(now)
+                    && testInstance.getScheduledEnd().isAfter(now);
+            boolean isEnded = testInstance.getScheduledEnd().isBefore(now);
+            boolean isActive = Boolean.TRUE.equals(testInstance.getTest().getIsActive());
+            boolean canStart = isActive && isAvailable && attemptCount < 2;
+
+            StudentTestListItemDto item = StudentTestListItemDto.builder()
+                    .testInstanceId(testInstance.getId())
+                    .courseTitle(testInstance.getTest().getCourse().getTitle())
+                    .courseInstanceTitle(testInstance.getInstance().getTitle())
+                    .testTitle(testInstance.getTest().getTitle())
+                    .startAt(testInstance.getScheduledStart())
+                    .endAt(testInstance.getScheduledEnd())
+                    .timeRange(DateUtil.formatWithTime(testInstance.getScheduledStart()) + " - "
+                            + DateUtil.formatWithTime(testInstance.getScheduledEnd()))
+                    .isActive(isActive)
+                    .isAvailable(isAvailable)
+                    .isEnded(isEnded)
+                    .hasAttempt(hasAttempt)
+                    .canStart(canStart)
+                    .attemptCount(attemptCount)
+                    .hasPassedAttempt(hasPassedAttempt)
+                    .build();
+
+            if (hasPassedAttempt || (isEnded && hasAttempt)) {
+                pastTests.add(item);
+            } else {
+                activeTests.add(item);
+            }
+        }
+
+        activeTests.sort(Comparator.comparing(StudentTestListItemDto::getStartAt));
+        pastTests.sort(Comparator.comparing(StudentTestListItemDto::getStartAt).reversed());
+
+        model.addAttribute("activeTests", activeTests);
+        model.addAttribute("pastTests", pastTests);
+        return "student/my-tests";
+    }
 
 }

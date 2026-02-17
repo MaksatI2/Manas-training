@@ -29,6 +29,8 @@ public interface TestInstanceService {
 
     Optional<TestInstance> getTestInstanceModelByCourseInstanceId(Integer id);
 
+    Optional<TestInstance> getTestInstanceModelByCourseInstanceIdWithDetails(Integer id);
+
     @Transactional
     void changeTestInstanceTime(TestInstanceDto testInstanceDto);
 }

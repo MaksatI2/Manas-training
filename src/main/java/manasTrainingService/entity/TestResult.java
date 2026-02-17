@@ -51,6 +51,10 @@ public class TestResult {
     @Column(name = "time_spent_minutes")
     Integer timeSpentMinutes;
 
+    @Column(name = "attempt_number", nullable = false)
+    @Builder.Default
+    Integer attemptNumber = 1;
+
     @OneToMany(mappedBy = "attempt", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     List<TestAnswer> answers;
 

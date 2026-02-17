@@ -103,7 +103,7 @@
                                        class="btn btn-primary btn-icon"><i class="fas fa-info-circle"></i><@spring.message code='student.course.detail.test.details'/></a>
                                 </#if>
                             <#else>
-                                <h3 class="test-title"><@spring.message code='student.course.detail.test.final'/>: ${testInstance.test.title}</h3>
+                                <h3 class="test-title"><@spring.message code='student.course.detail.test.final'/> ${testInstance.test.title}</h3>
                                 <#if isAvailableTime>
                                     <p class="test-info"><@spring.message code='student.course.detail.test.available.from'/> <span class="fw-bold">${startDate} ${testInstance.startTime}</span> <@spring.message code='student.course.detail.test.available.to'/> <span class="fw-bold">${endDate} ${testInstance.endTime}</span></p>
                                     <p class="test-info text-danger"><@spring.message code='student.course.detail.test.warning'/></p>

@@ -107,6 +107,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
+    public List<CourseEnrollment> getAllEnrollmentsByStudentId(Integer studentId) {
+        return enrollmentRepository.findAllByStudentId(studentId);
+    }
+
+    @Override
     public List<CourseEnrollmentCardDTO> getStudentCourses() {
         User user = userService.getAuthorizedUser();
         List<CourseEnrollment> enrollments = getStudentEnrollments(user.getId());

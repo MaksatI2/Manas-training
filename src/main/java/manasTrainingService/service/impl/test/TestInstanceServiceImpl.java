@@ -242,6 +242,11 @@ public class TestInstanceServiceImpl implements TestInstanceService {
         return testInstanceRepository.findByInstanceId(id);
     }
 
+        @Override
+        public Optional<TestInstance> getTestInstanceModelByCourseInstanceIdWithDetails(Integer id) {
+                return testInstanceRepository.findByInstanceIdWithDetails(id);
+        }
+
     @Transactional
     @Override
     public void changeTestInstanceTime(TestInstanceDto testInstanceDto){

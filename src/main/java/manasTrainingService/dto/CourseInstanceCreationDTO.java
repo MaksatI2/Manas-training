@@ -32,7 +32,7 @@ public class CourseInstanceCreationDTO {
     private String title;
 
     @NotNull(message = "{CourseInstanceCreationDTO.startDate.NotNull}")
-    @Future(message = "{CourseInstanceCreationDTO.startDate.Future}")
+    // @Future(message = "{CourseInstanceCreationDTO.startDate.Future}")
     private LocalDate startDate;
 
     @NotNull(message = "{CourseInstanceCreationDTO.endDate.NotNull}")

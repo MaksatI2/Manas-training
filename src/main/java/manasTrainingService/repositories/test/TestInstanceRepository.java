@@ -13,4 +13,13 @@ public interface TestInstanceRepository extends JpaRepository<TestInstance, Inte
 
     Optional<TestInstance> findByInstanceId(Integer instanceId);
     Boolean existsByInstanceId(Integer instanceId);
+
+    @Query("""
+            SELECT ti FROM TestInstance ti
+            JOIN FETCH ti.instance i
+            JOIN FETCH ti.test t
+            JOIN FETCH t.course c
+            WHERE i.id = :instanceId
+            """)
+    Optional<TestInstance> findByInstanceIdWithDetails(@Param("instanceId") Integer instanceId);
 }

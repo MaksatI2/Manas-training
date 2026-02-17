@@ -153,11 +153,16 @@ public class TestController {
             );
         }
 
-        if (testResultService.userHasTestAttempt(testDto.getId())) {
-            throw new NoAccessException(
-                    messageSource.getMessage("test.already.passed", null, LocaleContextHolder.getLocale())
+        // Check attempt count (max 2 attempts)
+        int attemptCount = testResultService.countUserTestAttempts(testInstanceId);
+        if (attemptCount >= 2) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("test.max.attempts.reached", null, LocaleContextHolder.getLocale())
             );
+            return "redirect:/student/my-tests";
         }
+
         if(testInstanceService.isValidAccessTime(testInstanceId)){
             CourseInstanceDTO courseInstanceDTO = courseInstanceService.getCourseInstanceById(testInstanceDto.getCourseInstance().getId());
             model.addAttribute("result", new TestAnswerDto());
@@ -166,6 +171,7 @@ public class TestController {
             model.addAttribute("passing_start", LocalDateTime.now());
             model.addAttribute("testInstanceId", testInstanceDto.getId());
             model.addAttribute("courseTitle", courseService.getCourseById(testDto.getId()).getTitle());
+            model.addAttribute("attemptNumber", attemptCount + 1);
             return "tests/test_passing";
         } else {
             redirectAttributes.addFlashAttribute(
@@ -211,11 +217,14 @@ public class TestController {
 
     @PostMapping("checking")
     public String checkTestResults(@Valid @ModelAttribute("result") TestAnswerDto result, BindingResult bindingResult, Model model) {
-        if (testResultService.userHasTestAttempt(result.getTestInstanceId())) {
+        // Check attempt count (max 2 attempts)
+        int attemptCount = testResultService.countUserTestAttempts(result.getTestInstanceId());
+        if (attemptCount >= 2) {
             throw new NoAccessException(
-                    messageSource.getMessage("test.already.passed", null, LocaleContextHolder.getLocale())
+                    messageSource.getMessage("test.max.attempts.reached", null, LocaleContextHolder.getLocale())
             );
         }
+
         TestInstanceDto testInstanceDto = testInstanceService.getTestInstanceById(result.getTestInstanceId());
         TestDto test = testService.getTestById(result.getTestId());
         test.setQuestions(questionService.getQuestionsByAnswerQuestionId(result));
@@ -226,6 +235,7 @@ public class TestController {
             model.addAttribute("passing_start", LocalDateTime.now());
             model.addAttribute("testInstanceId", testInstanceDto.getId());
             model.addAttribute("courseTitle", courseService.getCourseById(test.getId()).getTitle());
+            model.addAttribute("attemptNumber", attemptCount + 1);
             return "tests/test_passing";
         }
         model.addAttribute("results", testService.checkTestResult(result));
@@ -247,6 +257,14 @@ public class TestController {
                     messageSource.getMessage("error.test.not.exist", null, LocaleContextHolder.getLocale())
             );
         }
+        
+        // Only allow viewing results if student has passed
+        if (!testResultService.hasPassedAttempt(testInstanceId)) {
+            throw new NoAccessException(
+                    messageSource.getMessage("test.result.access.denied", null, LocaleContextHolder.getLocale())
+            );
+        }
+        
         TestResultDto testResultDto = testResultService.getResultsByTestInstanceIdAndStudentId(testInstanceId);
         model.addAttribute("test", testService.getTestByIdForTestResult(testInstanceDto.getId()));
         model.addAttribute("result", testResultDto);
