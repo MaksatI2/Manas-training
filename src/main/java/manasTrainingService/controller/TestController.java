@@ -170,7 +170,7 @@ public class TestController {
             model.addAttribute("test", testDto);
             model.addAttribute("passing_start", LocalDateTime.now());
             model.addAttribute("testInstanceId", testInstanceDto.getId());
-            model.addAttribute("courseTitle", courseService.getCourseById(testDto.getId()).getTitle());
+            model.addAttribute("courseTitle", courseInstanceDTO.getCourseTitle());
             model.addAttribute("attemptNumber", attemptCount + 1);
             return "tests/test_passing";
         } else {
