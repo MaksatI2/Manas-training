@@ -107,6 +107,7 @@
                 position: absolute;
                 user-select: none;
                 pointer-events: none;
+                z-index: 2;
             }
             .stamp {
                 opacity: .92;
@@ -167,15 +168,15 @@
 
             /* печать */
             .stamp {
-                left: 205mm;
+                left: 170mm;
                 top: 140mm;
                 width: 46mm;
             }
 
             /* подпись */
             .sign {
-                left: 155mm;
-                top: 165mm;
+                left: 167mm;
+                top: 147mm;
                 width: 55mm;
             }
 
@@ -233,8 +234,8 @@
             </div>
 
             <!-- 3) Печать / подпись (если нет — можешь удалить) -->
-<#--            <img class="stamp" src="/static/images/stamps/manas-stamp.png" alt="stamp"/>-->
-<#--            <img class="sign" src="/static/images/signs/director-sign.png" alt="signature"/>-->
+            <img class="stamp" src="/static/images/stamp.png" alt="stamp"/>
+            <img class="sign" src="/static/images/sign.png" alt="signature"/>
 
         </div>
     </div>
