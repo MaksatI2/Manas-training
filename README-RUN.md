@@ -13,7 +13,6 @@
 2. **Полный Docker-стек**
    - PostgreSQL + приложение + Nginx + Jitsi контейнеры,
    - максимально близко к production.
-
 ---
 
 ## 2) Пререквизиты
@@ -30,7 +29,6 @@ java -version
 docker --version
 docker compose version
 ```
-
 ---
 
 ## 3) Запуск для локальной разработки (рекомендуется для coding)
