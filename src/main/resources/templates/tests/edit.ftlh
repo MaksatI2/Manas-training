@@ -122,7 +122,7 @@
                                 </div>
                                 <div class="mb-3" id="createOption-questionId-${question?index}">
                                     <button type="button" class="btn btn-primary-custom"
-                                            onclick="createOption(${question?index}, ${question.id})"
+                                            onclick="createOption(${question?index}, ${question.id!'null'})"
                                             id="add-options-button-question-${question?index}">
                                         <@spring.message code="test.final.edit.option.add"/>
                                     </button>
